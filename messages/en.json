@@ -1,0 +1,14 @@
+{
+  "Index": {
+    "title": "Welcome to SkyLearners",
+    "subtitle": "Get all your academic content here. The ultimate learning platform for your success.",
+    "getStarted": "Get Started",
+    "courses": "Courses"
+  },
+  "Navigation": {
+    "home": "Home",
+    "courses": "Courses",
+    "dashboard": "Dashboard",
+    "login": "Login"
+  }
+}

@@ -29,14 +29,21 @@ export default function CoursesListPage() {
       try {
         const q = query(
           collection(db, 'courses'),
-          where('teacherId', '==', user.uid),
-          orderBy('createdAt', 'desc')
+          where('teacherId', '==', user.uid)
         );
         const querySnapshot = await getDocs(q);
         const fetchedCourses: Course[] = [];
         querySnapshot.forEach((doc) => {
           fetchedCourses.push({ id: doc.id, ...doc.data() } as Course);
         });
+        
+        // Sort in memory to avoid needing a composite index in Firestore immediately
+        fetchedCourses.sort((a, b) => {
+          const dateA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+          const dateB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+          return dateB - dateA;
+        });
+
         setCourses(fetchedCourses);
       } catch (error) {
         console.error('Error fetching courses:', error);

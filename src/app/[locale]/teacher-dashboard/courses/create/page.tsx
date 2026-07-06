@@ -19,6 +19,7 @@ export default function CreateCoursePage() {
   const [category, setCategory] = useState(''); // Education Level
   const [eduClass, setEduClass] = useState('');
   const [department, setDepartment] = useState('');
+  const [year, setYear] = useState('');
   const [coachingName, setCoachingName] = useState('');
   const [price, setPrice] = useState('');
   const [thumbnail, setThumbnail] = useState<File | null>(null);
@@ -58,6 +59,7 @@ export default function CreateCoursePage() {
         category, // Used as Education Level
         eduClass: (category === 'primary' || category === 'high_school' || category === 'intermediate') ? eduClass : '',
         department: (category === 'intermediate' || category === 'honours' || category === 'masters') ? department : '',
+        year: (category === 'honours' || category === 'masters') ? year : '',
         coachingName,
         price: Number(price),
         thumbnailUrl,
@@ -132,6 +134,7 @@ export default function CreateCoursePage() {
                     setCategory(e.target.value);
                     setEduClass('');
                     setDepartment('');
+                    setYear('');
                   }}
                   className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all appearance-none"
                   required
@@ -199,16 +202,29 @@ export default function CreateCoursePage() {
             )}
 
             {(category === 'honours' || category === 'masters') && (
-              <div>
-                <label className="block text-sm font-medium mb-1 text-foreground/80">Department / Subject <span className="text-red-500">*</span></label>
-                <input 
-                  type="text" 
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  placeholder="e.g. Physics"
-                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 transition-all"
-                  required
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-foreground/80">Department / Subject <span className="text-red-500">*</span></label>
+                  <input 
+                    type="text" 
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    placeholder="e.g. Physics"
+                    className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 transition-all"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-foreground/80">Year / Semester <span className="text-red-500">*</span></label>
+                  <input 
+                    type="text" 
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                    placeholder="e.g. 1st Year"
+                    className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 transition-all"
+                    required
+                  />
+                </div>
               </div>
             )}
 

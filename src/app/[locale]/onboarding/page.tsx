@@ -78,12 +78,14 @@ export default function OnboardingPage() {
       }
 
       // Add a timeout to prevent hanging forever if Firestore has connectivity issues
+      let timeoutId: NodeJS.Timeout;
       const setDocPromise = setDoc(doc(db, "users", user.uid), dataToSave, { merge: true });
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("Request timed out. Please check your internet connection.")), 15000)
-      );
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error("Request timed out. Please check your internet connection or Firebase setup.")), 15000);
+      });
       
       await Promise.race([setDocPromise, timeoutPromise]);
+      clearTimeout(timeoutId!);
       
       setIsSuccess(true);
       // Not calling refreshUserData here because it would trigger the useEffect redirect

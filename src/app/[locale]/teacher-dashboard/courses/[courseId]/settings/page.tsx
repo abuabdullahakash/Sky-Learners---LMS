@@ -115,6 +115,7 @@ export default function CourseSettingsPage() {
               value={course.subtitle || ''} onChange={e => setCourse({...course, subtitle: e.target.value})} rows={3}
               className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors custom-scrollbar"
             />
+          </div>
           <div>
             <label className="block text-sm font-medium mb-1">Detailed Description (HTML/Text)</label>
             <textarea 

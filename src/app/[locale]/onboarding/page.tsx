@@ -114,18 +114,29 @@ export default function OnboardingPage() {
             <p className="text-foreground/70 mb-8">আপনার প্রোফাইল সফলভাবে তৈরি হয়েছে।</p>
             
             <div className="flex flex-col gap-4 mt-4">
-              <button 
-                onClick={() => window.location.href = '/courses'}
-                className="w-full py-3 px-4 bg-primary text-primary-foreground font-bold rounded-xl hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all"
-              >
-                View Your Available Courses
-              </button>
-              <button 
-                onClick={() => window.location.href = role === 'teacher' ? '/teacher-dashboard' : '/dashboard'}
-                className="w-full py-3 px-4 bg-foreground/10 text-foreground font-bold rounded-xl hover:bg-foreground/20 transition-all"
-              >
-                Go to Dashboard
-              </button>
+              {role === 'student' ? (
+                <>
+                  <button 
+                    onClick={() => window.location.href = '/courses'}
+                    className="w-full py-3 px-4 bg-primary text-primary-foreground font-bold rounded-xl hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all"
+                  >
+                    Browse Available Courses
+                  </button>
+                  <button 
+                    onClick={() => window.location.href = '/dashboard'}
+                    className="w-full py-3 px-4 bg-foreground/10 text-foreground font-bold rounded-xl hover:bg-foreground/20 transition-all"
+                  >
+                    Go to Dashboard
+                  </button>
+                </>
+              ) : (
+                <button 
+                  onClick={() => window.location.href = '/teacher-dashboard'}
+                  className="w-full py-3 px-4 bg-orange-500 text-white font-bold rounded-xl hover:shadow-[0_0_15px_rgba(249,115,22,0.4)] transition-all"
+                >
+                  Go to Teacher Dashboard
+                </button>
+              )}
             </div>
           </div>
         ) : !role ? (

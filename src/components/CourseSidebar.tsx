@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, usePathname } from '@/i18n/routing';
-import { LayoutDashboard, BookOpen, Video, FileText, CheckSquare, MessageSquare, Settings, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Video, FileText, CheckSquare, MessageSquare, Settings, ArrowLeft, Users } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
@@ -36,6 +36,7 @@ export default function CourseSidebar() {
     { name: 'Live Classes', href: `/teacher-dashboard/courses/${courseId}/live-classes`, icon: Video },
     { name: 'Resources', href: `/teacher-dashboard/courses/${courseId}/resources`, icon: FileText },
     { name: 'Exams & Quizzes', href: `/teacher-dashboard/courses/${courseId}/exams`, icon: CheckSquare },
+    { name: 'Instructors', href: `/teacher-dashboard/courses/${courseId}/instructors`, icon: Users },
     { name: 'Community', href: `/teacher-dashboard/courses/${courseId}/community`, icon: MessageSquare },
     { name: 'Settings', href: `/teacher-dashboard/courses/${courseId}/settings`, icon: Settings },
   ];

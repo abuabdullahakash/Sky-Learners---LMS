@@ -8,7 +8,7 @@ import { useRouter } from '@/i18n/routing';
 import { GraduationCap, Presentation, CheckCircle2 } from 'lucide-react';
 
 export default function OnboardingPage() {
-  const { user, userData, refreshUserData } = useAuth();
+  const { user, userData, refreshUserData, loading } = useAuth();
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState<'student' | 'teacher' | null>(null);
   const role = selectedRole || (userData?.role as 'student' | 'teacher' | null);
@@ -31,10 +31,14 @@ export default function OnboardingPage() {
   const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
-    if (userData && userData.onboardingComplete) {
-      router.push(userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard');
+    if (!loading) {
+      if (!user) {
+        router.push('/login');
+      } else if (userData && userData.onboardingComplete) {
+        router.push(userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard');
+      }
     }
-  }, [userData, router]);
+  }, [user, userData, loading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,9 +57,15 @@ export default function OnboardingPage() {
         dataToSave.gender = gender;
         dataToSave.eduLevel = eduLevel;
         dataToSave.institution = institution;
-        if (eduClass) dataToSave.class = eduClass;
-        if (department) dataToSave.department = department;
-        if (year) dataToSave.year = year;
+        if (eduLevel === 'primary' || eduLevel === 'high_school') {
+          if (eduClass) dataToSave.class = eduClass;
+        } else if (eduLevel === 'intermediate') {
+          if (eduClass) dataToSave.class = eduClass;
+          if (department) dataToSave.department = department;
+        } else if (eduLevel === 'honours' || eduLevel === 'masters') {
+          if (department) dataToSave.department = department;
+          if (year) dataToSave.year = year;
+        }
       } else {
         dataToSave.experience = experience;
         dataToSave.subject = subject;
@@ -72,7 +82,7 @@ export default function OnboardingPage() {
     }
   };
 
-  if (!user || (userData && userData.onboardingComplete)) {
+  if (loading || !user || (userData && userData.onboardingComplete)) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 

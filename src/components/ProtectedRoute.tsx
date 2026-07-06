@@ -4,15 +4,24 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from '@/i18n/routing';
 import { useEffect } from 'react';
 
-export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+export default function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: string[] }) {
+  const { user, userData, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.replace('/login');
+    if (!loading) {
+      if (!user) {
+        router.replace('/login');
+      } else if (userData && allowedRoles && !allowedRoles.includes(userData.role as string)) {
+        // Redirect to appropriate page based on role and onboarding status
+        if (!userData.onboardingComplete) {
+          router.replace('/onboarding');
+        } else {
+          router.replace(userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard');
+        }
+      }
     }
-  }, [user, loading, router]);
+  }, [user, userData, loading, allowedRoles, router]);
 
   if (loading) {
     return (
@@ -23,6 +32,10 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   }
 
   if (!user) {
+    return null; // Will redirect in useEffect
+  }
+
+  if (userData && allowedRoles && !allowedRoles.includes(userData.role as string)) {
     return null; // Will redirect in useEffect
   }
 

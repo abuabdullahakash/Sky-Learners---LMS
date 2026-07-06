@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithP
 import { auth, db } from '@/lib/firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { Link, useRouter } from '@/i18n/routing';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import gsap from 'gsap';
 import { CheckCircle2, GraduationCap, Presentation, Eye, EyeOff } from 'lucide-react';
@@ -14,8 +15,11 @@ export default function RegisterPage() {
   const t = useTranslations('Auth.register');
   const tLogin = useTranslations('Auth.login');
   
-  const [step, setStep] = useState<1 | 2>(1);
-  const [role, setRole] = useState<'student' | 'teacher' | null>(null);
+  const searchParams = useSearchParams();
+  const queryRole = searchParams.get('role') as 'student' | 'teacher' | null;
+  
+  const [step, setStep] = useState<1 | 2>((queryRole === 'student' || queryRole === 'teacher') ? 2 : 1);
+  const [role, setRole] = useState<'student' | 'teacher' | null>((queryRole === 'student' || queryRole === 'teacher') ? queryRole : null);
   
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -61,36 +65,13 @@ export default function RegisterPage() {
         createdAt: new Date().toISOString()
       });
 
-      await refreshUserData();
       setIsSuccess(true);
       setTimeout(() => {
         router.push('/onboarding');
-      }, 1500);
+      }, 3000);
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
-        try {
-          const loginCredential = await signInWithEmailAndPassword(auth, email, password);
-          const userDocRef = doc(db, "users", loginCredential.user.uid);
-          const userDoc = await getDoc(userDocRef);
-          
-          let redirectUrl = '/onboarding';
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            if (!userData.onboardingComplete) {
-              await setDoc(userDocRef, { role: role }, { merge: true });
-            } else {
-              redirectUrl = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
-            }
-          }
-          
-          await refreshUserData();
-          setIsSuccess(true);
-          setTimeout(() => {
-            router.push(redirectUrl);
-          }, 1000);
-        } catch (loginErr: any) {
-          setError('এই ইমেইল দিয়ে আগে থেকেই একটি অ্যাকাউন্ট আছে। সঠিক পাসওয়ার্ড দিন।');
-        }
+        setError('এই ইমেইল দিয়ে আগে থেকেই একটি অ্যাকাউন্ট আছে। অনুগ্রহ করে লগইন করুন।');
       } else {
         setError(err.message || 'Failed to register');
       }
@@ -126,7 +107,6 @@ export default function RegisterPage() {
         }
       }
 
-      await refreshUserData();
       setIsSuccess(true);
       setTimeout(() => {
         router.push(redirectUrl);

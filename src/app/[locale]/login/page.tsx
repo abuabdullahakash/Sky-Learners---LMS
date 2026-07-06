@@ -16,6 +16,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
   
   const formRef = useRef<HTMLDivElement>(null);
@@ -29,38 +31,70 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError('');
     try {
       // Set persistence based on remember me checkbox
       const persistenceType = rememberMe ? browserLocalPersistence : browserSessionPersistence;
       await setPersistence(auth, persistenceType);
       
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push('/dashboard');
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Check onboarding and role
+      const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
+      
+      setIsSuccess(true);
+      setTimeout(() => {
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          if (!userData.onboardingComplete) {
+            window.location.href = '/onboarding';
+          } else {
+            window.location.href = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
+          }
+        } else {
+          window.location.href = '/onboarding';
+        }
+      }, 1000);
     } catch (err: any) {
       setError('Invalid email or password');
+    } finally {
+      if (!isSuccess) setIsLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
     const provider = new GoogleAuthProvider();
+    setIsLoading(true);
+    setError('');
     try {
       const userCredential = await signInWithPopup(auth, provider);
       
       const userDocRef = doc(db, "users", userCredential.user.uid);
       const userDoc = await getDoc(userDocRef);
       
-      if (!userDoc.exists()) {
-        await setDoc(userDocRef, {
-          name: userCredential.user.displayName,
-          email: userCredential.user.email,
-          role: "student",
-          createdAt: new Date().toISOString()
-        });
-      }
-
-      router.push('/dashboard');
+      setIsSuccess(true);
+      setTimeout(async () => {
+        if (!userDoc.exists()) {
+          await setDoc(userDocRef, {
+            name: userCredential.user.displayName,
+            email: userCredential.user.email,
+            onboardingComplete: false,
+            createdAt: new Date().toISOString()
+          });
+          window.location.href = '/onboarding';
+        } else {
+          const userData = userDoc.data();
+          if (!userData.onboardingComplete) {
+            window.location.href = '/onboarding';
+          } else {
+            window.location.href = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
+          }
+        }
+      }, 1000);
     } catch (err: any) {
       setError(err.message || 'Failed to login with Google');
+      setIsLoading(false);
     }
   };
 
@@ -76,12 +110,18 @@ export default function LoginPage() {
         await setDoc(userDocRef, {
           name: userCredential.user.displayName,
           email: userCredential.user.email,
-          role: "student",
+          onboardingComplete: false,
           createdAt: new Date().toISOString()
         });
+        window.location.href = '/onboarding';
+      } else {
+        const userData = userDoc.data();
+        if (!userData.onboardingComplete) {
+          window.location.href = '/onboarding';
+        } else {
+          window.location.href = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
+        }
       }
-
-      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Failed to login with Facebook');
     }
@@ -90,7 +130,23 @@ export default function LoginPage() {
   return (
     <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-10">
       <div ref={formRef} className="max-w-md w-full bg-foreground/5 p-8 rounded-2xl border border-foreground/10 backdrop-blur-md">
-        <h2 className="text-3xl font-bold text-center mb-6">{t('title')}</h2>
+        
+        {isSuccess ? (
+          <div className="text-center py-8">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center animate-bounce">
+                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold mb-4 text-green-500">Login Successful!</h2>
+            <p className="text-foreground/70 mb-6">Redirecting you to your account...</p>
+            <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          </div>
+        ) : (
+          <>
+            <h2 className="text-3xl font-bold text-center mb-6">{t('title')}</h2>
         
         {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
         
@@ -177,9 +233,8 @@ export default function LoginPage() {
           </button>
         </div>
 
-        <p className="text-center mt-6 text-foreground/70 text-sm">
-          {t('noAccount')} <Link href="/register" className="text-primary hover:underline font-medium">{t('registerLink')}</Link>
-        </p>
+          </>
+        )}
       </div>
     </div>
   );

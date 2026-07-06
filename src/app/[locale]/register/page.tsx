@@ -1,17 +1,21 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, updateProfile } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { Link, useRouter } from '@/i18n/routing';
 import gsap from 'gsap';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, GraduationCap, Presentation, Eye, EyeOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { Eye, EyeOff } from 'lucide-react';
 
 export default function RegisterPage() {
   const t = useTranslations('Auth.register');
+  const tLogin = useTranslations('Auth.login');
+  
+  const [step, setStep] = useState<1 | 2>(1);
+  const [role, setRole] = useState<'student' | 'teacher' | null>(null);
+  
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,84 +27,125 @@ export default function RegisterPage() {
   const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    gsap.fromTo(formRef.current, 
-      { opacity: 0, y: 30 }, 
-      { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }
-    );
-  }, []);
+    if (formRef.current) {
+      gsap.fromTo(formRef.current, 
+        { opacity: 0, y: 30 }, 
+        { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }
+      );
+    }
+  }, [step]);
+
+  const handleRoleSelection = (selectedRole: 'student' | 'teacher') => {
+    setRole(selectedRole);
+    setStep(2);
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!role) return;
+    
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
       // Update profile
       await updateProfile(userCredential.user, { displayName: name });
       
-      // Save user to Firestore
+      // Save basic user info to Firestore
       await setDoc(doc(db, "users", userCredential.user.uid), {
         name,
         email,
-        role: "student", // Default role
+        role: role,
+        onboardingComplete: false,
         createdAt: new Date().toISOString()
       });
 
       setIsSuccess(true);
       setTimeout(() => {
-        router.push('/dashboard');
-      }, 3000);
+        window.location.href = '/onboarding';
+      }, 2000);
     } catch (err: any) {
-      setError(err.message || 'Failed to register');
+      if (err.code === 'auth/email-already-in-use') {
+        try {
+          const loginCredential = await signInWithEmailAndPassword(auth, email, password);
+          // Just let the auth context's onAuthStateChanged handle the fetch and update state.
+          // Wait briefly for auth context to update before redirecting
+          setTimeout(async () => {
+             const userDoc = await getDoc(doc(db, "users", loginCredential.user.uid));
+             
+              if (userDoc.exists()) {
+               const userData = userDoc.data();
+               if (!userData.onboardingComplete) {
+                 // Force update the role they just selected before going to onboarding
+                 await setDoc(doc(db, "users", loginCredential.user.uid), { role: role }, { merge: true });
+                 setIsSuccess(true);
+                 setTimeout(() => window.location.href = '/onboarding', 1000); // Use hard reload to avoid context stale state
+               } else {
+                 setIsSuccess(true);
+                 setTimeout(() => {
+                   window.location.href = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
+                 }, 1000);
+               }
+             } else {
+               setIsSuccess(true);
+               setTimeout(() => window.location.href = '/onboarding', 1000);
+             }
+          }, 1000);
+        } catch (loginErr: any) {
+          setError('এই ইমেইল দিয়ে আগে থেকেই একটি অ্যাকাউন্ট আছে। সঠিক পাসওয়ার্ড দিন।');
+        }
+      } else {
+        setError(err.message || 'Failed to register');
+      }
     }
   };
 
-  const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider();
+  const handleSocialLogin = async (provider: GoogleAuthProvider | FacebookAuthProvider) => {
+    if (!role) return;
     try {
       const userCredential = await signInWithPopup(auth, provider);
       
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        name: userCredential.user.displayName,
-        email: userCredential.user.email,
-        role: "student", 
-        createdAt: new Date().toISOString()
-      }, { merge: true });
-
-      setIsSuccess(true);
-      setTimeout(() => {
-        router.push('/dashboard');
-      }, 3000);
-    } catch (err: any) {
-      setError(err.message || 'Failed to register with Google');
-    }
-  };
-
-  const handleFacebookLogin = async () => {
-    const provider = new FacebookAuthProvider();
-    try {
-      const userCredential = await signInWithPopup(auth, provider);
+      const userDocRef = doc(db, "users", userCredential.user.uid);
+      const userDoc = await getDoc(userDocRef);
       
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        name: userCredential.user.displayName,
-        email: userCredential.user.email,
-        role: "student", 
-        createdAt: new Date().toISOString()
-      }, { merge: true });
-
-      setIsSuccess(true);
-      setTimeout(() => {
-        router.push('/dashboard');
-      }, 3000);
+      if (!userDoc.exists()) {
+        // First time signup
+        await setDoc(userDocRef, {
+          name: userCredential.user.displayName,
+          email: userCredential.user.email,
+          role: role, 
+          onboardingComplete: false,
+          createdAt: new Date().toISOString()
+        });
+        setIsSuccess(true);
+        setTimeout(() => {
+          window.location.href = '/onboarding';
+        }, 2000);
+      } else {
+        // Already registered, but they are trying to register as a specific role now.
+        // Let's update their role if they haven't completed onboarding.
+        const userData = userDoc.data();
+        if (!userData.onboardingComplete) {
+          await setDoc(userDocRef, { role: role }, { merge: true });
+          setIsSuccess(true);
+          setTimeout(() => {
+            window.location.href = '/onboarding';
+          }, 1000);
+        } else {
+          setIsSuccess(true);
+          setTimeout(() => {
+            window.location.href = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
+          }, 1000);
+        }
+      }
     } catch (err: any) {
-      setError(err.message || 'Failed to register with Facebook');
+      setError(err.message || 'Failed to register with social provider');
     }
   };
-
-  const tLogin = useTranslations('Auth.login');
 
   return (
     <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-10">
       <div ref={formRef} className="max-w-md w-full bg-foreground/5 p-8 rounded-2xl border border-foreground/10 backdrop-blur-md">
+        
         {isSuccess ? (
           <div className="text-center py-8">
             <div className="flex justify-center mb-4">
@@ -108,13 +153,56 @@ export default function RegisterPage() {
             </div>
             <h2 className="text-2xl font-bold mb-4 text-green-500">{t('successTitle')}</h2>
             <p className="text-foreground/70 mb-6 leading-relaxed">
-              {t('successMessage')}
+              Account created successfully! Redirecting you to complete your profile...
             </p>
             <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
           </div>
+        ) : step === 1 ? (
+          <div className="animate-in fade-in zoom-in-95 duration-300">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold mb-2">Join Sky Learners</h2>
+              <p className="text-foreground/60">How would you like to use our platform?</p>
+            </div>
+            
+            <div className="space-y-4">
+              <button 
+                onClick={() => handleRoleSelection('student')}
+                className="w-full p-6 flex items-center gap-6 bg-foreground/5 hover:bg-primary/10 border border-foreground/10 hover:border-primary/50 rounded-2xl transition-all group"
+              >
+                <div className="w-16 h-16 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <GraduationCap size={32} />
+                </div>
+                <div className="text-left flex-1">
+                  <h3 className="text-xl font-bold mb-1">I am a Student</h3>
+                  <p className="text-sm text-foreground/60">I want to learn and access courses</p>
+                </div>
+              </button>
+              
+              <button 
+                onClick={() => handleRoleSelection('teacher')}
+                className="w-full p-6 flex items-center gap-6 bg-foreground/5 hover:bg-orange-500/10 border border-foreground/10 hover:border-orange-500/50 rounded-2xl transition-all group"
+              >
+                <div className="w-16 h-16 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Presentation size={32} />
+                </div>
+                <div className="text-left flex-1">
+                  <h3 className="text-xl font-bold mb-1">I am a Teacher</h3>
+                  <p className="text-sm text-foreground/60">I want to teach and create courses</p>
+                </div>
+              </button>
+            </div>
+
+          </div>
         ) : (
-          <>
-            <h2 className="text-3xl font-bold text-center mb-6">{t('title')}</h2>
+          <div className="animate-in slide-in-from-right-8 duration-300">
+            <div className="flex items-center gap-3 mb-6">
+              <button onClick={() => setStep(1)} className="text-foreground/50 hover:text-foreground">
+                ← Back
+              </button>
+              <h2 className="text-2xl font-bold flex-1 text-center">
+                Sign up as {role === 'student' ? 'Student' : 'Teacher'}
+              </h2>
+            </div>
             
             {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
             
@@ -125,7 +213,7 @@ export default function RegisterPage() {
                   type="text" 
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
+                  className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
                   required
                 />
               </div>
@@ -135,7 +223,7 @@ export default function RegisterPage() {
                   type="email" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
+                  className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
                   required
                 />
               </div>
@@ -146,7 +234,7 @@ export default function RegisterPage() {
                     type={showPassword ? "text" : "password"} 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-2 pr-10 rounded-lg bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
+                    className="w-full px-4 py-3 pr-10 rounded-xl bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
                     required
                   />
                   <button
@@ -154,12 +242,12 @@ export default function RegisterPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground/80 transition-colors"
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
               </div>
               
-              <button type="submit" className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors">
+              <button type="submit" className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-all hover:-translate-y-0.5 shadow-lg shadow-primary/20 hover:shadow-primary/40">
                 {t('submitButton')}
               </button>
             </form>
@@ -171,7 +259,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-3">
-              <button onClick={handleGoogleLogin} className="w-full py-3 bg-background border border-foreground/20 font-bold rounded-lg hover:bg-foreground/5 transition-colors flex items-center justify-center gap-2">
+              <button onClick={() => handleSocialLogin(new GoogleAuthProvider())} className="w-full py-3 bg-background border border-foreground/20 font-bold rounded-xl hover:bg-foreground/5 transition-colors flex items-center justify-center gap-2">
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                   <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -181,18 +269,14 @@ export default function RegisterPage() {
                 {tLogin('continueGoogle')}
               </button>
 
-              <button onClick={handleFacebookLogin} className="w-full py-3 bg-[#1877F2] text-white font-bold rounded-lg hover:bg-[#1877F2]/90 transition-colors flex items-center justify-center gap-2">
+              <button onClick={() => handleSocialLogin(new FacebookAuthProvider())} className="w-full py-3 bg-[#1877F2] text-white font-bold rounded-xl hover:bg-[#1877F2]/90 transition-colors flex items-center justify-center gap-2">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                 </svg>
                 {tLogin('continueFacebook')}
               </button>
             </div>
-
-            <p className="text-center mt-6 text-foreground/70 text-sm">
-              {t('alreadyAccount')} <Link href="/login" className="text-primary hover:underline font-medium">{t('loginLink')}</Link>
-            </p>
-          </>
+          </div>
         )}
       </div>
     </div>

@@ -1,7 +1,7 @@
 import ProtectedRoute from '@/components/ProtectedRoute';
-import Sidebar from '@/components/Sidebar';
+import TeacherSidebar from '@/components/TeacherSidebar';
 
-export default function DashboardLayout({
+export default function TeacherDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -13,7 +13,7 @@ export default function DashboardLayout({
           
           {/* Sidebar */}
           <div className="hidden md:block w-64 flex-shrink-0">
-            <Sidebar />
+            <TeacherSidebar />
           </div>
 
           {/* Main Content */}

@@ -2,31 +2,69 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged, signOut, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
+
+export interface UserData {
+  role?: 'student' | 'teacher';
+  name?: string;
+  email?: string;
+  [key: string]: any;
+}
 
 interface AuthContextType {
   user: User | null;
+  userData: UserData | null;
   loading: boolean;
   logout: () => Promise<void>;
   setUpRecaptcha: (number: string) => Promise<ConfirmationResult>;
+  refreshUserData: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  userData: null,
   loading: true,
   logout: async () => {},
   setUpRecaptcha: async () => { throw new Error('Not implemented'); },
+  refreshUserData: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchUserData = async (uid: string) => {
+    try {
+      const userDoc = await getDoc(doc(db, "users", uid));
+      if (userDoc.exists()) {
+        setUserData(userDoc.data() as UserData);
+      } else {
+        setUserData(null);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setUserData(null);
+    }
+  };
+
+  const refreshUserData = async () => {
+    if (user) {
+      await fetchUserData(user.uid);
+    }
+  };
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        await fetchUserData(currentUser.uid);
+      } else {
+        setUserData(null);
+      }
       setLoading(false);
     });
 
@@ -61,7 +99,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout, setUpRecaptcha }}>
+    <AuthContext.Provider value={{ user, userData, loading, logout, setUpRecaptcha, refreshUserData }}>
       {children}
     </AuthContext.Provider>
   );

@@ -2,13 +2,18 @@
 
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { User, Shield, Bell, CreditCard, Camera, CheckCircle2, XCircle } from 'lucide-react';
+import { User, Shield, Bell, CreditCard, Camera, CheckCircle2, XCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
+import { Link } from '@/i18n/routing';
 
 export default function SettingsPage() {
   const t = useTranslations('Dashboard.settings');
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'preferences' | 'billing'>('profile');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [eduLevel, setEduLevel] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const { user } = useAuth();
 
   const tabs = [
@@ -91,12 +96,15 @@ export default function SettingsPage() {
                 <h3 className="font-semibold text-lg border-b border-foreground/10 pb-2">{t('profile.personal')}</h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm text-foreground/70 mb-1">{t('profile.name')}</label>
+                    <div className="flex justify-between items-end mb-1">
+                      <label className="block text-sm text-foreground/70">{t('profile.name')}</label>
+                      <span className="text-xs text-foreground/50">{t('profile.nameHint')}</span>
+                    </div>
                     <input type="text" defaultValue={user?.displayName || ''} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                   </div>
                   <div>
                     <label className="block text-sm text-foreground/70 mb-1">{t('profile.phone')}</label>
-                    <input type="tel" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                    <input type="tel" placeholder="+880 1XXX-XXXXXX" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -106,9 +114,9 @@ export default function SettingsPage() {
                     <div>
                       <label className="block text-sm text-foreground/70 mb-1">{t('profile.gender')}</label>
                       <select className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
-                        <option>Male</option>
-                        <option>Female</option>
-                        <option>Other</option>
+                        <option className="bg-background text-foreground">Male</option>
+                        <option className="bg-background text-foreground">Female</option>
+                        <option className="bg-background text-foreground">Other</option>
                       </select>
                     </div>
                   </div>
@@ -119,20 +127,107 @@ export default function SettingsPage() {
               <div className="space-y-4">
                 <h3 className="font-semibold text-lg border-b border-foreground/10 pb-2">{t('profile.academic')}</h3>
                 <div className="space-y-3">
+                  {/* Field 1: Institution Name (Dynamic Label) */}
                   <div>
-                    <label className="block text-sm text-foreground/70 mb-1">{t('profile.institution')}</label>
-                    <input type="text" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                    <label className="block text-sm text-foreground/70 mb-1">
+                      {eduLevel === 'primary' || eduLevel === 'high_school' ? t('profile.schoolName') : 
+                       eduLevel === 'intermediate' ? t('profile.collegeName') : 
+                       eduLevel === 'honours' || eduLevel === 'masters' ? t('profile.uniName') : 
+                       t('profile.institutionName')}
+                    </label>
+                    <input type="text" placeholder="e.g. Dhaka College" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                   </div>
+
+                  {/* Field 2: Education Level */}
                   <div>
-                    <label className="block text-sm text-foreground/70 mb-1">{t('profile.class')}</label>
-                    <input type="text" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                    <label className="block text-sm text-foreground/70 mb-1">{t('profile.eduLevel')}</label>
+                    <select 
+                      value={eduLevel}
+                      onChange={(e) => setEduLevel(e.target.value)}
+                      className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none"
+                    >
+                      <option value="" disabled className="bg-background text-foreground">Select Education Level</option>
+                      <option value="primary" className="bg-background text-foreground">{t('profile.levels.primary')}</option>
+                      <option value="high_school" className="bg-background text-foreground">{t('profile.levels.high_school')}</option>
+                      <option value="intermediate" className="bg-background text-foreground">{t('profile.levels.intermediate')}</option>
+                      <option value="honours" className="bg-background text-foreground">{t('profile.levels.honours')}</option>
+                      <option value="masters" className="bg-background text-foreground">{t('profile.levels.masters')}</option>
+                    </select>
                   </div>
+
+                  {/* Dynamic Fields based on Education Level */}
+                  {(eduLevel === 'primary' || eduLevel === 'high_school') && (
+                    <div>
+                      <label className="block text-sm text-foreground/70 mb-1">{t('profile.class')}</label>
+                      <select className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
+                        <option value="" disabled className="bg-background text-foreground">Select Class</option>
+                        {eduLevel === 'primary' 
+                          ? Array.from({length: 5}, (_, i) => <option key={i+1} value={i+1} className="bg-background text-foreground">Class {i+1}</option>)
+                          : Array.from({length: 5}, (_, i) => <option key={i+6} value={i+6} className="bg-background text-foreground">Class {i+6}</option>)
+                        }
+                      </select>
+                    </div>
+                  )}
+
+                  {eduLevel === 'intermediate' && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm text-foreground/70 mb-1">{t('profile.class')}</label>
+                        <select className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
+                          <option value="" disabled className="bg-background text-foreground">Select Class</option>
+                          <option value="11" className="bg-background text-foreground">Class 11</option>
+                          <option value="12" className="bg-background text-foreground">Class 12</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm text-foreground/70 mb-1">{t('profile.group')}</label>
+                        <select className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
+                          <option value="" disabled className="bg-background text-foreground">Select Group</option>
+                          <option value="science" className="bg-background text-foreground">Science</option>
+                          <option value="arts" className="bg-background text-foreground">Arts (Humanities)</option>
+                          <option value="commerce" className="bg-background text-foreground">Commerce (Business Studies)</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
+
+                  {(eduLevel === 'honours' || eduLevel === 'masters') && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm text-foreground/70 mb-1">{t('profile.department')}</label>
+                        <select className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
+                          <option value="" disabled className="bg-background text-foreground">Select Department</option>
+                          <option value="physics" className="bg-background text-foreground">Physics</option>
+                          <option value="mathematics" className="bg-background text-foreground">Mathematics</option>
+                          <option value="chemistry" className="bg-background text-foreground">Chemistry</option>
+                          <option value="botany" className="bg-background text-foreground">Botany</option>
+                          <option value="zoology" className="bg-background text-foreground">Zoology</option>
+                          <option value="economy" className="bg-background text-foreground">Economy</option>
+                          <option value="other" className="bg-background text-foreground">Other</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm text-foreground/70 mb-1">{t('profile.year')}</label>
+                        <select className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
+                          <option value="" disabled className="bg-background text-foreground">Select Year</option>
+                          <option value="1st" className="bg-background text-foreground">1st Year</option>
+                          <option value="2nd" className="bg-background text-foreground">2nd Year</option>
+                          <option value="3rd" className="bg-background text-foreground">3rd Year</option>
+                          <option value="final" className="bg-background text-foreground">Final Year</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
+
                 </div>
               </div>
             </div>
 
             <div className="flex justify-end pt-4">
-              <button className="px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all hover:-translate-y-0.5">
+              <button 
+                onClick={() => setShowSuccessModal(true)}
+                className="px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all hover:-translate-y-0.5"
+              >
                 {t('profile.saveBtn')}
               </button>
             </div>
@@ -158,11 +253,39 @@ export default function SettingsPage() {
                   </div>
                   <div>
                     <label className="block text-sm text-foreground/70 mb-1">{t('security.newPassword')}</label>
-                    <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                    <div className="relative">
+                      <input 
+                        type={showNewPassword ? 'text' : 'password'} 
+                        placeholder="••••••••" 
+                        autoComplete="new-password"
+                        className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all pr-12" 
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground transition-colors"
+                      >
+                        {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm text-foreground/70 mb-1">{t('security.confirmPassword')}</label>
-                    <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                    <div className="relative">
+                      <input 
+                        type={showConfirmPassword ? 'text' : 'password'} 
+                        placeholder="••••••••" 
+                        autoComplete="new-password"
+                        className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all pr-12" 
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground transition-colors"
+                      >
+                        {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
                   </div>
                   <button className="w-full py-3 bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-xl font-bold shadow-lg shadow-secondary/20 transition-all hover:-translate-y-0.5 mt-2">
                     {t('security.updateBtn')}
@@ -276,6 +399,36 @@ export default function SettingsPage() {
         )}
 
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowSuccessModal(false)}></div>
+          <div className="relative bg-background border border-foreground/10 rounded-3xl p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-8 h-8" />
+            </div>
+            <h3 className="text-2xl font-bold text-center mb-2">অভিনন্দন! (Congratulations!)</h3>
+            <p className="text-foreground/60 text-center mb-8">Your profile has been successfully updated. We have tailored some courses based on your academic profile.</p>
+            
+            <div className="flex flex-col gap-3">
+              <Link 
+                href="/dashboard/recommended" 
+                className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-bold shadow-lg hover:shadow-primary/40 transition-all hover:-translate-y-0.5 text-center flex items-center justify-center gap-2"
+              >
+                View Available Courses
+              </Link>
+              <button 
+                onClick={() => setShowSuccessModal(false)}
+                className="w-full py-3 bg-foreground/5 hover:bg-foreground/10 text-foreground rounded-xl font-semibold transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

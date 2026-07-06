@@ -2,19 +2,20 @@
 
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
-import { LayoutDashboard, BookOpen, GraduationCap, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Video, Users, DollarSign, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
-export default function Sidebar() {
+export default function TeacherSidebar() {
   const t = useTranslations('Dashboard.sidebar');
   const pathname = usePathname();
   const { logout } = useAuth();
 
   const menuItems = [
-    { name: t('overview'), href: '/dashboard', icon: LayoutDashboard },
-    { name: t('courses'), href: '/dashboard/courses', icon: BookOpen },
-    { name: t('exams'), href: '/dashboard/exams', icon: GraduationCap },
-    { name: t('settings'), href: '/dashboard/settings', icon: Settings },
+    { name: t('overview') || 'Overview', href: '/teacher-dashboard', icon: LayoutDashboard },
+    { name: 'My Courses', href: '/teacher-dashboard/courses', icon: Video },
+    { name: 'Students', href: '/teacher-dashboard/students', icon: Users },
+    { name: 'Earnings', href: '/teacher-dashboard/earnings', icon: DollarSign },
+    { name: t('settings') || 'Settings', href: '/teacher-dashboard/settings', icon: Settings },
   ];
 
   return (
@@ -29,7 +30,7 @@ export default function Sidebar() {
               href={item.href}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 font-medium ${
                 isActive 
-                  ? 'bg-primary text-primary-foreground shadow-[0_0_15px_rgba(59,130,246,0.3)]' 
+                  ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.3)]' 
                   : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground'
               }`}
             >
@@ -46,7 +47,7 @@ export default function Sidebar() {
           className="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-red-500/10 text-red-500 transition-colors font-medium"
         >
           <LogOut className="w-5 h-5" />
-          {t('logout')}
+          {t('logout') || 'Logout'}
         </button>
       </div>
     </aside>

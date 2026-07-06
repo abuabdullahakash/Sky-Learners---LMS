@@ -172,6 +172,63 @@ export default function DashboardOverview() {
 
       </div>
 
+      {/* Ongoing Courses (Based on Profile) */}
+      <div className="space-y-6 pt-8 border-t border-foreground/10">
+        <div className="flex justify-between items-end">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Ongoing Courses</h2>
+            <p className="text-foreground/60 text-sm mt-1">Based on your academic profile</p>
+          </div>
+          <button className="text-primary text-sm font-semibold hover:underline flex items-center gap-1">
+            Browse more <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Course 1 */}
+          <div className="bg-foreground/5 rounded-3xl p-4 border border-foreground/10 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group cursor-pointer">
+            <div className="h-40 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl mb-4 relative overflow-hidden">
+              <div className="absolute inset-0 bg-black/10"></div>
+              <div className="absolute bottom-3 left-3 bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg text-white text-xs font-bold">Physics</div>
+            </div>
+            <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">Quantum Mechanics Fundamentals</h3>
+            <p className="text-foreground/60 text-sm mb-4 line-clamp-2">Understand the basic principles of quantum theory and wave-particle duality.</p>
+            <div className="flex justify-between items-center text-sm font-medium">
+              <span className="text-foreground/50">24 Lessons</span>
+              <span className="text-primary">Continue</span>
+            </div>
+          </div>
+
+          {/* Course 2 */}
+          <div className="bg-foreground/5 rounded-3xl p-4 border border-foreground/10 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group cursor-pointer">
+            <div className="h-40 bg-gradient-to-br from-green-500 to-emerald-400 rounded-2xl mb-4 relative overflow-hidden">
+              <div className="absolute inset-0 bg-black/10"></div>
+              <div className="absolute bottom-3 left-3 bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg text-white text-xs font-bold">Mathematics</div>
+            </div>
+            <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">Calculus II: Integration</h3>
+            <p className="text-foreground/60 text-sm mb-4 line-clamp-2">Master advanced integration techniques and their applications in physics.</p>
+            <div className="flex justify-between items-center text-sm font-medium">
+              <span className="text-foreground/50">18 Lessons</span>
+              <span className="text-primary">Continue</span>
+            </div>
+          </div>
+
+          {/* Course 3 */}
+          <div className="bg-foreground/5 rounded-3xl p-4 border border-foreground/10 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group cursor-pointer">
+            <div className="h-40 bg-gradient-to-br from-orange-500 to-yellow-400 rounded-2xl mb-4 relative overflow-hidden">
+              <div className="absolute inset-0 bg-black/10"></div>
+              <div className="absolute bottom-3 left-3 bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg text-white text-xs font-bold">Chemistry</div>
+            </div>
+            <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">Organic Chemistry Basics</h3>
+            <p className="text-foreground/60 text-sm mb-4 line-clamp-2">Introduction to organic compounds, structure, and reactivity.</p>
+            <div className="flex justify-between items-center text-sm font-medium">
+              <span className="text-foreground/50">32 Lessons</span>
+              <span className="text-primary">Continue</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <style jsx global>{`
         @keyframes progress {
           from { background-position: 1rem 0; }

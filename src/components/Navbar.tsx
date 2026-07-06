@@ -10,7 +10,7 @@ import { LogOut, User as UserIcon } from 'lucide-react';
 export default function Navbar() {
   const t = useTranslations('Navigation');
   const pathname = usePathname();
-  const { user, logout, loading } = useAuth();
+  const { user, userData, logout, loading } = useAuth();
 
   return (
     <nav className="fixed w-full top-0 z-50 bg-background/80 backdrop-blur-md border-b border-foreground/10">
@@ -43,7 +43,7 @@ export default function Navbar() {
               {!loading && (
                 user ? (
                   <div className="flex items-center gap-4">
-                    <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-full font-medium transition-colors border border-foreground/10">
+                    <Link href={userData?.role === 'teacher' ? '/teacher-dashboard' : '/dashboard'} className="flex items-center gap-2 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-full font-medium transition-colors border border-foreground/10">
                       <UserIcon className="w-4 h-4" />
                       Dashboard
                     </Link>
@@ -52,8 +52,8 @@ export default function Navbar() {
                     </button>
                   </div>
                 ) : (
-                  <Link href="/login" className="px-6 py-2 bg-primary text-primary-foreground font-bold rounded-full hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all">
-                    Login
+                  <Link href="/register" className="px-6 py-2 bg-primary text-primary-foreground font-bold rounded-full hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all">
+                    Login / Join
                   </Link>
                 )
               )}

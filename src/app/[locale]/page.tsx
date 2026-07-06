@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { Link } from '@/i18n/routing';
 import { BookOpen, GraduationCap, Users } from 'lucide-react';
 import Image from 'next/image';
 
@@ -74,12 +75,12 @@ export default function Home() {
         </p>
         
         <div ref={btnRef} className="flex gap-4 justify-center">
-          <button className="px-8 py-4 bg-primary text-primary-foreground rounded-full font-bold text-lg shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] transition-all hover:-translate-y-1">
+          <Link href="/register" className="px-8 py-4 bg-primary text-primary-foreground rounded-full font-bold text-lg shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] transition-all hover:-translate-y-1">
             {t('getStarted')}
-          </button>
-          <button className="px-8 py-4 bg-secondary text-secondary-foreground rounded-full font-bold text-lg shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all hover:-translate-y-1">
+          </Link>
+          <Link href="/courses" className="px-8 py-4 bg-secondary text-secondary-foreground rounded-full font-bold text-lg shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all hover:-translate-y-1">
             {t('courses')}
-          </button>
+          </Link>
         </div>
       </div>
 

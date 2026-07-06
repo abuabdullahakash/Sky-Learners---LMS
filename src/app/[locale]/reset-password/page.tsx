@@ -36,20 +36,25 @@ function ResetPasswordForm() {
   // Verify the code when component mounts
   useEffect(() => {
     if (!oobCode) {
-      setError(t('invalidLinkMessage'));
-      setIsVerifying(false);
+      // Avoid calling setState in effect synchronously
+      // We will handle the false state in the render directly or use a timeout if absolutely needed
+      // But since we have a check `if (!oobCode)` in render, it's fine.
+      setTimeout(() => setIsVerifying(false), 0);
       return;
     }
 
-    verifyPasswordResetCode(auth, oobCode)
-      .then(() => {
+    const verifyCode = async () => {
+      try {
+        await verifyPasswordResetCode(auth, oobCode);
         setIsValidCode(true);
-        setIsVerifying(false);
-      })
-      .catch(() => {
+      } catch {
         setError(t('invalidLinkMessage'));
+      } finally {
         setIsVerifying(false);
-      });
+      }
+    };
+    
+    verifyCode();
   }, [oobCode, t]);
 
   const handleReset = async (e: React.FormEvent) => {
@@ -215,6 +220,7 @@ function ResetPasswordForm() {
 }
 
 export default function ResetPasswordPage() {
+
   return (
     <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-10">
       <div className="max-w-md w-full bg-foreground/5 p-8 rounded-2xl border border-foreground/10 backdrop-blur-md relative overflow-hidden">

@@ -19,7 +19,7 @@ export default function Navbar() {
 
   const handleRoleSelect = (role: 'student' | 'teacher') => {
     setIsRoleModalOpen(false);
-    router.push(`/register?role=${role}`);
+    router.push(`/onboarding?role=${role}`);
   };
 
   return (
@@ -62,10 +62,7 @@ export default function Navbar() {
                       </Link>
                     ) : (
                       <button 
-                        onClick={() => {
-                          alert("আপনার প্রোফাইল সম্পন্ন করুন");
-                          router.push("/onboarding");
-                        }}
+                        onClick={() => setIsRoleModalOpen(true)}
                         className="flex items-center gap-2 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-full font-medium transition-colors border border-foreground/10 text-orange-500 hover:text-orange-600"
                       >
                         <UserIcon className="w-4 h-4" />
@@ -74,9 +71,9 @@ export default function Navbar() {
                     )}
                   </div>
                 ) : (
-                  <button onClick={() => setIsRoleModalOpen(true)} className="px-6 py-2 bg-primary text-primary-foreground font-bold rounded-full hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all">
+                  <Link href="/register" className="px-6 py-2 bg-primary text-primary-foreground font-bold rounded-full hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all">
                     Login / Join
-                  </button>
+                  </Link>
                 )}
               </div>
             </div>

@@ -5,12 +5,16 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from '@/i18n/routing';
+import { useSearchParams } from 'next/navigation';
 import { GraduationCap, Presentation, CheckCircle2 } from 'lucide-react';
 
 export default function OnboardingPage() {
   const { user, userData, refreshUserData, loading } = useAuth();
   const router = useRouter();
-  const [selectedRole, setSelectedRole] = useState<'student' | 'teacher' | null>(null);
+  const searchParams = useSearchParams();
+  const queryRole = searchParams.get('role') as 'student' | 'teacher' | null;
+
+  const [selectedRole, setSelectedRole] = useState<'student' | 'teacher' | null>(queryRole);
   const role = selectedRole || (userData?.role as 'student' | 'teacher' | null);
   
   // Form states (Student)

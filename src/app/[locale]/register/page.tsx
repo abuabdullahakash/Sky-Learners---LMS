@@ -15,12 +15,6 @@ export default function RegisterPage() {
   const t = useTranslations('Auth.register');
   const tLogin = useTranslations('Auth.login');
   
-  const searchParams = useSearchParams();
-  const queryRole = searchParams.get('role') as 'student' | 'teacher' | null;
-  
-  const [step, setStep] = useState<1 | 2>((queryRole === 'student' || queryRole === 'teacher') ? 2 : 1);
-  const [role, setRole] = useState<'student' | 'teacher' | null>((queryRole === 'student' || queryRole === 'teacher') ? queryRole : null);
-  
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,16 +33,10 @@ export default function RegisterPage() {
         { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }
       );
     }
-  }, [step]);
-
-  const handleRoleSelection = (selectedRole: 'student' | 'teacher') => {
-    setRole(selectedRole);
-    setStep(2);
-  };
+  }, []);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!role) return;
     
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -56,18 +44,18 @@ export default function RegisterPage() {
       // Update profile
       await updateProfile(userCredential.user, { displayName: name });
       
-      // Save basic user info to Firestore
+      // Save basic user info to Firestore with null role
       await setDoc(doc(db, "users", userCredential.user.uid), {
         name,
         email,
-        role: role,
+        role: null,
         onboardingComplete: false,
         createdAt: new Date().toISOString()
       });
 
       setIsSuccess(true);
       setTimeout(() => {
-        router.push('/onboarding');
+        router.push('/');
       }, 3000);
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
@@ -79,29 +67,27 @@ export default function RegisterPage() {
   };
 
   const handleSocialLogin = async (provider: GoogleAuthProvider | FacebookAuthProvider) => {
-    if (!role) return;
     try {
       const userCredential = await signInWithPopup(auth, provider);
       
       const userDocRef = doc(db, "users", userCredential.user.uid);
       const userDoc = await getDoc(userDocRef);
       
-      let redirectUrl = '/onboarding';
+      let redirectUrl = '/';
       if (!userDoc.exists()) {
         // First time signup
         await setDoc(userDocRef, {
           name: userCredential.user.displayName,
           email: userCredential.user.email,
-          role: role, 
+          role: null, 
           onboardingComplete: false,
           createdAt: new Date().toISOString()
         });
       } else {
-        // Already registered, but they are trying to register as a specific role now.
-        // Let's update their role if they haven't completed onboarding.
+        // Already registered, just redirect properly
         const userData = userDoc.data();
         if (!userData.onboardingComplete) {
-          await setDoc(userDocRef, { role: role }, { merge: true });
+          redirectUrl = '/'; // Go to home to see 'My Account'
         } else {
           redirectUrl = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
         }
@@ -127,54 +113,18 @@ export default function RegisterPage() {
             </div>
             <h2 className="text-2xl font-bold mb-4 text-green-500">{t('successTitle')}</h2>
             <p className="text-foreground/70 mb-6 leading-relaxed">
-              Account created successfully! Redirecting you to complete your profile...
+              Registration successful! Please complete your profile by clicking 'My Account' in the header...
             </p>
             <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-          </div>
-        ) : step === 1 ? (
-          <div className="animate-in fade-in zoom-in-95 duration-300">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-2">Join Sky Learners</h2>
-              <p className="text-foreground/60">How would you like to use our platform?</p>
-            </div>
-            
-            <div className="space-y-4">
-              <button 
-                onClick={() => handleRoleSelection('student')}
-                className="w-full p-6 flex items-center gap-6 bg-foreground/5 hover:bg-primary/10 border border-foreground/10 hover:border-primary/50 rounded-2xl transition-all group"
-              >
-                <div className="w-16 h-16 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <GraduationCap size={32} />
-                </div>
-                <div className="text-left flex-1">
-                  <h3 className="text-xl font-bold mb-1">I am a Student</h3>
-                  <p className="text-sm text-foreground/60">I want to learn and access courses</p>
-                </div>
-              </button>
-              
-              <button 
-                onClick={() => handleRoleSelection('teacher')}
-                className="w-full p-6 flex items-center gap-6 bg-foreground/5 hover:bg-orange-500/10 border border-foreground/10 hover:border-orange-500/50 rounded-2xl transition-all group"
-              >
-                <div className="w-16 h-16 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Presentation size={32} />
-                </div>
-                <div className="text-left flex-1">
-                  <h3 className="text-xl font-bold mb-1">I am a Teacher</h3>
-                  <p className="text-sm text-foreground/60">I want to teach and create courses</p>
-                </div>
-              </button>
-            </div>
-
           </div>
         ) : (
           <div className="animate-in slide-in-from-right-8 duration-300">
             <div className="flex items-center gap-3 mb-6">
-              <button onClick={() => setStep(1)} className="text-foreground/50 hover:text-foreground">
-                ← Back
-              </button>
+              <Link href="/login" className="text-foreground/50 hover:text-foreground">
+                ← Back to Login
+              </Link>
               <h2 className="text-2xl font-bold flex-1 text-center">
-                Sign up as {role === 'student' ? 'Student' : 'Teacher'}
+                Create an Account
               </h2>
             </div>
             

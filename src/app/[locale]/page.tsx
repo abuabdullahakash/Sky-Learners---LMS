@@ -3,21 +3,12 @@
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import { Link, useRouter } from '@/i18n/routing';
+import { Link } from '@/i18n/routing';
 import { BookOpen, GraduationCap, Users } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
-import RoleSelectionModal from '@/components/RoleSelectionModal';
 
 export default function Home() {
   const t = useTranslations('Index');
-  const router = useRouter();
-  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
-  
-  const handleRoleSelect = (role: 'student' | 'teacher') => {
-    setIsRoleModalOpen(false);
-    router.push(`/register?role=${role}`);
-  };
   
   const heroRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -84,9 +75,9 @@ export default function Home() {
         </p>
         
         <div ref={btnRef} className="flex gap-4 justify-center">
-          <button onClick={() => setIsRoleModalOpen(true)} className="px-8 py-4 bg-primary text-primary-foreground rounded-full font-bold text-lg shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] transition-all hover:-translate-y-1">
+          <Link href="/register" className="px-8 py-4 bg-primary text-primary-foreground rounded-full font-bold text-lg shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] transition-all hover:-translate-y-1">
             {t('getStarted')}
-          </button>
+          </Link>
           <Link href="/courses" className="px-8 py-4 bg-secondary text-secondary-foreground rounded-full font-bold text-lg shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all hover:-translate-y-1">
             {t('courses')}
           </Link>
@@ -107,12 +98,6 @@ export default function Home() {
           </div>
         ))}
       </div>
-
-      <RoleSelectionModal 
-        isOpen={isRoleModalOpen} 
-        onClose={() => setIsRoleModalOpen(false)} 
-        onSelectRole={handleRoleSelect} 
-      />
     </div>
   );
 }

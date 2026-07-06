@@ -16,7 +16,10 @@ export default function CreateCoursePage() {
   
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState(''); // Education Level
+  const [eduClass, setEduClass] = useState('');
+  const [department, setDepartment] = useState('');
+  const [coachingName, setCoachingName] = useState('');
   const [price, setPrice] = useState('');
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string>('');
@@ -52,7 +55,10 @@ export default function CreateCoursePage() {
         teacherId: user.uid,
         title,
         subtitle,
-        category,
+        category, // Used as Education Level
+        eduClass: (category === 'primary' || category === 'high_school' || category === 'intermediate') ? eduClass : '',
+        department: (category === 'intermediate' || category === 'honours' || category === 'masters') ? department : '',
+        coachingName,
         price: Number(price),
         thumbnailUrl,
         isPublished: false, // Draft by default
@@ -119,22 +125,94 @@ export default function CreateCoursePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1 text-foreground/80">Category <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-medium mb-1 text-foreground/80">Education Level (Category) <span className="text-red-500">*</span></label>
                 <select 
                   value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  onChange={(e) => {
+                    setCategory(e.target.value);
+                    setEduClass('');
+                    setDepartment('');
+                  }}
                   className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all appearance-none"
                   required
                 >
-                  <option value="" disabled className="bg-background text-foreground">Select Category</option>
-                  <option value="academic" className="bg-background text-foreground">Academic (Class 9-12)</option>
-                  <option value="university" className="bg-background text-foreground">University & Admission</option>
-                  <option value="programming" className="bg-background text-foreground">Programming & Tech</option>
-                  <option value="design" className="bg-background text-foreground">Design & Creative</option>
-                  <option value="business" className="bg-background text-foreground">Business & Marketing</option>
-                  <option value="language" className="bg-background text-foreground">Language Learning</option>
+                  <option value="" disabled className="bg-background text-foreground">Select Level</option>
+                  <option value="primary" className="bg-background text-foreground">Primary School</option>
+                  <option value="high_school" className="bg-background text-foreground">High School</option>
+                  <option value="intermediate" className="bg-background text-foreground">Intermediate / HSC</option>
+                  <option value="honours" className="bg-background text-foreground">Honours / Undergrad</option>
+                  <option value="masters" className="bg-background text-foreground">Masters / Postgrad</option>
+                  <option value="skills" className="bg-background text-foreground">Skills / Others</option>
                 </select>
               </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-foreground/80">Your School / Coaching Name <span className="text-red-500">*</span></label>
+                <input 
+                  type="text" 
+                  value={coachingName}
+                  onChange={(e) => setCoachingName(e.target.value)}
+                  placeholder="e.g. ABC Coaching Center"
+                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all"
+                  required
+                />
+              </div>
+            </div>
+
+            {(category === 'primary' || category === 'high_school') && (
+              <div>
+                <label className="block text-sm font-medium mb-1 text-foreground/80">Class <span className="text-red-500">*</span></label>
+                <select 
+                  value={eduClass}
+                  onChange={(e) => setEduClass(e.target.value)}
+                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 transition-all appearance-none"
+                  required
+                >
+                  <option value="" disabled className="bg-background text-foreground">Select Class</option>
+                  {category === 'primary' 
+                    ? Array.from({length: 5}, (_, i) => <option key={i+1} value={i+1} className="bg-background text-foreground">Class {i+1}</option>)
+                    : Array.from({length: 5}, (_, i) => <option key={i+6} value={i+6} className="bg-background text-foreground">Class {i+6}</option>)
+                  }
+                </select>
+              </div>
+            )}
+
+            {category === 'intermediate' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-foreground/80">Class <span className="text-red-500">*</span></label>
+                  <select value={eduClass} onChange={(e) => setEduClass(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 transition-all appearance-none" required>
+                    <option value="" disabled className="bg-background text-foreground">Select Class</option>
+                    <option value="11" className="bg-background text-foreground">Class 11</option>
+                    <option value="12" className="bg-background text-foreground">Class 12</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-foreground/80">Group <span className="text-red-500">*</span></label>
+                  <select value={department} onChange={(e) => setDepartment(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 transition-all appearance-none" required>
+                    <option value="" disabled className="bg-background text-foreground">Select Group</option>
+                    <option value="science" className="bg-background text-foreground">Science</option>
+                    <option value="arts" className="bg-background text-foreground">Arts (Humanities)</option>
+                    <option value="commerce" className="bg-background text-foreground">Commerce</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {(category === 'honours' || category === 'masters') && (
+              <div>
+                <label className="block text-sm font-medium mb-1 text-foreground/80">Department / Subject <span className="text-red-500">*</span></label>
+                <input 
+                  type="text" 
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  placeholder="e.g. Physics"
+                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 transition-all"
+                  required
+                />
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-foreground/80">Price (BDT) <span className="text-red-500">*</span></label>
                 <input 

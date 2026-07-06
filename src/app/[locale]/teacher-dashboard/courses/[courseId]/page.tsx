@@ -54,7 +54,10 @@ export default function CourseBuilderPage() {
         title: course.title,
         subtitle: course.subtitle,
         price: Number(course.price),
-        category: course.category
+        category: course.category,
+        eduClass: (course.category === 'primary' || course.category === 'high_school' || course.category === 'intermediate') ? course.eduClass : '',
+        department: (course.category === 'intermediate' || course.category === 'honours' || course.category === 'masters') ? course.department : '',
+        coachingName: course.coachingName || ''
       });
       setMessage('Basic info updated successfully!');
       setTimeout(() => setMessage(''), 3000);
@@ -188,23 +191,85 @@ export default function CourseBuilderPage() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Category</label>
+              <label className="block text-sm font-medium mb-1">Education Level (Category)</label>
               <select 
-                value={course.category} onChange={e => setCourse({...course, category: e.target.value})}
+                value={course.category || ''} 
+                onChange={e => setCourse({...course, category: e.target.value, eduClass: '', department: ''})}
                 className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none"
               >
-                <option value="academic">Academic</option>
-                <option value="university">University</option>
-                <option value="programming">Programming</option>
-                <option value="design">Design</option>
-                <option value="business">Business</option>
-                <option value="language">Language</option>
+                <option value="" disabled>Select Level</option>
+                <option value="primary">Primary School</option>
+                <option value="high_school">High School</option>
+                <option value="intermediate">Intermediate / HSC</option>
+                <option value="honours">Honours / Undergrad</option>
+                <option value="masters">Masters / Postgrad</option>
+                <option value="skills">Skills / Others</option>
               </select>
             </div>
             <div>
+              <label className="block text-sm font-medium mb-1">Your School / Coaching Name</label>
+              <input 
+                type="text" value={course.coachingName || ''} onChange={e => setCourse({...course, coachingName: e.target.value})}
+                className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                placeholder="e.g. ABC Coaching Center"
+              />
+            </div>
+          </div>
+
+          {(course.category === 'primary' || course.category === 'high_school') && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Class</label>
+              <select 
+                value={course.eduClass || ''} onChange={e => setCourse({...course, eduClass: e.target.value})}
+                className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none"
+              >
+                <option value="" disabled>Select Class</option>
+                {course.category === 'primary' 
+                  ? Array.from({length: 5}, (_, i) => <option key={i+1} value={i+1}>Class {i+1}</option>)
+                  : Array.from({length: 5}, (_, i) => <option key={i+6} value={i+6}>Class {i+6}</option>)
+                }
+              </select>
+            </div>
+          )}
+
+          {course.category === 'intermediate' && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Class</label>
+                <select value={course.eduClass || ''} onChange={e => setCourse({...course, eduClass: e.target.value})} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none">
+                  <option value="" disabled>Select Class</option>
+                  <option value="11">Class 11</option>
+                  <option value="12">Class 12</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Group</label>
+                <select value={course.department || ''} onChange={e => setCourse({...course, department: e.target.value})} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none">
+                  <option value="" disabled>Select Group</option>
+                  <option value="science">Science</option>
+                  <option value="arts">Arts (Humanities)</option>
+                  <option value="commerce">Commerce</option>
+                </select>
+              </div>
+            </div>
+          )}
+
+          {(course.category === 'honours' || course.category === 'masters') && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Department / Subject</label>
+              <input 
+                type="text" value={course.department || ''} onChange={e => setCourse({...course, department: e.target.value})}
+                className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                placeholder="e.g. Physics"
+              />
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
               <label className="block text-sm font-medium mb-1">Price (BDT)</label>
               <input 
-                type="number" value={course.price} onChange={e => setCourse({...course, price: e.target.value})}
+                type="number" value={course.price || ''} onChange={e => setCourse({...course, price: e.target.value})}
                 className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
               />
             </div>

@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
 import { ThemeToggle } from './ThemeToggle';
-import LanguageSwitcher from './LanguageSwitcher';
+import { LanguageToggle } from './LanguageToggle';
 import { useAuth } from '@/context/AuthContext';
 import { LogOut, User as UserIcon } from 'lucide-react';
 
@@ -38,7 +38,7 @@ export default function Navbar() {
             
             <div className="flex items-center gap-4 pl-4 border-l border-foreground/10">
               <ThemeToggle />
-              <LanguageSwitcher />
+              <LanguageToggle />
               
               {!loading && (
                 user ? (

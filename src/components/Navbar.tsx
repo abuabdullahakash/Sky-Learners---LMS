@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import { LogOut, User as UserIcon } from 'lucide-react';
 
 export default function Navbar() {
-  const t = useTranslations('Index');
+  const t = useTranslations('Navigation');
   const pathname = usePathname();
   const { user, logout, loading } = useAuth();
 

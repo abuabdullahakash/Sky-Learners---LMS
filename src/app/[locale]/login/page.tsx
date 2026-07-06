@@ -1,18 +1,20 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { Link, useRouter } from '@/i18n/routing';
 import gsap from 'gsap';
-import PhoneAuth from '@/components/PhoneAuth';
-import { Mail, Phone } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
-  const [authMode, setAuthMode] = useState<'email' | 'phone'>('email');
+  const t = useTranslations('Auth.login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState('');
   const router = useRouter();
   
@@ -28,6 +30,10 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Set persistence based on remember me checkbox
+      const persistenceType = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+      await setPersistence(auth, persistenceType);
+      
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/dashboard');
     } catch (err: any) {
@@ -84,60 +90,71 @@ export default function LoginPage() {
   return (
     <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-10">
       <div ref={formRef} className="max-w-md w-full bg-foreground/5 p-8 rounded-2xl border border-foreground/10 backdrop-blur-md">
-        <h2 className="text-3xl font-bold text-center mb-6">Welcome Back</h2>
+        <h2 className="text-3xl font-bold text-center mb-6">{t('title')}</h2>
         
-        {/* Toggle Auth Mode */}
-        <div className="flex bg-foreground/5 p-1 rounded-xl mb-6">
-          <button 
-            onClick={() => setAuthMode('email')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-colors ${authMode === 'email' ? 'bg-background shadow text-foreground' : 'text-foreground/60 hover:text-foreground'}`}
-          >
-            <Mail className="w-4 h-4" /> Email
-          </button>
-          <button 
-            onClick={() => setAuthMode('phone')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-colors ${authMode === 'phone' ? 'bg-background shadow text-foreground' : 'text-foreground/60 hover:text-foreground'}`}
-          >
-            <Phone className="w-4 h-4" /> Phone
-          </button>
-        </div>
-
-        {error && authMode === 'email' && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
+        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
         
-        {authMode === 'email' ? (
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">{t('emailLabel')}</label>
+            <input 
+              type="email" 
+              name="email"
+              autoComplete="email"
+              placeholder={t('emailPlaceholder')}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">{t('passwordLabel')}</label>
+            <div className="relative">
               <input 
-                type="email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Password</label>
-              <input 
-                type="password" 
+                type={showPassword ? "text" : "password"} 
+                name="password"
+                autoComplete="current-password"
+                placeholder={t('passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
+                className="w-full px-4 py-2 pr-10 rounded-lg bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground/80 transition-colors"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
+          </div>
+          
+          <div className="flex items-center justify-between text-sm">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input 
+                type="checkbox" 
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-foreground/30 text-primary focus:ring-primary bg-background"
+              />
+              <span className="text-foreground/80">{t('rememberMe')}</span>
+            </label>
             
-            <button type="submit" className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors">
-              Login with Email
-            </button>
-          </form>
-        ) : (
-          <PhoneAuth isRegister={false} />
-        )}
+            <Link href="/forgot-password" className="text-primary hover:underline font-medium">
+              {t('forgotPassword')}
+            </Link>
+          </div>
+          
+          <button type="submit" className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors mt-2">
+            {t('submitButton')}
+          </button>
+        </form>
 
         <div className="my-6 flex items-center">
           <div className="flex-1 border-t border-foreground/10"></div>
-          <span className="px-3 text-foreground/50 text-sm">OR</span>
+          <span className="px-3 text-foreground/50 text-sm">{t('orText')}</span>
           <div className="flex-1 border-t border-foreground/10"></div>
         </div>
 
@@ -149,19 +166,19 @@ export default function LoginPage() {
               <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
               <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
             </svg>
-            Continue with Google
+            {t('continueGoogle')}
           </button>
 
           <button onClick={handleFacebookLogin} className="w-full py-3 bg-[#1877F2] text-white font-bold rounded-lg hover:bg-[#1877F2]/90 transition-colors flex items-center justify-center gap-2">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
             </svg>
-            Continue with Facebook
+            {t('continueFacebook')}
           </button>
         </div>
 
         <p className="text-center mt-6 text-foreground/70 text-sm">
-          Don't have an account? <Link href="/register" className="text-primary hover:underline font-medium">Register here</Link>
+          {t('noAccount')} <Link href="/register" className="text-primary hover:underline font-medium">{t('registerLink')}</Link>
         </p>
       </div>
     </div>

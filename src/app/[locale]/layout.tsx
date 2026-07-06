@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 
 const geistSans = Geist({
@@ -36,7 +37,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground flex flex-col`}
       >
         <NextIntlClientProvider messages={messages}>
           <AuthProvider>
@@ -47,9 +48,10 @@ export default async function RootLayout({
               disableTransitionOnChange
             >
               <Navbar />
-              <main className="pt-20">
+              <main className="w-full flex-grow">
                 {children}
               </main>
+              <Footer />
             </ThemeProvider>
           </AuthProvider>
         </NextIntlClientProvider>

@@ -26,6 +26,133 @@
       "completed": "Completed Lessons",
       "score": "Average Score",
       "continue": "Continue Learning"
+    },
+    "settings": {
+      "title": "Settings",
+      "tabs": {
+        "profile": "Profile",
+        "security": "Security",
+        "preferences": "Preferences",
+        "billing": "Billing"
+      },
+      "profile": {
+        "title": "Profile Information",
+        "subtitle": "Manage your personal and academic details.",
+        "picture": "Profile Picture",
+        "uploadBtn": "Upload New Photo",
+        "personal": "Personal Details",
+        "name": "Full Name",
+        "phone": "Phone Number",
+        "dob": "Date of Birth",
+        "gender": "Gender",
+        "academic": "Academic Details",
+        "institution": "School / College",
+        "class": "Class / Department",
+        "saveBtn": "Save Profile"
+      },
+      "security": {
+        "title": "Account & Security",
+        "subtitle": "Manage your password and connected accounts.",
+        "email": "Email Address",
+        "changePassword": "Change Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm Password",
+        "updateBtn": "Update Password",
+        "connected": "Connected Accounts",
+        "google": "Google",
+        "facebook": "Facebook",
+        "connectedStatus": "Connected",
+        "notConnectedStatus": "Not Connected"
+      },
+      "preferences": {
+        "title": "Preferences",
+        "subtitle": "Manage your notifications and alerts.",
+        "notifications": "Email Notifications",
+        "notifCourses": "New course announcements",
+        "notifExams": "Exam results and reports",
+        "notifOffers": "Special offers and promotions"
+      },
+      "billing": {
+        "title": "Billing & Subscription",
+        "subtitle": "Manage your active plans and payments.",
+        "activePlan": "Active Plan",
+        "noPlan": "You don't have any active subscription.",
+        "upgradeBtn": "Upgrade Plan",
+        "history": "Payment History",
+        "noHistory": "No previous transactions found."
+      }
+    }
+  },
+  "Footer": {
+    "about": "Get all your academic content here. The ultimate learning platform for your success.",
+    "quickLinks": "Quick Links",
+    "home": "Home",
+    "courses": "Courses",
+    "aboutUs": "About Us",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contact": "Contact Us",
+    "rights": "All rights reserved."
+  },
+  "Auth": {
+    "login": {
+      "title": "Welcome Back",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter your email address",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "submitButton": "Login",
+      "orText": "OR",
+      "continueGoogle": "Continue with Google",
+      "continueFacebook": "Continue with Facebook",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Register here"
+    },
+    "register": {
+      "title": "Create Account",
+      "nameLabel": "Full Name",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "submitButton": "Register with Email",
+      "alreadyAccount": "Already have an account?",
+      "loginLink": "Login here",
+      "successTitle": "Account created successfully!",
+      "successMessage": "Please save your email and password for future use. Redirecting to dashboard..."
+    },
+    "forgotPassword": {
+      "title": "Forgot Password?",
+      "subtitle": "No worries! Enter your email address and we'll send you a link to reset your password.",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "Enter your registered email",
+      "submitButton": "Send Reset Link",
+      "sending": "Sending...",
+      "backToLogin": "Back to Login",
+      "successTitle": "Check Your Email",
+      "successMessage": "We've sent a password reset link to",
+      "returnLogin": "Return to Login"
+    },
+    "resetPassword": {
+      "title": "Set New Password",
+      "subtitle": "Please enter your new password below",
+      "newPasswordLabel": "New Password",
+      "newPasswordPlaceholder": "Minimum 6 characters",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Re-enter your password",
+      "submitButton": "Change Password",
+      "changing": "Changing...",
+      "successTitle": "Password changed successfully!",
+      "successMessage": "Your account's new password has been set. You can now login with your new password.",
+      "loginButton": "Login Now",
+      "errorMismatch": "Passwords do not match!",
+      "errorLength": "Password must be at least 6 characters.",
+      "errorGeneric": "Failed to change password. Please try again.",
+      "verifying": "Checking link...",
+      "invalidLinkTitle": "Invalid Link!",
+      "invalidLinkMessage": "The password reset link is invalid or has expired.",
+      "requestNewLink": "Request new link"
     }
   }
 }

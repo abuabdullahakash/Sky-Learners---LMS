@@ -18,7 +18,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 border-r border-foreground/10 bg-background/50 backdrop-blur-md hidden md:flex flex-col justify-between h-[calc(100vh-80px)] sticky top-20">
+    <aside className="w-64 border-r border-foreground/10 bg-background/20 backdrop-blur-md hidden md:flex flex-col justify-between h-full">
       <div className="p-4 space-y-2">
         {menuItems.map((item) => {
           const isActive = pathname === item.href;

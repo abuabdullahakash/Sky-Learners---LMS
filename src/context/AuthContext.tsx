@@ -42,12 +42,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const setUpRecaptcha = (number: string) => {
-    // Clear any existing recaptcha
-    if (!(window as any).recaptchaVerifier) {
-      (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'invisible',
-      });
+    // Clear any existing recaptcha to prevent "element has been removed" error on re-renders
+    if ((window as any).recaptchaVerifier) {
+      try {
+        (window as any).recaptchaVerifier.clear();
+      } catch (e) {
+        console.error("Error clearing recaptcha", e);
+      }
+      (window as any).recaptchaVerifier = undefined;
     }
+    
+    (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      'size': 'invisible',
+    });
+    
     const appVerifier = (window as any).recaptchaVerifier;
     return signInWithPhoneNumber(auth, number, appVerifier);
   };

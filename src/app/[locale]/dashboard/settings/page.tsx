@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User, Shield, Bell, CreditCard, Camera, CheckCircle2, XCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
@@ -17,7 +17,6 @@ export default function SettingsPage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // Sync eduLevel when userData is loaded
-  import { useEffect } from 'react';
   useEffect(() => {
     if (userData?.eduLevel) {
       setEduLevel(userData.eduLevel);

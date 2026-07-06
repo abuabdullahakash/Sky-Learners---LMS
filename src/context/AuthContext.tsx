@@ -1,19 +1,21 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged, signOut } from 'firebase/auth';
+import { User, onAuthStateChanged, signOut, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   logout: () => Promise<void>;
+  setUpRecaptcha: (number: string) => Promise<ConfirmationResult>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   logout: async () => {},
+  setUpRecaptcha: async () => { throw new Error('Not implemented'); },
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -39,8 +41,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const setUpRecaptcha = (number: string) => {
+    // Clear any existing recaptcha
+    if (!(window as any).recaptchaVerifier) {
+      (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        'size': 'invisible',
+      });
+    }
+    const appVerifier = (window as any).recaptchaVerifier;
+    return signInWithPhoneNumber(auth, number, appVerifier);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, logout }}>
+    <AuthContext.Provider value={{ user, loading, logout, setUpRecaptcha }}>
       {children}
     </AuthContext.Provider>
   );

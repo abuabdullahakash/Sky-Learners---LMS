@@ -2,11 +2,15 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { Link, useRouter } from '@/i18n/routing';
 import gsap from 'gsap';
+import PhoneAuth from '@/components/PhoneAuth';
+import { Mail, Phone } from 'lucide-react';
 
 export default function LoginPage() {
+  const [authMode, setAuthMode] = useState<'email' | 'phone'>('email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,8 +20,8 @@ export default function LoginPage() {
 
   useEffect(() => {
     gsap.fromTo(formRef.current, 
-      { opacity: 0, y: 30 }, 
-      { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }
+      { opacity: 0, scale: 0.95 }, 
+      { opacity: 1, scale: 1, duration: 0.5, ease: "power2.out" }
     );
   }, []);
 
@@ -27,14 +31,27 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Failed to login');
+      setError('Invalid email or password');
     }
   };
 
   const handleGoogleLogin = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const userCredential = await signInWithPopup(auth, provider);
+      
+      const userDocRef = doc(db, "users", userCredential.user.uid);
+      const userDoc = await getDoc(userDocRef);
+      
+      if (!userDoc.exists()) {
+        await setDoc(userDocRef, {
+          name: userCredential.user.displayName,
+          email: userCredential.user.email,
+          role: "student",
+          createdAt: new Date().toISOString()
+        });
+      }
+
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Failed to login with Google');
@@ -44,7 +61,20 @@ export default function LoginPage() {
   const handleFacebookLogin = async () => {
     const provider = new FacebookAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const userCredential = await signInWithPopup(auth, provider);
+      
+      const userDocRef = doc(db, "users", userCredential.user.uid);
+      const userDoc = await getDoc(userDocRef);
+      
+      if (!userDoc.exists()) {
+        await setDoc(userDocRef, {
+          name: userCredential.user.displayName,
+          email: userCredential.user.email,
+          role: "student",
+          createdAt: new Date().toISOString()
+        });
+      }
+
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Failed to login with Facebook');
@@ -56,34 +86,54 @@ export default function LoginPage() {
       <div ref={formRef} className="max-w-md w-full bg-foreground/5 p-8 rounded-2xl border border-foreground/10 backdrop-blur-md">
         <h2 className="text-3xl font-bold text-center mb-6">Welcome Back</h2>
         
-        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
-        
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input 
-              type="email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
-            <input 
-              type="password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
-              required
-            />
-          </div>
-          
-          <button type="submit" className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors">
-            Login
+        {/* Toggle Auth Mode */}
+        <div className="flex bg-foreground/5 p-1 rounded-xl mb-6">
+          <button 
+            onClick={() => setAuthMode('email')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-colors ${authMode === 'email' ? 'bg-background shadow text-foreground' : 'text-foreground/60 hover:text-foreground'}`}
+          >
+            <Mail className="w-4 h-4" /> Email
           </button>
-        </form>
+          <button 
+            onClick={() => setAuthMode('phone')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-colors ${authMode === 'phone' ? 'bg-background shadow text-foreground' : 'text-foreground/60 hover:text-foreground'}`}
+          >
+            <Phone className="w-4 h-4" /> Phone
+          </button>
+        </div>
+
+        {error && authMode === 'email' && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
+        
+        {authMode === 'email' ? (
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Email</label>
+              <input 
+                type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Password</label>
+              <input 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
+                required
+              />
+            </div>
+            
+            <button type="submit" className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors">
+              Login with Email
+            </button>
+          </form>
+        ) : (
+          <PhoneAuth isRegister={false} />
+        )}
 
         <div className="my-6 flex items-center">
           <div className="flex-1 border-t border-foreground/10"></div>

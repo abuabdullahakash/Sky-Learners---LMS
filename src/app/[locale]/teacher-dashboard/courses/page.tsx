@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { Link } from '@/i18n/routing';
-import { PlusCircle, Search, Video, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { PlusCircle, Search, Video, MoreVertical, Edit, Trash2, Users, CheckSquare, Calendar } from 'lucide-react';
 import Image from 'next/image';
 
 type Course = {
@@ -16,6 +16,9 @@ type Course = {
   thumbnailUrl: string;
   isPublished: boolean;
   createdAt: any;
+  totalVideoLessons?: number;
+  totalExams?: number;
+  courseValidity?: string;
 };
 
 export default function CoursesListPage() {
@@ -132,7 +135,15 @@ export default function CoursesListPage() {
               <div className="p-6">
                 <div className="text-sm font-medium text-orange-500 mb-2">{course.category.toUpperCase()}</div>
                 <h3 className="text-xl font-bold mb-2 line-clamp-2" title={course.title}>{course.title}</h3>
-                <div className="flex items-center justify-between mt-6">
+                
+                <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3 mb-6 text-xs text-foreground/60 font-medium">
+                  <div className="flex items-center gap-1.5" title="Enrolled Students"><Users className="w-4 h-4" /> 0</div>
+                  <div className="flex items-center gap-1.5" title="Total Videos"><Video className="w-4 h-4" /> {course.totalVideoLessons || 0}</div>
+                  <div className="flex items-center gap-1.5" title="Total Exams"><CheckSquare className="w-4 h-4" /> {course.totalExams || 0}</div>
+                  <div className="flex items-center gap-1.5" title="Validity"><Calendar className="w-4 h-4" /> {course.courseValidity || 'N/A'}</div>
+                </div>
+
+                <div className="flex items-center justify-between mt-auto pt-4 border-t border-foreground/10">
                   <div className="text-lg font-extrabold">৳{course.price}</div>
                   <Link 
                     href={`/teacher-dashboard/courses/${course.id}`}

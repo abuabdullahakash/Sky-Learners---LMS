@@ -48,7 +48,17 @@ export default function CourseSettingsPage() {
       await updateDoc(doc(db, 'courses', courseId), {
         title: course.title,
         subtitle: course.subtitle,
+        detailedDescription: course.detailedDescription || '',
         price: Number(course.price),
+        discountPrice: course.discountPrice ? Number(course.discountPrice) : null,
+        discountValidUntil: course.discountValidUntil || '',
+        classStartDate: course.classStartDate || '',
+        courseValidity: course.courseValidity || '',
+        totalLiveClasses: course.totalLiveClasses ? Number(course.totalLiveClasses) : 0,
+        totalVideoLessons: course.totalVideoLessons ? Number(course.totalVideoLessons) : 0,
+        totalExams: course.totalExams ? Number(course.totalExams) : 0,
+        totalPdfs: course.totalPdfs ? Number(course.totalPdfs) : 0,
+        hasDoubtSolving: course.hasDoubtSolving || false,
         category: course.category,
         eduClass: (course.category === 'primary' || course.category === 'high_school' || course.category === 'intermediate') ? course.eduClass : '',
         department: (course.category === 'intermediate' || course.category === 'honours' || course.category === 'masters') ? course.department : '',
@@ -104,6 +114,13 @@ export default function CourseSettingsPage() {
             <textarea 
               value={course.subtitle || ''} onChange={e => setCourse({...course, subtitle: e.target.value})} rows={3}
               className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors custom-scrollbar"
+            />
+          <div>
+            <label className="block text-sm font-medium mb-1">Detailed Description (HTML/Text)</label>
+            <textarea 
+              value={course.detailedDescription || ''} onChange={e => setCourse({...course, detailedDescription: e.target.value})} rows={6}
+              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors custom-scrollbar"
+              placeholder="Provide a detailed description of what this course offers..."
             />
           </div>
 
@@ -193,14 +210,80 @@ export default function CourseSettingsPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Price (BDT)</label>
+              <label className="block text-sm font-medium mb-1">Regular Price (BDT)</label>
               <input 
                 type="number" value={course.price || ''} onChange={e => setCourse({...course, price: e.target.value})}
                 className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Discount Price (Optional)</label>
+              <input 
+                type="number" value={course.discountPrice || ''} onChange={e => setCourse({...course, discountPrice: e.target.value})}
+                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Discount Valid Until</label>
+              <input 
+                type="date" value={course.discountValidUntil || ''} onChange={e => setCourse({...course, discountValidUntil: e.target.value})}
+                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+              />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Class Start Date</label>
+              <input 
+                type="date" value={course.classStartDate || ''} onChange={e => setCourse({...course, classStartDate: e.target.value})}
+                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Course Validity</label>
+              <input 
+                type="text" value={course.courseValidity || ''} onChange={e => setCourse({...course, courseValidity: e.target.value})} placeholder="e.g. 6 Months, Till Admission Test"
+                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+              />
+            </div>
+          </div>
+
+          <hr className="border-foreground/10 my-6" />
+          <h2 className="text-xl font-bold mb-4">Marketing Stats & Features</h2>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Total Live Classes</label>
+              <input type="number" value={course.totalLiveClasses || ''} onChange={e => setCourse({...course, totalLiveClasses: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Total Videos</label>
+              <input type="number" value={course.totalVideoLessons || ''} onChange={e => setCourse({...course, totalVideoLessons: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Total Exams</label>
+              <input type="number" value={course.totalExams || ''} onChange={e => setCourse({...course, totalExams: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Total Notes/PDFs</label>
+              <input type="number" value={course.totalPdfs || ''} onChange={e => setCourse({...course, totalPdfs: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+            </div>
+          </div>
+          
+          <div className="mt-4 flex items-center gap-3">
+            <input 
+              type="checkbox" 
+              id="doubtSolving" 
+              checked={course.hasDoubtSolving || false} 
+              onChange={e => setCourse({...course, hasDoubtSolving: e.target.checked})} 
+              className="w-5 h-5 accent-orange-500"
+            />
+            <label htmlFor="doubtSolving" className="text-sm font-medium cursor-pointer">
+              Includes 24/7 Doubt Solving Support / Group
+            </label>
           </div>
         </div>
         

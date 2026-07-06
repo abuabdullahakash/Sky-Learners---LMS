@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithP
 import { auth, db } from '@/lib/firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { Link, useRouter } from '@/i18n/routing';
+import { useAuth } from '@/context/AuthContext';
 import gsap from 'gsap';
 import { CheckCircle2, GraduationCap, Presentation, Eye, EyeOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -23,6 +24,7 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
+  const { refreshUserData } = useAuth();
   
   const formRef = useRef<HTMLDivElement>(null);
 
@@ -59,36 +61,32 @@ export default function RegisterPage() {
         createdAt: new Date().toISOString()
       });
 
+      await refreshUserData();
       setIsSuccess(true);
       setTimeout(() => {
-        window.location.href = '/onboarding';
-      }, 2000);
+        router.push('/onboarding');
+      }, 1500);
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
         try {
           const loginCredential = await signInWithEmailAndPassword(auth, email, password);
-          // Just let the auth context's onAuthStateChanged handle the fetch and update state.
-          // Wait briefly for auth context to update before redirecting
-          setTimeout(async () => {
-             const userDoc = await getDoc(doc(db, "users", loginCredential.user.uid));
-             
-              if (userDoc.exists()) {
-               const userData = userDoc.data();
-               if (!userData.onboardingComplete) {
-                 // Force update the role they just selected before going to onboarding
-                 await setDoc(doc(db, "users", loginCredential.user.uid), { role: role }, { merge: true });
-                 setIsSuccess(true);
-                 setTimeout(() => window.location.href = '/onboarding', 1000); // Use hard reload to avoid context stale state
-               } else {
-                 setIsSuccess(true);
-                 setTimeout(() => {
-                   window.location.href = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
-                 }, 1000);
-               }
-             } else {
-               setIsSuccess(true);
-               setTimeout(() => window.location.href = '/onboarding', 1000);
-             }
+          const userDocRef = doc(db, "users", loginCredential.user.uid);
+          const userDoc = await getDoc(userDocRef);
+          
+          let redirectUrl = '/onboarding';
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            if (!userData.onboardingComplete) {
+              await setDoc(userDocRef, { role: role }, { merge: true });
+            } else {
+              redirectUrl = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
+            }
+          }
+          
+          await refreshUserData();
+          setIsSuccess(true);
+          setTimeout(() => {
+            router.push(redirectUrl);
           }, 1000);
         } catch (loginErr: any) {
           setError('এই ইমেইল দিয়ে আগে থেকেই একটি অ্যাকাউন্ট আছে। সঠিক পাসওয়ার্ড দিন।');
@@ -107,6 +105,7 @@ export default function RegisterPage() {
       const userDocRef = doc(db, "users", userCredential.user.uid);
       const userDoc = await getDoc(userDocRef);
       
+      let redirectUrl = '/onboarding';
       if (!userDoc.exists()) {
         // First time signup
         await setDoc(userDocRef, {
@@ -116,27 +115,22 @@ export default function RegisterPage() {
           onboardingComplete: false,
           createdAt: new Date().toISOString()
         });
-        setIsSuccess(true);
-        setTimeout(() => {
-          window.location.href = '/onboarding';
-        }, 2000);
       } else {
         // Already registered, but they are trying to register as a specific role now.
         // Let's update their role if they haven't completed onboarding.
         const userData = userDoc.data();
         if (!userData.onboardingComplete) {
           await setDoc(userDocRef, { role: role }, { merge: true });
-          setIsSuccess(true);
-          setTimeout(() => {
-            window.location.href = '/onboarding';
-          }, 1000);
         } else {
-          setIsSuccess(true);
-          setTimeout(() => {
-            window.location.href = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
-          }, 1000);
+          redirectUrl = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
         }
       }
+
+      await refreshUserData();
+      setIsSuccess(true);
+      setTimeout(() => {
+        router.push(redirectUrl);
+      }, 1000);
     } catch (err: any) {
       setError(err.message || 'Failed to register with social provider');
     }

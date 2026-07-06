@@ -5,6 +5,7 @@ import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, Facebo
 import { auth, db } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { Link, useRouter } from '@/i18n/routing';
+import { useAuth } from '@/context/AuthContext';
 import gsap from 'gsap';
 import { useTranslations } from 'next-intl';
 import { Eye, EyeOff } from 'lucide-react';
@@ -19,6 +20,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
+  const { refreshUserData } = useAuth();
   
   const formRef = useRef<HTMLDivElement>(null);
 
@@ -41,19 +43,21 @@ export default function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       
       // Check onboarding and role
-      const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
+      const userDocRef = doc(db, "users", userCredential.user.uid);
+      const userDoc = await getDoc(userDocRef);
       
+      await refreshUserData();
       setIsSuccess(true);
       setTimeout(() => {
         if (userDoc.exists()) {
           const userData = userDoc.data();
           if (!userData.onboardingComplete) {
-            window.location.href = '/onboarding';
+            router.push('/onboarding');
           } else {
-            window.location.href = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
+            router.push(userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard');
           }
         } else {
-          window.location.href = '/onboarding';
+          router.push('/onboarding');
         }
       }, 1000);
     } catch (err: any) {
@@ -73,24 +77,25 @@ export default function LoginPage() {
       const userDocRef = doc(db, "users", userCredential.user.uid);
       const userDoc = await getDoc(userDocRef);
       
-      setIsSuccess(true);
-      setTimeout(async () => {
-        if (!userDoc.exists()) {
-          await setDoc(userDocRef, {
-            name: userCredential.user.displayName,
-            email: userCredential.user.email,
-            onboardingComplete: false,
-            createdAt: new Date().toISOString()
-          });
-          window.location.href = '/onboarding';
-        } else {
-          const userData = userDoc.data();
-          if (!userData.onboardingComplete) {
-            window.location.href = '/onboarding';
-          } else {
-            window.location.href = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
-          }
+      let redirectUrl = '/onboarding';
+      if (!userDoc.exists()) {
+        await setDoc(userDocRef, {
+          name: userCredential.user.displayName,
+          email: userCredential.user.email,
+          onboardingComplete: false,
+          createdAt: new Date().toISOString()
+        });
+      } else {
+        const userData = userDoc.data();
+        if (userData.onboardingComplete) {
+          redirectUrl = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
         }
+      }
+
+      await refreshUserData();
+      setIsSuccess(true);
+      setTimeout(() => {
+        router.push(redirectUrl);
       }, 1000);
     } catch (err: any) {
       setError(err.message || 'Failed to login with Google');
@@ -106,6 +111,7 @@ export default function LoginPage() {
       const userDocRef = doc(db, "users", userCredential.user.uid);
       const userDoc = await getDoc(userDocRef);
       
+      let redirectUrl = '/onboarding';
       if (!userDoc.exists()) {
         await setDoc(userDocRef, {
           name: userCredential.user.displayName,
@@ -113,15 +119,18 @@ export default function LoginPage() {
           onboardingComplete: false,
           createdAt: new Date().toISOString()
         });
-        window.location.href = '/onboarding';
       } else {
         const userData = userDoc.data();
-        if (!userData.onboardingComplete) {
-          window.location.href = '/onboarding';
-        } else {
-          window.location.href = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
+        if (userData.onboardingComplete) {
+          redirectUrl = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
         }
       }
+
+      await refreshUserData();
+      setIsSuccess(true);
+      setTimeout(() => {
+        router.push(redirectUrl);
+      }, 1000);
     } catch (err: any) {
       setError(err.message || 'Failed to login with Facebook');
     }

@@ -10,5 +10,22 @@
     "courses": "কোর্স",
     "dashboard": "ড্যাশবোর্ড",
     "login": "লগইন"
+  },
+  "Dashboard": {
+    "sidebar": {
+      "overview": "ওভারভিউ",
+      "courses": "আমার কোর্স",
+      "exams": "ডেইলি এক্সাম",
+      "settings": "সেটিংস",
+      "logout": "লগআউট"
+    },
+    "overview": {
+      "welcome": "স্বাগতম",
+      "subtitle": "আজ নতুন কিছু শিখতে প্রস্তুত?",
+      "enrolled": "এনরোল করা কোর্স",
+      "completed": "কমপ্লিট করা লেসন",
+      "score": "গড় নম্বর",
+      "continue": "পড়া চালিয়ে যান"
+    }
   }
 }

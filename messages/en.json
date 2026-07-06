@@ -10,5 +10,22 @@
     "courses": "Courses",
     "dashboard": "Dashboard",
     "login": "Login"
+  },
+  "Dashboard": {
+    "sidebar": {
+      "overview": "Overview",
+      "courses": "My Courses",
+      "exams": "Daily Exams",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
+    "overview": {
+      "welcome": "Welcome back",
+      "subtitle": "Ready to learn something new today?",
+      "enrolled": "Enrolled Courses",
+      "completed": "Completed Lessons",
+      "score": "Average Score",
+      "continue": "Continue Learning"
+    }
   }
 }

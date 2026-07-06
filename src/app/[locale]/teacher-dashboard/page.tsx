@@ -27,7 +27,7 @@ export default function TeacherDashboard() {
         </div>
         
         <Link 
-          href="/teacher-dashboard/courses/new" 
+          href="/teacher-dashboard/courses/create" 
           className="relative z-10 flex items-center justify-center gap-2 px-6 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-all shadow-lg hover:shadow-orange-500/30 hover:-translate-y-0.5"
         >
           <PlusCircle className="w-5 h-5" />

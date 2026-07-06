@@ -12,9 +12,17 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'preferences' | 'billing'>('profile');
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [eduLevel, setEduLevel] = useState('');
+  const { user, userData } = useAuth();
+  const [eduLevel, setEduLevel] = useState(userData?.eduLevel || '');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const { user } = useAuth();
+
+  // Sync eduLevel when userData is loaded
+  import { useEffect } from 'react';
+  useEffect(() => {
+    if (userData?.eduLevel) {
+      setEduLevel(userData.eduLevel);
+    }
+  }, [userData]);
 
   const tabs = [
     { id: 'profile', label: t('tabs.profile'), icon: User },
@@ -104,19 +112,20 @@ export default function SettingsPage() {
                   </div>
                   <div>
                     <label className="block text-sm text-foreground/70 mb-1">{t('profile.phone')}</label>
-                    <input type="tel" placeholder="+880 1XXX-XXXXXX" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                    <input type="tel" defaultValue={userData?.phone || ''} placeholder="+880 1XXX-XXXXXX" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm text-foreground/70 mb-1">{t('profile.dob')}</label>
-                      <input type="date" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-foreground" />
+                      <input type="date" defaultValue={userData?.dob || ''} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-foreground" />
                     </div>
                     <div>
                       <label className="block text-sm text-foreground/70 mb-1">{t('profile.gender')}</label>
-                      <select className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
-                        <option className="bg-background text-foreground">Male</option>
-                        <option className="bg-background text-foreground">Female</option>
-                        <option className="bg-background text-foreground">Other</option>
+                      <select defaultValue={userData?.gender || ''} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
+                        <option value="" disabled className="bg-background text-foreground">Select Gender</option>
+                        <option value="Male" className="bg-background text-foreground">Male</option>
+                        <option value="Female" className="bg-background text-foreground">Female</option>
+                        <option value="Other" className="bg-background text-foreground">Other</option>
                       </select>
                     </div>
                   </div>
@@ -135,7 +144,7 @@ export default function SettingsPage() {
                        eduLevel === 'honours' || eduLevel === 'masters' ? t('profile.uniName') : 
                        t('profile.institutionName')}
                     </label>
-                    <input type="text" placeholder="e.g. Dhaka College" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                    <input type="text" defaultValue={userData?.institution || ''} placeholder="e.g. Dhaka College" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                   </div>
 
                   {/* Field 2: Education Level */}
@@ -159,7 +168,7 @@ export default function SettingsPage() {
                   {(eduLevel === 'primary' || eduLevel === 'high_school') && (
                     <div>
                       <label className="block text-sm text-foreground/70 mb-1">{t('profile.class')}</label>
-                      <select className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
+                      <select defaultValue={userData?.class || ''} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
                         <option value="" disabled className="bg-background text-foreground">Select Class</option>
                         {eduLevel === 'primary' 
                           ? Array.from({length: 5}, (_, i) => <option key={i+1} value={i+1} className="bg-background text-foreground">Class {i+1}</option>)
@@ -173,7 +182,7 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm text-foreground/70 mb-1">{t('profile.class')}</label>
-                        <select className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
+                        <select defaultValue={userData?.class || ''} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
                           <option value="" disabled className="bg-background text-foreground">Select Class</option>
                           <option value="11" className="bg-background text-foreground">Class 11</option>
                           <option value="12" className="bg-background text-foreground">Class 12</option>
@@ -181,7 +190,7 @@ export default function SettingsPage() {
                       </div>
                       <div>
                         <label className="block text-sm text-foreground/70 mb-1">{t('profile.group')}</label>
-                        <select className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
+                        <select defaultValue={userData?.department || ''} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
                           <option value="" disabled className="bg-background text-foreground">Select Group</option>
                           <option value="science" className="bg-background text-foreground">Science</option>
                           <option value="arts" className="bg-background text-foreground">Arts (Humanities)</option>
@@ -195,26 +204,11 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm text-foreground/70 mb-1">{t('profile.department')}</label>
-                        <select className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
-                          <option value="" disabled className="bg-background text-foreground">Select Department</option>
-                          <option value="physics" className="bg-background text-foreground">Physics</option>
-                          <option value="mathematics" className="bg-background text-foreground">Mathematics</option>
-                          <option value="chemistry" className="bg-background text-foreground">Chemistry</option>
-                          <option value="botany" className="bg-background text-foreground">Botany</option>
-                          <option value="zoology" className="bg-background text-foreground">Zoology</option>
-                          <option value="economy" className="bg-background text-foreground">Economy</option>
-                          <option value="other" className="bg-background text-foreground">Other</option>
-                        </select>
+                        <input type="text" defaultValue={userData?.department || ''} placeholder="e.g. Physics" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                       </div>
                       <div>
                         <label className="block text-sm text-foreground/70 mb-1">{t('profile.year')}</label>
-                        <select className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
-                          <option value="" disabled className="bg-background text-foreground">Select Year</option>
-                          <option value="1st" className="bg-background text-foreground">1st Year</option>
-                          <option value="2nd" className="bg-background text-foreground">2nd Year</option>
-                          <option value="3rd" className="bg-background text-foreground">3rd Year</option>
-                          <option value="final" className="bg-background text-foreground">Final Year</option>
-                        </select>
+                        <input type="text" defaultValue={userData?.year || ''} placeholder="e.g. 1st Year" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                       </div>
                     </div>
                   )}

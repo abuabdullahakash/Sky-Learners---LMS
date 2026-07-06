@@ -33,21 +33,23 @@ export default function OnboardingPage() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!loading) {
       if (!user) {
         router.push('/login');
-      } else if (userData && userData.onboardingComplete) {
+      } else if (userData && userData.onboardingComplete && !isSuccess) {
         router.push(userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard');
       }
     }
-  }, [user, userData, loading, router]);
+  }, [user, userData, loading, router, isSuccess]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !role) return;
     setIsLoading(true);
+    setError('');
 
     try {
       const dataToSave: any = {
@@ -75,18 +77,27 @@ export default function OnboardingPage() {
         dataToSave.subject = subject;
       }
 
-      await setDoc(doc(db, "users", user.uid), dataToSave, { merge: true });
-      await refreshUserData();
-      setIsSuccess(true);
+      // Add a timeout to prevent hanging forever if Firestore has connectivity issues
+      const setDocPromise = setDoc(doc(db, "users", user.uid), dataToSave, { merge: true });
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Request timed out. Please check your internet connection.")), 15000)
+      );
       
-    } catch (error) {
-      console.error("Error saving onboarding details", error);
+      await Promise.race([setDocPromise, timeoutPromise]);
+      
+      setIsSuccess(true);
+      // Not calling refreshUserData here because it would trigger the useEffect redirect
+      // and hide this success screen. Full page reload on link click will fetch new data.
+      
+    } catch (err: any) {
+      console.error("Error saving onboarding details", err);
+      setError(err.message || "An error occurred while saving your profile.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (loading || !user || (userData && userData.onboardingComplete)) {
+  if (loading || !user || (userData && userData.onboardingComplete && !isSuccess)) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
@@ -156,6 +167,12 @@ export default function OnboardingPage() {
               <h2 className="text-3xl font-bold mb-2">Complete Your Profile</h2>
               <p className="text-foreground/60">Just a few more details to set up your {role} account.</p>
             </div>
+
+            {error && (
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl text-red-500 text-sm text-center">
+                {error}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
               

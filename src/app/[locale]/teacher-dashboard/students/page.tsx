@@ -1,81 +1,105 @@
 "use client";
 
-import { useState } from 'react';
-import { Search, Filter, Mail, Eye, Users, UserCheck, UserPlus } from 'lucide-react';
-import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import { Search, Filter, Mail, Eye, Users, UserCheck, UserPlus, Loader2 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { db } from '@/lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
-// Mock data for students
-const MOCK_STUDENTS = [
-  {
-    id: 1,
-    name: 'Rahim Uddin',
-    email: 'rahim@example.com',
-    avatar: 'https://i.pravatar.cc/150?img=11',
-    course: 'Web Development Basics',
-    enrollDate: '12 May, 2026',
-    progress: 75,
-    status: 'Active'
-  },
-  {
-    id: 2,
-    name: 'Jannatul Ferdous',
-    email: 'jannatul@example.com',
-    avatar: 'https://i.pravatar.cc/150?img=5',
-    course: 'Advanced Physics',
-    enrollDate: '01 Jun, 2026',
-    progress: 40,
-    status: 'Active'
-  },
-  {
-    id: 3,
-    name: 'Hasan Mahmud',
-    email: 'hasan@example.com',
-    avatar: 'https://i.pravatar.cc/150?img=12',
-    course: 'Web Development Basics',
-    enrollDate: '15 Jun, 2026',
-    progress: 100,
-    status: 'Completed'
-  },
-  {
-    id: 4,
-    name: 'Sumaiya Akter',
-    email: 'sumaiya@example.com',
-    avatar: 'https://i.pravatar.cc/150?img=9',
-    course: 'Basic English Grammar',
-    enrollDate: '05 Jul, 2026',
-    progress: 10,
-    status: 'Active'
-  },
-  {
-    id: 5,
-    name: 'Karimul Islam',
-    email: 'karimul@example.com',
-    avatar: 'https://i.pravatar.cc/150?img=13',
-    course: 'Advanced Physics',
-    enrollDate: '02 Jul, 2026',
-    progress: 25,
-    status: 'Active'
-  }
+// Base mock names to generate dynamic students for real courses
+const MOCK_NAMES = [
+  { n: 'Rahim Uddin', e: 'rahim@example.com' },
+  { n: 'Jannatul Ferdous', e: 'jannatul@example.com' },
+  { n: 'Hasan Mahmud', e: 'hasan@example.com' },
+  { n: 'Sumaiya Akter', e: 'sumaiya@example.com' },
+  { n: 'Karimul Islam', e: 'karimul@example.com' },
+  { n: 'Ayesha Siddiqa', e: 'ayesha@example.com' },
+  { n: 'Tariqul Islam', e: 'tariqul@example.com' },
 ];
 
 export default function StudentsPage() {
+  const { user } = useAuth();
+  const [courses, setCourses] = useState<any[]>([]);
+  const [students, setStudents] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterCourse, setFilterCourse] = useState('All');
+  const [filterCourseId, setFilterCourseId] = useState('All');
+
+  useEffect(() => {
+    const fetchCoursesAndStudents = async () => {
+      if (!user) return;
+      setIsLoading(true);
+      try {
+        // Fetch real courses created by this teacher
+        const q = query(
+          collection(db, 'courses'),
+          where('teacherId', '==', user.uid)
+        );
+        const querySnapshot = await getDocs(q);
+        const fetchedCourses: any[] = [];
+        querySnapshot.forEach((doc) => {
+          fetchedCourses.push({ id: doc.id, ...doc.data() });
+        });
+        
+        setCourses(fetchedCourses);
+
+        // Dynamically assign mock students to the teacher's real courses
+        if (fetchedCourses.length > 0) {
+          const generatedStudents = MOCK_NAMES.map((person, i) => {
+            const course = fetchedCourses[i % fetchedCourses.length];
+            const progress = Math.floor(Math.random() * 100);
+            return {
+              id: i,
+              name: person.n,
+              email: person.e,
+              avatar: `https://i.pravatar.cc/150?img=${(i % 50) + 10}`, // Randomize avatar slightly
+              courseTitle: course.title,
+              courseId: course.id,
+              enrollDate: new Date(Date.now() - Math.random() * 10000000000).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+              progress: progress,
+              status: progress === 100 ? 'Completed' : 'Active'
+            };
+          });
+          setStudents(generatedStudents);
+        } else {
+          setStudents([]);
+        }
+
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchCoursesAndStudents();
+  }, [user]);
 
   // Filter logic
-  const filteredStudents = MOCK_STUDENTS.filter(student => {
+  const filteredStudents = students.filter(student => {
     const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           student.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCourse = filterCourse === 'All' || student.course === filterCourse;
+    const matchesCourse = filterCourseId === 'All' || student.courseId === filterCourseId;
     return matchesSearch && matchesCourse;
   });
+
+  const activeStudentsCount = students.filter(s => s.status === 'Active').length;
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold mb-2">Students</h1>
-        <p className="text-foreground/60">Manage and track your enrolled students' progress.</p>
+        <p className="text-foreground/60">Manage and track your enrolled students' progress across your courses.</p>
       </div>
 
       {/* Stats Cards */}
@@ -86,7 +110,7 @@ export default function StudentsPage() {
           </div>
           <div>
             <p className="text-foreground/60 text-sm font-medium">Total Students</p>
-            <h3 className="text-2xl font-bold">1,245</h3>
+            <h3 className="text-2xl font-bold">{students.length}</h3>
           </div>
         </div>
         
@@ -96,7 +120,7 @@ export default function StudentsPage() {
           </div>
           <div>
             <p className="text-foreground/60 text-sm font-medium">Active Students</p>
-            <h3 className="text-2xl font-bold">890</h3>
+            <h3 className="text-2xl font-bold">{activeStudentsCount}</h3>
           </div>
         </div>
 
@@ -106,7 +130,7 @@ export default function StudentsPage() {
           </div>
           <div>
             <p className="text-foreground/60 text-sm font-medium">New This Month</p>
-            <h3 className="text-2xl font-bold">124</h3>
+            <h3 className="text-2xl font-bold">{Math.floor(students.length / 3)}</h3>
           </div>
         </div>
       </div>
@@ -130,14 +154,16 @@ export default function StudentsPage() {
             <div className="relative flex-1 sm:flex-none">
               <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
               <select 
-                value={filterCourse}
-                onChange={(e) => setFilterCourse(e.target.value)}
-                className="w-full sm:w-48 bg-background border border-foreground/20 rounded-xl py-2.5 pl-9 pr-4 appearance-none focus:outline-none focus:border-primary transition-colors cursor-pointer"
+                value={filterCourseId}
+                onChange={(e) => setFilterCourseId(e.target.value)}
+                className="w-full sm:w-56 bg-background border border-foreground/20 rounded-xl py-2.5 pl-9 pr-4 appearance-none focus:outline-none focus:border-primary transition-colors cursor-pointer"
               >
                 <option value="All">All Courses</option>
-                <option value="Web Development Basics">Web Dev Basics</option>
-                <option value="Advanced Physics">Advanced Physics</option>
-                <option value="Basic English Grammar">Basic English</option>
+                {courses.map(course => (
+                  <option key={course.id} value={course.id}>
+                    {course.title.length > 25 ? course.title.substring(0, 25) + '...' : course.title}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -145,7 +171,7 @@ export default function StudentsPage() {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-foreground/5 text-foreground/60 text-sm uppercase tracking-wider">
                 <th className="px-6 py-4 font-medium">Student</th>
@@ -156,7 +182,13 @@ export default function StudentsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-foreground/10">
-              {filteredStudents.length > 0 ? (
+              {courses.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center text-foreground/50">
+                    You haven't created any courses yet.
+                  </td>
+                </tr>
+              ) : filteredStudents.length > 0 ? (
                 filteredStudents.map((student) => (
                   <tr key={student.id} className="hover:bg-foreground/5 transition-colors">
                     <td className="px-6 py-4">
@@ -174,7 +206,7 @@ export default function StudentsPage() {
                     </td>
                     <td className="px-6 py-4">
                       <span className="inline-block px-3 py-1 bg-foreground/10 rounded-full text-sm font-medium">
-                        {student.course}
+                        {student.courseTitle}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-foreground/70">
@@ -185,7 +217,7 @@ export default function StudentsPage() {
                         <span className="text-xs font-bold">{student.progress}%</span>
                         <div className="w-24 h-2 bg-foreground/10 rounded-full overflow-hidden">
                           <div 
-                            className={`h-full rounded-full ${
+                            className={`h-full rounded-full transition-all duration-1000 ${
                               student.progress === 100 ? 'bg-green-500' : 'bg-orange-500'
                             }`}
                             style={{ width: `${student.progress}%` }}
@@ -217,15 +249,16 @@ export default function StudentsPage() {
         </div>
         
         {/* Pagination Dummy */}
-        <div className="p-4 border-t border-foreground/10 flex items-center justify-between text-sm text-foreground/60 bg-background/50">
-          <p>Showing {filteredStudents.length} of {MOCK_STUDENTS.length} students</p>
-          <div className="flex gap-1">
-            <button className="px-3 py-1 rounded bg-foreground/10 hover:bg-foreground/20 disabled:opacity-50" disabled>Prev</button>
-            <button className="px-3 py-1 rounded bg-primary text-white">1</button>
-            <button className="px-3 py-1 rounded bg-foreground/10 hover:bg-foreground/20">2</button>
-            <button className="px-3 py-1 rounded bg-foreground/10 hover:bg-foreground/20">Next</button>
+        {students.length > 0 && (
+          <div className="p-4 border-t border-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-foreground/60 bg-background/50">
+            <p>Showing {filteredStudents.length} of {students.length} students</p>
+            <div className="flex gap-1">
+              <button className="px-3 py-1 rounded bg-foreground/10 hover:bg-foreground/20 disabled:opacity-50" disabled>Prev</button>
+              <button className="px-3 py-1 rounded bg-primary text-white">1</button>
+              <button className="px-3 py-1 rounded bg-foreground/10 hover:bg-foreground/20 disabled:opacity-50" disabled={filteredStudents.length === 0}>Next</button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

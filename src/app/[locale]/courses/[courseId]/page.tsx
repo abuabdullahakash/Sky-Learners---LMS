@@ -92,7 +92,12 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
                   </div>
                   <div>
                     <p className="text-foreground/50 text-xs uppercase">শিক্ষক</p>
-                    <p>{course.coachingName || 'Instructor'}</p>
+                    <p className="font-bold">{course.coachingName || 'Instructor'}</p>
+                    {course.teacherId && (
+                      <Link href={`/teachers/${course.teacherId}`} className="text-primary text-xs hover:underline mt-0.5 inline-block">
+                        প্রোফাইল দেখুন
+                      </Link>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -101,7 +106,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
                   </div>
                   <div>
                     <p className="text-foreground/50 text-xs uppercase">মেয়াদ</p>
-                    <p>Life-time Access</p>
+                    <p>{course.courseValidity || 'Life-time Access'}</p>
                   </div>
                 </div>
               </div>
@@ -181,13 +186,37 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
                   <span className="text-foreground/60">মডিউল সংখ্যা</span>
                   <span>{course.modules?.length || 0} টি</span>
                 </li>
+                {course.department && (
+                  <li className="flex items-center justify-between text-sm font-semibold">
+                    <span className="text-foreground/60">বিষয়/বিভাগ</span>
+                    <span className="text-right">{course.department}</span>
+                  </li>
+                )}
+                {course.year && (
+                  <li className="flex items-center justify-between text-sm font-semibold">
+                    <span className="text-foreground/60">বর্ষ/সেমিস্টার</span>
+                    <span className="text-right">{course.year}</span>
+                  </li>
+                )}
+                {course.eduClass && (
+                  <li className="flex items-center justify-between text-sm font-semibold">
+                    <span className="text-foreground/60">শ্রেণী</span>
+                    <span className="text-right">{course.category === 'intermediate' ? 'একাদশ/দ্বাদশ' : `Class ${course.eduClass}`}</span>
+                  </li>
+                )}
+                {course.classStartDate && (
+                  <li className="flex items-center justify-between text-sm font-semibold">
+                    <span className="text-foreground/60">ক্লাস শুরু</span>
+                    <span className="text-right">{new Date(course.classStartDate).toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                  </li>
+                )}
                 <li className="flex items-center justify-between text-sm font-semibold">
-                  <span className="text-foreground/60">কোর্স অ্যাক্সেস</span>
-                  <span>লাইফ-টাইম</span>
+                  <span className="text-foreground/60">কোর্সের মেয়াদ</span>
+                  <span className="text-right">{course.courseValidity || 'লাইফ-টাইম'}</span>
                 </li>
                 <li className="flex items-center justify-between text-sm font-semibold">
                   <span className="text-foreground/60">সার্টিফিকেট</span>
-                  <span>হ্যাঁ</span>
+                  <span className="text-right">হ্যাঁ</span>
                 </li>
               </ul>
 

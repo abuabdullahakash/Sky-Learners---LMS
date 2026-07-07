@@ -1,16 +1,19 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { DollarSign, TrendingUp, CreditCard, Clock, ArrowUpRight, ArrowDownRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { DollarSign, TrendingUp, Clock, CheckCircle2, AlertCircle, Filter } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 // --- MOCK DATA GENERATORS (Easy to replace with real API later) ---
-const fetchMockEarningsStats = async () => {
+const fetchMockEarningsStats = async (month: string) => {
+  // Simulating different stats based on month selection
+  const baseTotal = 12500;
+  const multiplier = month === 'All Time' ? 1 : month === 'July 2026' ? 0.8 : 0.5;
+  
   return new Promise(resolve => setTimeout(() => resolve({
-    totalEarnings: 12500,
-    thisMonth: 1250,
-    available: 3400,
-    pending: 450,
+    totalEarnings: baseTotal * multiplier,
+    thisMonth: 1250 * (multiplier > 0.5 ? 1 : 0),
+    pending: 450 * multiplier,
     growth: 12.5 // percentage
   }), 500));
 };
@@ -22,13 +25,6 @@ const fetchMockTransactions = async () => {
     { id: 'TRX-103', student: 'Hasan Mahmud', course: 'Web Development Basics', amount: 1500, status: 'pending', date: '2026-07-05' },
     { id: 'TRX-104', student: 'Sumaiya Akter', course: 'Basic English Grammar', amount: 1000, status: 'completed', date: '2026-07-02' },
     { id: 'TRX-105', student: 'Karimul Islam', course: 'Advanced Physics', amount: 2000, status: 'refunded', date: '2026-06-30' },
-  ]), 500));
-};
-
-const fetchMockPayoutHistory = async () => {
-  return new Promise(resolve => setTimeout(() => resolve([
-    { id: 'PAY-01', method: 'Bank Transfer (DBBL)', amount: 5000, status: 'completed', date: '2026-06-01' },
-    { id: 'PAY-02', method: 'bKash', amount: 2500, status: 'completed', date: '2026-05-15' },
   ]), 500));
 };
 
@@ -56,27 +52,26 @@ export default function EarningsPage() {
   const { user } = useAuth();
   const [stats, setStats] = useState<any>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
-  const [payouts, setPayouts] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [topCourses, setTopCourses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  const [selectedMonth, setSelectedMonth] = useState('All Time');
 
   useEffect(() => {
-    // Load all mock data on mount
+    // Load all mock data on mount and when month changes
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const [statsData, trxData, payoutData, chartRes, topCoursesRes] = await Promise.all([
-          fetchMockEarningsStats(),
+        const [statsData, trxData, chartRes, topCoursesRes] = await Promise.all([
+          fetchMockEarningsStats(selectedMonth),
           fetchMockTransactions(),
-          fetchMockPayoutHistory(),
           fetchMockChartData(),
           fetchMockTopCourses()
         ]);
         
         setStats(statsData);
         setTransactions(trxData as any[]);
-        setPayouts(payoutData as any[]);
         setChartData(chartRes as any[]);
         setTopCourses(topCoursesRes as any[]);
       } catch (error) {
@@ -87,9 +82,9 @@ export default function EarningsPage() {
     };
     
     loadData();
-  }, []);
+  }, [selectedMonth]);
 
-  if (isLoading) {
+  if (isLoading && !stats) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -105,14 +100,35 @@ export default function EarningsPage() {
 
   return (
     <div className="space-y-8 pb-10">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Earnings & Payouts</h1>
-        <p className="text-foreground/60">Track your revenue, view transactions, and manage withdrawals.</p>
+      {/* Header & Filter */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Earnings Report</h1>
+          <p className="text-foreground/60">Track your revenue and pending clearances from student enrollments.</p>
+        </div>
+        
+        <div className="relative">
+          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+          <select 
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="w-full sm:w-48 bg-foreground/5 border border-foreground/10 rounded-xl py-2.5 pl-9 pr-4 appearance-none focus:outline-none focus:border-primary transition-colors cursor-pointer font-medium"
+          >
+            <option value="All Time">All Time</option>
+            <option value="July 2026">July 2026</option>
+            <option value="June 2026">June 2026</option>
+            <option value="May 2026">May 2026</option>
+          </select>
+        </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 relative">
+        {isLoading && (
+          <div className="absolute inset-0 bg-background/50 z-10 flex items-center justify-center backdrop-blur-sm rounded-3xl">
+            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
         <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-6 relative overflow-hidden group hover:border-primary/50 transition-colors">
           <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-green-500/20 transition-colors"></div>
           <div className="relative z-10">
@@ -138,14 +154,6 @@ export default function EarningsPage() {
         </div>
 
         <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-6">
-          <div className="p-3 bg-orange-500/20 text-orange-500 rounded-xl w-max mb-4">
-            <CreditCard className="w-6 h-6" />
-          </div>
-          <p className="text-foreground/60 text-sm font-medium mb-1">Available for Withdrawal</p>
-          <h3 className="text-3xl font-bold">{formatCurrency(stats?.available || 0)}</h3>
-        </div>
-
-        <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-6">
           <div className="p-3 bg-yellow-500/20 text-yellow-500 rounded-xl w-max mb-4">
             <Clock className="w-6 h-6" />
           </div>
@@ -157,12 +165,7 @@ export default function EarningsPage() {
       {/* Analytics Chart */}
       <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-6 md:p-8">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-xl font-bold">Revenue Analytics (Last 7 Days)</h2>
-          <select className="bg-background border border-foreground/20 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-primary cursor-pointer">
-            <option>Last 7 Days</option>
-            <option>This Month</option>
-            <option>This Year</option>
-          </select>
+          <h2 className="text-xl font-bold">Revenue Analytics</h2>
         </div>
         
         {/* Custom CSS Bar Chart */}
@@ -245,31 +248,8 @@ export default function EarningsPage() {
           </div>
         </div>
 
-        {/* Right Col: Payouts & Top Courses */}
+        {/* Right Col: Top Courses */}
         <div className="space-y-8">
-          
-          {/* Payout Widget */}
-          <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-6">
-            <h2 className="text-xl font-bold mb-6">Withdraw Funds</h2>
-            
-            <div className="bg-background border border-foreground/10 rounded-2xl p-5 mb-6">
-              <p className="text-sm text-foreground/60 mb-1">Available Balance</p>
-              <h3 className="text-4xl font-bold text-primary mb-4">{formatCurrency(stats?.available || 0)}</h3>
-              
-              <div className="flex items-center justify-between py-3 border-t border-foreground/10">
-                <span className="text-sm text-foreground/60">Payout Method</span>
-                <span className="text-sm font-semibold flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-primary" /> Bank (**** 1234)
-                </span>
-              </div>
-            </div>
-            
-            <button className="w-full py-3.5 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] transition-all flex items-center justify-center gap-2">
-              <ArrowUpRight className="w-5 h-5" /> Request Payout
-            </button>
-            <p className="text-center text-xs text-foreground/40 mt-3">Minimum withdrawal amount is ৳1000.</p>
-          </div>
-
           {/* Top Courses */}
           <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-6">
             <h2 className="text-xl font-bold mb-6">Top Selling Courses</h2>
@@ -291,7 +271,6 @@ export default function EarningsPage() {
               ))}
             </div>
           </div>
-
         </div>
       </div>
     </div>

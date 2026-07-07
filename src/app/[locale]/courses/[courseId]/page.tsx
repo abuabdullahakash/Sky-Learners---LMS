@@ -130,9 +130,9 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
           
           <div className="lg:col-span-2 space-y-12">
             <section>
-              <h2 className="text-3xl font-bold mb-6">কোর্সটি কাদের জন্য?</h2>
-              <div className="bg-foreground/5 p-6 rounded-2xl border border-foreground/10 text-foreground/80 leading-relaxed text-lg">
-                যে সকল শিক্ষার্থীরা {course.category === 'intermediate' ? 'HSC' : course.category === 'primary' ? 'Primary' : course.category === 'high_school' ? 'SSC' : course.category} তে অধ্যয়নরত আছেন এবং নিজেদের প্রস্তুতিকে আরও এক ধাপ এগিয়ে নিতে চান, তাদের জন্য এই কোর্সটি বিশেষভাবে ডিজাইন করা হয়েছে।
+              <h2 className="text-3xl font-bold mb-6">কোর্সের বিস্তারিত বিবরণ</h2>
+              <div className="bg-foreground/5 p-6 rounded-2xl border border-foreground/10 text-foreground/80 leading-relaxed text-lg whitespace-pre-wrap">
+                {course.detailedDescription || `যে সকল শিক্ষার্থীরা ${course.category === 'intermediate' ? 'HSC' : course.category === 'primary' ? 'Primary' : course.category === 'high_school' ? 'SSC' : course.category} তে অধ্যয়নরত আছেন এবং নিজেদের প্রস্তুতিকে আরও এক ধাপ এগিয়ে নিতে চান, তাদের জন্য এই কোর্সটি বিশেষভাবে ডিজাইন করা হয়েছে।`}
               </div>
             </section>
 
@@ -140,18 +140,29 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
               <h2 className="text-3xl font-bold mb-6">কোর্সে যা যা থাকছে</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
-                  'লং ও শর্ট সিলেবাস কভার',
-                  'রেকর্ডেড ভিডিও ক্লাস',
-                  'লাইভ ক্লাস সেশন',
-                  'ক্লাস নোট ও পিডিএফ',
-                  'অধ্যায়ভিত্তিক পরীক্ষা (MCQ)',
-                  'প্রবলেম সলভিং ক্লাস'
-                ].map((feature, i) => (
-                  <div key={i} className="flex items-center gap-3 p-4 bg-background border border-foreground/10 rounded-2xl shadow-sm hover:border-primary/30 transition-colors">
-                    <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
-                    <span className="font-semibold text-foreground/90">{feature}</span>
+                  course.totalVideoLessons > 0 ? `${course.totalVideoLessons} টি রেকর্ডেড ভিডিও ক্লাস` : null,
+                  course.totalLiveClasses > 0 ? `${course.totalLiveClasses} টি লাইভ ক্লাস সেশন` : null,
+                  course.totalPdfs > 0 ? `${course.totalPdfs} টি ক্লাস নোট ও পিডিএফ` : null,
+                  course.totalExams > 0 ? `${course.totalExams} টি অধ্যায়ভিত্তিক পরীক্ষা (MCQ)` : null,
+                  course.hasDoubtSolving ? '24/7 ডাউট সলভিং সাপোর্ট' : null,
+                ].filter(Boolean).length > 0 ? (
+                  [
+                    course.totalVideoLessons > 0 ? `${course.totalVideoLessons} টি রেকর্ডেড ভিডিও ক্লাস` : null,
+                    course.totalLiveClasses > 0 ? `${course.totalLiveClasses} টি লাইভ ক্লাস সেশন` : null,
+                    course.totalPdfs > 0 ? `${course.totalPdfs} টি ক্লাস নোট ও পিডিএফ` : null,
+                    course.totalExams > 0 ? `${course.totalExams} টি অধ্যায়ভিত্তিক পরীক্ষা (MCQ)` : null,
+                    course.hasDoubtSolving ? '24/7 ডাউট সলভিং সাপোর্ট' : null,
+                  ].filter(Boolean).map((feature, i) => (
+                    <div key={i} className="flex items-center gap-3 p-4 bg-background border border-foreground/10 rounded-2xl shadow-sm hover:border-primary/30 transition-colors">
+                      <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
+                      <span className="font-semibold text-foreground/90">{feature}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-1 sm:col-span-2 p-4 text-foreground/50 border border-foreground/10 rounded-2xl bg-background text-sm">
+                    এই কোর্সের বিস্তারিত ফিচার খুব শীঘ্রই যুক্ত করা হবে।
                   </div>
-                ))}
+                )}
               </div>
             </section>
           </div>

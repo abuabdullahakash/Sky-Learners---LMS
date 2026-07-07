@@ -9,6 +9,7 @@ import { BookOpen, Users, Clock, CheckCircle2, ArrowLeft, Star, PlayCircle, Imag
 import { Link } from '@/i18n/routing';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { PerspectiveCarousel } from '@/components/ui/perspective-carousel';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -114,7 +115,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500">
-      <div className={`min-h-[75vh] lg:min-h-[85vh] pt-28 pb-12 flex items-center border-b border-foreground/10 relative overflow-hidden ${hasCover ? '' : 'bg-foreground/5'}`}>
+      <div className={`min-h-[75vh] lg:min-h-[85vh] pt-28 pb-12 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-foreground/5'}`}>
         {hasSlider ? (
           <div className="absolute inset-0 z-0">
             <img 
@@ -144,7 +145,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
                 <span className="text-white/70 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
                 <div className="flex flex-col gap-3">
                   {course.sliderImages.map((_: any, idx: number) => (
-                    <div key={idx} onClick={() => setCurrentSlide(idx)} className={`w-2 rounded-full transition-all duration-300 cursor-pointer ${idx === currentSlide ? 'bg-primary h-8' : 'bg-white/50 h-2 hover:bg-white/80'}`} />
+                    <div key={idx} onClick={() => setCurrentSlide(idx)} className={`w-2 rounded-full transition-all duration-300 cursor-pointer ${idx === currentSlide ? 'bg-gradient-to-b from-cyan-400 to-purple-500 h-8 shadow-[0_0_10px_rgba(192,132,252,0.5)]' : 'bg-white/50 h-2 hover:bg-white/80'}`} />
                   ))}
                 </div>
                 <span className="text-white/30 text-xs font-bold">{String(course.sliderImages.length).padStart(2, '0')}</span>
@@ -166,18 +167,18 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
               </a>
             )}
             <div className="w-px h-16 bg-white/10"></div>
-            <div className="flex flex-col gap-8 text-white/60">
+            <div className="flex flex-col gap-8">
               <div className="flex flex-col items-center gap-1 group cursor-default" title={`Total Lessons: ${course.totalVideoLessons || 0}`}>
-                <BookOpen className="w-5 h-5 group-hover:text-white group-hover:scale-125 group-hover:-translate-y-1 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+                <BookOpen className="w-5 h-5 text-cyan-400 group-hover:scale-125 group-hover:-translate-y-1 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
               </div>
               <div className="flex flex-col items-center gap-1 group cursor-default" title={`Live Classes: ${course.totalLiveClasses || 0}`}>
-                <Users className="w-5 h-5 group-hover:text-white group-hover:scale-125 group-hover:-translate-y-1 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+                <Users className="w-5 h-5 text-blue-400 group-hover:scale-125 group-hover:-translate-y-1 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]" />
               </div>
               <div className="flex flex-col items-center gap-1 group cursor-default" title={`Exams: ${course.totalExams || 0}`}>
-                <CheckCircle2 className="w-5 h-5 group-hover:text-white group-hover:scale-125 group-hover:-translate-y-1 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+                <CheckCircle2 className="w-5 h-5 text-purple-400 group-hover:scale-125 group-hover:-translate-y-1 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(192,132,252,0.8)]" />
               </div>
               <div className="flex flex-col items-center gap-1 group cursor-default" title={`Duration: ${course.courseValidity || 'Lifetime'}`}>
-                <Clock className="w-5 h-5 group-hover:text-white group-hover:scale-125 group-hover:-translate-y-1 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+                <Clock className="w-5 h-5 text-pink-400 group-hover:scale-125 group-hover:-translate-y-1 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(244,114,182,0.8)]" />
               </div>
             </div>
           </div>
@@ -228,6 +229,9 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
           </div>
         </div>
 
+        {/* Bottom Blend Gradient overlay */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none"></div>
+
         {/* Bottom Slider Dots (Mobile) */}
         {hasSlider && course.sliderImages.length > 1 && (
           <div className="lg:hidden absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-10">
@@ -250,35 +254,6 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
               </div>
             </section>
 
-            <section>
-              <h2 className="text-3xl font-bold mb-6">কোর্সে যা যা থাকছে</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[
-                  course.totalVideoLessons > 0 ? `${course.totalVideoLessons} টি রেকর্ডেড ভিডিও ক্লাস` : null,
-                  course.totalLiveClasses > 0 ? `${course.totalLiveClasses} টি লাইভ ক্লাস সেশন` : null,
-                  course.totalPdfs > 0 ? `${course.totalPdfs} টি ক্লাস নোট ও পিডিএফ` : null,
-                  course.totalExams > 0 ? `${course.totalExams} টি অধ্যায়ভিত্তিক পরীক্ষা (MCQ)` : null,
-                  course.hasDoubtSolving ? '24/7 ডাউট সলভিং সাপোর্ট' : null,
-                ].filter(Boolean).length > 0 ? (
-                  [
-                    course.totalVideoLessons > 0 ? `${course.totalVideoLessons} টি রেকর্ডেড ভিডিও ক্লাস` : null,
-                    course.totalLiveClasses > 0 ? `${course.totalLiveClasses} টি লাইভ ক্লাস সেশন` : null,
-                    course.totalPdfs > 0 ? `${course.totalPdfs} টি ক্লাস নোট ও পিডিএফ` : null,
-                    course.totalExams > 0 ? `${course.totalExams} টি অধ্যায়ভিত্তিক পরীক্ষা (MCQ)` : null,
-                    course.hasDoubtSolving ? '24/7 ডাউট সলভিং সাপোর্ট' : null,
-                  ].filter(Boolean).map((feature, i) => (
-                    <div key={i} className="flex items-center gap-3 p-4 bg-background border border-foreground/10 rounded-2xl shadow-sm hover:border-primary/30 transition-colors">
-                      <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
-                      <span className="font-semibold text-foreground/90">{feature}</span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="col-span-1 sm:col-span-2 p-4 text-foreground/50 border border-foreground/10 rounded-2xl bg-background text-sm">
-                    এই কোর্সের বিস্তারিত ফিচার খুব শীঘ্রই যুক্ত করা হবে।
-                  </div>
-                )}
-              </div>
-            </section>
 
             {freeLessons.length > 0 && (
               <section className="animate-in slide-in-from-bottom-4 duration-700 delay-200">
@@ -313,17 +288,12 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
                   <Users className="w-8 h-8 text-primary" /> 
                   কোর্সের প্রশিক্ষকবৃন্দ
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {course.instructors.map((instructor: any) => (
-                    <div key={instructor.id} className="bg-background border border-foreground/10 rounded-3xl p-6 flex flex-col items-center text-center shadow-sm hover:border-primary/30 transition-all hover:-translate-y-1">
-                      <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-primary/10">
-                        <img src={instructor.photoUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'} alt={instructor.name} className="w-full h-full object-cover" />
-                      </div>
-                      <h3 className="text-xl font-bold mb-1">{instructor.name}</h3>
-                      <p className="text-primary font-semibold text-sm mb-3">{instructor.role || 'Instructor'}</p>
-                      <p className="text-foreground/70 text-sm leading-relaxed">{instructor.background}</p>
-                    </div>
-                  ))}
+                <div className="w-full h-[400px] py-10 relative">
+                  <PerspectiveCarousel 
+                    items={course.instructors} 
+                    slideWidth={300}
+                    rotationStep={40}
+                  />
                 </div>
               </section>
             )}
@@ -347,8 +317,8 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
 
           </div>
           
-          <div className="lg:col-span-1">
-            <div className="sticky top-24 bg-background border border-foreground/10 rounded-3xl p-6 shadow-xl">
+          <div className="lg:col-span-1 space-y-6 sticky top-24 h-fit pb-12">
+            <div className="bg-background border border-foreground/10 rounded-3xl p-6 shadow-xl">
               <div className="text-center mb-6">
                 <p className="text-foreground/50 font-bold uppercase tracking-wider mb-2">কোর্স ফি</p>
                 <div className="text-5xl font-extrabold text-primary">
@@ -406,6 +376,37 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
                 ১০০% নিরাপদ পেমেন্ট (বিকাশ/নগদ/রকেট)
               </p>
             </div>
+            
+            <div className="bg-background border border-foreground/10 rounded-3xl p-6 shadow-sm">
+              <h2 className="text-xl font-bold mb-4">কোর্সে যা যা থাকছে</h2>
+              <div className="flex flex-col gap-3">
+                {[
+                  course.totalVideoLessons > 0 ? `${course.totalVideoLessons} টি রেকর্ডেড ভিডিও ক্লাস` : null,
+                  course.totalLiveClasses > 0 ? `${course.totalLiveClasses} টি লাইভ ক্লাস সেশন` : null,
+                  course.totalPdfs > 0 ? `${course.totalPdfs} টি ক্লাস নোট ও পিডিএফ` : null,
+                  course.totalExams > 0 ? `${course.totalExams} টি অধ্যায়ভিত্তিক পরীক্ষা (MCQ)` : null,
+                  course.hasDoubtSolving ? '24/7 ডাউট সলভিং সাপোর্ট' : null,
+                ].filter(Boolean).length > 0 ? (
+                  [
+                    course.totalVideoLessons > 0 ? `${course.totalVideoLessons} টি রেকর্ডেড ভিডিও ক্লাস` : null,
+                    course.totalLiveClasses > 0 ? `${course.totalLiveClasses} টি লাইভ ক্লাস সেশন` : null,
+                    course.totalPdfs > 0 ? `${course.totalPdfs} টি ক্লাস নোট ও পিডিএফ` : null,
+                    course.totalExams > 0 ? `${course.totalExams} টি অধ্যায়ভিত্তিক পরীক্ষা (MCQ)` : null,
+                    course.hasDoubtSolving ? '24/7 ডাউট সলভিং সাপোর্ট' : null,
+                  ].filter(Boolean).map((feature, i) => (
+                    <div key={i} className="flex items-center gap-3 p-3 bg-foreground/5 border border-foreground/10 rounded-xl">
+                      <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
+                      <span className="font-semibold text-sm text-foreground/90">{feature}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-4 text-foreground/50 border border-foreground/10 rounded-xl bg-background text-sm text-center">
+                    ফিচার যুক্ত করা হয়নি
+                  </div>
+                )}
+              </div>
+            </div>
+
           </div>
 
         </div>

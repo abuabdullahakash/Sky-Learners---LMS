@@ -205,6 +205,27 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
               </section>
             )}
 
+            {course.instructors && course.instructors.length > 0 && (
+              <section className="animate-in slide-in-from-bottom-4 duration-700 delay-300">
+                <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
+                  <Users className="w-8 h-8 text-primary" /> 
+                  কোর্সের প্রশিক্ষকবৃন্দ
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {course.instructors.map((instructor: any) => (
+                    <div key={instructor.id} className="bg-background border border-foreground/10 rounded-3xl p-6 flex flex-col items-center text-center shadow-sm hover:border-primary/30 transition-all hover:-translate-y-1">
+                      <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-primary/10">
+                        <img src={instructor.photoUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'} alt={instructor.name} className="w-full h-full object-cover" />
+                      </div>
+                      <h3 className="text-xl font-bold mb-1">{instructor.name}</h3>
+                      <p className="text-primary font-semibold text-sm mb-3">{instructor.role || 'Instructor'}</p>
+                      <p className="text-foreground/70 text-sm leading-relaxed">{instructor.background}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
           </div>
           
           <div className="lg:col-span-1">

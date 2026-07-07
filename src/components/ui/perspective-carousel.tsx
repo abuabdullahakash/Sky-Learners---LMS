@@ -138,7 +138,7 @@ export function PerspectiveCarousel({
 
             return (
               <div
-                key={`${item.src}-${index}`}
+                key={`${item.id || item.name}-${index}`}
                 className="shrink-0"
                 style={{ width: safeSlideWidth, perspective: "1200px" }}
               >

@@ -1,16 +1,18 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useState, useEffect, use } from 'react';
+import { useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, addDoc, Timestamp } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { CheckCircle2, ShieldCheck, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 
-export default function CheckoutPage() {
-  const params = useParams();
+export default function CheckoutPage({ params }: { params: Promise<{ courseId: string }> }) {
   const router = useRouter();
-  const courseId = params.courseId as string;
+  
+  const resolvedParams = use(params);
+  const courseId = resolvedParams.courseId;
+  
   const { user, userData } = useAuth();
   
   const [course, setCourse] = useState<any>(null);

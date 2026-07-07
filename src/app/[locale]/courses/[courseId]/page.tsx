@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
@@ -8,13 +8,13 @@ import { doc, getDoc } from 'firebase/firestore';
 import { BookOpen, Users, Clock, CheckCircle2, ArrowLeft, Star, PlayCircle } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 
-import { useParams } from 'next/navigation';
-
-export default function CourseDetailsPage() {
+export default function CourseDetailsPage({ params }: { params: Promise<{ courseId: string }> }) {
   const { user } = useAuth();
   const router = useRouter();
-  const params = useParams();
-  const courseId = params.courseId as string;
+  
+  const resolvedParams = use(params);
+  const courseId = resolvedParams.courseId;
+  
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 

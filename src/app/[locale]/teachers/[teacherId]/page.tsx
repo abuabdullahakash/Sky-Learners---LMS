@@ -42,17 +42,18 @@ export default function TeacherProfilePage({ params }: { params: Promise<{ teach
   if (!profileData) return <div className="min-h-screen flex items-center justify-center text-xl text-foreground/50">Profile not found.</div>;
 
   return (
-    <div className="min-h-screen bg-background pb-20 animate-in fade-in duration-500">
-      <div className="max-w-5xl mx-auto pt-20 px-4 sm:px-6">
-        <div className="relative w-full bg-background border border-foreground/10 rounded-[2rem] shadow-sm overflow-hidden flex flex-col mt-8">
-          
-          {/* Cover Photo */}
-          <div className="h-48 md:h-64 relative bg-foreground/10">
-            <img src={profileData.coverPhoto || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1000&auto=format&fit=crop'} alt="Cover" className="w-full h-full object-cover" />
-          </div>
+    <div className="min-h-screen bg-background pb-20 animate-in fade-in duration-500 pt-16">
+      
+      {/* Cover Photo */}
+      <div className="h-48 md:h-80 relative bg-foreground/10 w-full">
+        <img src={profileData.coverPhoto || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1000&auto=format&fit=crop'} alt="Cover" className="w-full h-full object-cover" />
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="relative w-full bg-background flex flex-col">
 
           {/* Profile Info Section */}
-          <div className="px-6 md:px-12 relative pb-12">
+          <div className="relative pb-12">
             
             {/* Profile Photo */}
             <div className="relative w-32 h-32 md:w-40 md:h-40 -mt-16 md:-mt-20 mb-4">

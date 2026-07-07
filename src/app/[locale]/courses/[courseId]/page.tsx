@@ -59,6 +59,13 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
     );
   }
 
+  const freeLessons = (course.modules || []).flatMap((m: any) => 
+    (m.lessons || []).filter((l: any) => l.isFreePreview === true)
+  );
+
+  console.log('Course Modules:', course.modules);
+  console.log('Free Lessons:', freeLessons);
+
   return (
     <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500">
       {/* Hero Section */}
@@ -170,6 +177,34 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
                 )}
               </div>
             </section>
+
+            {freeLessons.length > 0 && (
+              <section className="animate-in slide-in-from-bottom-4 duration-700 delay-200">
+                <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
+                  <PlayCircle className="w-8 h-8 text-primary" /> 
+                  ফ্রি ক্লাস ও ম্যাটেরিয়ালস
+                </h2>
+                <div className="bg-background border border-foreground/10 rounded-3xl overflow-hidden shadow-sm">
+                  {freeLessons.map((lesson: any, i: number) => (
+                    <div key={lesson.id} className={`p-4 flex items-center justify-between hover:bg-foreground/5 transition-colors ${i !== freeLessons.length - 1 ? 'border-b border-foreground/10' : ''}`}>
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                          <PlayCircle className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground/90">{lesson.title || `ফ্রি লেসন ${i + 1}`}</p>
+                          <p className="text-xs text-foreground/50 mt-0.5">ফ্রি প্রিভিউ</p>
+                        </div>
+                      </div>
+                      <a href={lesson.videoUrl || '#'} target={lesson.videoUrl ? "_blank" : "_self"} className="px-4 py-2 bg-primary/10 text-primary font-bold rounded-xl text-sm hover:bg-primary hover:text-white transition-colors whitespace-nowrap">
+                        দেখুন
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
           </div>
           
           <div className="lg:col-span-1">

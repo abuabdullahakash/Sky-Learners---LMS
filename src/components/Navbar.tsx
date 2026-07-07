@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { ThemeToggle } from './ThemeToggle';
+import Image from 'next/image';
 import { LanguageToggle } from './LanguageToggle';
 import { useAuth } from '@/context/AuthContext';
 import { User as UserIcon } from 'lucide-react';
@@ -29,10 +30,9 @@ export default function Navbar() {
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-accent flex items-center justify-center text-white font-bold text-xl">
-                S
+              <div className="relative w-[180px] h-[48px] md:w-[220px] md:h-[56px] lg:w-[260px] lg:h-[64px] overflow-hidden flex items-center justify-center">
+                <Image src="/Sky learners academy.png" alt="Sky Learners Logo" fill className="object-contain scale-[1.7] origin-center" priority />
               </div>
-              <span className="font-extrabold text-2xl tracking-tight">Sky<span className="text-primary">Learners</span></span>
             </Link>
 
             {/* Desktop Navigation */}

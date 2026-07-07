@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
 import { Mail, MapPin, Phone } from 'lucide-react';
+import Image from 'next/image';
 
 const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
@@ -32,11 +33,10 @@ export default function Footer() {
           
           {/* Brand & About */}
           <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-accent flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-primary/20">
-                S
+            <Link href="/" className="flex items-center gap-2 mb-2">
+              <div className="relative w-[180px] h-[50px] md:w-[240px] md:h-[60px] overflow-hidden flex items-center justify-center">
+                <Image src="/Sky learners academy.png" alt="Sky Learners Logo" fill className="object-contain scale-[1.7] origin-center" />
               </div>
-              <span className="font-extrabold text-2xl tracking-tight">Sky<span className="text-primary">Learners</span></span>
             </Link>
             <p className="text-foreground/70 leading-relaxed">
               {t('about')}

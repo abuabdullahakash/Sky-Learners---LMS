@@ -5,8 +5,9 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Save } from 'lucide-react';
+import { Save, ImagePlus, Trash2, X, Loader2 } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
+import { uploadImageToImgBB } from '@/lib/imgbb';
 
 export default function CourseSettingsPage() {
   const { user } = useAuth();
@@ -18,6 +19,64 @@ export default function CourseSettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [course, setCourse] = useState<any>(null);
   const [message, setMessage] = useState('');
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [isUploadingSlider, setIsUploadingSlider] = useState(false);
+
+  const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+
+  const handleUploadCover = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setIsUploadingCover(true);
+      try {
+        const url = await uploadImageToImgBB(e.target.files[0]);
+        setCourse((prev: any) => ({ ...prev, coverImageUrl: url }));
+      } catch (err) {
+        console.error(err);
+        alert('Failed to upload cover image.');
+      }
+      setIsUploadingCover(false);
+    }
+  };
+
+  const handleUploadSlider = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setIsUploadingSlider(true);
+      try {
+        const url = await uploadImageToImgBB(e.target.files[0]);
+        setCourse((prev: any) => ({ ...prev, sliderImages: [...(prev.sliderImages || []), url] }));
+      } catch (err) {
+        console.error(err);
+        alert('Failed to upload slider image.');
+      }
+      setIsUploadingSlider(false);
+    }
+  };
+
+  const removeSliderImage = (index: number) => {
+    const updated = [...(course.sliderImages || [])];
+    updated.splice(index, 1);
+    setCourse({ ...course, sliderImages: updated });
+  };
+
+  const handleUploadGallery = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setIsUploadingGallery(true);
+      try {
+        const url = await uploadImageToImgBB(e.target.files[0]);
+        setCourse((prev: any) => ({ ...prev, galleryImages: [...(prev.galleryImages || []), url] }));
+      } catch (err) {
+        console.error(err);
+        alert('Failed to upload gallery image.');
+      }
+      setIsUploadingGallery(false);
+    }
+  };
+
+  const removeGalleryImage = (index: number) => {
+    const updated = [...(course.galleryImages || [])];
+    updated.splice(index, 1);
+    setCourse({ ...course, galleryImages: updated });
+  };
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -49,6 +108,9 @@ export default function CourseSettingsPage() {
         title: course.title,
         subtitle: course.subtitle,
         detailedDescription: course.detailedDescription || '',
+        coverImageUrl: course.coverImageUrl || '',
+        sliderImages: course.sliderImages || [],
+        galleryImages: course.galleryImages || [],
         price: Number(course.price),
         discountPrice: course.discountPrice ? Number(course.discountPrice) : null,
         discountValidUntil: course.discountValidUntil || '',
@@ -102,6 +164,67 @@ export default function CourseSettingsPage() {
         {message && <div className="p-4 bg-green-500/10 text-green-500 rounded-xl mb-4 font-medium">{message}</div>}
         
         <div className="space-y-4">
+          {/* Cover & Slider Images */}
+          <div className="space-y-6 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+            <div>
+              <label className="block text-sm font-medium mb-2">Background Cover Image (Optional)</label>
+              <div className="flex items-center gap-4">
+                {course.coverImageUrl && (
+                  <div className="relative w-32 h-20 rounded-lg overflow-hidden border border-foreground/20">
+                    <img src={course.coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
+                    <button type="button" onClick={() => setCourse({...course, coverImageUrl: ''})} className="absolute top-1 right-1 p-1 bg-black/50 hover:bg-red-500 rounded-full text-white transition-colors">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+                <label className="flex flex-col items-center justify-center w-32 h-20 bg-background border-2 border-dashed border-foreground/20 rounded-lg cursor-pointer hover:border-orange-500 hover:bg-orange-500/5 transition-colors">
+                  {isUploadingCover ? <Loader2 className="w-6 h-6 animate-spin text-orange-500" /> : <ImagePlus className="w-6 h-6 text-foreground/40" />}
+                  <span className="text-xs text-foreground/50 mt-1">Upload</span>
+                  <input type="file" accept="image/*" onChange={handleUploadCover} className="hidden" disabled={isUploadingCover} />
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Hero Section Slider Images (Optional)</label>
+              <p className="text-xs text-foreground/50 mb-3">Upload multiple images to show a beautiful auto-sliding gallery in the course details page.</p>
+              <div className="flex flex-wrap items-center gap-4">
+                {course.sliderImages && course.sliderImages.map((url: string, index: number) => (
+                  <div key={index} className="relative w-32 h-20 rounded-lg overflow-hidden border border-foreground/20 group">
+                    <img src={url} alt={`Slider ${index}`} className="w-full h-full object-cover" />
+                    <button type="button" onClick={() => removeSliderImage(index)} className="absolute top-1 right-1 p-1 bg-black/50 hover:bg-red-500 rounded-full text-white transition-colors opacity-0 group-hover:opacity-100">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+                <label className="flex flex-col items-center justify-center w-32 h-20 bg-background border-2 border-dashed border-foreground/20 rounded-lg cursor-pointer hover:border-orange-500 hover:bg-orange-500/5 transition-colors">
+                  {isUploadingSlider ? <Loader2 className="w-6 h-6 animate-spin text-orange-500" /> : <ImagePlus className="w-6 h-6 text-foreground/40" />}
+                  <span className="text-xs text-foreground/50 mt-1">Add Image</span>
+                  <input type="file" accept="image/*" onChange={handleUploadSlider} className="hidden" disabled={isUploadingSlider} />
+                </label>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Course Gallery Images (Optional)</label>
+              <p className="text-xs text-foreground/50 mb-3">Upload multiple images to show a beautiful gallery section in the course details page.</p>
+              <div className="flex flex-wrap items-center gap-4">
+                {course.galleryImages && course.galleryImages.map((url: string, index: number) => (
+                  <div key={index} className="relative w-32 h-20 rounded-lg overflow-hidden border border-foreground/20 group">
+                    <img src={url} alt={`Gallery ${index}`} className="w-full h-full object-cover" />
+                    <button type="button" onClick={() => removeGalleryImage(index)} className="absolute top-1 right-1 p-1 bg-black/50 hover:bg-red-500 rounded-full text-white transition-colors opacity-0 group-hover:opacity-100">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+                <label className="flex flex-col items-center justify-center w-32 h-20 bg-background border-2 border-dashed border-foreground/20 rounded-lg cursor-pointer hover:border-orange-500 hover:bg-orange-500/5 transition-colors">
+                  {isUploadingGallery ? <Loader2 className="w-6 h-6 animate-spin text-orange-500" /> : <ImagePlus className="w-6 h-6 text-foreground/40" />}
+                  <span className="text-xs text-foreground/50 mt-1">Add Image</span>
+                  <input type="file" accept="image/*" onChange={handleUploadGallery} className="hidden" disabled={isUploadingGallery} />
+                </label>
+              </div>
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Course Title</label>
             <input 

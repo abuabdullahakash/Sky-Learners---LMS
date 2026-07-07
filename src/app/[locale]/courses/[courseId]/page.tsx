@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, use, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import { BookOpen, Users, Clock, CheckCircle2, ArrowLeft, Star, PlayCircle } from 'lucide-react';
+import { BookOpen, Users, Clock, CheckCircle2, ArrowLeft, Star, PlayCircle, Image as ImageIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function CourseDetailsPage({ params }: { params: Promise<{ courseId: string }> }) {
   const { user } = useAuth();
@@ -17,6 +21,8 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
   
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const galleryRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -26,9 +32,11 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
         
         if (docSnap.exists()) {
           setCourse({ id: docSnap.id, ...docSnap.data() });
+        } else {
+          router.push('/courses');
         }
       } catch (error) {
-        console.error("Error fetching course:", error);
+        console.error("Error fetching course details:", error);
       } finally {
         setLoading(false);
       }
@@ -38,6 +46,38 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
       fetchCourse();
     }
   }, [courseId]);
+
+  useEffect(() => {
+    if (course?.sliderImages?.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % course.sliderImages.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [course?.sliderImages]);
+
+  useEffect(() => {
+    if (galleryRef.current && course?.galleryImages?.length > 0) {
+      const elements = galleryRef.current.querySelectorAll('.gallery-item');
+      if (elements.length > 0) {
+        gsap.fromTo(elements, 
+          { opacity: 0, y: 50, scale: 0.95 }, 
+          { 
+            opacity: 1, 
+            y: 0, 
+            scale: 1, 
+            duration: 0.8, 
+            stagger: 0.15,
+            ease: "back.out(1.7)",
+            scrollTrigger: {
+              trigger: galleryRef.current,
+              start: "top 85%",
+            }
+          }
+        );
+      }
+    }
+  }, [course?.galleryImages, loading]);
 
   if (loading) {
     return (
@@ -66,54 +106,65 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
   console.log('Course Modules:', course.modules);
   console.log('Free Lessons:', freeLessons);
 
+  const hasCover = !!course.coverImageUrl;
+  const textColor = hasCover ? "text-white" : "text-foreground";
+  const mutedColor = hasCover ? "text-white/80" : "text-foreground/70";
+  const softColor = hasCover ? "text-white/60" : "text-foreground/50";
+
   return (
     <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500">
       {/* Hero Section */}
-      <div className="bg-foreground/5 pt-28 pb-12 md:pt-36 md:pb-20 border-b border-foreground/10 relative overflow-hidden">
-        {course.thumbnailUrl && (
-          <div className="absolute inset-0 opacity-10 blur-xl">
+      <div className={`pt-28 pb-12 md:pt-36 md:pb-20 border-b border-foreground/10 relative overflow-hidden ${hasCover ? '' : 'bg-foreground/5'}`}>
+        {hasCover ? (
+          <div className="absolute inset-0 z-0">
+            <img src={course.coverImageUrl} alt="Cover Background" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+          </div>
+        ) : course.thumbnailUrl ? (
+          <div className="absolute inset-0 opacity-10 blur-xl z-0">
             <img src={course.thumbnailUrl} alt="background blur" className="w-full h-full object-cover" />
           </div>
-        )}
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
-          <Link href="/courses" className="inline-flex items-center gap-2 text-foreground/60 hover:text-foreground font-semibold mb-6 transition-colors">
+        ) : null}
+        
+        <div className={`max-w-7xl mx-auto px-4 relative z-10 ${textColor}`}>
+          <Link href="/courses" className={`inline-flex items-center gap-2 font-semibold mb-6 transition-colors hover:opacity-100 ${hasCover ? 'text-white/70 hover:text-white' : 'text-foreground/60 hover:text-foreground'}`}>
             <ArrowLeft className="w-4 h-4" /> ফিরে যান
           </Link>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-block px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-bold mb-6 border border-primary/20 shadow-sm uppercase tracking-wide">
+              <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-6 border shadow-sm uppercase tracking-wide ${hasCover ? 'bg-primary/20 text-primary border-primary/30' : 'bg-primary/10 text-primary border-primary/20'}`}>
                 {course.category === 'intermediate' ? 'HSC' : course.category === 'primary' ? 'Primary' : course.category === 'high_school' ? 'SSC' : course.category}
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
                 {course.title}
               </h1>
-              <p className="text-lg md:text-xl text-foreground/70 mb-8 leading-relaxed max-w-2xl">
+              <p className={`text-lg md:text-xl mb-8 leading-relaxed max-w-2xl ${mutedColor}`}>
                 {course.subtitle || 'এই কোর্সে আপনি গুরুত্বপূর্ণ সব টপিক শিখতে পারবেন এবং পরীক্ষায় ভালো ফলাফল করতে পারবেন।'}
               </p>
               
               <div className="flex flex-wrap items-center gap-6 text-sm font-semibold">
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
-                    <Users className="w-5 h-5" />
+                <div className="flex items-center gap-3">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${hasCover ? 'bg-white/10 text-white' : 'bg-primary/20 text-primary'}`}>
+                    <Users className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-foreground/50 text-xs uppercase">প্রশিক্ষক/প্রতিষ্ঠান</p>
-                    <p className="font-bold">{course.coachingName || 'Instructor'}</p>
+                    <p className={`text-xs uppercase tracking-wide ${softColor}`}>প্রশিক্ষক/প্রতিষ্ঠান</p>
+                    <p className="font-bold text-base mt-0.5">{course.coachingName || 'Instructor'}</p>
                     {course.teacherId && (
-                      <Link href={`/teachers/${course.teacherId}`} target="_blank" className="text-primary text-xs hover:underline mt-0.5 inline-block">
+                      <Link href={`/teachers/${course.teacherId}`} target="_blank" className="text-primary text-xs hover:underline mt-0.5 inline-block font-bold">
                         প্রোফাইল দেখুন
                       </Link>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
-                    <Clock className="w-5 h-5" />
+                <div className="flex items-center gap-3">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${hasCover ? 'bg-white/10 text-white' : 'bg-primary/20 text-primary'}`}>
+                    <Clock className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-foreground/50 text-xs uppercase">মেয়াদ</p>
-                    <p>{course.courseValidity || 'Life-time Access'}</p>
+                    <p className={`text-xs uppercase tracking-wide ${softColor}`}>মেয়াদ</p>
+                    <p className="font-bold text-base mt-0.5">{course.courseValidity || 'Life-time Access'}</p>
                   </div>
                 </div>
               </div>
@@ -121,14 +172,31 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
             
             <div className="relative group">
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-purple-500/20 rounded-3xl transform rotate-3 scale-105 group-hover:rotate-6 transition-transform duration-500"></div>
-              <div className="relative rounded-3xl overflow-hidden border-4 border-background shadow-2xl bg-foreground/5 aspect-video flex items-center justify-center">
-                {course.thumbnailUrl ? (
+              <div className={`relative rounded-3xl overflow-hidden border-4 shadow-2xl aspect-video flex items-center justify-center ${hasCover ? 'border-white/10 bg-black/50' : 'border-background bg-foreground/5'}`}>
+                {course.sliderImages && course.sliderImages.length > 0 ? (
+                  <>
+                    <img 
+                      key={currentSlide}
+                      src={course.sliderImages[currentSlide]} 
+                      alt={`Slide ${currentSlide + 1}`} 
+                      className="w-full h-full object-cover animate-in fade-in duration-700" 
+                    />
+                    {course.sliderImages.length > 1 && (
+                      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
+                        {course.sliderImages.map((_: any, idx: number) => (
+                          <div key={idx} className={`h-2 rounded-full transition-all duration-300 ${idx === currentSlide ? 'bg-primary w-6' : 'bg-white/70 w-2'}`} />
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : course.thumbnailUrl ? (
                   <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover" />
                 ) : (
-                  <BookOpen className="w-20 h-20 text-foreground/20" />
+                  <BookOpen className={`w-20 h-20 ${hasCover ? 'text-white/20' : 'text-foreground/20'}`} />
                 )}
+                
                 <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                  <PlayCircle className="w-16 h-16 text-white" />
+                  <PlayCircle className="w-16 h-16 text-white drop-shadow-lg" />
                 </div>
               </div>
             </div>
@@ -220,6 +288,23 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
                       <h3 className="text-xl font-bold mb-1">{instructor.name}</h3>
                       <p className="text-primary font-semibold text-sm mb-3">{instructor.role || 'Instructor'}</p>
                       <p className="text-foreground/70 text-sm leading-relaxed">{instructor.background}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {course.galleryImages && course.galleryImages.length > 0 && (
+              <section className="mt-12" ref={galleryRef}>
+                <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
+                  <ImageIcon className="w-8 h-8 text-primary" /> 
+                  কোর্স গ্যালারি
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {course.galleryImages.map((img: string, i: number) => (
+                    <div key={i} className="gallery-item relative aspect-square rounded-2xl overflow-hidden shadow-sm group border border-foreground/10 bg-foreground/5 cursor-pointer">
+                      <img src={img} alt={`Gallery ${i}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                      <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                     </div>
                   ))}
                 </div>

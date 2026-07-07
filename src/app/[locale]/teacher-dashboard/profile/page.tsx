@@ -32,7 +32,7 @@ export default function ProfileBuilderPage() {
     
     // Institution Specific Fields
     teachersRoster: [
-      { id: '1', name: 'Rahim Sir', subjects: 'Physics', classes: 'HSC, Admission' }
+      { id: '1', name: 'Rahim Sir', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rahim', university: 'Dhaka University', subjects: 'Physics', classes: 'HSC, Admission' }
     ]
   });
 
@@ -86,7 +86,7 @@ export default function ProfileBuilderPage() {
   const addTeacher = () => {
     setProfileData(prev => ({
       ...prev,
-      teachersRoster: [...prev.teachersRoster, { id: Date.now().toString(), name: '', subjects: '', classes: '' }]
+      teachersRoster: [...prev.teachersRoster, { id: Date.now().toString(), name: '', image: '', university: '', subjects: '', classes: '' }]
     }));
   };
   const updateTeacher = (id: string, field: string, value: string) => {
@@ -137,30 +137,18 @@ export default function ProfileBuilderPage() {
             <h2 className="text-xl font-bold border-b border-foreground/10 pb-2 flex items-center gap-2">
               <User className="w-5 h-5 text-primary" /> Profile Type
             </h2>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <label className={`flex-1 border-2 rounded-2xl p-6 cursor-pointer transition-all flex flex-col items-center gap-3 text-center ${profileData.type === 'individual' ? 'border-primary bg-primary/5 text-primary' : 'border-foreground/10 hover:border-foreground/30 text-foreground/80'}`}>
-                <input 
-                  type="radio" 
-                  className="hidden" 
-                  checked={profileData.type === 'individual'} 
-                  onChange={() => setProfileData({...profileData, type: 'individual'})}
-                />
-                <User className="w-10 h-10" />
-                <span className="font-bold text-lg">Individual Teacher</span>
-                <span className="text-sm text-foreground/60 leading-relaxed max-w-[250px]">I am a single teacher providing classes/courses.</span>
-              </label>
-              
-              <label className={`flex-1 border-2 rounded-2xl p-6 cursor-pointer transition-all flex flex-col items-center gap-3 text-center ${profileData.type === 'institution' ? 'border-primary bg-primary/5 text-primary' : 'border-foreground/10 hover:border-foreground/30 text-foreground/80'}`}>
-                <input 
-                  type="radio" 
-                  className="hidden" 
-                  checked={profileData.type === 'institution'} 
-                  onChange={() => setProfileData({...profileData, type: 'institution'})}
-                />
-                <Building2 className="w-10 h-10" />
-                <span className="font-bold text-lg">Institution / Academy</span>
-                <span className="text-sm text-foreground/60 leading-relaxed max-w-[250px]">We are a coaching center or school with multiple teachers.</span>
-              </label>
+            <div className="relative">
+              <select 
+                value={profileData.type}
+                onChange={(e) => setProfileData({...profileData, type: e.target.value as 'individual' | 'institution'})}
+                className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 appearance-none focus:outline-none focus:border-primary transition-colors cursor-pointer font-medium"
+              >
+                <option value="individual">Individual Teacher - I am a single teacher providing classes/courses.</option>
+                <option value="institution">Institution / Academy - We are a coaching center or school with multiple teachers.</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                <svg className="w-4 h-4 text-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
             </div>
           </div>
 
@@ -327,12 +315,28 @@ export default function ProfileBuilderPage() {
                 <div className="space-y-3">
                   {profileData.teachersRoster.map((teacher) => (
                     <div key={teacher.id} className="flex flex-col md:flex-row gap-3 p-4 bg-background border border-foreground/10 rounded-2xl relative">
-                      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="space-y-1 md:col-span-2">
+                          <span className="text-xs text-foreground/50 font-bold uppercase">Profile Image URL (Optional)</span>
+                          <input 
+                            type="text" placeholder="https://..." 
+                            value={teacher.image || ''} onChange={(e) => updateTeacher(teacher.id, 'image', e.target.value)}
+                            className="w-full bg-foreground/5 border border-foreground/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary transition-colors"
+                          />
+                        </div>
                         <div className="space-y-1">
                           <span className="text-xs text-foreground/50 font-bold uppercase">Teacher Name</span>
                           <input 
                             type="text" placeholder="e.g. Rahim Sir" 
                             value={teacher.name} onChange={(e) => updateTeacher(teacher.id, 'name', e.target.value)}
+                            className="w-full bg-foreground/5 border border-foreground/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary transition-colors"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-xs text-foreground/50 font-bold uppercase">University / Institution</span>
+                          <input 
+                            type="text" placeholder="e.g. Dhaka University" 
+                            value={teacher.university || ''} onChange={(e) => updateTeacher(teacher.id, 'university', e.target.value)}
                             className="w-full bg-foreground/5 border border-foreground/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary transition-colors"
                           />
                         </div>
@@ -536,15 +540,27 @@ export default function ProfileBuilderPage() {
                         <h3 className="font-bold text-xl mb-4 flex items-center gap-2"><Presentation className="w-5 h-5 text-primary" /> Our Teachers</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {profileData.teachersRoster.map(teacher => (
-                            <div key={teacher.id} className="p-4 bg-foreground/5 rounded-2xl border border-foreground/10 hover:border-primary/30 transition-colors">
-                              <h4 className="font-bold text-lg mb-1">{teacher.name || 'Teacher Name'}</h4>
-                              <p className="text-sm text-foreground/70 mb-2"><span className="font-medium text-foreground">Subjects:</span> {teacher.subjects || 'N/A'}</p>
-                              <div className="flex flex-wrap gap-1">
-                                {teacher.classes.split(',').map((cls, i) => cls.trim() && (
-                                  <span key={i} className="text-[10px] px-2 py-1 bg-background rounded border border-foreground/10 font-medium">
-                                    {cls.trim()}
-                                  </span>
-                                ))}
+                            <div key={teacher.id} className="p-4 bg-foreground/5 rounded-2xl border border-foreground/10 hover:border-primary/30 transition-colors flex gap-4 items-start">
+                              <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden shrink-0 bg-background border border-foreground/10">
+                                {teacher.image ? (
+                                  <img src={teacher.image} alt={teacher.name} className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center font-bold text-xl bg-primary/10 text-primary">
+                                    {teacher.name ? teacher.name.charAt(0) : 'T'}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="font-bold text-lg mb-0.5 leading-tight">{teacher.name || 'Teacher Name'}</h4>
+                                {teacher.university && <p className="text-xs text-primary font-bold mb-2">{teacher.university}</p>}
+                                <p className="text-sm text-foreground/70 mb-2"><span className="font-medium text-foreground">Subjects:</span> {teacher.subjects || 'N/A'}</p>
+                                <div className="flex flex-wrap gap-1">
+                                  {teacher.classes.split(',').map((cls, i) => cls.trim() && (
+                                    <span key={i} className="text-[10px] px-2 py-1 bg-background rounded border border-foreground/10 font-medium">
+                                      {cls.trim()}
+                                    </span>
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           ))}

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Building2, User, Camera, Link as LinkIcon, Facebook, Youtube, Linkedin, Save, CheckCircle2, Globe, Star, Users, Video } from 'lucide-react';
+import { Building2, User, Camera, Link as LinkIcon, Save, CheckCircle2, Globe, Star, Users, Video } from 'lucide-react';
 
 export default function ProfileBuilderPage() {
   const { user } = useAuth();
@@ -133,7 +133,7 @@ export default function ProfileBuilderPage() {
                   />
                 </div>
                 <div className="relative">
-                  <Facebook className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+                  <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
                   <input 
                     type="url" 
                     placeholder="Facebook Profile/Page URL"
@@ -143,7 +143,7 @@ export default function ProfileBuilderPage() {
                   />
                 </div>
                 <div className="relative">
-                  <Youtube className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+                  <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
                   <input 
                     type="url" 
                     placeholder="YouTube Channel URL"
@@ -153,7 +153,7 @@ export default function ProfileBuilderPage() {
                   />
                 </div>
                 <div className="relative">
-                  <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+                  <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
                   <input 
                     type="url" 
                     placeholder="LinkedIn Profile/Company URL"
@@ -274,17 +274,17 @@ export default function ProfileBuilderPage() {
                 )}
                 {profileData.facebook && (
                   <a href="#" className="w-10 h-10 rounded-full bg-[#1877F2]/10 text-[#1877F2] flex items-center justify-center hover:bg-[#1877F2] hover:text-white transition-colors">
-                    <Facebook className="w-4 h-4" />
+                    <LinkIcon className="w-4 h-4" />
                   </a>
                 )}
                 {profileData.youtube && (
                   <a href="#" className="w-10 h-10 rounded-full bg-[#FF0000]/10 text-[#FF0000] flex items-center justify-center hover:bg-[#FF0000] hover:text-white transition-colors">
-                    <Youtube className="w-4 h-4" />
+                    <LinkIcon className="w-4 h-4" />
                   </a>
                 )}
                 {profileData.linkedin && (
                   <a href="#" className="w-10 h-10 rounded-full bg-[#0A66C2]/10 text-[#0A66C2] flex items-center justify-center hover:bg-[#0A66C2] hover:text-white transition-colors">
-                    <Linkedin className="w-4 h-4" />
+                    <LinkIcon className="w-4 h-4" />
                   </a>
                 )}
                 {!profileData.website && !profileData.facebook && !profileData.youtube && !profileData.linkedin && (

@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Save, ImagePlus, Trash2, X, Loader2 } from 'lucide-react';
+import { Save, ImagePlus, Trash2, X, Loader2, Plus } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import { uploadImageToImgBB } from '@/lib/imgbb';
 
@@ -126,7 +126,9 @@ export default function CourseSettingsPage() {
         eduClass: (course.category === 'primary' || course.category === 'high_school' || course.category === 'intermediate') ? course.eduClass : '',
         department: (course.category === 'intermediate' || course.category === 'honours' || course.category === 'masters') ? course.department : '',
         year: (course.category === 'honours' || course.category === 'masters') ? course.year : '',
-        coachingName: course.coachingName || ''
+        coachingName: course.coachingName || '',
+        contactNumber: course.contactNumber || '',
+        faqs: course.faqs || []
       });
       setMessage('Settings updated successfully!');
       setTimeout(() => setMessage(''), 3000);
@@ -230,6 +232,14 @@ export default function CourseSettingsPage() {
             <label className="block text-sm font-medium mb-1">Course Title</label>
             <input 
               type="text" value={course.title || ''} onChange={e => setCourse({...course, title: e.target.value})}
+              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Contact Number (For Inquiries)</label>
+            <input 
+              type="text" value={course.contactNumber || ''} onChange={e => setCourse({...course, contactNumber: e.target.value})}
+              placeholder="e.g. 16910 or 017XXXXXXX"
               className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
             />
           </div>
@@ -382,6 +392,71 @@ export default function CourseSettingsPage() {
                 className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
               />
             </div>
+          </div>
+
+          <hr className="border-foreground/10 my-6" />
+          
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">Frequently Asked Questions (FAQs)</h2>
+            <button 
+              type="button" 
+              onClick={() => setCourse({ ...course, faqs: [...(course.faqs || []), { question: '', answer: '' }] })}
+              className="px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors"
+            >
+              <Plus className="w-4 h-4" /> Add FAQ
+            </button>
+          </div>
+          
+          <div className="space-y-4">
+            {(!course.faqs || course.faqs.length === 0) ? (
+              <div className="text-center p-6 border border-dashed border-foreground/20 rounded-xl text-foreground/50">
+                No FAQs added yet.
+              </div>
+            ) : (
+              course.faqs.map((faq: any, index: number) => (
+                <div key={index} className="p-4 bg-foreground/5 border border-foreground/10 rounded-xl space-y-3 relative group">
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const newFaqs = [...course.faqs];
+                      newFaqs.splice(index, 1);
+                      setCourse({ ...course, faqs: newFaqs });
+                    }}
+                    className="absolute top-4 right-4 p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <div className="pr-12">
+                    <label className="block text-xs font-bold mb-1 uppercase tracking-wider text-foreground/60">Question</label>
+                    <input 
+                      type="text" 
+                      value={faq.question} 
+                      onChange={e => {
+                        const newFaqs = [...course.faqs];
+                        newFaqs[index].question = e.target.value;
+                        setCourse({ ...course, faqs: newFaqs });
+                      }}
+                      placeholder="e.g. What is this course about?"
+                      className="w-full px-4 py-2 bg-background border border-foreground/10 rounded-lg focus:border-orange-500 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold mb-1 uppercase tracking-wider text-foreground/60">Answer</label>
+                    <textarea 
+                      value={faq.answer} 
+                      onChange={e => {
+                        const newFaqs = [...course.faqs];
+                        newFaqs[index].answer = e.target.value;
+                        setCourse({ ...course, faqs: newFaqs });
+                      }}
+                      placeholder="Answer goes here..."
+                      rows={2}
+                      className="w-full px-4 py-2 bg-background border border-foreground/10 rounded-lg focus:border-orange-500 transition-colors custom-scrollbar"
+                    />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
 
           <hr className="border-foreground/10 my-6" />

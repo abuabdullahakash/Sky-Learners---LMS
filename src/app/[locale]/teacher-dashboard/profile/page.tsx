@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Building2, User, Camera, Link as LinkIcon, Save, CheckCircle2, Globe, Star, Users, Video, X, Plus, GraduationCap, Briefcase, BookOpen, Presentation, Eye } from 'lucide-react';
+import { Building2, User, Camera, Link as LinkIcon, Save, CheckCircle2, Globe, Star, Users, Video, X, Plus, GraduationCap, Briefcase, BookOpen, Presentation, Eye, Upload, Loader2 } from 'lucide-react';
 
 export default function ProfileBuilderPage() {
   const { user } = useAuth();
@@ -10,6 +10,35 @@ export default function ProfileBuilderPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [uploadingImageId, setUploadingImageId] = useState<string | null>(null);
+
+  const handleImageUpload = async (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImageId(id);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success) {
+        updateTeacher(id, 'image', data.data.url);
+      } else {
+        console.error("ImgBB upload failed", data);
+        alert("Failed to upload image.");
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("Error uploading image.");
+    } finally {
+      setUploadingImageId(null);
+    }
+  };
 
   const [profileData, setProfileData] = useState({
     type: 'individual' as 'individual' | 'institution',
@@ -317,12 +346,29 @@ export default function ProfileBuilderPage() {
                     <div key={teacher.id} className="flex flex-col md:flex-row gap-3 p-4 bg-background border border-foreground/10 rounded-2xl relative">
                       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div className="space-y-1 md:col-span-2">
-                          <span className="text-xs text-foreground/50 font-bold uppercase">Profile Image URL (Optional)</span>
-                          <input 
-                            type="text" placeholder="https://..." 
-                            value={teacher.image || ''} onChange={(e) => updateTeacher(teacher.id, 'image', e.target.value)}
-                            className="w-full bg-foreground/5 border border-foreground/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary transition-colors"
-                          />
+                          <span className="text-xs text-foreground/50 font-bold uppercase">Profile Image (Optional)</span>
+                          <div className="flex items-center gap-4 mt-1">
+                            {teacher.image && (
+                              <img src={teacher.image} alt="Preview" className="w-12 h-12 rounded-full object-cover border border-foreground/10" />
+                            )}
+                            <label className={`flex items-center justify-center gap-2 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 rounded-xl cursor-pointer transition-colors text-sm font-semibold ${uploadingImageId === teacher.id ? 'opacity-50 pointer-events-none' : ''}`}>
+                              {uploadingImageId === teacher.id ? (
+                                <><Loader2 className="w-4 h-4 animate-spin" /> Uploading...</>
+                              ) : (
+                                <><Upload className="w-4 h-4" /> Upload Now</>
+                              )}
+                              <input 
+                                type="file" 
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => handleImageUpload(teacher.id, e)}
+                                disabled={uploadingImageId === teacher.id}
+                              />
+                            </label>
+                            {teacher.image && (
+                               <button type="button" onClick={() => updateTeacher(teacher.id, 'image', '')} className="text-xs text-red-500 font-bold hover:underline">Remove</button>
+                            )}
+                          </div>
                         </div>
                         <div className="space-y-1">
                           <span className="text-xs text-foreground/50 font-bold uppercase">Teacher Name</span>
@@ -540,26 +586,29 @@ export default function ProfileBuilderPage() {
                         <h3 className="font-bold text-xl mb-4 flex items-center gap-2"><Presentation className="w-5 h-5 text-primary" /> Our Teachers</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {profileData.teachersRoster.map(teacher => (
-                            <div key={teacher.id} className="p-4 bg-foreground/5 rounded-2xl border border-foreground/10 hover:border-primary/30 transition-colors flex gap-4 items-start">
-                              <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden shrink-0 bg-background border border-foreground/10">
-                                {teacher.image ? (
-                                  <img src={teacher.image} alt={teacher.name} className="w-full h-full object-cover" />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center font-bold text-xl bg-primary/10 text-primary">
-                                    {teacher.name ? teacher.name.charAt(0) : 'T'}
+                            <div key={teacher.id} className="group relative p-5 bg-background dark:bg-foreground/[0.02] rounded-3xl border border-foreground/10 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
+                              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-purple-500 to-pink-500 opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                              <div className="flex gap-4 items-start relative z-10 pt-2">
+                                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden shrink-0 bg-primary/10 border-4 border-background shadow-md">
+                                  {teacher.image ? (
+                                    <img src={teacher.image} alt={teacher.name} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center font-bold text-2xl text-primary">
+                                      {teacher.name ? teacher.name.charAt(0).toUpperCase() : 'T'}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex-1 pt-1">
+                                  <h4 className="font-bold text-xl mb-0.5 leading-tight">{teacher.name || 'Teacher Name'}</h4>
+                                  {teacher.university && <p className="text-xs text-primary font-bold mb-3 tracking-wide uppercase">{teacher.university}</p>}
+                                  <p className="text-sm text-foreground/80 mb-3 leading-relaxed"><span className="font-semibold text-foreground">Subjects:</span> {teacher.subjects || 'N/A'}</p>
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {teacher.classes.split(',').map((cls, i) => cls.trim() && (
+                                      <span key={i} className="text-[11px] px-2.5 py-1 bg-foreground/5 text-foreground rounded-md font-semibold border border-foreground/10 shadow-sm">
+                                        {cls.trim()}
+                                      </span>
+                                    ))}
                                   </div>
-                                )}
-                              </div>
-                              <div className="flex-1">
-                                <h4 className="font-bold text-lg mb-0.5 leading-tight">{teacher.name || 'Teacher Name'}</h4>
-                                {teacher.university && <p className="text-xs text-primary font-bold mb-2">{teacher.university}</p>}
-                                <p className="text-sm text-foreground/70 mb-2"><span className="font-medium text-foreground">Subjects:</span> {teacher.subjects || 'N/A'}</p>
-                                <div className="flex flex-wrap gap-1">
-                                  {teacher.classes.split(',').map((cls, i) => cls.trim() && (
-                                    <span key={i} className="text-[10px] px-2 py-1 bg-background rounded border border-foreground/10 font-medium">
-                                      {cls.trim()}
-                                    </span>
-                                  ))}
                                 </div>
                               </div>
                             </div>

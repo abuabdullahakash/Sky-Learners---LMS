@@ -156,31 +156,34 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
           <div className="hidden lg:flex absolute right-4 xl:right-0 top-1/2 -translate-y-1/2 flex-col items-center gap-10 w-20">
             {(course.introVideoUrl || course.thumbnailUrl) && (
               <a href={course.introVideoUrl || '#'} target={course.introVideoUrl ? "_blank" : "_self"} className="flex flex-col items-center gap-3 group cursor-pointer">
-                <div className="w-14 h-14 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white group-hover:bg-primary group-hover:border-primary group-hover:scale-110 transition-all shadow-lg">
-                  <PlayCircle className="w-6 h-6 fill-current" />
+                <div className="relative w-14 h-14 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-primary/40 rounded-full animate-ping opacity-75"></div>
+                  <div className="relative w-14 h-14 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white group-hover:bg-primary group-hover:border-primary group-hover:scale-110 transition-all duration-300 shadow-lg shadow-primary/20">
+                    <PlayCircle className="w-6 h-6 fill-current" />
+                  </div>
                 </div>
-                <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest text-center group-hover:text-primary transition-colors">Watch<br/>Trailer</span>
+                <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest text-center group-hover:text-primary group-hover:-translate-y-1 transition-all duration-300">Watch<br/>Trailer</span>
               </a>
             )}
             <div className="w-px h-16 bg-white/10"></div>
             <div className="flex flex-col gap-8 text-white/60">
               <div className="flex flex-col items-center gap-1 group cursor-default" title={`Total Lessons: ${course.totalVideoLessons || 0}`}>
-                <BookOpen className="w-5 h-5 group-hover:text-white transition-colors" />
+                <BookOpen className="w-5 h-5 group-hover:text-white group-hover:scale-125 group-hover:-translate-y-1 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
               </div>
               <div className="flex flex-col items-center gap-1 group cursor-default" title={`Live Classes: ${course.totalLiveClasses || 0}`}>
-                <Users className="w-5 h-5 group-hover:text-white transition-colors" />
+                <Users className="w-5 h-5 group-hover:text-white group-hover:scale-125 group-hover:-translate-y-1 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
               </div>
               <div className="flex flex-col items-center gap-1 group cursor-default" title={`Exams: ${course.totalExams || 0}`}>
-                <CheckCircle2 className="w-5 h-5 group-hover:text-white transition-colors" />
+                <CheckCircle2 className="w-5 h-5 group-hover:text-white group-hover:scale-125 group-hover:-translate-y-1 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
               </div>
               <div className="flex flex-col items-center gap-1 group cursor-default" title={`Duration: ${course.courseValidity || 'Lifetime'}`}>
-                <Clock className="w-5 h-5 group-hover:text-white transition-colors" />
+                <Clock className="w-5 h-5 group-hover:text-white group-hover:scale-125 group-hover:-translate-y-1 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
               </div>
             </div>
           </div>
 
           {/* Center Content */}
-          <div className={`w-full px-4 lg:px-28 xl:px-32 py-12 ${textColor}`}>
+          <div className={`w-full px-4 lg:px-20 xl:px-24 py-12 ${textColor}`}>
             <Link href="/courses" className={`inline-flex items-center gap-2 font-semibold mb-8 transition-colors hover:opacity-100 ${hasCover ? 'text-white/70 hover:text-white' : 'text-foreground/60 hover:text-foreground'}`}>
               <ArrowLeft className="w-4 h-4" /> ফিরে যান
             </Link>
@@ -189,7 +192,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
               <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-6 border shadow-sm uppercase tracking-wide ${hasCover ? 'bg-primary/20 text-primary border-primary/30' : 'bg-primary/10 text-primary border-primary/20'}`}>
                 {course.category === 'intermediate' ? 'HSC' : course.category === 'primary' ? 'Primary' : course.category === 'high_school' ? 'SSC' : course.category}
               </div>
-              <h1 className="text-5xl lg:text-7xl font-extrabold mb-6 leading-tight tracking-tight">
+              <h1 className="text-5xl lg:text-7xl font-extrabold mb-6 leading-tight tracking-tight bg-gradient-to-r from-cyan-400 via-blue-500 via-purple-500 to-pink-500 text-transparent bg-clip-text drop-shadow-sm animate-pulse">
                 {course.title}
               </h1>
               <p className={`text-xl mb-10 leading-relaxed ${mutedColor}`}>

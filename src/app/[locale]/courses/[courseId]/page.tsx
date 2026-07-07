@@ -324,7 +324,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
               <section className="mt-12">
                 <h2 className="text-3xl font-bold mb-6">সচরাচর জিজ্ঞাসা</h2>
                 <div className="bg-background border border-foreground/10 rounded-3xl p-6 shadow-sm">
-                  <Accordion type="single" collapsible className="w-full">
+                  <Accordion className="w-full">
                     {course.faqs.map((faq: any, i: number) => (
                       <AccordionItem key={i} value={`item-${i}`} className={i === course.faqs.length - 1 ? "border-b-0" : ""}>
                         <AccordionTrigger className="text-left font-bold text-lg hover:text-primary transition-colors">

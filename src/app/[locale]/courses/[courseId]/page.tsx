@@ -106,7 +106,8 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
   console.log('Course Modules:', course.modules);
   console.log('Free Lessons:', freeLessons);
 
-  const hasCover = !!course.coverImageUrl;
+  const hasSlider = course.sliderImages && course.sliderImages.length > 0;
+  const hasCover = hasSlider || !!course.coverImageUrl;
   const textColor = hasCover ? "text-white" : "text-foreground";
   const mutedColor = hasCover ? "text-white/80" : "text-foreground/70";
   const softColor = hasCover ? "text-white/60" : "text-foreground/50";
@@ -115,7 +116,17 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
     <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500">
       {/* Hero Section */}
       <div className={`pt-28 pb-12 md:pt-36 md:pb-20 border-b border-foreground/10 relative overflow-hidden ${hasCover ? '' : 'bg-foreground/5'}`}>
-        {hasCover ? (
+        {hasSlider ? (
+          <div className="absolute inset-0 z-0">
+            <img 
+              key={currentSlide}
+              src={course.sliderImages[currentSlide]} 
+              alt="Background Slider" 
+              className="w-full h-full object-cover animate-in fade-in duration-1000" 
+            />
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+          </div>
+        ) : course.coverImageUrl ? (
           <div className="absolute inset-0 z-0">
             <img src={course.coverImageUrl} alt="Cover Background" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
@@ -126,6 +137,15 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
           </div>
         ) : null}
         
+        {/* Slider Dots */}
+        {hasSlider && course.sliderImages.length > 1 && (
+          <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-10">
+            {course.sliderImages.map((_: any, idx: number) => (
+              <div key={idx} onClick={() => setCurrentSlide(idx)} className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${idx === currentSlide ? 'bg-primary w-8' : 'bg-white/50 w-2 hover:bg-white/80'}`} />
+            ))}
+          </div>
+        )}
+
         <div className={`max-w-7xl mx-auto px-4 relative z-10 ${textColor}`}>
           <Link href="/courses" className={`inline-flex items-center gap-2 font-semibold mb-6 transition-colors hover:opacity-100 ${hasCover ? 'text-white/70 hover:text-white' : 'text-foreground/60 hover:text-foreground'}`}>
             <ArrowLeft className="w-4 h-4" /> ফিরে যান
@@ -173,30 +193,14 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
             <div className="relative group">
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-purple-500/20 rounded-3xl transform rotate-3 scale-105 group-hover:rotate-6 transition-transform duration-500"></div>
               <div className={`relative rounded-3xl overflow-hidden border-4 shadow-2xl aspect-video flex items-center justify-center ${hasCover ? 'border-white/10 bg-black/50' : 'border-background bg-foreground/5'}`}>
-                {course.sliderImages && course.sliderImages.length > 0 ? (
-                  <>
-                    <img 
-                      key={currentSlide}
-                      src={course.sliderImages[currentSlide]} 
-                      alt={`Slide ${currentSlide + 1}`} 
-                      className="w-full h-full object-cover animate-in fade-in duration-700" 
-                    />
-                    {course.sliderImages.length > 1 && (
-                      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
-                        {course.sliderImages.map((_: any, idx: number) => (
-                          <div key={idx} className={`h-2 rounded-full transition-all duration-300 ${idx === currentSlide ? 'bg-primary w-6' : 'bg-white/70 w-2'}`} />
-                        ))}
-                      </div>
-                    )}
-                  </>
-                ) : course.thumbnailUrl ? (
+                {course.thumbnailUrl ? (
                   <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover" />
                 ) : (
                   <BookOpen className={`w-20 h-20 ${hasCover ? 'text-white/20' : 'text-foreground/20'}`} />
                 )}
                 
-                <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                  <PlayCircle className="w-16 h-16 text-white drop-shadow-lg" />
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-colors group-hover:bg-black/50 cursor-pointer">
+                  <PlayCircle className="w-16 h-16 text-white drop-shadow-lg transition-transform group-hover:scale-110" />
                 </div>
               </div>
             </div>

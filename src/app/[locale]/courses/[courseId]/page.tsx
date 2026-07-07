@@ -91,10 +91,10 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
                     <Users className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-foreground/50 text-xs uppercase">শিক্ষক</p>
+                    <p className="text-foreground/50 text-xs uppercase">প্রশিক্ষক/প্রতিষ্ঠান</p>
                     <p className="font-bold">{course.coachingName || 'Instructor'}</p>
                     {course.teacherId && (
-                      <Link href={`/teachers/${course.teacherId}`} className="text-primary text-xs hover:underline mt-0.5 inline-block">
+                      <Link href={`/teachers/${course.teacherId}`} target="_blank" className="text-primary text-xs hover:underline mt-0.5 inline-block">
                         প্রোফাইল দেখুন
                       </Link>
                     )}

@@ -114,7 +114,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500">
-      <div className={`min-h-[85vh] lg:min-h-screen pt-28 pb-12 flex items-center border-b border-foreground/10 relative overflow-hidden ${hasCover ? '' : 'bg-foreground/5'}`}>
+      <div className={`min-h-[75vh] lg:min-h-[85vh] pt-28 pb-12 flex items-center border-b border-foreground/10 relative overflow-hidden ${hasCover ? '' : 'bg-foreground/5'}`}>
         {hasSlider ? (
           <div className="absolute inset-0 z-0">
             <img 
@@ -135,19 +135,93 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
             <img src={course.thumbnailUrl} alt="background blur" className="w-full h-full object-cover" />
           </div>
         ) : null}
-        
-        {/* Left Side: Vertical Slider Dots & Counter (Desktop) */}
-        {hasSlider && course.sliderImages.length > 1 && (
-          <div className="hidden lg:flex absolute left-8 top-1/2 -translate-y-1/2 flex-col items-center gap-6 z-20">
-            <span className="text-white/70 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
-            <div className="flex flex-col gap-3">
-              {course.sliderImages.map((_: any, idx: number) => (
-                <div key={idx} onClick={() => setCurrentSlide(idx)} className={`w-2 rounded-full transition-all duration-300 cursor-pointer ${idx === currentSlide ? 'bg-primary h-8' : 'bg-white/50 h-2 hover:bg-white/80'}`} />
-              ))}
+
+        <div className="w-full max-w-[1400px] mx-auto relative z-20 h-full flex items-center">
+          {/* Left Side: Vertical Slider Dots & Counter (Desktop) */}
+          {hasSlider && course.sliderImages.length > 1 && (
+            <div className="hidden lg:flex absolute left-4 xl:left-0 top-1/2 -translate-y-1/2 flex-col items-center gap-6">
+              <span className="text-white/70 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
+              <div className="flex flex-col gap-3">
+                {course.sliderImages.map((_: any, idx: number) => (
+                  <div key={idx} onClick={() => setCurrentSlide(idx)} className={`w-2 rounded-full transition-all duration-300 cursor-pointer ${idx === currentSlide ? 'bg-primary h-8' : 'bg-white/50 h-2 hover:bg-white/80'}`} />
+                ))}
+              </div>
+              <span className="text-white/30 text-xs font-bold">{String(course.sliderImages.length).padStart(2, '0')}</span>
             </div>
-            <span className="text-white/30 text-xs font-bold">{String(course.sliderImages.length).padStart(2, '0')}</span>
+          )}
+
+          {/* Right Side: Watch Trailer & Icons */}
+          <div className="hidden lg:flex absolute right-4 xl:right-0 top-1/2 -translate-y-1/2 flex-col items-center gap-10">
+            {(course.introVideoUrl || course.thumbnailUrl) && (
+              <a href={course.introVideoUrl || '#'} target={course.introVideoUrl ? "_blank" : "_self"} className="flex flex-col items-center gap-3 group cursor-pointer">
+                <div className="w-14 h-14 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white group-hover:bg-primary group-hover:border-primary group-hover:scale-110 transition-all shadow-lg">
+                  <PlayCircle className="w-6 h-6 fill-current" />
+                </div>
+                <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest text-center group-hover:text-primary transition-colors">Watch<br/>Trailer</span>
+              </a>
+            )}
+            <div className="w-px h-16 bg-white/10"></div>
+            <div className="flex flex-col gap-8 text-white/60">
+              <div className="flex flex-col items-center gap-1 group cursor-default" title={`Total Lessons: ${course.totalVideoLessons || 0}`}>
+                <BookOpen className="w-5 h-5 group-hover:text-white transition-colors" />
+              </div>
+              <div className="flex flex-col items-center gap-1 group cursor-default" title={`Live Classes: ${course.totalLiveClasses || 0}`}>
+                <Users className="w-5 h-5 group-hover:text-white transition-colors" />
+              </div>
+              <div className="flex flex-col items-center gap-1 group cursor-default" title={`Exams: ${course.totalExams || 0}`}>
+                <CheckCircle2 className="w-5 h-5 group-hover:text-white transition-colors" />
+              </div>
+              <div className="flex flex-col items-center gap-1 group cursor-default" title={`Duration: ${course.courseValidity || 'Lifetime'}`}>
+                <Clock className="w-5 h-5 group-hover:text-white transition-colors" />
+              </div>
+            </div>
           </div>
-        )}
+
+          {/* Center Content */}
+          <div className={`w-full px-4 lg:px-24 xl:px-32 ${textColor}`}>
+            <Link href="/courses" className={`inline-flex items-center gap-2 font-semibold mb-8 transition-colors hover:opacity-100 ${hasCover ? 'text-white/70 hover:text-white' : 'text-foreground/60 hover:text-foreground'}`}>
+              <ArrowLeft className="w-4 h-4" /> ফিরে যান
+            </Link>
+            
+            <div className="max-w-2xl">
+              <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-6 border shadow-sm uppercase tracking-wide ${hasCover ? 'bg-primary/20 text-primary border-primary/30' : 'bg-primary/10 text-primary border-primary/20'}`}>
+                {course.category === 'intermediate' ? 'HSC' : course.category === 'primary' ? 'Primary' : course.category === 'high_school' ? 'SSC' : course.category}
+              </div>
+              <h1 className="text-5xl lg:text-7xl font-extrabold mb-6 leading-tight tracking-tight">
+                {course.title}
+              </h1>
+              <p className={`text-xl mb-10 leading-relaxed ${mutedColor}`}>
+                {course.subtitle || 'এই কোর্সে আপনি গুরুত্বপূর্ণ সব টপিক শিখতে পারবেন এবং পরীক্ষায় ভালো ফলাফল করতে পারবেন।'}
+              </p>
+              
+              <div className="flex flex-wrap items-center gap-8 text-sm font-semibold">
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${hasCover ? 'bg-white/10 text-white' : 'bg-primary/20 text-primary'}`}>
+                    <Users className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className={`text-xs uppercase tracking-wide ${softColor}`}>প্রশিক্ষক/প্রতিষ্ঠান</p>
+                    <p className="font-bold text-base mt-0.5">{course.coachingName || 'Instructor'}</p>
+                    {course.teacherId && (
+                      <Link href={`/teachers/${course.teacherId}`} target="_blank" className="text-primary text-xs hover:underline mt-0.5 inline-block font-bold">
+                        প্রোফাইল দেখুন
+                      </Link>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${hasCover ? 'bg-white/10 text-white' : 'bg-primary/20 text-primary'}`}>
+                    <Clock className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className={`text-xs uppercase tracking-wide ${softColor}`}>মেয়াদ</p>
+                    <p className="font-bold text-base mt-0.5">{course.courseValidity || 'Life-time Access'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Bottom Slider Dots (Mobile) */}
         {hasSlider && course.sliderImages.length > 1 && (
@@ -157,78 +231,6 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
             ))}
           </div>
         )}
-
-        {/* Right Side: Watch Trailer & Icons */}
-        <div className="hidden lg:flex absolute right-8 top-1/2 -translate-y-1/2 flex-col items-center gap-10 z-20">
-          {(course.introVideoUrl || course.thumbnailUrl) && (
-            <a href={course.introVideoUrl || '#'} target={course.introVideoUrl ? "_blank" : "_self"} className="flex flex-col items-center gap-3 group cursor-pointer">
-              <div className="w-14 h-14 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white group-hover:bg-primary group-hover:border-primary group-hover:scale-110 transition-all shadow-lg">
-                <PlayCircle className="w-6 h-6 fill-current" />
-              </div>
-              <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest text-center group-hover:text-primary transition-colors">Watch<br/>Trailer</span>
-            </a>
-          )}
-          <div className="w-px h-16 bg-white/10"></div>
-          <div className="flex flex-col gap-8 text-white/60">
-            <div className="flex flex-col items-center gap-1 group cursor-default" title={`Total Lessons: ${course.totalVideoLessons || 0}`}>
-              <BookOpen className="w-5 h-5 group-hover:text-white transition-colors" />
-            </div>
-            <div className="flex flex-col items-center gap-1 group cursor-default" title={`Live Classes: ${course.totalLiveClasses || 0}`}>
-              <Users className="w-5 h-5 group-hover:text-white transition-colors" />
-            </div>
-            <div className="flex flex-col items-center gap-1 group cursor-default" title={`Exams: ${course.totalExams || 0}`}>
-              <CheckCircle2 className="w-5 h-5 group-hover:text-white transition-colors" />
-            </div>
-            <div className="flex flex-col items-center gap-1 group cursor-default" title={`Duration: ${course.courseValidity || 'Lifetime'}`}>
-              <Clock className="w-5 h-5 group-hover:text-white transition-colors" />
-            </div>
-          </div>
-        </div>
-
-        {/* Center Content */}
-        <div className={`w-full max-w-7xl mx-auto px-4 lg:px-24 relative z-10 ${textColor}`}>
-          <Link href="/courses" className={`inline-flex items-center gap-2 font-semibold mb-8 transition-colors hover:opacity-100 ${hasCover ? 'text-white/70 hover:text-white' : 'text-foreground/60 hover:text-foreground'}`}>
-            <ArrowLeft className="w-4 h-4" /> ফিরে যান
-          </Link>
-          
-          <div className="max-w-2xl">
-            <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-6 border shadow-sm uppercase tracking-wide ${hasCover ? 'bg-primary/20 text-primary border-primary/30' : 'bg-primary/10 text-primary border-primary/20'}`}>
-              {course.category === 'intermediate' ? 'HSC' : course.category === 'primary' ? 'Primary' : course.category === 'high_school' ? 'SSC' : course.category}
-            </div>
-            <h1 className="text-5xl lg:text-7xl font-extrabold mb-6 leading-tight tracking-tight">
-              {course.title}
-            </h1>
-            <p className={`text-xl mb-10 leading-relaxed ${mutedColor}`}>
-              {course.subtitle || 'এই কোর্সে আপনি গুরুত্বপূর্ণ সব টপিক শিখতে পারবেন এবং পরীক্ষায় ভালো ফলাফল করতে পারবেন।'}
-            </p>
-            
-            <div className="flex flex-wrap items-center gap-8 text-sm font-semibold">
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${hasCover ? 'bg-white/10 text-white' : 'bg-primary/20 text-primary'}`}>
-                  <Users className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className={`text-xs uppercase tracking-wide ${softColor}`}>প্রশিক্ষক/প্রতিষ্ঠান</p>
-                  <p className="font-bold text-base mt-0.5">{course.coachingName || 'Instructor'}</p>
-                  {course.teacherId && (
-                    <Link href={`/teachers/${course.teacherId}`} target="_blank" className="text-primary text-xs hover:underline mt-0.5 inline-block font-bold">
-                      প্রোফাইল দেখুন
-                    </Link>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${hasCover ? 'bg-white/10 text-white' : 'bg-primary/20 text-primary'}`}>
-                  <Clock className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className={`text-xs uppercase tracking-wide ${softColor}`}>মেয়াদ</p>
-                  <p className="font-bold text-base mt-0.5">{course.courseValidity || 'Life-time Access'}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Content Section */}

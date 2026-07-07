@@ -136,9 +136,9 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
           </div>
         ) : null}
 
-        <div className="w-full max-w-[1400px] mx-auto px-4 lg:px-8 xl:px-12 relative z-20 h-full flex items-center justify-between gap-8">
+        <div className="w-full max-w-7xl mx-auto relative z-20 h-full flex items-center">
           {/* Left Side: Vertical Slider Dots & Counter (Desktop) */}
-          <div className="hidden lg:flex flex-col items-center gap-6 w-16 shrink-0">
+          <div className="hidden lg:flex absolute left-4 xl:left-0 top-1/2 -translate-y-1/2 flex-col items-center gap-6 w-16">
             {hasSlider && course.sliderImages.length > 1 && (
               <>
                 <span className="text-white/70 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
@@ -153,7 +153,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
           </div>
 
           {/* Right Side: Watch Trailer & Icons */}
-          <div className="hidden lg:flex flex-col items-center gap-10 w-20 shrink-0">
+          <div className="hidden lg:flex absolute right-4 xl:right-0 top-1/2 -translate-y-1/2 flex-col items-center gap-10 w-20">
             {(course.introVideoUrl || course.thumbnailUrl) && (
               <a href={course.introVideoUrl || '#'} target={course.introVideoUrl ? "_blank" : "_self"} className="flex flex-col items-center gap-3 group cursor-pointer">
                 <div className="w-14 h-14 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white group-hover:bg-primary group-hover:border-primary group-hover:scale-110 transition-all shadow-lg">
@@ -180,7 +180,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
           </div>
 
           {/* Center Content */}
-          <div className={`w-full max-w-4xl px-4 lg:px-8 xl:px-12 ${textColor}`}>
+          <div className={`w-full px-4 lg:px-28 xl:px-32 py-12 ${textColor}`}>
             <Link href="/courses" className={`inline-flex items-center gap-2 font-semibold mb-8 transition-colors hover:opacity-100 ${hasCover ? 'text-white/70 hover:text-white' : 'text-foreground/60 hover:text-foreground'}`}>
               <ArrowLeft className="w-4 h-4" /> ফিরে যান
             </Link>

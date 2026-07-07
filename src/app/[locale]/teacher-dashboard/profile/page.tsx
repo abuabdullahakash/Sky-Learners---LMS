@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { Building2, User, Camera, Link as LinkIcon, Save, CheckCircle2, Globe, Star, Users, Video, X, Plus, GraduationCap, Briefcase, BookOpen, Presentation, Eye, Upload, Loader2 } from 'lucide-react';
 
 export default function ProfileBuilderPage() {
@@ -64,6 +66,23 @@ export default function ProfileBuilderPage() {
       { id: '1', name: 'Rahim Sir', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rahim', university: 'Dhaka University', subjects: 'Physics', classes: 'HSC, Admission' }
     ]
   });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user?.uid) {
+        try {
+          const docRef = doc(db, 'teacherProfiles', user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setProfileData((prev) => ({ ...prev, ...docSnap.data() }));
+          }
+        } catch (error) {
+          console.error("Error fetching profile", error);
+        }
+      }
+    };
+    fetchProfile();
+  }, [user]);
 
   const educationLevelOptions = ['Primary', 'High School (SSC)', 'Intermediate (HSC)', 'Admission', 'Undergraduate (Hons)'];
 
@@ -131,14 +150,21 @@ export default function ProfileBuilderPage() {
     }));
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user?.uid) return;
+    
     setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
+    try {
+      await setDoc(doc(db, 'teacherProfiles', user.uid), profileData);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
-    }, 1500);
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      alert("Failed to save profile. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (

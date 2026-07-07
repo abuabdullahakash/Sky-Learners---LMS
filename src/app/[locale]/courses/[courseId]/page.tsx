@@ -8,16 +8,20 @@ import { doc, getDoc } from 'firebase/firestore';
 import { BookOpen, Users, Clock, CheckCircle2, ArrowLeft, Star, PlayCircle } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 
-export default function CourseDetailsPage({ params }: { params: { courseId: string } }) {
+import { useParams } from 'next/navigation';
+
+export default function CourseDetailsPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const params = useParams();
+  const courseId = params.courseId as string;
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const docRef = doc(db, 'courses', params.courseId);
+        const docRef = doc(db, 'courses', courseId);
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
@@ -30,8 +34,10 @@ export default function CourseDetailsPage({ params }: { params: { courseId: stri
       }
     };
 
-    fetchCourse();
-  }, [params.courseId]);
+    if (courseId) {
+      fetchCourse();
+    }
+  }, [courseId]);
 
   if (loading) {
     return (

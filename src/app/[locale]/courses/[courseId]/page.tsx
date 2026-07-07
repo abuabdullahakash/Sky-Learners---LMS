@@ -56,7 +56,7 @@ export default function CourseDetailsPage({ params }: { params: { courseId: stri
   return (
     <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500">
       {/* Hero Section */}
-      <div className="bg-foreground/5 py-12 md:py-20 border-b border-foreground/10 relative overflow-hidden">
+      <div className="bg-foreground/5 pt-28 pb-12 md:pt-36 md:pb-20 border-b border-foreground/10 relative overflow-hidden">
         {course.thumbnailUrl && (
           <div className="absolute inset-0 opacity-10 blur-xl">
             <img src={course.thumbnailUrl} alt="background blur" className="w-full h-full object-cover" />

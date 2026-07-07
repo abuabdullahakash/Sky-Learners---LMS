@@ -18,13 +18,17 @@ export default function CoursesPage() {
       try {
         const coursesRef = collection(db, 'courses');
         // Fetching all published courses
-        const q = query(coursesRef, where('isPublished', '==', true), orderBy('createdAt', 'desc'));
+        const q = query(coursesRef, where('isPublished', '==', true));
         const querySnapshot = await getDocs(q);
         
         const coursesData = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
-        }));
+        })).sort((a: any, b: any) => {
+          const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+          const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+          return timeB - timeA;
+        });
         
         setCourses(coursesData);
       } catch (error) {
@@ -46,7 +50,7 @@ export default function CoursesPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-80px)] px-4 py-10 bg-background text-foreground">
+    <div className="min-h-[calc(100vh-80px)] px-4 pt-28 pb-10 bg-background text-foreground">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold mb-4 text-primary">আমাদের সকল কোর্সসমূহ</h1>

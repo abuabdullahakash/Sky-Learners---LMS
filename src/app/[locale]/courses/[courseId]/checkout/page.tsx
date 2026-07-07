@@ -129,7 +129,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto py-12 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-5xl mx-auto pt-28 pb-12 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
       
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">পেমেন্ট এবং চেকআউট</h1>

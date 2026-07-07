@@ -96,21 +96,34 @@ export default function CheckoutPage() {
 
   if (success) {
     return (
-      <div className="max-w-2xl mx-auto py-20 px-4 text-center animate-in fade-in zoom-in duration-500">
-        <div className="w-24 h-24 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-          <CheckCircle2 className="w-12 h-12" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-300">
+        <div className="max-w-md w-full bg-background border border-foreground/10 p-8 rounded-3xl shadow-2xl animate-in zoom-in-95 duration-500 text-center relative overflow-hidden">
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-green-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl"></div>
+          
+          <div className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 relative z-10">
+            <CheckCircle2 className="w-10 h-10" />
+          </div>
+          <h2 className="text-3xl font-extrabold mb-3 relative z-10 text-primary">অভিনন্দন!</h2>
+          <p className="text-foreground/80 mb-8 relative z-10 leading-relaxed">
+            আপনার রিকোয়েস্টটি সফলভাবে সাবমিট হয়েছে। শিক্ষক পেমেন্ট চেক করে অ্যাপ্রুভ করা পর্যন্ত অনুগ্রহ করে অপেক্ষা করুন।
+          </p>
+          
+          <div className="space-y-3 relative z-10">
+            <button 
+              onClick={() => router.push('/dashboard')}
+              className="w-full py-3.5 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+            >
+              ড্যাশবোর্ডে যান
+            </button>
+            <button 
+              onClick={() => router.push('/courses')}
+              className="w-full py-3.5 bg-foreground/5 text-foreground font-semibold rounded-xl hover:bg-foreground/10 transition-colors"
+            >
+              আরও কোর্স দেখুন
+            </button>
+          </div>
         </div>
-        <h1 className="text-3xl font-bold mb-4">Request Submitted Successfully!</h1>
-        <p className="text-foreground/70 text-lg mb-8">
-          Thank you for your payment. The instructor will verify your transaction shortly. 
-          Once approved, you will get full access to <strong>{course?.title}</strong>.
-        </p>
-        <button 
-          onClick={() => router.push('/dashboard')} // Assuming a student dashboard exists
-          className="px-8 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-colors"
-        >
-          Go to Dashboard
-        </button>
       </div>
     );
   }
@@ -119,8 +132,8 @@ export default function CheckoutPage() {
     <div className="max-w-5xl mx-auto py-12 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
       
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Secure Checkout</h1>
-        <p className="text-foreground/60">Complete your manual payment to enroll.</p>
+        <h1 className="text-3xl font-bold mb-2">পেমেন্ট এবং চেকআউট</h1>
+        <p className="text-foreground/60">কোর্সে যুক্ত হতে নিচের নির্দেশাবলী অনুসরণ করে পেমেন্ট সম্পন্ন করুন।</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative items-start">
@@ -131,22 +144,22 @@ export default function CheckoutPage() {
           {/* Instructions */}
           <div className="bg-foreground/5 border border-foreground/10 p-6 rounded-3xl">
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <ShieldCheck className="text-green-500" /> Payment Instructions
+              <ShieldCheck className="text-green-500" /> পেমেন্ট নির্দেশাবলী
             </h2>
             
-            <div className="space-y-4 text-foreground/80">
-              <p>1. Open your bKash, Nagad, or Rocket app.</p>
-              <p>2. Use the <strong>Send Money</strong> or <strong>Make Payment</strong> option.</p>
-              <p>3. Send exactly <strong className="text-xl text-primary">৳{course?.price || 0}</strong> to one of the following numbers:</p>
+            <div className="space-y-4 text-foreground/80 font-medium">
+              <p>১. আপনার বিকাশ, নগদ বা রকেট অ্যাপ ওপেন করুন।</p>
+              <p>২. <strong className="text-foreground">Send Money</strong> অপশনটি সিলেক্ট করুন।</p>
+              <p>৩. নিচের যেকোনো একটি নাম্বারে ঠিক <strong className="text-xl text-primary bg-primary/10 px-2 py-0.5 rounded">৳{course?.price || 0}</strong> সেন্ড মানি করুন:</p>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                <div className="bg-pink-500/10 border border-pink-500/20 p-4 rounded-2xl flex flex-col items-center justify-center gap-2">
-                  <span className="font-bold text-pink-500">bKash (Personal)</span>
-                  <span className="text-2xl font-black">017XX-XXXXXX</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                <div className="bg-pink-500/10 border border-pink-500/20 p-5 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">
+                  <span className="font-bold text-pink-500 uppercase tracking-wider text-xs">bKash (Personal)</span>
+                  <span className="text-2xl font-black text-foreground">017XX-XXXXXX</span>
                 </div>
-                <div className="bg-orange-500/10 border border-orange-500/20 p-4 rounded-2xl flex flex-col items-center justify-center gap-2">
-                  <span className="font-bold text-orange-500">Nagad (Personal)</span>
-                  <span className="text-2xl font-black">018XX-XXXXXX</span>
+                <div className="bg-orange-500/10 border border-orange-500/20 p-5 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">
+                  <span className="font-bold text-orange-500 uppercase tracking-wider text-xs">Nagad (Personal)</span>
+                  <span className="text-2xl font-black text-foreground">018XX-XXXXXX</span>
                 </div>
               </div>
             </div>
@@ -154,10 +167,10 @@ export default function CheckoutPage() {
 
           {/* Form */}
           <div className="bg-foreground/5 border border-foreground/10 p-6 rounded-3xl">
-            <h2 className="text-xl font-bold mb-6">Verify Payment</h2>
+            <h2 className="text-xl font-bold mb-6">পেমেন্ট ভেরিফিকেশন ফর্ম</h2>
             
             {error && (
-              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 flex items-center gap-2 text-sm">
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 flex items-center gap-2 text-sm font-semibold">
                 <AlertCircle className="w-5 h-5 shrink-0" />
                 {error}
               </div>
@@ -166,10 +179,10 @@ export default function CheckoutPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground/80">Payment Method Used <span className="text-red-500">*</span></label>
+                <label className="text-sm font-bold text-foreground/80">পেমেন্ট মেথড <span className="text-red-500">*</span></label>
                 <div className="flex gap-4">
                   {['bkash', 'nagad', 'rocket'].map(method => (
-                    <label key={method} className={`flex-1 border rounded-xl p-3 text-center cursor-pointer transition-colors ${formData.paymentMethod === method ? 'border-primary bg-primary/10 text-primary font-bold' : 'border-foreground/20 hover:border-foreground/40'}`}>
+                    <label key={method} className={`flex-1 border rounded-xl p-3 text-center cursor-pointer transition-colors ${formData.paymentMethod === method ? 'border-primary bg-primary/10 text-primary font-bold' : 'border-foreground/20 hover:border-foreground/40 font-semibold text-foreground/70'}`}>
                       <input 
                         type="radio" 
                         name="paymentMethod" 
@@ -185,37 +198,37 @@ export default function CheckoutPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground/80">Your Mobile Number (Sender Number) <span className="text-red-500">*</span></label>
+                <label className="text-sm font-bold text-foreground/80">যে নাম্বার থেকে টাকা পাঠিয়েছেন <span className="text-red-500">*</span></label>
                 <input 
                   type="text" 
                   placeholder="e.g. 017XXXXXXXX" 
                   value={formData.senderNumber}
                   onChange={(e) => setFormData({...formData, senderNumber: e.target.value})}
-                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-colors"
+                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-semibold"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground/80">Transaction ID (TrxID) <span className="text-foreground/50 text-xs font-normal">(Optional but recommended)</span></label>
+                <label className="text-sm font-bold text-foreground/80">Transaction ID (TrxID) <span className="text-foreground/50 text-xs font-normal">(ঐচ্ছিক কিন্তু দিলে ভালো)</span></label>
                 <input 
                   type="text" 
                   placeholder="e.g. 9J5A6B8CD" 
                   value={formData.trxId}
                   onChange={(e) => setFormData({...formData, trxId: e.target.value})}
-                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-colors font-mono"
+                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono font-bold tracking-wider"
                 />
               </div>
 
               <button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed text-lg"
               >
                 {isSubmitting ? (
-                  <><Loader2 className="w-5 h-5 animate-spin" /> Submitting Request...</>
+                  <><Loader2 className="w-5 h-5 animate-spin" /> সাবমিট হচ্ছে...</>
                 ) : (
-                  <>Submit for Verification <ArrowRight className="w-5 h-5" /></>
+                  <>পেমেন্ট সাবমিট করুন <ArrowRight className="w-5 h-5" /></>
                 )}
               </button>
             </form>
@@ -226,30 +239,32 @@ export default function CheckoutPage() {
         {/* Right Column: Order Summary */}
         <div className="lg:col-span-1 sticky top-24">
           <div className="bg-foreground/5 border border-foreground/10 p-6 rounded-3xl">
-            <h2 className="text-xl font-bold mb-6 border-b border-foreground/10 pb-4">Order Summary</h2>
+            <h2 className="text-xl font-bold mb-6 border-b border-foreground/10 pb-4">অর্ডার সামারি</h2>
             
             <div className="mb-6">
-              {course?.thumbnailUrl && (
-                <img src={course.thumbnailUrl} alt={course.title} className="w-full h-32 object-cover rounded-xl mb-4" />
+              {course?.thumbnailUrl ? (
+                <img src={course.thumbnailUrl} alt={course.title} className="w-full h-36 object-cover rounded-xl mb-4 border border-foreground/10 shadow-sm" />
+              ) : (
+                <div className="w-full h-36 bg-background rounded-xl mb-4 flex items-center justify-center border border-foreground/10">Loading...</div>
               )}
-              <h3 className="font-semibold text-lg line-clamp-2">{course?.title || 'Loading...'}</h3>
-              <p className="text-sm text-foreground/60 mt-1 capitalize">{course?.category}</p>
+              <h3 className="font-bold text-lg line-clamp-2 leading-tight">{course?.title || 'Loading...'}</h3>
+              <p className="text-sm font-semibold text-primary mt-1 uppercase tracking-wide">{course?.category === 'intermediate' ? 'HSC' : course?.category}</p>
             </div>
 
             <div className="space-y-3 border-t border-foreground/10 pt-4 mb-6">
-              <div className="flex justify-between text-foreground/80">
-                <span>Original Price</span>
+              <div className="flex justify-between text-foreground/80 font-medium">
+                <span>কোর্স ফি</span>
                 <span>৳{course?.price || 0}</span>
               </div>
-              <div className="flex justify-between font-bold text-lg pt-2 border-t border-foreground/10">
-                <span>Total to Pay</span>
+              <div className="flex justify-between font-extrabold text-xl pt-2 border-t border-foreground/10">
+                <span>সর্বমোট</span>
                 <span className="text-primary">৳{course?.price || 0}</span>
               </div>
             </div>
 
-            <div className="p-4 bg-yellow-500/10 text-yellow-600 rounded-xl text-sm flex gap-3">
+            <div className="p-4 bg-yellow-500/10 text-yellow-600 rounded-xl text-sm font-semibold flex gap-3">
               <AlertCircle className="w-5 h-5 shrink-0" />
-              <p>Your enrollment will be manually verified by the instructor. It usually takes 5-10 minutes.</p>
+              <p>আপনার পেমেন্টটি শিক্ষকের দ্বারা ম্যানুয়ালি ভেরিফাই করা হবে। এটি সাধারণত ৫-১০ মিনিট সময় নেয়।</p>
             </div>
           </div>
         </div>

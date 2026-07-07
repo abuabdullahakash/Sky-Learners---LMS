@@ -5,11 +5,17 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import { BookOpen, Users, Clock, CheckCircle2, ArrowLeft, Star, PlayCircle, Image as ImageIcon } from 'lucide-react';
+import { BookOpen, Users, Clock, CheckCircle2, ArrowLeft, Star, PlayCircle, Image as ImageIcon, PhoneCall } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { PerspectiveCarousel } from '@/components/ui/perspective-carousel';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -229,8 +235,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
           </div>
         </div>
 
-        {/* Bottom Blend Gradient overlay */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none"></div>
+        {/* Bottom Blend Gradient overlay removed as per user request */}
 
         {/* Bottom Slider Dots (Mobile) */}
         {hasSlider && course.sliderImages.length > 1 && (
@@ -311,6 +316,26 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
                       <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                     </div>
                   ))}
+                </div>
+              </section>
+            )}
+
+            {course.faqs && course.faqs.length > 0 && (
+              <section className="mt-12">
+                <h2 className="text-3xl font-bold mb-6">সচরাচর জিজ্ঞাসা</h2>
+                <div className="bg-background border border-foreground/10 rounded-3xl p-6 shadow-sm">
+                  <Accordion type="single" collapsible className="w-full">
+                    {course.faqs.map((faq: any, i: number) => (
+                      <AccordionItem key={i} value={`item-${i}`} className={i === course.faqs.length - 1 ? "border-b-0" : ""}>
+                        <AccordionTrigger className="text-left font-bold text-lg hover:text-primary transition-colors">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-foreground/70 text-base leading-relaxed">
+                          {faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
                 </div>
               </section>
             )}
@@ -406,6 +431,16 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
                 )}
               </div>
             </div>
+
+            {course.contactNumber && (
+              <div className="bg-background border border-foreground/10 rounded-3xl p-6 shadow-sm text-center">
+                <h2 className="text-xl font-bold mb-4">আরও কোন জিজ্ঞাসা আছে?</h2>
+                <a href={`tel:${course.contactNumber}`} className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400 font-bold rounded-2xl hover:bg-green-100 dark:hover:bg-green-500/20 transition-colors border border-green-200 dark:border-green-500/20">
+                  <PhoneCall className="w-5 h-5" />
+                  কল করুন {course.contactNumber} নম্বরে
+                </a>
+              </div>
+            )}
 
           </div>
 

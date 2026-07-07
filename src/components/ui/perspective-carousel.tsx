@@ -162,15 +162,32 @@ export function PerspectiveCarousel({
                     onClick={() => selectSlide(index)}
                   >
                     <div className={cn(
-                      "bg-background border border-foreground/10 rounded-3xl p-6 flex flex-col items-center text-center shadow-sm transition-all h-[300px]",
-                      isActive ? "border-primary/30 shadow-lg shadow-primary/10" : ""
+                      "bg-background border border-foreground/10 rounded-3xl flex flex-col overflow-hidden shadow-sm transition-all h-[320px] group",
+                      isActive ? "border-primary/50 shadow-xl shadow-primary/20 ring-1 ring-primary/30" : "hover:border-primary/30"
                     )}>
-                      <div className="w-24 h-24 shrink-0 rounded-full overflow-hidden mb-4 border-4 border-primary/10">
-                        <img src={item.photoUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'} alt={item.name} className="w-full h-full object-cover" />
+                      {/* Top Half: Image */}
+                      <div className="w-full h-[55%] relative bg-foreground/5 shrink-0 overflow-hidden">
+                        <img 
+                          src={item.photoUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'} 
+                          alt={item.name} 
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                        />
+                        {/* Gradient to blend image smoothly into the background */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent opacity-100" />
                       </div>
-                      <h3 className="text-xl font-bold mb-1 line-clamp-1">{item.name}</h3>
-                      <p className="text-primary font-semibold text-sm mb-3 line-clamp-1">{item.role || 'Instructor'}</p>
-                      <p className="text-foreground/70 text-sm leading-relaxed line-clamp-3">{item.background}</p>
+                      
+                      {/* Bottom Half: Text */}
+                      <div className="flex-1 flex flex-col items-center justify-start p-5 text-center z-10 -mt-10 relative">
+                        <h3 className="text-2xl font-extrabold mb-1.5 line-clamp-1 bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-blue-500">
+                          {item.name}
+                        </h3>
+                        <p className="text-foreground/90 font-bold text-sm mb-2 line-clamp-1">
+                          {item.role || 'Instructor'}
+                        </p>
+                        <p className="text-foreground/60 font-medium text-xs line-clamp-2 leading-relaxed px-2">
+                          {item.background}
+                        </p>
+                      </div>
                     </div>
                   </button>
                 </motion.div>

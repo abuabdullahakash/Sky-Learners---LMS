@@ -6,14 +6,25 @@ import { useAuth } from '@/context/AuthContext';
 
 // --- MOCK DATA GENERATORS (Easy to replace with real API later) ---
 const fetchMockEarningsStats = async (month: string) => {
-  // Simulating different stats based on month selection
-  const baseTotal = 12500;
-  const multiplier = month === 'All Time' ? 1 : month === 'July 2026' ? 0.8 : 0.5;
+  // Total Lifetime Earnings remains constant regardless of the filter
+  const lifetimeTotal = 12500;
   
+  // Selected period total changes based on the filter
+  let selectedPeriodTotal = 0;
+  if (month === 'All Time') {
+    selectedPeriodTotal = 1250; // default to 'This Month' if All Time is selected
+  } else if (month === 'July 2026') {
+    selectedPeriodTotal = 1250;
+  } else if (month === 'June 2026') {
+    selectedPeriodTotal = 2400;
+  } else if (month === 'May 2026') {
+    selectedPeriodTotal = 1800;
+  }
+
   return new Promise(resolve => setTimeout(() => resolve({
-    totalEarnings: baseTotal * multiplier,
-    thisMonth: 1250 * (multiplier > 0.5 ? 1 : 0),
-    pending: 450 * multiplier,
+    lifetimeTotal: lifetimeTotal,
+    selectedPeriodTotal: selectedPeriodTotal,
+    pending: 450, // pending might also be filtered or constant depending on business logic
     growth: 12.5 // percentage
   }), 500));
 };
@@ -99,7 +110,7 @@ export default function EarningsPage() {
   const maxChartValue = Math.max(...chartData.map(d => d.value), 1);
 
   return (
-    <div className="space-y-8 pb-10">
+    <div className="space-y-8 pb-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header & Filter */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
@@ -129,6 +140,8 @@ export default function EarningsPage() {
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
+        
+        {/* Total Lifetime Earnings (Always Static) */}
         <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-6 relative overflow-hidden group hover:border-primary/50 transition-colors">
           <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-green-500/20 transition-colors"></div>
           <div className="relative z-10">
@@ -140,32 +153,46 @@ export default function EarningsPage() {
                 <TrendingUp className="w-4 h-4" /> +{stats?.growth}%
               </span>
             </div>
-            <p className="text-foreground/60 text-sm font-medium mb-1">Total Earnings</p>
-            <h3 className="text-3xl font-bold">{formatCurrency(stats?.totalEarnings || 0)}</h3>
+            <p className="text-foreground/60 text-sm font-medium mb-1">Total Lifetime Earnings</p>
+            <h3 className="text-3xl font-bold">{formatCurrency(stats?.lifetimeTotal || 0)}</h3>
           </div>
         </div>
 
-        <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-6">
-          <div className="p-3 bg-blue-500/20 text-blue-500 rounded-xl w-max mb-4">
-            <TrendingUp className="w-6 h-6" />
+        {/* Dynamic Period Earnings */}
+        <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-6 relative overflow-hidden group hover:border-primary/50 transition-colors">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-blue-500/20 transition-colors"></div>
+          <div className="relative z-10">
+             <div className="flex items-center justify-between mb-4">
+               <div className="p-3 bg-blue-500/20 text-blue-500 rounded-xl">
+                 <TrendingUp className="w-6 h-6" />
+               </div>
+             </div>
+             <p className="text-foreground/60 text-sm font-medium mb-1">
+               {selectedMonth === 'All Time' ? 'Earnings This Month' : `Earnings in ${selectedMonth}`}
+             </p>
+             <h3 className="text-3xl font-bold text-blue-500">{formatCurrency(stats?.selectedPeriodTotal || 0)}</h3>
           </div>
-          <p className="text-foreground/60 text-sm font-medium mb-1">This Month</p>
-          <h3 className="text-3xl font-bold">{formatCurrency(stats?.thisMonth || 0)}</h3>
         </div>
 
-        <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-6">
-          <div className="p-3 bg-yellow-500/20 text-yellow-500 rounded-xl w-max mb-4">
-            <Clock className="w-6 h-6" />
-          </div>
-          <p className="text-foreground/60 text-sm font-medium mb-1">Pending Clearance</p>
-          <h3 className="text-3xl font-bold">{formatCurrency(stats?.pending || 0)}</h3>
+        {/* Pending Clearance */}
+        <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-6 relative overflow-hidden group hover:border-primary/50 transition-colors">
+           <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-yellow-500/20 transition-colors"></div>
+           <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                 <div className="p-3 bg-yellow-500/20 text-yellow-500 rounded-xl">
+                   <Clock className="w-6 h-6" />
+                 </div>
+              </div>
+              <p className="text-foreground/60 text-sm font-medium mb-1">Pending Clearance</p>
+              <h3 className="text-3xl font-bold">{formatCurrency(stats?.pending || 0)}</h3>
+           </div>
         </div>
       </div>
 
       {/* Analytics Chart */}
       <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-6 md:p-8">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-xl font-bold">Revenue Analytics</h2>
+          <h2 className="text-xl font-bold">Revenue Analytics {selectedMonth !== 'All Time' ? `(${selectedMonth})` : ''}</h2>
         </div>
         
         {/* Custom CSS Bar Chart */}

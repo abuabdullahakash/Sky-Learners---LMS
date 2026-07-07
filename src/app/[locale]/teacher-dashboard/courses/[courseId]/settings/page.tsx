@@ -111,6 +111,7 @@ export default function CourseSettingsPage() {
         coverImageUrl: course.coverImageUrl || '',
         sliderImages: course.sliderImages || [],
         galleryImages: course.galleryImages || [],
+        introVideoUrl: course.introVideoUrl || '',
         price: Number(course.price),
         discountPrice: course.discountPrice ? Number(course.discountPrice) : null,
         discountValidUntil: course.discountValidUntil || '',
@@ -229,6 +230,14 @@ export default function CourseSettingsPage() {
             <label className="block text-sm font-medium mb-1">Course Title</label>
             <input 
               type="text" value={course.title || ''} onChange={e => setCourse({...course, title: e.target.value})}
+              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Intro Video URL (YouTube/Facebook)</label>
+            <input 
+              type="text" value={course.introVideoUrl || ''} onChange={e => setCourse({...course, introVideoUrl: e.target.value})}
+              placeholder="https://youtube.com/watch?v=..."
               className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
             />
           </div>

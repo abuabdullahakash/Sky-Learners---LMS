@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from 'react';
-import { ShieldCheck, CreditCard, Bell, Save, Key, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { ShieldCheck, CreditCard, Bell, Save, AlertCircle, CheckCircle2, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export default function TeacherSettingsPage() {
@@ -10,6 +10,7 @@ export default function TeacherSettingsPage() {
   const [activeTab, setActiveTab] = useState<'payment' | 'security' | 'notifications'>('payment');
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   // Form States
   const [paymentData, setPaymentData] = useState({
@@ -42,6 +43,22 @@ export default function TeacherSettingsPage() {
     }, 1500);
   };
 
+  const scrollTabs = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = 200;
+      scrollRef.current.scrollBy({
+        left: direction === 'right' ? scrollAmount : -scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const tabs = [
+    { id: 'payment', label: 'Payment Methods', icon: CreditCard },
+    { id: 'security', label: 'Security', icon: ShieldCheck },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+  ];
+
   return (
     <div className="space-y-8 pb-10 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl">
       
@@ -51,49 +68,58 @@ export default function TeacherSettingsPage() {
         <p className="text-foreground/60">Manage your payment methods, security, and preferences.</p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col gap-6">
         
-        {/* Settings Sidebar */}
-        <div className="w-full lg:w-64 shrink-0">
-          <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-3 flex flex-col gap-2">
-            <button 
-              onClick={() => setActiveTab('payment')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 font-medium text-sm text-left ${
-                activeTab === 'payment' 
-                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' 
-                  : 'hover:bg-foreground/5 text-foreground/70 hover:text-foreground'
-              }`}
-            >
-              <CreditCard className="w-5 h-5" />
-              Payment Methods
-            </button>
-            <button 
-              onClick={() => setActiveTab('security')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 font-medium text-sm text-left ${
-                activeTab === 'security' 
-                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' 
-                  : 'hover:bg-foreground/5 text-foreground/70 hover:text-foreground'
-              }`}
-            >
-              <ShieldCheck className="w-5 h-5" />
-              Security
-            </button>
-            <button 
-              onClick={() => setActiveTab('notifications')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 font-medium text-sm text-left ${
-                activeTab === 'notifications' 
-                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' 
-                  : 'hover:bg-foreground/5 text-foreground/70 hover:text-foreground'
-              }`}
-            >
-              <Bell className="w-5 h-5" />
-              Notifications
-            </button>
+        {/* Horizontal Scrollable Tabs */}
+        <div className="relative group flex items-center bg-foreground/5 border border-foreground/10 rounded-2xl p-1.5">
+          
+          <button 
+            onClick={() => scrollTabs('left')}
+            className="absolute left-0 z-10 w-8 h-full bg-gradient-to-r from-background via-background/80 to-transparent flex items-center justify-start pl-2 text-foreground/50 hover:text-primary transition-colors opacity-0 group-hover:opacity-100 md:hidden pointer-events-none"
+            style={{ pointerEvents: 'auto' }}
+          >
+            <ChevronLeft className="w-5 h-5 bg-background rounded-full shadow" />
+          </button>
+
+          <div 
+            ref={scrollRef}
+            className="flex items-center gap-2 overflow-x-auto custom-scrollbar scroll-smooth w-full px-1"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <style jsx>{`
+              div::-webkit-scrollbar { display: none; }
+            `}</style>
+            
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button 
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex items-center gap-2.5 px-5 py-3 rounded-xl transition-all duration-300 font-medium text-sm whitespace-nowrap ${
+                    activeTab === tab.id 
+                      ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' 
+                      : 'hover:bg-foreground/10 text-foreground/70 hover:text-foreground'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
+
+          <button 
+            onClick={() => scrollTabs('right')}
+            className="absolute right-0 z-10 w-12 h-full bg-gradient-to-l from-background via-background/90 to-transparent flex items-center justify-end pr-2 text-foreground/50 hover:text-primary transition-colors opacity-0 group-hover:opacity-100 md:hidden pointer-events-none"
+            style={{ pointerEvents: 'auto' }}
+          >
+            <ChevronRight className="w-5 h-5 bg-background rounded-full shadow" />
+          </button>
         </div>
 
         {/* Settings Content Area */}
-        <div className="flex-1 bg-foreground/5 border border-foreground/10 rounded-3xl p-6 md:p-8">
+        <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-6 md:p-8">
           
           <form onSubmit={handleSave} className="space-y-8">
             

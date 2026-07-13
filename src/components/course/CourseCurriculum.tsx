@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PlayCircle, Lock, FileText, Download, X, Calendar } from 'lucide-react';
+import { PlayCircle, Lock, FileText, Download, X, Calendar, Loader2 } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -11,6 +11,28 @@ import { useTranslations } from 'next-intl';
 export default function CourseCurriculum({ modules, routineImageUrl }: { modules: any[], routineImageUrl?: string }) {
   const t = useTranslations('CourseDetails');
   const [isRoutineOpen, setIsRoutineOpen] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownload = async (url: string) => {
+    try {
+      setIsDownloading(true);
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = 'Class-Routine.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error('Failed to download image', error);
+      window.open(url, '_blank'); // fallback
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   if ((!modules || modules.length === 0) && !routineImageUrl) return null;
 
@@ -181,15 +203,14 @@ export default function CourseCurriculum({ modules, routineImageUrl }: { modules
               />
             </div>
             
-            <a 
-              href={routineImageUrl} 
-              download="Class-Routine.png"
-              target="_blank"
-              className="flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl shadow-lg transition-colors"
+            <button 
+              onClick={() => handleDownload(routineImageUrl)}
+              disabled={isDownloading}
+              className="flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 disabled:opacity-70 text-white font-bold rounded-xl shadow-lg transition-colors"
             >
-              <Download className="w-5 h-5" />
+              {isDownloading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
               {t('downloadRoutine').includes('CourseDetails.') ? 'Download Routine' : t('downloadRoutine')}
-            </a>
+            </button>
           </div>
         </div>
       )}

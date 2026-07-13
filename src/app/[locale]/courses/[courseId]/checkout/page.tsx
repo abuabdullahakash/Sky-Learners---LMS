@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, addDoc, Timestamp } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
-import { CheckCircle2, ShieldCheck, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { CheckCircle2, ShieldCheck, ArrowRight, Loader2, AlertCircle, UserCircle, Phone, Link, Mail, Camera, Upload } from 'lucide-react';
+import { uploadImageToImgBB } from '@/lib/imgbb';
 
 export default function CheckoutPage({ params }: { params: Promise<{ courseId: string }> }) {
   const router = useRouter();
@@ -26,6 +27,31 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
     senderNumber: '',
     trxId: ''
   });
+
+  const [studentInfo, setStudentInfo] = useState({
+    phone: '',
+    whatsapp: '',
+    facebookUrl: '',
+    email: '',
+    imageUrl: ''
+  });
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    try {
+      const url = await uploadImageToImgBB(file);
+      setStudentInfo(prev => ({ ...prev, imageUrl: url }));
+    } catch (err) {
+      console.error("Error uploading image:", err);
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -58,6 +84,10 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
       setError("Sender mobile number is required.");
       return;
     }
+    if (!studentInfo.phone) {
+      setError("Offline phone number is required.");
+      return;
+    }
 
     setIsSubmitting(true);
     setError('');
@@ -75,6 +105,12 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
         paymentMethod: formData.paymentMethod,
         amount: course?.price || 0,
         status: 'pending',
+        // New student info
+        offlinePhone: studentInfo.phone,
+        whatsappNumber: studentInfo.whatsapp,
+        facebookUrl: studentInfo.facebookUrl,
+        contactEmail: studentInfo.email,
+        profileImageUrl: studentInfo.imageUrl,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
       });
@@ -162,6 +198,93 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
                 <div className="bg-orange-500/10 border border-orange-500/20 p-5 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">
                   <span className="font-bold text-orange-500 uppercase tracking-wider text-xs">Nagad (Personal)</span>
                   <span className="text-2xl font-black text-foreground">018XX-XXXXXX</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Student Information Form */}
+          <div className="bg-foreground/5 border border-foreground/10 p-6 rounded-3xl">
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <UserCircle className="text-blue-500" /> স্টুডেন্ট ইনফরমেশন
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-foreground/80 flex items-center gap-2">
+                  <Phone className="w-4 h-4" /> অফলাইন ফোন নাম্বার <span className="text-red-500">*</span>
+                </label>
+                <input 
+                  type="tel" 
+                  placeholder="01XXXXXXXXX" 
+                  value={studentInfo.phone}
+                  onChange={(e) => setStudentInfo({...studentInfo, phone: e.target.value})}
+                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-semibold"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-foreground/80 flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-green-500" /> হোয়াটসঅ্যাপ নাম্বার <span className="text-foreground/50 font-normal text-xs">(ঐচ্ছিক)</span>
+                </label>
+                <input 
+                  type="tel" 
+                  placeholder="01XXXXXXXXX" 
+                  value={studentInfo.whatsapp}
+                  onChange={(e) => setStudentInfo({...studentInfo, whatsapp: e.target.value})}
+                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-semibold"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-foreground/80 flex items-center gap-2">
+                  <Link className="w-4 h-4 text-blue-600" /> ফেসবুক প্রোফাইল লিংক <span className="text-foreground/50 font-normal text-xs">(ঐচ্ছিক)</span>
+                </label>
+                <input 
+                  type="url" 
+                  placeholder="https://facebook.com/..." 
+                  value={studentInfo.facebookUrl}
+                  onChange={(e) => setStudentInfo({...studentInfo, facebookUrl: e.target.value})}
+                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-foreground/80 flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-orange-500" /> ইমেইল এড্রেস <span className="text-foreground/50 font-normal text-xs">(ঐচ্ছিক)</span>
+                </label>
+                <input 
+                  type="email" 
+                  placeholder="student@example.com" 
+                  value={studentInfo.email}
+                  onChange={(e) => setStudentInfo({...studentInfo, email: e.target.value})}
+                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-bold text-foreground/80 flex items-center gap-2">
+                  <Camera className="w-4 h-4 text-pink-500" /> আপনার ছবি <span className="text-foreground/50 font-normal text-xs">(ঐচ্ছিক)</span>
+                </label>
+                <div className="flex items-center gap-4 mt-2">
+                  {studentInfo.imageUrl ? (
+                    <div className="relative w-20 h-20 rounded-xl overflow-hidden border-2 border-primary/20">
+                      <img src={studentInfo.imageUrl} alt="Student profile" className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl bg-foreground/5 border-2 border-dashed border-foreground/20 flex flex-col items-center justify-center text-foreground/50">
+                      <UserCircle className="w-8 h-8 mb-1" />
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 rounded-lg text-sm font-semibold transition-colors">
+                      {isUploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                      {isUploadingImage ? 'আপলোড হচ্ছে...' : 'ছবি আপলোড করুন'}
+                      <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isUploadingImage} />
+                    </label>
+                    <p className="text-xs text-foreground/50 mt-2">শিক্ষকের সাথে সহজে পরিচিত হওয়ার জন্য আপনার একটি সুন্দর ছবি যুক্ত করতে পারেন।</p>
+                  </div>
                 </div>
               </div>
             </div>

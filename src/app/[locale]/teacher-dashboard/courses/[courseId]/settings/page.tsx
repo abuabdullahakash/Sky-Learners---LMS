@@ -536,7 +536,7 @@ export default function CourseSettingsPage() {
               </div>
             ) : (
               course.learningOutcomes.map((outcome: any, index: number) => (
-                <div key={index} className="flex items-center gap-3 relative z-10">
+                <div key={index} className="flex items-center gap-3 relative" style={{ zIndex: 50 - index }}>
                   <IconPicker 
                     selectedIcon={outcome.icon || 'CheckCircle2'}
                     onSelect={(iconName) => {

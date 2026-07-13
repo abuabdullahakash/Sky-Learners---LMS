@@ -52,7 +52,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
     if (course?.sliderImages?.length > 1) {
       const interval = setInterval(() => {
         setCurrentSlide((prev) => (prev + 1) % course.sliderImages.length);
-      }, 3000);
+      }, 5000);
       return () => clearInterval(interval);
     }
   }, [course?.sliderImages]);

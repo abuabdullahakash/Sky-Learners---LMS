@@ -25,13 +25,17 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
         
         {/* Background Layer */}
         {hasSlider ? (
-          <div className="absolute inset-0 z-0">
-            <img 
-              key={currentSlide}
-              src={course.sliderImages[currentSlide]} 
-              alt="Background Slider" 
-              className="w-full h-full object-cover animate-in fade-in duration-1000" 
-            />
+          <div className="absolute inset-0 z-0 overflow-hidden">
+            <div 
+              className="flex w-full h-full transition-transform duration-1000 ease-in-out"
+              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            >
+              {course.sliderImages.map((src: string, idx: number) => (
+                <div key={idx} className="w-full h-full shrink-0 relative">
+                  <img src={src} alt="Background Slider" className="w-full h-full object-cover" />
+                </div>
+              ))}
+            </div>
             <div className="absolute inset-0 bg-gradient-to-r from-red-950/90 via-red-900/70 to-black/50 backdrop-blur-[2px]"></div>
           </div>
         ) : course.coverImageUrl ? (
@@ -41,20 +45,18 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
           </div>
         ) : null}
 
-        {/* Slider Controls (Left Sidebar) */}
-        <div className="hidden lg:flex absolute left-4 xl:left-0 top-1/2 -translate-y-1/2 flex-col items-center gap-6 w-16 z-20">
-          {hasSlider && course.sliderImages.length > 1 && (
-            <>
-              <span className="text-white/70 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
-              <div className="flex flex-col gap-3">
-                {course.sliderImages.map((_: any, idx: number) => (
-                  <div key={idx} onClick={() => setCurrentSlide(idx)} className={`w-2 rounded-full transition-all duration-300 cursor-pointer ${idx === currentSlide ? 'bg-gradient-to-b from-red-400 to-orange-500 h-8 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-white/50 h-2 hover:bg-white/80'}`} />
-                ))}
-              </div>
-              <span className="text-white/30 text-xs font-bold">{String(course.sliderImages.length).padStart(2, '0')}</span>
-            </>
-          )}
-        </div>
+        {/* Slider Controls (Bottom Center) */}
+        {hasSlider && course.sliderImages.length > 1 && (
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-20">
+            {course.sliderImages.map((_: any, idx: number) => (
+              <div 
+                key={idx} 
+                onClick={() => setCurrentSlide(idx)} 
+                className={`transition-all duration-500 cursor-pointer rounded-full ${idx === currentSlide ? 'bg-gradient-to-r from-red-400 to-orange-500 w-10 h-2.5 shadow-[0_0_15px_rgba(239,68,68,0.6)]' : 'bg-white/40 w-2.5 h-2.5 hover:bg-white/80'}`} 
+              />
+            ))}
+          </div>
+        )}
 
         {/* Video Button & Stats (Right Sidebar) */}
         <div className="hidden lg:flex absolute right-4 xl:right-0 top-1/2 -translate-y-1/2 flex-col items-center gap-10 w-20 z-20">

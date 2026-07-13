@@ -95,25 +95,31 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
               {course.subtitle || t('descriptionFallbackPrimary')}
             </p>
           </div>
+        </div>
 
-          {/* Video Button (Right Sidebar) */}
-          <div className="hidden lg:flex absolute right-4 top-1/2 -translate-y-1/2 flex-col items-center gap-10 w-20 z-20">
-            {course.introVideoUrl && (
-              <button onClick={() => setIsVideoModalOpen(true)} className="flex flex-col items-center gap-3 group cursor-pointer">
-                <div className="relative w-14 h-14 flex items-center justify-center">
-                  <div className={`absolute inset-0 rounded-full animate-ping opacity-75 ${hasCover ? 'bg-white/40' : 'bg-primary/40'}`}></div>
-                  <div className={`relative w-14 h-14 rounded-full border flex items-center justify-center transition-all duration-300 shadow-lg ${hasCover ? 'bg-white/10 border-white/20 text-white group-hover:bg-white group-hover:text-black group-hover:scale-110 shadow-white/20' : 'bg-primary/10 border-primary/20 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 shadow-primary/20'}`}>
-                    <PlayCircle className="w-6 h-6 fill-current" />
+        {/* Video Button (Right Sidebar) */}
+        <div className="absolute inset-0 z-20 pointer-events-none">
+          <div className="w-full max-w-7xl mx-auto px-4 relative h-full flex items-center justify-end">
+            <div className="hidden lg:flex flex-col items-center gap-10 w-20 pointer-events-auto">
+              {course.introVideoUrl && (
+                <button onClick={() => setIsVideoModalOpen(true)} className="flex flex-col items-center gap-3 group cursor-pointer">
+                  <div className="relative w-14 h-14 flex items-center justify-center">
+                    <div className={`absolute inset-0 rounded-full animate-ping opacity-75 ${hasCover ? 'bg-white/40' : 'bg-primary/40'}`}></div>
+                    <div className={`relative w-14 h-14 rounded-full border flex items-center justify-center transition-all duration-300 shadow-lg ${hasCover ? 'bg-white/10 border-white/20 text-white group-hover:bg-white group-hover:text-black group-hover:scale-110 shadow-white/20' : 'bg-primary/10 border-primary/20 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 shadow-primary/20'}`}>
+                      <PlayCircle className="w-6 h-6 fill-current" />
+                    </div>
                   </div>
-                </div>
-                <span className={`text-[10px] font-bold uppercase tracking-widest text-center transition-all duration-300 whitespace-pre-line group-hover:-translate-y-1 ${hasCover ? 'text-white/60 group-hover:text-white' : 'text-foreground/60 group-hover:text-primary'}`}>{t('watchTrailer')}</span>
-              </button>
-            )}
+                  <span className={`text-[10px] font-bold uppercase tracking-widest text-center transition-all duration-300 whitespace-pre-line group-hover:-translate-y-1 ${hasCover ? 'text-white/60 group-hover:text-white' : 'text-foreground/60 group-hover:text-primary'}`}>{t('watchTrailer')}</span>
+                </button>
+              )}
+            </div>
           </div>
+        </div>
 
-          {/* Slider Controls */}
-          {hasSlider && course.sliderImages.length > 1 && (
-            <div className="absolute bottom-10 left-4 flex items-center gap-10 z-20">
+        {/* Slider Controls */}
+        {hasSlider && course.sliderImages.length > 1 && (
+          <div className="absolute bottom-10 left-0 right-0 z-20 pointer-events-none">
+            <div className="w-full max-w-7xl mx-auto px-4 relative flex justify-between items-center pointer-events-auto">
               {/* Pagination Dots */}
               <div className="flex items-center gap-4">
                 <span className="text-white/80 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
@@ -145,8 +151,8 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
                 </button>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-16">

@@ -6,8 +6,7 @@ import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { Plus, GripVertical, Video as VideoIcon, Image as ImageIcon, Trash2, Upload, Loader2, X } from 'lucide-react';
-import { storage } from '@/lib/firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { uploadImageToImgBB } from '@/lib/imgbb';
 
 export default function CourseCurriculumPage() {
   const { user } = useAuth();
@@ -93,9 +92,7 @@ export default function CourseCurriculumPage() {
     
     try {
       setUploadingThumbnail(lessonId);
-      const storageRef = ref(storage, `courses/${courseId}/modules/${moduleId}/lessons/${lessonId}_${file.name}`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
+      const url = await uploadImageToImgBB(file);
       await handleUpdateLesson(moduleId, lessonId, 'thumbnailUrl', url);
     } catch (error) {
       console.error("Error uploading thumbnail", error);

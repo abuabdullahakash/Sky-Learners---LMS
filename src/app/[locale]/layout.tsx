@@ -40,7 +40,8 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${hindSiliguri.variable} font-sans antialiased min-h-screen bg-background text-foreground flex flex-col`}
+        className={`${inter.variable} ${hindSiliguri.variable} antialiased min-h-screen bg-background text-foreground flex flex-col`}
+        style={{ fontFamily: 'var(--font-inter), var(--font-hind-siliguri), sans-serif' }}
       >
         <NextIntlClientProvider messages={messages}>
           <AuthProvider>

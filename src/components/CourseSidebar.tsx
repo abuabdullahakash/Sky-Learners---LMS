@@ -4,7 +4,7 @@ import { Link, usePathname } from '@/i18n/routing';
 import { LayoutDashboard, BookOpen, Video, FileText, CheckSquare, MessageSquare, Settings, ArrowLeft, Users, ClipboardList, GraduationCap } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 export default function CourseSidebar() {
@@ -30,6 +30,22 @@ export default function CourseSidebar() {
     if (courseId) fetchCourse();
   }, [courseId]);
 
+  const handleTogglePublish = async () => {
+    const action = isPublished ? 'unpublish' : 'publish';
+    if (!window.confirm(`Are you sure you want to ${action} this course?`)) return;
+
+    try {
+      const docRef = doc(db, 'courses', courseId);
+      await updateDoc(docRef, {
+        isPublished: !isPublished
+      });
+      setIsPublished(!isPublished);
+    } catch (error) {
+      console.error("Error toggling publish status", error);
+      alert("Failed to update course status.");
+    }
+  };
+
   const menuItems = [
     { name: 'Overview', href: `/teacher-dashboard/courses/${courseId}`, icon: LayoutDashboard, exact: true },
     { name: 'Enrollments', href: `/teacher-dashboard/courses/${courseId}/enrollments`, icon: ClipboardList },
@@ -40,7 +56,7 @@ export default function CourseSidebar() {
     { name: 'Exams & Quizzes', href: `/teacher-dashboard/courses/${courseId}/exams`, icon: CheckSquare },
     { name: 'Instructors', href: `/teacher-dashboard/courses/${courseId}/instructors`, icon: Users },
     { name: 'Community', href: `/teacher-dashboard/courses/${courseId}/community`, icon: MessageSquare },
-    { name: 'Settings', href: `/teacher-dashboard/courses/${courseId}/settings`, icon: Settings },
+    { name: 'Course Details', href: `/teacher-dashboard/courses/${courseId}/settings`, icon: Settings },
   ];
 
   return (
@@ -79,6 +95,20 @@ export default function CourseSidebar() {
             </Link>
           );
         })}
+      </div>
+
+      {/* Publish/Unpublish Action */}
+      <div className="p-4 border-t border-foreground/10 bg-background/50">
+        <button
+          onClick={handleTogglePublish}
+          className={`w-full py-3 rounded-xl font-bold text-sm transition-all shadow-sm ${
+            isPublished 
+              ? 'bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white' 
+              : 'bg-green-500 text-white hover:bg-green-600 hover:shadow-lg'
+          }`}
+        >
+          {isPublished ? 'Unpublish Course' : 'Publish Now'}
+        </button>
       </div>
     </aside>
   );

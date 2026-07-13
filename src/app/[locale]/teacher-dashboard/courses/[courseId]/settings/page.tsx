@@ -154,27 +154,14 @@ export default function CourseSettingsPage() {
     }
   };
 
-  const handleTogglePublish = async () => {
-    const newStatus = !course.isPublished;
-    setIsSaving(true);
-    try {
-      await updateDoc(doc(db, 'courses', courseId), { isPublished: newStatus });
-      setCourse({ ...course, isPublished: newStatus });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   if (isLoading) return <div className="flex justify-center items-center h-64">Loading...</div>;
   if (!course) return null;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-2xl font-bold mb-2">Course Settings</h1>
-        <p className="text-foreground/70">Manage basic information and visibility of your course.</p>
+        <h1 className="text-2xl font-bold mb-2">Course Details</h1>
+        <p className="text-foreground/70">Manage basic information of your course.</p>
       </div>
 
       <form onSubmit={handleSaveBasicInfo} className="bg-background p-6 md:p-8 rounded-3xl border border-foreground/10 space-y-6 shadow-sm">
@@ -695,29 +682,6 @@ export default function CourseSettingsPage() {
         </div>
       </form>
 
-      <div className="bg-background p-6 md:p-8 rounded-3xl border border-foreground/10 space-y-4 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div>
-          <h2 className="text-xl font-bold mb-2">Publish Course</h2>
-          <p className="text-foreground/70 text-sm max-w-lg">
-            Once published, your course will be visible to students in the marketplace. You can unpublish it anytime.
-          </p>
-          <div className="mt-2">
-            <span className="font-semibold text-sm">Status: </span>
-            <span className={course.isPublished ? 'text-green-500 font-bold' : 'text-orange-500 font-bold'}>{course.isPublished ? 'Published' : 'Draft'}</span>
-          </div>
-        </div>
-        <button 
-          onClick={handleTogglePublish}
-          disabled={isSaving}
-          className={`px-6 py-3 text-white font-bold rounded-xl transition-all shadow-lg hover:-translate-y-0.5 whitespace-nowrap ${
-            course.isPublished 
-              ? 'bg-red-500 hover:bg-red-600 hover:shadow-red-500/30' 
-              : 'bg-green-500 hover:bg-green-600 hover:shadow-green-500/30'
-          }`}
-        >
-          {isSaving ? 'Processing...' : (course.isPublished ? 'Unpublish Course' : 'Publish Course Now')}
-        </button>
-      </div>
     </div>
   );
 }

@@ -73,7 +73,7 @@ export default function LearningOutcomes({ outcomes }: { outcomes?: any[] }) {
               {/* Animated Background Shape */}
               <div 
                 ref={el => { shapesRef.current[i] = el; }}
-                className={`absolute -right-6 -top-6 w-32 h-32 rounded-full blur-3xl ${shapeColorClass} pointer-events-none`}
+                className={`absolute -right-6 -top-6 w-32 h-32 rounded-full opacity-30 dark:opacity-20 ${shapeColorClass} pointer-events-none`}
               />
               
               <div className="p-2 bg-white/60 dark:bg-black/20 rounded-md shrink-0 transition-transform group-hover:scale-110 shadow-sm relative z-10">

@@ -59,7 +59,7 @@ export default function CourseTestimonials({ testimonials }: { testimonials?: an
               {/* Animated Background Shape */}
               <div 
                 ref={el => { shapesRef.current[i] = el; }}
-                className={`absolute -left-6 -bottom-6 w-32 h-32 rounded-full blur-3xl ${shapeColorClass} pointer-events-none`}
+                className={`absolute -left-6 -bottom-6 w-32 h-32 rounded-full opacity-30 dark:opacity-20 ${shapeColorClass} pointer-events-none`}
               />
               
               <div className="absolute top-4 right-4 opacity-5 group-hover:opacity-10 transition-opacity">

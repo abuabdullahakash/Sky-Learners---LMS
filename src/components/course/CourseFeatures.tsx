@@ -98,7 +98,7 @@ export default function CourseFeatures({ course }: { course: any }) {
               {/* Animated Background Shape */}
               <div 
                 ref={el => { shapesRef.current[i] = el; }}
-                className={`absolute -right-4 -bottom-4 w-24 h-24 rounded-full blur-2xl ${shapeColorClass} pointer-events-none`}
+                className={`absolute -right-6 -bottom-6 w-32 h-32 rounded-full opacity-30 dark:opacity-20 ${shapeColorClass} pointer-events-none`}
               />
               
               <div className="p-4 bg-white/60 dark:bg-black/20 rounded-lg mb-4 group-hover:scale-110 transition-transform duration-300 shadow-sm relative z-10">

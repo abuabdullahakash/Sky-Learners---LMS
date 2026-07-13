@@ -1,23 +1,44 @@
 import { PhoneCall } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
 
 export default function StickyPricingCard({ course }: { course: any }) {
   const t = useTranslations('CourseDetails');
   const router = useRouter();
+  const shapeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (shapeRef.current) {
+      gsap.to(shapeRef.current, {
+        y: "random(-10, 10)",
+        x: "random(-10, 10)",
+        scale: "random(0.95, 1.05)",
+        rotation: "random(-5, 5)",
+        duration: "random(4, 6)",
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut"
+      });
+    }
+  }, []);
 
   return (
     <div className="lg:col-span-1 space-y-6 sticky top-24 h-fit pb-12">
-      <div className="bg-gradient-to-b from-background to-blue-50/20 dark:from-background dark:to-blue-900/5 border border-blue-100 dark:border-foreground/10 rounded-xl p-6 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
-        <div className="text-center mb-6">
+      <div className="bg-gradient-to-b from-background to-blue-50/20 dark:from-background dark:to-blue-900/5 border border-blue-100 dark:border-foreground/10 rounded-xl p-6 shadow-xl relative overflow-hidden group">
+        <div 
+          ref={shapeRef}
+          className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/10 dark:bg-blue-500/20 rounded-full pointer-events-none opacity-50 dark:opacity-30" 
+        />
+        <div className="text-center mb-6 relative z-10">
           <p className="text-foreground/50 font-bold uppercase tracking-wider mb-2">{t('pricingCard.courseFee')}</p>
           <div className="text-5xl font-extrabold text-primary">
             ৳{course.price}
           </div>
         </div>
         
-        <ul className="space-y-4 mb-8">
+        <ul className="space-y-4 mb-8 relative z-10">
           <li className="flex items-center justify-between text-sm font-semibold">
             <span className="text-foreground/60">{t('pricingCard.modules')}</span>
             <span>{course.modules?.length || 0}</span>

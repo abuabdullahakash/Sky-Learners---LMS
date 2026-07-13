@@ -21,6 +21,24 @@ gsap.registerPlugin(ScrollTrigger);
 export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }: { course: any, currentSlide: number, setCurrentSlide: (s: number) => void }) {
   const t = useTranslations('CourseDetails');
   const galleryRef = useRef<HTMLDivElement>(null);
+  const shapeRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    shapeRefs.current.forEach((shape, index) => {
+      if (!shape) return;
+      gsap.to(shape, {
+        y: "random(-10, 10)",
+        x: "random(-10, 10)",
+        scale: "random(0.95, 1.05)",
+        rotation: "random(-5, 5)",
+        duration: "random(4, 6)",
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+        delay: index * 0.3,
+      });
+    });
+  }, []);
 
   useEffect(() => {
     // Gallery animation...
@@ -127,8 +145,15 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
 
             <section>
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
-              <div className="bg-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-foreground/10 border-r-foreground/10 text-foreground/80 leading-relaxed text-lg whitespace-pre-wrap">
-                {course.detailedDescription || t('descriptionFallbackPrimary')}
+              <div className="bg-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-foreground/10 border-r-foreground/10 leading-relaxed text-lg whitespace-pre-wrap relative overflow-hidden group">
+                {/* Animated Background Shape */}
+                <div 
+                  ref={el => { shapeRefs.current[0] = el; }}
+                  className="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-blue-500/10 dark:bg-blue-500/20 opacity-40 dark:opacity-30 pointer-events-none"
+                />
+                <div className="relative z-10 text-foreground/80">
+                  {course.detailedDescription || t('descriptionFallbackPrimary')}
+                </div>
               </div>
             </section>
 
@@ -172,8 +197,14 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
             {course.faqs && course.faqs.length > 0 && (
               <section className="mt-12">
                 <h2 className="text-3xl font-bold mb-6">{t('faqs')}</h2>
-                <div className="bg-background border border-foreground/10 rounded-lg p-6 shadow-sm">
-                  <Accordion className="w-full">
+                <div className="bg-background border border-foreground/10 rounded-lg p-6 shadow-sm relative overflow-hidden group">
+                  {/* Animated Background Shape */}
+                  <div 
+                    ref={el => { shapeRefs.current[1] = el; }}
+                    className="absolute -left-10 -top-10 w-48 h-48 rounded-full bg-purple-500/10 dark:bg-purple-500/20 opacity-40 dark:opacity-30 pointer-events-none"
+                  />
+                  <div className="relative z-10">
+                    <Accordion className="w-full">
                     {course.faqs.map((faq: any, i: number) => (
                       <AccordionItem key={i} value={`item-${i}`} className={i === course.faqs.length - 1 ? "border-b-0" : ""}>
                         <AccordionTrigger className="text-left font-bold text-lg hover:text-primary transition-colors">
@@ -185,6 +216,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
                       </AccordionItem>
                     ))}
                   </Accordion>
+                  </div>
                 </div>
               </section>
             )}

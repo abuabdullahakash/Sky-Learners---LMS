@@ -135,6 +135,7 @@ export default function CourseSettingsPage() {
         parentMessage: (course.category === 'primary' || course.category === 'high_school') ? (course.parentMessage || '') : '',
         successMessage: course.category === 'intermediate' ? (course.successMessage || '') : '',
         careerMessage: (course.category === 'honours' || course.category === 'masters' || course.category === 'skills') ? (course.careerMessage || '') : '',
+        studyRoutineUrl: course.studyRoutineUrl || '',
       });
       setMessage('Settings updated successfully!');
       setTimeout(() => setMessage(''), 3000);
@@ -270,6 +271,14 @@ export default function CourseSettingsPage() {
               value={course.detailedDescription || ''} onChange={e => setCourse({...course, detailedDescription: e.target.value})} rows={6}
               className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors custom-scrollbar"
               placeholder="Provide a detailed description of what this course offers..."
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Study Routine / Syllabus Link (Optional PDF or Drive Link)</label>
+            <input 
+              type="text" value={course.studyRoutineUrl || ''} onChange={e => setCourse({...course, studyRoutineUrl: e.target.value})}
+              placeholder="https://drive.google.com/..."
+              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
             />
           </div>
 

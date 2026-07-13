@@ -50,8 +50,8 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
           <div className="absolute bottom-10 left-0 right-0 z-20 pointer-events-none">
             <div className="w-full max-w-7xl mx-auto px-4 relative h-10 pointer-events-auto">
               
-              {/* Slider Controls (Bottom Center) */}
-              <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-4">
+              {/* Slider Controls (Bottom Left) */}
+              <div className="absolute left-4 flex items-center gap-4">
                 <span className="text-white/80 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
                 <div className="flex items-center gap-3">
                   {course.sliderImages.map((_: any, idx: number) => (

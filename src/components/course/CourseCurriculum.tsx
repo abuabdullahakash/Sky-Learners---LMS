@@ -1,4 +1,4 @@
-import { PlayCircle, Lock } from 'lucide-react';
+import { PlayCircle, Lock, FileText } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -112,16 +112,23 @@ export default function CourseCurriculum({ modules }: { modules: any[] }) {
                           )}
                         </div>
                       </div>
-                      
-                      {lesson.isFreePreview ? (
-                        <a href={lesson.videoUrl || '#'} target={lesson.videoUrl ? "_blank" : "_self"} className={`px-5 py-2.5 font-bold rounded-xl text-xs transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap text-center sm:text-left shrink-0 ${theme.btn}`}>
-                          {t('watch')}
-                        </a>
-                      ) : (
-                        <span className="text-xs text-foreground/40 font-semibold px-2 shrink-0">
-                          {t('locked')}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-3 shrink-0">
+                        {lesson.noteUrl && (
+                          <a href={lesson.noteUrl} target="_blank" className={`px-4 py-2 font-bold rounded-xl text-xs transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap text-center !no-underline hover:!text-white flex items-center gap-1.5 ${theme.btn}`}>
+                            <FileText className="w-4 h-4" />
+                            {t('classNote') || 'ক্লাস নোট'}
+                          </a>
+                        )}
+                        {lesson.isFreePreview ? (
+                          <a href={lesson.videoUrl || '#'} target={lesson.videoUrl ? "_blank" : "_self"} className={`px-5 py-2.5 font-bold rounded-xl text-xs transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap text-center sm:text-left !no-underline hover:!text-white ${theme.btn}`}>
+                            {t('watch')}
+                          </a>
+                        ) : (
+                          <span className="text-xs text-foreground/40 font-semibold px-2 shrink-0">
+                            {t('locked')}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )})}
                   {(!module.lessons || module.lessons.length === 0) && (

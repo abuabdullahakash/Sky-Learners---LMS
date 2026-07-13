@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Plus, GripVertical, Video as VideoIcon } from 'lucide-react';
+import { Plus, GripVertical, Video as VideoIcon, Image as ImageIcon } from 'lucide-react';
 
 export default function CourseCurriculumPage() {
   const { user } = useAuth();
@@ -146,6 +146,15 @@ export default function CourseCurriculumPage() {
                         />
                         Free Preview
                       </label>
+                    </div>
+                    <div className="flex items-center gap-3 pl-7">
+                      <ImageIcon className="w-4 h-4 text-orange-400" />
+                      <input 
+                        type="text" value={lesson.thumbnailUrl || ''}
+                        onChange={(e) => handleUpdateLesson(module.id, lesson.id, 'thumbnailUrl', e.target.value)}
+                        className="flex-1 bg-background px-3 py-1.5 rounded-lg border border-foreground/10 text-sm focus:outline-none focus:border-orange-500"
+                        placeholder="Thumbnail Image URL (Optional)"
+                      />
                     </div>
                   </div>
                 ))

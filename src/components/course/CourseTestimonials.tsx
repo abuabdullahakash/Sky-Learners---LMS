@@ -20,20 +20,32 @@ export default function CourseTestimonials({ testimonials }: { testimonials?: an
         {t('testimonials')}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {displayTestimonials.map((review, i) => (
-          <div key={i} className="bg-background border border-foreground/10 rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex text-yellow-400 mb-4">
-              {[...Array(5)].map((_, j) => (
-                <Star key={j} className={`w-4 h-4 ${j < review.rating ? 'fill-current' : 'text-foreground/20'}`} />
-              ))}
+        {displayTestimonials.map((review, i) => {
+          const colors = [
+            'bg-orange-50/30 border-orange-100/50 dark:bg-orange-900/5 dark:border-orange-800/20',
+            'bg-blue-50/30 border-blue-100/50 dark:bg-blue-900/5 dark:border-blue-800/20',
+            'bg-green-50/30 border-green-100/50 dark:bg-green-900/5 dark:border-green-800/20'
+          ];
+          const colorClass = colors[i % colors.length];
+
+          return (
+            <div key={i} className={`rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border ${colorClass} relative overflow-hidden group`}>
+              <div className="absolute top-4 right-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                <MessageSquareQuote className="w-16 h-16" />
+              </div>
+              <div className="flex text-yellow-400 mb-4 relative z-10">
+                {[...Array(5)].map((_, j) => (
+                  <Star key={j} className={`w-4 h-4 ${j < review.rating ? 'fill-current' : 'text-foreground/20'}`} />
+                ))}
+              </div>
+              <p className="text-foreground/80 italic mb-6 relative z-10">"{review.text}"</p>
+              <div className="relative z-10">
+                <p className="font-bold text-foreground">{review.name}</p>
+                <p className="text-xs text-foreground/50 uppercase tracking-wider">{review.role}</p>
+              </div>
             </div>
-            <p className="text-foreground/80 italic mb-6">"{review.text}"</p>
-            <div>
-              <p className="font-bold text-foreground">{review.name}</p>
-              <p className="text-xs text-foreground/50 uppercase tracking-wider">{review.role}</p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

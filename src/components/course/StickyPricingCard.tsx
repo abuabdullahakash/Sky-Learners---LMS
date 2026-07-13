@@ -8,7 +8,8 @@ export default function StickyPricingCard({ course }: { course: any }) {
 
   return (
     <div className="lg:col-span-1 space-y-6 sticky top-24 h-fit pb-12">
-      <div className="bg-background border border-foreground/10 rounded-3xl p-6 shadow-xl">
+      <div className="bg-gradient-to-b from-background to-blue-50/20 dark:from-background dark:to-blue-900/5 border border-blue-100 dark:border-foreground/10 rounded-xl p-6 shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
         <div className="text-center mb-6">
           <p className="text-foreground/50 font-bold uppercase tracking-wider mb-2">{t('pricingCard.courseFee')}</p>
           <div className="text-5xl font-extrabold text-primary">
@@ -59,7 +60,7 @@ export default function StickyPricingCard({ course }: { course: any }) {
 
         <button 
           onClick={() => router.push(`/courses/${course.id}/checkout`)}
-          className="w-full py-4 bg-primary text-primary-foreground text-xl font-bold rounded-2xl hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-primary/20"
+          className="w-full py-4 bg-primary text-primary-foreground text-xl font-bold rounded-lg hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-primary/20 relative z-10"
         >
           {t('pricingCard.enrollBtn')}
         </button>

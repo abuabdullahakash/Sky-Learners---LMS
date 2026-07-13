@@ -113,7 +113,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
           
           <div className="lg:col-span-2 space-y-12">
             {/* Message for Parents */}
-            <section className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-8 rounded-3xl border border-blue-100 dark:border-blue-800/30">
+            <section className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-8 rounded-lg border border-blue-100 dark:border-blue-800/30">
               <h3 className="text-2xl font-bold mb-4 flex items-center gap-3 text-blue-700 dark:text-blue-400">
                 <Heart className="w-6 h-6" /> 
                 অভিভাবকদের উদ্দেশ্যে
@@ -127,7 +127,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
 
             <section>
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
-              <div className="bg-foreground/5 p-6 rounded-2xl border border-foreground/10 text-foreground/80 leading-relaxed text-lg whitespace-pre-wrap">
+              <div className="bg-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-foreground/10 border-r-foreground/10 text-foreground/80 leading-relaxed text-lg whitespace-pre-wrap">
                 {course.detailedDescription || t('descriptionFallbackPrimary')}
               </div>
             </section>
@@ -137,7 +137,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
             <CourseCurriculum modules={course.modules} />
 
             {course.studyRoutineUrl && (
-              <section className="bg-blue-500/10 border border-blue-500/20 p-8 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6">
+              <section className="bg-blue-500/10 border border-blue-500/20 p-8 rounded-lg flex flex-col md:flex-row items-center justify-between gap-6">
                 <div>
                   <h3 className="text-2xl font-bold mb-2 text-blue-600 dark:text-blue-400">স্টাডি রুটিন ও সিলেবাস</h3>
                   <p className="text-foreground/70">পুরো কোর্সের বিস্তারিত রুটিন ডাউনলোড করে প্রস্তুতি শুরু করুন আজই!</p>
@@ -172,7 +172,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
             {course.faqs && course.faqs.length > 0 && (
               <section className="mt-12">
                 <h2 className="text-3xl font-bold mb-6">{t('faqs')}</h2>
-                <div className="bg-background border border-foreground/10 rounded-3xl p-6 shadow-sm">
+                <div className="bg-background border border-foreground/10 rounded-lg p-6 shadow-sm">
                   <Accordion className="w-full">
                     {course.faqs.map((faq: any, i: number) => (
                       <AccordionItem key={i} value={`item-${i}`} className={i === course.faqs.length - 1 ? "border-b-0" : ""}>

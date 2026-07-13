@@ -18,13 +18,13 @@ export default function CourseCurriculum({ modules }: { modules: any[] }) {
         <PlayCircle className="w-8 h-8 text-primary" /> 
         {t('curriculum')}
       </h2>
-      <div className="bg-background border border-blue-100 dark:border-foreground/10 rounded-3xl p-6 shadow-md shadow-blue-900/5 dark:shadow-none">
+      <div className="bg-background border border-blue-100 dark:border-foreground/10 rounded-xl p-6 shadow-md shadow-blue-900/5 dark:shadow-none">
         <Accordion className="w-full gap-3 flex flex-col">
           {modules.map((module: any, i: number) => (
             <AccordionItem 
               key={module.id || i} 
               value={`module-${i}`} 
-              className="border-none bg-blue-50/50 dark:bg-foreground/5 rounded-2xl overflow-hidden data-[state=open]:bg-blue-50 dark:data-[state=open]:bg-foreground/10 transition-colors"
+              className="border-none bg-blue-50/50 dark:bg-foreground/5 rounded-lg overflow-hidden data-[state=open]:bg-blue-50 dark:data-[state=open]:bg-foreground/10 transition-colors"
             >
               <AccordionTrigger className="text-left font-bold text-lg hover:no-underline hover:text-blue-600 dark:hover:text-blue-400 transition-colors px-5 py-4 group">
                 <div className="flex justify-between items-center w-full pr-4">
@@ -83,7 +83,7 @@ export default function CourseCurriculum({ modules }: { modules: any[] }) {
                     const theme = themeColors[j % themeColors.length];
                     
                     return (
-                    <div key={lesson.id || j} className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-3.5 rounded-xl border transition-all duration-300 hover:shadow-md group/lesson ${theme.border} ${theme.bg}`}>
+                    <div key={lesson.id || j} className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg border transition-all duration-300 group/lesson cursor-pointer ${theme.border} ${theme.bg}`}>
                       <div className="flex items-center gap-4">
                         {lesson.thumbnailUrl ? (
                           <div className="relative w-20 h-14 rounded-lg overflow-hidden shrink-0 shadow-sm border border-foreground/10 group-hover/lesson:border-primary/30 transition-colors">
@@ -99,7 +99,7 @@ export default function CourseCurriculum({ modules }: { modules: any[] }) {
                             <PlayCircle className="w-6 h-6" />
                           </div>
                         ) : (
-                          <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-foreground/10 flex items-center justify-center text-slate-400 dark:text-foreground/40 shrink-0 shadow-sm">
+                          <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-foreground/10 flex items-center justify-center text-slate-400 dark:text-foreground/40 shrink-0 shadow-sm">
                             <Lock className="w-5 h-5" />
                           </div>
                         )}
@@ -114,13 +114,13 @@ export default function CourseCurriculum({ modules }: { modules: any[] }) {
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
                         {lesson.noteUrl && (
-                          <a href={lesson.noteUrl} target="_blank" className={`px-4 py-2 font-bold rounded-xl text-xs transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap text-center !no-underline hover:!text-white flex items-center gap-1.5 ${theme.btn}`}>
+                          <a href={lesson.noteUrl} target="_blank" className={`px-4 py-2 font-bold rounded-lg text-xs transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap text-center !no-underline hover:!text-white flex items-center gap-1.5 ${theme.btn}`}>
                             <FileText className="w-4 h-4" />
                             {t('classNote')}
                           </a>
                         )}
                         {lesson.isFreePreview ? (
-                          <a href={lesson.videoUrl || '#'} target={lesson.videoUrl ? "_blank" : "_self"} className={`px-5 py-2.5 font-bold rounded-xl text-xs transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap text-center sm:text-left !no-underline hover:!text-white ${theme.btn}`}>
+                          <a href={lesson.videoUrl || '#'} target={lesson.videoUrl ? "_blank" : "_self"} className={`px-5 py-2.5 font-bold rounded-lg text-xs transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap text-center sm:text-left !no-underline hover:!text-white ${theme.btn}`}>
                             {t('watch')}
                           </a>
                         ) : (

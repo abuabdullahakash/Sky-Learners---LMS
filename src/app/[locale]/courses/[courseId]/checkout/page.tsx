@@ -29,6 +29,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
   });
 
   const [studentInfo, setStudentInfo] = useState({
+    name: '',
     phone: '',
     whatsapp: '',
     facebookUrl: '',
@@ -52,6 +53,15 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
       setIsUploadingImage(false);
     }
   };
+
+  useEffect(() => {
+    if (user || userData) {
+      setStudentInfo(prev => ({
+        ...prev,
+        name: prev.name || user?.displayName || userData?.name || ''
+      }));
+    }
+  }, [user, userData]);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -98,7 +108,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
         courseTitle: course?.title || 'Unknown Course',
         teacherId: course?.teacherId || '',
         studentId: user.uid,
-        studentName: user.displayName || userData?.name || 'Student',
+        studentName: studentInfo.name || user.displayName || userData?.name || 'Student',
         studentEmail: user.email,
         senderNumber: formData.senderNumber,
         trxId: formData.trxId,
@@ -210,6 +220,20 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-bold text-foreground/80 flex items-center gap-2">
+                  <UserCircle className="w-4 h-4" /> স্টুডেন্ট এর নাম <span className="text-red-500">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  placeholder="আপনার পূর্ণ নাম" 
+                  value={studentInfo.name}
+                  onChange={(e) => setStudentInfo({...studentInfo, name: e.target.value})}
+                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-semibold"
+                  required
+                />
+              </div>
+
               <div className="space-y-2">
                 <label className="text-sm font-bold text-foreground/80 flex items-center gap-2">
                   <Phone className="w-4 h-4" /> অফলাইন ফোন নাম্বার <span className="text-red-500">*</span>

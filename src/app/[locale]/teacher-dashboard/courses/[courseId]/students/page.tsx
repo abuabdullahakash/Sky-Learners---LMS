@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { Search, Users, Phone, Link, Mail, UserCircle } from 'lucide-react';
+import { Search, Users, Phone, Link, Mail, UserCircle, LayoutGrid, List as ListIcon } from 'lucide-react';
 
 type Student = {
   id: string;
@@ -24,6 +24,7 @@ export default function CourseStudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // Fetch approved enrollments to get students
   const fetchStudents = async () => {
@@ -85,15 +86,35 @@ export default function CourseStudentsPage() {
             <Users className="w-4 h-4" /> Total: {students.length}
           </div>
 
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
-            <input 
-              type="text" 
-              placeholder="Search by name, phone, email..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-background border border-foreground/20 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-primary transition-colors"
-            />
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <div className="relative w-full sm:w-80">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+              <input 
+                type="text" 
+                placeholder="Search by name, phone, email..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-background border border-foreground/20 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-primary transition-colors"
+              />
+            </div>
+            
+            {/* View Toggle */}
+            <div className="hidden sm:flex items-center bg-background border border-foreground/20 rounded-xl p-1 shrink-0">
+              <button 
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-primary/10 text-primary' : 'text-foreground/40 hover:text-foreground/80'}`}
+                title="Grid View"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-primary/10 text-primary' : 'text-foreground/40 hover:text-foreground/80'}`}
+                title="List View"
+              >
+                <ListIcon className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -110,15 +131,17 @@ export default function CourseStudentsPage() {
               <p>No students found.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+            <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4" : "flex flex-col gap-3 p-4"}>
               {filteredStudents.map((student) => (
-                <div key={student.id} className="bg-background border border-foreground/10 p-5 rounded-2xl hover:shadow-lg transition-shadow relative group flex flex-col">
-                  <div className="flex items-center gap-4 mb-4 pb-4 border-b border-foreground/10">
+                <div key={student.id} className={`bg-background border border-foreground/10 rounded-2xl hover:shadow-lg transition-shadow relative group ${viewMode === 'grid' ? 'p-5 flex flex-col' : 'p-4 flex flex-col md:flex-row md:items-center gap-6'}`}>
+                  
+                  {/* User Profile Info */}
+                  <div className={`flex items-center gap-4 ${viewMode === 'grid' ? 'mb-4 pb-4 border-b border-foreground/10' : 'md:w-1/3 shrink-0'}`}>
                     {student.profileImageUrl ? (
-                      <img src={student.profileImageUrl} alt={student.studentName} className="w-12 h-12 rounded-full object-cover border-2 border-primary/20" />
+                      <img src={student.profileImageUrl} alt={student.studentName} className={`${viewMode === 'grid' ? 'w-12 h-12' : 'w-14 h-14'} rounded-full object-cover border-2 border-primary/20 shrink-0`} />
                     ) : (
-                      <div className="w-12 h-12 rounded-full bg-foreground/5 flex items-center justify-center text-foreground/40 border border-foreground/10">
-                        <UserCircle className="w-8 h-8" />
+                      <div className={`${viewMode === 'grid' ? 'w-12 h-12' : 'w-14 h-14'} rounded-full bg-foreground/5 flex items-center justify-center text-foreground/40 border border-foreground/10 shrink-0`}>
+                        <UserCircle className={`${viewMode === 'grid' ? 'w-8 h-8' : 'w-9 h-9'}`} />
                       </div>
                     )}
                     <div>
@@ -127,7 +150,8 @@ export default function CourseStudentsPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-3 text-sm flex-1">
+                  {/* Contact Info */}
+                  <div className={`text-sm flex-1 ${viewMode === 'grid' ? 'space-y-3' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'}`}>
                     {student.offlinePhone ? (
                       <div className="flex items-start gap-2">
                         <Phone className="w-4 h-4 text-foreground/40 shrink-0 mt-0.5" />
@@ -136,7 +160,7 @@ export default function CourseStudentsPage() {
                           <a href={`tel:${student.offlinePhone}`} className="font-semibold hover:text-primary transition-colors">{student.offlinePhone}</a>
                         </div>
                       </div>
-                    ) : null}
+                    ) : <div className={viewMode === 'list' ? 'hidden lg:block opacity-0' : 'hidden'}></div>}
 
                     {student.whatsappNumber ? (
                       <div className="flex items-start gap-2">
@@ -146,27 +170,27 @@ export default function CourseStudentsPage() {
                           <a href={`https://wa.me/${student.whatsappNumber.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="font-semibold text-green-500 hover:underline">{student.whatsappNumber}</a>
                         </div>
                       </div>
-                    ) : null}
+                    ) : <div className={viewMode === 'list' ? 'hidden lg:block opacity-0' : 'hidden'}></div>}
 
                     {student.contactEmail ? (
                       <div className="flex items-start gap-2">
                         <Mail className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-                        <div>
+                        <div className="min-w-0">
                           <p className="text-xs text-foreground/50">Email</p>
-                          <a href={`mailto:${student.contactEmail}`} className="font-medium text-foreground/80 hover:text-primary transition-colors truncate block max-w-[200px]">{student.contactEmail}</a>
+                          <a href={`mailto:${student.contactEmail}`} className="font-medium text-foreground/80 hover:text-primary transition-colors truncate block">{student.contactEmail}</a>
                         </div>
                       </div>
-                    ) : null}
+                    ) : <div className={viewMode === 'list' ? 'hidden lg:block opacity-0' : 'hidden'}></div>}
 
                     {student.facebookUrl ? (
                       <div className="flex items-start gap-2">
                         <Link className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <div>
+                        <div className="min-w-0">
                           <p className="text-xs text-foreground/50">Facebook</p>
-                          <a href={student.facebookUrl.startsWith('http') ? student.facebookUrl : `https://${student.facebookUrl}`} target="_blank" rel="noopener noreferrer" className="font-medium text-blue-600 hover:underline truncate block max-w-[200px]">{student.facebookUrl}</a>
+                          <a href={student.facebookUrl.startsWith('http') ? student.facebookUrl : `https://${student.facebookUrl}`} target="_blank" rel="noopener noreferrer" className="font-medium text-blue-600 hover:underline truncate block">{student.facebookUrl}</a>
                         </div>
                       </div>
-                    ) : null}
+                    ) : <div className={viewMode === 'list' ? 'hidden lg:block opacity-0' : 'hidden'}></div>}
                   </div>
                 </div>
               ))}

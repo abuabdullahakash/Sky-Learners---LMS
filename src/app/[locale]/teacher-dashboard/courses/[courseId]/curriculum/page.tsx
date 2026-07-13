@@ -5,7 +5,9 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Plus, GripVertical, Video as VideoIcon, Image as ImageIcon } from 'lucide-react';
+import { Plus, GripVertical, Video as VideoIcon, Image as ImageIcon, Trash2, Upload, Loader2, X } from 'lucide-react';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export default function CourseCurriculumPage() {
   const { user } = useAuth();
@@ -14,6 +16,7 @@ export default function CourseCurriculumPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [course, setCourse] = useState<any>(null);
+  const [uploadingThumbnail, setUploadingThumbnail] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -76,6 +79,43 @@ export default function CourseCurriculumPage() {
           lessons: mod.lessons.map((lesson: any) => 
             lesson.id === lessonId ? { ...lesson, [field]: value } : lesson
           )
+        };
+      }
+      return mod;
+    });
+    setCourse({ ...course, modules: updatedModules });
+    await updateDoc(doc(db, 'courses', courseId), { modules: updatedModules });
+  };
+
+  const handleUploadThumbnail = async (moduleId: string, lessonId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    try {
+      setUploadingThumbnail(lessonId);
+      const storageRef = ref(storage, `courses/${courseId}/modules/${moduleId}/lessons/${lessonId}_${file.name}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      await handleUpdateLesson(moduleId, lessonId, 'thumbnailUrl', url);
+    } catch (error) {
+      console.error("Error uploading thumbnail", error);
+    } finally {
+      setUploadingThumbnail(null);
+    }
+  };
+
+  const handleRemoveThumbnail = async (moduleId: string, lessonId: string) => {
+    await handleUpdateLesson(moduleId, lessonId, 'thumbnailUrl', '');
+  };
+
+  const handleRemoveLesson = async (moduleId: string, lessonId: string) => {
+    if (!confirm('Are you sure you want to delete this lesson?')) return;
+    
+    const updatedModules = course.modules.map((mod: any) => {
+      if (mod.id === moduleId) {
+        return {
+          ...mod,
+          lessons: mod.lessons.filter((l: any) => l.id !== lessonId)
         };
       }
       return mod;
@@ -147,14 +187,35 @@ export default function CourseCurriculumPage() {
                         Free Preview
                       </label>
                     </div>
-                    <div className="flex items-center gap-3 pl-7">
+                    <div className="flex flex-wrap items-center gap-3 pl-7">
                       <ImageIcon className="w-4 h-4 text-orange-400" />
-                      <input 
-                        type="text" value={lesson.thumbnailUrl || ''}
-                        onChange={(e) => handleUpdateLesson(module.id, lesson.id, 'thumbnailUrl', e.target.value)}
-                        className="flex-1 bg-background px-3 py-1.5 rounded-lg border border-foreground/10 text-sm focus:outline-none focus:border-orange-500"
-                        placeholder="Thumbnail Image URL (Optional)"
-                      />
+                      {lesson.thumbnailUrl ? (
+                        <div className="flex items-center gap-3 flex-1">
+                          <img src={lesson.thumbnailUrl} alt="Thumbnail" className="h-10 w-16 object-cover rounded border border-foreground/10" />
+                          <button onClick={() => handleRemoveThumbnail(module.id, lesson.id)} className="text-red-500 hover:bg-red-50 px-2 py-1.5 rounded-lg transition-colors text-sm flex items-center gap-1">
+                            <X className="w-4 h-4" /> Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex-1 relative">
+                          <input 
+                            type="file" accept="image/*"
+                            onChange={(e) => handleUploadThumbnail(module.id, lesson.id, e)}
+                            className="hidden" id={`thumbnail-${lesson.id}`}
+                            disabled={uploadingThumbnail === lesson.id}
+                          />
+                          <label htmlFor={`thumbnail-${lesson.id}`} className={`flex items-center justify-center gap-2 border border-dashed border-foreground/20 rounded-lg px-3 py-2 text-sm cursor-pointer hover:bg-foreground/5 transition-colors ${uploadingThumbnail === lesson.id ? 'opacity-50 pointer-events-none' : ''}`}>
+                            {uploadingThumbnail === lesson.id ? <Loader2 className="w-4 h-4 animate-spin text-orange-500" /> : <Upload className="w-4 h-4 text-foreground/50" />}
+                            <span className="text-foreground/50">Upload Thumbnail (Optional)</span>
+                          </label>
+                        </div>
+                      )}
+                      
+                      <div className="ml-auto flex items-center gap-2">
+                        <button onClick={() => handleRemoveLesson(module.id, lesson.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete Lesson">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))

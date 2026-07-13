@@ -75,38 +75,43 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
           </div>
         ) : null}
 
-        {/* Slider Controls (Bottom Center) */}
+        {/* Navigation Wrapper to keep them inside content boundary */}
         {hasSlider && course.sliderImages.length > 1 && (
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-4 z-20">
-            <span className="text-white/80 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
-            <div className="flex items-center gap-3">
-              {course.sliderImages.map((_: any, idx: number) => (
-                <div 
-                  key={idx} 
-                  onClick={() => setCurrentSlide(idx)} 
-                  className={`transition-all duration-500 cursor-pointer rounded-full ${idx === currentSlide ? 'bg-gradient-to-r from-blue-400 to-pink-500 w-10 h-2.5 shadow-[0_0_15px_rgba(236,72,153,0.6)]' : 'bg-white/40 w-2.5 h-2.5 hover:bg-white/80'}`} 
-                />
-              ))}
-            </div>
-            <span className="text-white/40 text-xs font-bold">{String(course.sliderImages.length).padStart(2, '0')}</span>
-          </div>
-        )}
+          <div className="absolute bottom-10 left-0 right-0 z-20 pointer-events-none">
+            <div className="w-full max-w-7xl mx-auto px-4 relative h-10 pointer-events-auto">
+              
+              {/* Slider Controls (Bottom Center) */}
+              <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-4">
+                <span className="text-white/80 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
+                <div className="flex items-center gap-3">
+                  {course.sliderImages.map((_: any, idx: number) => (
+                    <div 
+                      key={idx} 
+                      onClick={() => setCurrentSlide(idx)} 
+                      className={`transition-all duration-500 cursor-pointer rounded-full ${idx === currentSlide ? 'bg-gradient-to-r from-blue-400 to-pink-500 w-10 h-2.5 shadow-[0_0_15px_rgba(236,72,153,0.6)]' : 'bg-white/40 w-2.5 h-2.5 hover:bg-white/80'}`} 
+                    />
+                  ))}
+                </div>
+                <span className="text-white/40 text-xs font-bold">{String(course.sliderImages.length).padStart(2, '0')}</span>
+              </div>
 
-        {/* Next/Prev Navigation */}
-        {hasSlider && course.sliderImages.length > 1 && (
-          <div className="absolute bottom-10 right-4 lg:right-8 flex items-center gap-3 z-20">
-            <button 
-              onClick={() => setCurrentSlide((currentSlide === 0 ? course.sliderImages.length - 1 : currentSlide - 1))}
-              className="w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all shadow-lg hover:scale-105"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button 
-              onClick={() => setCurrentSlide((currentSlide + 1) % course.sliderImages.length)}
-              className="w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all shadow-lg hover:scale-105"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+              {/* Next/Prev Navigation */}
+              <div className="absolute right-4 flex items-center gap-3">
+                <button 
+                  onClick={() => setCurrentSlide((currentSlide === 0 ? course.sliderImages.length - 1 : currentSlide - 1))}
+                  className="w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all shadow-lg hover:scale-105"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button 
+                  onClick={() => setCurrentSlide((currentSlide + 1) % course.sliderImages.length)}
+                  className="w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all shadow-lg hover:scale-105"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+
+            </div>
           </div>
         )}
 

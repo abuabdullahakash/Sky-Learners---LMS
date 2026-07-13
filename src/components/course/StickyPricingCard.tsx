@@ -1,4 +1,4 @@
-import { CheckCircle2, PhoneCall } from 'lucide-react';
+import { PhoneCall } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 
@@ -69,35 +69,6 @@ export default function StickyPricingCard({ course }: { course: any }) {
         </p>
       </div>
       
-      <div className="bg-background border border-foreground/10 rounded-3xl p-6 shadow-sm">
-        <h2 className="text-xl font-bold mb-4">{t('pricingCard.whatsIncluded')}</h2>
-        <div className="flex flex-col gap-3">
-          {[
-            course.totalVideoLessons > 0 ? `${course.totalVideoLessons} ${t('pricingCard.recordedClasses')}` : null,
-            course.totalLiveClasses > 0 ? `${course.totalLiveClasses} ${t('pricingCard.liveClasses')}` : null,
-            course.totalPdfs > 0 ? `${course.totalPdfs} ${t('pricingCard.pdfs')}` : null,
-            course.totalExams > 0 ? `${course.totalExams} ${t('pricingCard.exams')}` : null,
-            course.hasDoubtSolving ? t('pricingCard.doubtSolving') : null,
-          ].filter(Boolean).length > 0 ? (
-            [
-              course.totalVideoLessons > 0 ? `${course.totalVideoLessons} ${t('pricingCard.recordedClasses')}` : null,
-              course.totalLiveClasses > 0 ? `${course.totalLiveClasses} ${t('pricingCard.liveClasses')}` : null,
-              course.totalPdfs > 0 ? `${course.totalPdfs} ${t('pricingCard.pdfs')}` : null,
-              course.totalExams > 0 ? `${course.totalExams} ${t('pricingCard.exams')}` : null,
-              course.hasDoubtSolving ? t('pricingCard.doubtSolving') : null,
-            ].filter(Boolean).map((feature, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 bg-foreground/5 border border-foreground/10 rounded-xl">
-                <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
-                <span className="font-semibold text-sm text-foreground/90">{feature}</span>
-              </div>
-            ))
-          ) : (
-            <div className="p-4 text-foreground/50 border border-foreground/10 rounded-xl bg-background text-sm text-center">
-              {t('pricingCard.noFeatures')}
-            </div>
-          )}
-        </div>
-      </div>
 
       {course.contactNumber && (
         <div className="bg-background border border-foreground/10 rounded-3xl p-6 shadow-sm text-center">

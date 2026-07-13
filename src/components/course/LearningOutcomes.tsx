@@ -1,7 +1,8 @@
 import { Target, CheckCircle2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { curatedIcons, CuratedIconName } from '@/lib/icons';
 
-export default function LearningOutcomes({ outcomes }: { outcomes?: string[] }) {
+export default function LearningOutcomes({ outcomes }: { outcomes?: any[] }) {
   const t = useTranslations('CourseDetails');
 
   // Fallback data if outcomes are not provided in DB
@@ -22,12 +23,33 @@ export default function LearningOutcomes({ outcomes }: { outcomes?: string[] }) 
       </h2>
       <div className="bg-background border border-foreground/10 rounded-3xl p-6 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {displayOutcomes.map((outcome, i) => (
-            <div key={i} className="flex items-start gap-3 p-4 bg-foreground/5 rounded-xl hover:bg-foreground/10 transition-colors">
-              <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0 mt-0.5" />
-              <p className="text-foreground/80 font-medium leading-relaxed">{outcome}</p>
-            </div>
-          ))}
+          {displayOutcomes.map((outcome, i) => {
+            const isObject = typeof outcome === 'object' && outcome !== null;
+            const text = isObject ? outcome.text : outcome;
+            const iconName = isObject ? outcome.icon : 'CheckCircle2';
+            
+            const IconComponent = curatedIcons[iconName as CuratedIconName] || CheckCircle2;
+            
+            // Random vibrant colors for the icons to make it look premium
+            const colors = [
+              'text-blue-500 bg-blue-500/10',
+              'text-emerald-500 bg-emerald-500/10',
+              'text-violet-500 bg-violet-500/10',
+              'text-pink-500 bg-pink-500/10',
+              'text-amber-500 bg-amber-500/10',
+              'text-cyan-500 bg-cyan-500/10'
+            ];
+            const colorClass = colors[i % colors.length];
+
+            return (
+              <div key={i} className="flex items-start gap-4 p-5 bg-foreground/5 rounded-2xl hover:bg-foreground/10 transition-colors border border-foreground/5 hover:border-foreground/10 group">
+                <div className={`p-2 rounded-xl shrink-0 transition-transform group-hover:scale-110 ${colorClass}`}>
+                  <IconComponent className="w-6 h-6" />
+                </div>
+                <p className="text-foreground/80 font-medium leading-relaxed mt-1">{text}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

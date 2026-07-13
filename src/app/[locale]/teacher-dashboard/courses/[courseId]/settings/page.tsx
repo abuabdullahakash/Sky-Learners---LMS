@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import { Save, ImagePlus, Trash2, X, Loader2, Plus } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import { uploadImageToImgBB } from '@/lib/imgbb';
+import { IconPicker } from '@/components/ui/IconPicker';
 
 export default function CourseSettingsPage() {
   const { user } = useAuth();
@@ -85,7 +86,14 @@ export default function CourseSettingsPage() {
         const docRef = doc(db, 'courses', courseId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists() && docSnap.data().teacherId === user.uid) {
-          setCourse(docSnap.data());
+          const data = docSnap.data();
+          if (data.learningOutcomes) {
+            data.learningOutcomes = data.learningOutcomes.map((item: any) => {
+              if (typeof item === 'string') return { text: item, icon: 'CheckCircle2' };
+              return item;
+            });
+          }
+          setCourse(data);
         } else {
           router.push('/teacher-dashboard/courses');
         }
@@ -515,7 +523,7 @@ export default function CourseSettingsPage() {
             <h2 className="text-xl font-bold">Learning Outcomes (কী কী শিখবেন)</h2>
             <button 
               type="button" 
-              onClick={() => setCourse({ ...course, learningOutcomes: [...(course.learningOutcomes || []), ''] })}
+              onClick={() => setCourse({ ...course, learningOutcomes: [...(course.learningOutcomes || []), { text: '', icon: 'CheckCircle2' }] })}
               className="px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors"
             >
               <Plus className="w-4 h-4" /> Add Outcome
@@ -527,14 +535,22 @@ export default function CourseSettingsPage() {
                 No learning outcomes added yet.
               </div>
             ) : (
-              course.learningOutcomes.map((outcome: string, index: number) => (
-                <div key={index} className="flex items-center gap-3">
+              course.learningOutcomes.map((outcome: any, index: number) => (
+                <div key={index} className="flex items-center gap-3 relative z-10">
+                  <IconPicker 
+                    selectedIcon={outcome.icon || 'CheckCircle2'}
+                    onSelect={(iconName) => {
+                      const newOutcomes = [...course.learningOutcomes];
+                      newOutcomes[index] = { ...newOutcomes[index], icon: iconName };
+                      setCourse({ ...course, learningOutcomes: newOutcomes });
+                    }}
+                  />
                   <input 
                     type="text" 
-                    value={outcome} 
+                    value={outcome.text || ''} 
                     onChange={e => {
                       const newOutcomes = [...course.learningOutcomes];
-                      newOutcomes[index] = e.target.value;
+                      newOutcomes[index] = { ...newOutcomes[index], text: e.target.value };
                       setCourse({ ...course, learningOutcomes: newOutcomes });
                     }}
                     placeholder={`e.g. ${course.category === 'intermediate' ? 'ঢাকা বিশ্ববিদ্যালয়ে চান্স পাওয়ার ১০০% প্রস্তুতি' : 'বাস্তব জীবনের প্রজেক্ট তৈরি করা'}`}

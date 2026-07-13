@@ -116,7 +116,7 @@ export default function CourseCurriculum({ modules }: { modules: any[] }) {
                         {lesson.noteUrl && (
                           <a href={lesson.noteUrl} target="_blank" className={`px-4 py-2 font-bold rounded-xl text-xs transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap text-center !no-underline hover:!text-white flex items-center gap-1.5 ${theme.btn}`}>
                             <FileText className="w-4 h-4" />
-                            {t('classNote') || 'ক্লাস নোট'}
+                            {t('classNote')}
                           </a>
                         )}
                         {lesson.isFreePreview ? (
@@ -132,7 +132,7 @@ export default function CourseCurriculum({ modules }: { modules: any[] }) {
                     </div>
                   )})}
                   {(!module.lessons || module.lessons.length === 0) && (
-                    <p className="text-sm text-foreground/50 text-center py-4">কোনো লেসন যুক্ত করা হয়নি</p>
+                    <p className="text-sm text-foreground/50 text-center py-4">{t('noLessons')}</p>
                   )}
                 </div>
               </AccordionContent>

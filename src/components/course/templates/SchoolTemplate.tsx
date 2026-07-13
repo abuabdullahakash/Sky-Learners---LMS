@@ -51,7 +51,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
   return (
     <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500">
       {/* Playful Hero Section for School Level */}
-      <div className={`min-h-[60vh] lg:min-h-[75vh] pt-28 pb-12 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-gradient-to-br from-blue-500/20 via-purple-500/10 to-pink-500/20'}`}>
+      <div className={`min-h-[60vh] lg:min-h-[75vh] pt-20 pb-16 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-gradient-to-br from-blue-500/20 via-purple-500/10 to-pink-500/20'}`}>
         
         {/* Background Layer */}
         {hasSlider ? (
@@ -145,7 +145,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
 
             <section>
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
-              <div className="bg-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-foreground/10 border-r-foreground/10 leading-relaxed text-lg whitespace-pre-wrap relative overflow-hidden group">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-foreground/5 dark:to-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-blue-100 border-r-blue-100 dark:border-y-foreground/10 dark:border-r-foreground/10 leading-relaxed text-lg whitespace-pre-wrap relative overflow-hidden group">
                 {/* Animated Background Shape */}
                 <div 
                   ref={el => { shapeRefs.current[0] = el; }}
@@ -207,7 +207,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
                     <Accordion className="w-full">
                     {course.faqs.map((faq: any, i: number) => (
                       <AccordionItem key={i} value={`item-${i}`} className={i === course.faqs.length - 1 ? "border-b-0" : ""}>
-                        <AccordionTrigger className="text-left font-bold text-lg hover:text-primary transition-colors">
+                        <AccordionTrigger className="text-left font-bold text-lg hover:no-underline hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                           {faq.question}
                         </AccordionTrigger>
                         <AccordionContent className="text-foreground/70 text-base leading-relaxed">

@@ -173,7 +173,8 @@
   "CourseDetails": {
     "notFound": "কোর্সটি খুঁজে পাওয়া যায়নি",
     "goBack": "ফিরে যান",
-    "watchTrailer": "ট্রেইলার\\nদেখুন",
+    "watchTrailer": "ট্রেইলার\nদেখুন",
+    "freeClasses": "ফ্রি ক্লাসসমূহ",
     "category": {
       "intermediate": "HSC",
       "primary": "Primary",

@@ -28,7 +28,7 @@ export default function CourseCurriculum({ modules }: { modules: any[] }) {
             >
               <AccordionTrigger className="text-left font-bold text-lg hover:no-underline hover:text-blue-600 dark:hover:text-blue-400 transition-colors px-5 py-4 group">
                 <div className="flex justify-between items-center w-full pr-4">
-                  <span>{module.title || `মডিউল ${i + 1}`}</span>
+                  <span>{module.title === 'New Module' ? t('freeClasses') : module.title || `মডিউল ${i + 1}`}</span>
                   <span className="text-sm font-semibold text-blue-600/70 dark:text-blue-400/70 hidden sm:inline-block bg-blue-100/50 dark:bg-blue-900/30 px-3 py-1 rounded-full">
                     {module.lessons?.length || 0} টি লেসন
                   </span>

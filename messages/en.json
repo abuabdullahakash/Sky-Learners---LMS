@@ -173,7 +173,8 @@
   "CourseDetails": {
     "notFound": "Course not found",
     "goBack": "Go Back",
-    "watchTrailer": "Watch\\nTrailer",
+    "watchTrailer": "Watch\nTrailer",
+    "freeClasses": "Free Classes",
     "category": {
       "intermediate": "HSC",
       "primary": "Primary",

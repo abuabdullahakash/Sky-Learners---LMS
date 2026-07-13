@@ -21,7 +21,7 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500">
-      <div className={`min-h-[60vh] lg:min-h-[75vh] pt-28 pb-12 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-gradient-to-br from-red-900/40 via-background to-red-900/20 dark:from-red-950 dark:via-background dark:to-red-900/30'}`}>
+      <div className={`min-h-[60vh] lg:min-h-[75vh] pt-20 pb-16 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-gradient-to-br from-red-900/40 via-background to-red-900/20 dark:from-red-950 dark:via-background dark:to-red-900/30'}`}>
         
         {/* Background Layer */}
         {hasSlider ? (
@@ -128,8 +128,10 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
 
             <section>
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
-              <div className="bg-foreground/5 p-6 rounded-2xl border border-foreground/10 text-foreground/80 leading-relaxed text-lg whitespace-pre-wrap">
-                {course.detailedDescription || t('descriptionFallbackHsc')}
+              <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-foreground/5 dark:to-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-red-100 border-r-red-100 dark:border-y-foreground/10 dark:border-r-foreground/10 leading-relaxed text-lg whitespace-pre-wrap relative overflow-hidden group">
+                <div className="relative z-10 text-foreground/80">
+                  {course.detailedDescription || t('descriptionFallbackHsc')}
+                </div>
               </div>
             </section>
 
@@ -177,7 +179,7 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
                   <Accordion className="w-full">
                     {course.faqs.map((faq: any, i: number) => (
                       <AccordionItem key={i} value={`item-${i}`} className={i === course.faqs.length - 1 ? "border-b-0" : ""}>
-                        <AccordionTrigger className="text-left font-bold text-lg hover:text-primary transition-colors">
+                        <AccordionTrigger className="text-left font-bold text-lg hover:no-underline hover:text-red-600 dark:hover:text-red-400 transition-colors">
                           {faq.question}
                         </AccordionTrigger>
                         <AccordionContent className="text-foreground/70 text-base leading-relaxed">

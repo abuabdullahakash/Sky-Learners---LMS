@@ -49,7 +49,7 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500">
-      <div className={`min-h-[60vh] lg:min-h-[75vh] pt-28 pb-12 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-gradient-to-br from-emerald-900/30 via-background to-teal-900/20 dark:from-emerald-950 dark:via-background dark:to-teal-900/30'}`}>
+      <div className={`min-h-[60vh] lg:min-h-[75vh] pt-20 pb-16 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-gradient-to-br from-emerald-900/30 via-background to-teal-900/20 dark:from-emerald-950 dark:via-background dark:to-teal-900/30'}`}>
         
         {/* Background Layer */}
         {hasSlider ? (
@@ -156,8 +156,10 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
 
             <section>
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
-              <div className="bg-foreground/5 p-6 rounded-2xl border border-foreground/10 text-foreground/80 leading-relaxed text-lg whitespace-pre-wrap">
-                {course.detailedDescription || t('descriptionFallbackSkill')}
+              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-foreground/5 dark:to-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-emerald-100 border-r-emerald-100 dark:border-y-foreground/10 dark:border-r-foreground/10 leading-relaxed text-lg whitespace-pre-wrap relative overflow-hidden group">
+                <div className="relative z-10 text-foreground/80">
+                  {course.detailedDescription || t('descriptionFallbackSkill')}
+                </div>
               </div>
             </section>
 
@@ -207,7 +209,7 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
                   <Accordion className="w-full">
                     {course.faqs.map((faq: any, i: number) => (
                       <AccordionItem key={i} value={`item-${i}`} className={i === course.faqs.length - 1 ? "border-b-0" : ""}>
-                        <AccordionTrigger className="text-left font-bold text-lg hover:text-primary transition-colors">
+                        <AccordionTrigger className="text-left font-bold text-lg hover:no-underline hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                           {faq.question}
                         </AccordionTrigger>
                         <AccordionContent className="text-foreground/70 text-base leading-relaxed">

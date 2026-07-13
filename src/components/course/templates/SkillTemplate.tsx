@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { ArrowLeft, Briefcase, Award, Users, Image as ImageIcon, PlayCircle, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { PerspectiveCarousel } from '@/components/ui/perspective-carousel';
@@ -14,10 +14,12 @@ import TargetAudience from '../TargetAudience';
 import CourseTestimonials from '../CourseTestimonials';
 import StickyPricingCard from '../StickyPricingCard';
 import CourseFeatures from '../CourseFeatures';
+import { VideoModal } from '@/components/ui/VideoModal';
 
 export default function SkillTemplate({ course, currentSlide, setCurrentSlide }: { course: any, currentSlide: number, setCurrentSlide: (s: number) => void }) {
   const t = useTranslations('CourseDetails');
   const galleryRef = useRef<HTMLDivElement>(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -116,15 +118,15 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
         {/* Video Button & Stats (Right Sidebar) */}
         <div className="hidden lg:flex absolute right-4 xl:right-0 top-1/2 -translate-y-1/2 flex-col items-center gap-10 w-20 z-20">
           {course.introVideoUrl && (
-            <a href={course.introVideoUrl} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-3 group cursor-pointer">
+            <button onClick={() => setIsVideoModalOpen(true)} className="flex flex-col items-center gap-3 group cursor-pointer">
               <div className="relative w-14 h-14 flex items-center justify-center">
-                <div className="absolute inset-0 bg-emerald-500/40 rounded-full animate-ping opacity-75"></div>
-                <div className="relative w-14 h-14 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white group-hover:bg-emerald-500 group-hover:border-emerald-500 group-hover:scale-110 transition-all duration-300 shadow-lg shadow-emerald-500/20">
+                <div className={`absolute inset-0 rounded-full animate-ping opacity-75 ${hasCover ? 'bg-white/40' : 'bg-primary/40'}`}></div>
+                <div className={`relative w-14 h-14 rounded-full border flex items-center justify-center transition-all duration-300 shadow-lg ${hasCover ? 'bg-white/10 border-white/20 text-white group-hover:bg-white group-hover:text-black group-hover:scale-110 shadow-white/20' : 'bg-primary/10 border-primary/20 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 shadow-primary/20'}`}>
                   <PlayCircle className="w-6 h-6 fill-current" />
                 </div>
               </div>
-              <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest text-center group-hover:text-emerald-400 group-hover:-translate-y-1 transition-all duration-300 whitespace-pre-line">{t('watchTrailer')}</span>
-            </a>
+              <span className={`text-[10px] font-bold uppercase tracking-widest text-center transition-all duration-300 whitespace-pre-line group-hover:-translate-y-1 ${hasCover ? 'text-white/60 group-hover:text-white' : 'text-foreground/60 group-hover:text-primary'}`}>{t('watchTrailer')}</span>
+            </button>
           )}
         </div>
 
@@ -250,6 +252,14 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
 
         </div>
       </div>
+
+      {course.introVideoUrl && (
+        <VideoModal 
+          isOpen={isVideoModalOpen} 
+          onClose={() => setIsVideoModalOpen(false)} 
+          videoUrl={course.introVideoUrl} 
+        />
+      )}
     </div>
   );
 }

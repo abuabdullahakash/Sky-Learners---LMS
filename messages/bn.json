@@ -169,5 +169,58 @@
       "invalidLinkMessage": "পাসওয়ার্ড রিসেট লিংকটি সঠিক নয় অথবা এর মেয়াদ শেষ হয়ে গেছে।",
       "requestNewLink": "নতুন লিংক রিকোয়েস্ট করুন"
     }
+  },
+  "CourseDetails": {
+    "notFound": "কোর্সটি খুঁজে পাওয়া যায়নি",
+    "goBack": "ফিরে যান",
+    "watchTrailer": "ট্রেইলার\\nদেখুন",
+    "category": {
+      "intermediate": "HSC",
+      "primary": "Primary",
+      "high_school": "SSC",
+      "honours": "Honours",
+      "skills": "Skills"
+    },
+    "instructor": "প্রশিক্ষক/প্রতিষ্ঠান",
+    "viewProfile": "প্রোফাইল দেখুন",
+    "duration": "মেয়াদ",
+    "lifetimeAccess": "লাইফ-টাইম এক্সেস",
+    "description": "কোর্সের বিস্তারিত বিবরণ",
+    "descriptionFallbackPrimary": "ছোট সোনামণিদের পড়ালেখার শক্ত ভিত গড়তে এই কোর্সটি বিশেষভাবে সাজানো হয়েছে।",
+    "descriptionFallbackHsc": "এইচএসসি পরীক্ষায় জিপিএ-৫ এবং এডমিশনে চান্স পাওয়ার জন্য আমাদের এই কোর্সটি তোমার সেরা প্রস্তুতি নিশ্চিত করবে।",
+    "descriptionFallbackSkill": "আপনার ক্যারিয়ারকে এক ধাপ এগিয়ে নিতে এবং প্র্যাকটিক্যাল স্কিল অর্জন করতে এই কোর্সটিতে আজই যুক্ত হোন।",
+    "descriptionFallback": "এই কোর্সে আপনি গুরুত্বপূর্ণ সব টপিক শিখতে পারবেন এবং পরীক্ষায় ভালো ফলাফল করতে পারবেন।",
+    "curriculum": "কোর্স কারিকুলাম ও ম্যাটেরিয়ালস",
+    "freePreview": "ফ্রি প্রিভিউ",
+    "watch": "দেখুন",
+    "locked": "লকড",
+    "learningOutcomes": "কোর্সটি থেকে কী কী শিখবেন?",
+    "targetAudience": "এই কোর্সটি কাদের জন্য?",
+    "instructors": "কোর্সের প্রশিক্ষকবৃন্দ",
+    "gallery": "কোর্স গ্যালারি",
+    "testimonials": "শিক্ষার্থীদের মতামত",
+    "faqs": "সচরাচর জিজ্ঞাসা",
+    "pricingCard": {
+      "courseFee": "কোর্স ফি",
+      "modules": "মডিউল সংখ্যা",
+      "department": "বিষয়/বিভাগ",
+      "year": "বর্ষ/সেমিস্টার",
+      "class": "শ্রেণী",
+      "startDate": "ক্লাস শুরু",
+      "validity": "কোর্সের মেয়াদ",
+      "certificate": "সার্টিফিকেট",
+      "yes": "হ্যাঁ",
+      "enrollBtn": "কোর্সে যুক্ত হোন",
+      "securePayment": "১০০% নিরাপদ পেমেন্ট (বিকাশ/নগদ/রকেট)",
+      "whatsIncluded": "কোর্সে যা যা থাকছে",
+      "recordedClasses": "টি রেকর্ডেড ভিডিও ক্লাস",
+      "liveClasses": "টি লাইভ ক্লাস সেশন",
+      "pdfs": "টি ক্লাস নোট ও পিডিএফ",
+      "exams": "টি অধ্যায়ভিত্তিক পরীক্ষা (MCQ)",
+      "doubtSolving": "24/7 ডাউট সলভিং সাপোর্ট",
+      "noFeatures": "ফিচার যুক্ত করা হয়নি",
+      "moreQuestions": "আরও কোন জিজ্ঞাসা আছে?",
+      "callUs": "কল করুন"
+    }
   }
 }

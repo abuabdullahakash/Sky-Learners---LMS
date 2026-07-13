@@ -169,5 +169,58 @@
       "invalidLinkMessage": "The password reset link is invalid or has expired.",
       "requestNewLink": "Request new link"
     }
+  },
+  "CourseDetails": {
+    "notFound": "Course not found",
+    "goBack": "Go Back",
+    "watchTrailer": "Watch\\nTrailer",
+    "category": {
+      "intermediate": "HSC",
+      "primary": "Primary",
+      "high_school": "SSC",
+      "honours": "Honours",
+      "skills": "Skills"
+    },
+    "instructor": "Instructor/Institution",
+    "viewProfile": "View Profile",
+    "duration": "Duration",
+    "lifetimeAccess": "Lifetime Access",
+    "description": "Course Description",
+    "descriptionFallbackPrimary": "This course is specially designed to build a strong educational foundation for young learners.",
+    "descriptionFallbackHsc": "This course will ensure your best preparation to achieve GPA-5 in HSC and secure admission.",
+    "descriptionFallbackSkill": "Join this course today to take your career a step forward and gain practical skills.",
+    "descriptionFallback": "In this course, you will learn all the important topics and achieve good results.",
+    "curriculum": "Course Curriculum & Materials",
+    "freePreview": "Free Preview",
+    "watch": "Watch",
+    "locked": "Locked",
+    "learningOutcomes": "What you will learn",
+    "targetAudience": "Who is this course for?",
+    "instructors": "Course Instructors",
+    "gallery": "Course Gallery",
+    "testimonials": "Student Reviews",
+    "faqs": "Frequently Asked Questions",
+    "pricingCard": {
+      "courseFee": "Course Fee",
+      "modules": "Total Modules",
+      "department": "Department",
+      "year": "Year/Semester",
+      "class": "Class",
+      "startDate": "Class Starts",
+      "validity": "Course Validity",
+      "certificate": "Certificate",
+      "yes": "Yes",
+      "enrollBtn": "Enroll Now",
+      "securePayment": "100% Secure Payment",
+      "whatsIncluded": "What's Included",
+      "recordedClasses": "Recorded Video Classes",
+      "liveClasses": "Live Class Sessions",
+      "pdfs": "Class Notes & PDFs",
+      "exams": "Chapter-wise Exams (MCQ)",
+      "doubtSolving": "24/7 Doubt Solving Support",
+      "noFeatures": "No features added",
+      "moreQuestions": "Have more questions?",
+      "callUs": "Call"
+    }
   }
 }

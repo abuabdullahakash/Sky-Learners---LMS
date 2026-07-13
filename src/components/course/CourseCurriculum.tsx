@@ -148,15 +148,15 @@ export default function CourseCurriculum({ modules, routineImageUrl }: { modules
         <div className="mt-8 bg-background border border-orange-100 dark:border-foreground/10 rounded-xl p-6 shadow-md shadow-orange-900/5 dark:shadow-none animate-in slide-in-from-bottom-4 duration-700 delay-300">
           <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
             <Calendar className="w-6 h-6 text-orange-500" />
-            {t('classRoutine') || 'ক্লাস রুটিন'}
+            {t('classRoutine').includes('CourseDetails.') ? 'ক্লাস রুটিন' : t('classRoutine')}
           </h3>
           <div 
             onClick={() => setIsRoutineOpen(true)}
-            className="relative w-full max-w-sm aspect-video rounded-xl overflow-hidden border-2 border-foreground/10 cursor-pointer group hover:border-orange-500 transition-colors"
+            className="relative w-full rounded-xl overflow-hidden border-2 border-foreground/10 cursor-pointer group hover:border-orange-500 transition-colors bg-foreground/5 flex items-center justify-center min-h-[200px]"
           >
-            <img src={routineImageUrl} alt="Class Routine" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-              <span className="text-white font-bold bg-orange-500 px-4 py-2 rounded-lg shadow-lg">View Full Routine</span>
+            <img src={routineImageUrl} alt="Class Routine" className="w-full max-h-[500px] object-contain group-hover:scale-[1.02] transition-transform duration-500" />
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+              <span className="text-white font-bold bg-orange-500 px-6 py-3 rounded-xl shadow-2xl">View Full Routine</span>
             </div>
           </div>
         </div>
@@ -188,7 +188,7 @@ export default function CourseCurriculum({ modules, routineImageUrl }: { modules
               className="flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl shadow-lg transition-colors"
             >
               <Download className="w-5 h-5" />
-              {t('downloadRoutine') || 'Download Routine'}
+              {t('downloadRoutine').includes('CourseDetails.') ? 'Download Routine' : t('downloadRoutine')}
             </a>
           </div>
         </div>

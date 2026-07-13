@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { ArrowLeft, Target, Trophy, Clock, Users, Download, PlayCircle } from 'lucide-react';
+import { ArrowLeft, Target, Trophy, Clock, Users, Download, PlayCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PerspectiveCarousel } from '@/components/ui/perspective-carousel';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import CourseCurriculum from '../CourseCurriculum';
@@ -47,7 +47,7 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
 
         {/* Slider Controls (Bottom Center) */}
         {hasSlider && course.sliderImages.length > 1 && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-20">
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-4 z-20">
             <span className="text-white/80 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
             <div className="flex items-center gap-3">
               {course.sliderImages.map((_: any, idx: number) => (
@@ -59,6 +59,24 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
               ))}
             </div>
             <span className="text-white/40 text-xs font-bold">{String(course.sliderImages.length).padStart(2, '0')}</span>
+          </div>
+        )}
+
+        {/* Next/Prev Navigation */}
+        {hasSlider && course.sliderImages.length > 1 && (
+          <div className="absolute bottom-10 right-4 lg:right-8 flex items-center gap-3 z-20">
+            <button 
+              onClick={() => setCurrentSlide((currentSlide === 0 ? course.sliderImages.length - 1 : currentSlide - 1))}
+              className="w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all shadow-lg hover:scale-105"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => setCurrentSlide((currentSlide + 1) % course.sliderImages.length)}
+              className="w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all shadow-lg hover:scale-105"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
         )}
 
@@ -77,7 +95,7 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
           )}
         </div>
 
-        <div className={`w-full max-w-7xl mx-auto px-4 lg:px-20 xl:px-24 relative z-20 h-full flex flex-col justify-center ${textColor}`}>
+        <div className={`w-full max-w-7xl mx-auto px-4 relative z-20 h-full flex flex-col justify-center ${textColor}`}>
           <Link href="/courses" className={`inline-flex items-center gap-2 font-semibold mb-8 transition-colors ${hasCover ? 'text-white/70 hover:text-white' : 'text-foreground/60 hover:text-foreground'}`}>
             <ArrowLeft className="w-4 h-4" /> {t('goBack')}
           </Link>

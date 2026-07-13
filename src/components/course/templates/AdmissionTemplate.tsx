@@ -50,6 +50,18 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
           <div className="lg:col-span-2 space-y-12">
+            {course.successMessage && (
+              <section className="bg-red-900/10 dark:bg-red-900/20 p-8 rounded-3xl border border-red-200 dark:border-red-900/30">
+                <h3 className="text-2xl font-bold mb-4 flex items-center gap-3 text-red-700 dark:text-red-400">
+                  <Target className="w-6 h-6" /> 
+                  স্পেশাল ফোকাস / নিশ্চয়তা
+                </h3>
+                <p className="text-foreground/80 leading-relaxed whitespace-pre-wrap font-medium">
+                  {course.successMessage}
+                </p>
+              </section>
+            )}
+
             <section>
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
               <div className="bg-foreground/5 p-6 rounded-2xl border border-foreground/10 text-foreground/80 leading-relaxed text-lg whitespace-pre-wrap">

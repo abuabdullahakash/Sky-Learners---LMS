@@ -60,8 +60,8 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
                 <Heart className="w-6 h-6" /> 
                 অভিভাবকদের উদ্দেশ্যে
               </h3>
-              <p className="text-foreground/80 leading-relaxed">
-                আপনার সন্তানের উজ্জ্বল ভবিষ্যতের জন্য একটি শক্ত ভিত্তি তৈরি করা অত্যন্ত জরুরি। আমাদের এই কোর্সটি এমনভাবে সাজানো হয়েছে যাতে পড়াশোনা তাদের কাছে বোঝা না মনে হয়ে আনন্দদায়ক মনে হয়।
+              <p className="text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                {course.parentMessage || "আপনার সন্তানের উজ্জ্বল ভবিষ্যতের জন্য একটি শক্ত ভিত্তি তৈরি করা অত্যন্ত জরুরি। আমাদের এই কোর্সটি এমনভাবে সাজানো হয়েছে যাতে পড়াশোনা তাদের কাছে বোঝা না মনে হয়ে আনন্দদায়ক মনে হয়।"}
               </p>
             </section>
 

@@ -128,7 +128,13 @@ export default function CourseSettingsPage() {
         year: (course.category === 'honours' || course.category === 'masters') ? course.year : '',
         coachingName: course.coachingName || '',
         contactNumber: course.contactNumber || '',
-        faqs: course.faqs || []
+        faqs: course.faqs || [],
+        learningOutcomes: course.learningOutcomes || [],
+        targetAudience: course.targetAudience || '',
+        testimonials: course.testimonials || [],
+        parentMessage: (course.category === 'primary' || course.category === 'high_school') ? (course.parentMessage || '') : '',
+        successMessage: course.category === 'intermediate' ? (course.successMessage || '') : '',
+        careerMessage: (course.category === 'honours' || course.category === 'masters' || course.category === 'skills') ? (course.careerMessage || '') : '',
       });
       setMessage('Settings updated successfully!');
       setTimeout(() => setMessage(''), 3000);
@@ -353,6 +359,40 @@ export default function CourseSettingsPage() {
             </div>
           )}
 
+          {/* Category-Specific Dynamic Fields */}
+          {(course.category === 'primary' || course.category === 'high_school') && (
+            <div className="p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl">
+              <label className="block text-sm font-medium mb-1 text-blue-600">অভিভাবকদের উদ্দেশ্যে বার্তা (Message for Parents)</label>
+              <textarea 
+                value={course.parentMessage || ''} onChange={e => setCourse({...course, parentMessage: e.target.value})} rows={3}
+                className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-blue-500 transition-colors custom-scrollbar"
+                placeholder="উদাহরণ: আপনার সন্তানের উজ্জ্বল ভবিষ্যতের জন্য একটি শক্ত ভিত্তি তৈরি করা অত্যন্ত জরুরি..."
+              />
+            </div>
+          )}
+
+          {course.category === 'intermediate' && (
+            <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
+              <label className="block text-sm font-medium mb-1 text-red-600">চান্স পাওয়ার নিশ্চয়তা / স্পেশাল ফোকাস (Success Message)</label>
+              <textarea 
+                value={course.successMessage || ''} onChange={e => setCourse({...course, successMessage: e.target.value})} rows={3}
+                className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-red-500 transition-colors custom-scrollbar"
+                placeholder="উদাহরণ: ঢাকা বিশ্ববিদ্যালয়ে চান্স পাওয়ার ১০০% প্রস্তুতি এবং স্পেশাল গাইডলাইন..."
+              />
+            </div>
+          )}
+
+          {(course.category === 'honours' || course.category === 'masters' || course.category === 'skills') && (
+            <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
+              <label className="block text-sm font-medium mb-1 text-emerald-600">ক্যারিয়ার গাইডেন্স / পোর্টফোলিও (Career Message)</label>
+              <textarea 
+                value={course.careerMessage || ''} onChange={e => setCourse({...course, careerMessage: e.target.value})} rows={3}
+                className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-emerald-500 transition-colors custom-scrollbar"
+                placeholder="উদাহরণ: কোর্স শেষে আপনার প্রফেশনাল পোর্টফোলিও তৈরি করা হবে যা চাকরিতে সাহায্য করবে..."
+              />
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">Regular Price (BDT)</label>
@@ -451,6 +491,134 @@ export default function CourseSettingsPage() {
                       }}
                       placeholder="Answer goes here..."
                       rows={2}
+                      className="w-full px-4 py-2 bg-background border border-foreground/10 rounded-lg focus:border-orange-500 transition-colors custom-scrollbar"
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          <hr className="border-foreground/10 my-6" />
+
+          {/* Learning Outcomes */}
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">Learning Outcomes (কী কী শিখবেন)</h2>
+            <button 
+              type="button" 
+              onClick={() => setCourse({ ...course, learningOutcomes: [...(course.learningOutcomes || []), ''] })}
+              className="px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors"
+            >
+              <Plus className="w-4 h-4" /> Add Outcome
+            </button>
+          </div>
+          <div className="space-y-3">
+            {(!course.learningOutcomes || course.learningOutcomes.length === 0) ? (
+              <div className="text-center p-6 border border-dashed border-foreground/20 rounded-xl text-foreground/50">
+                No learning outcomes added yet.
+              </div>
+            ) : (
+              course.learningOutcomes.map((outcome: string, index: number) => (
+                <div key={index} className="flex items-center gap-3">
+                  <input 
+                    type="text" 
+                    value={outcome} 
+                    onChange={e => {
+                      const newOutcomes = [...course.learningOutcomes];
+                      newOutcomes[index] = e.target.value;
+                      setCourse({ ...course, learningOutcomes: newOutcomes });
+                    }}
+                    placeholder={`e.g. ${course.category === 'intermediate' ? 'ঢাকা বিশ্ববিদ্যালয়ে চান্স পাওয়ার ১০০% প্রস্তুতি' : 'বাস্তব জীবনের প্রজেক্ট তৈরি করা'}`}
+                    className="w-full px-4 py-2 bg-foreground/5 border border-foreground/10 rounded-lg focus:border-orange-500 transition-colors"
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const newOutcomes = [...course.learningOutcomes];
+                      newOutcomes.splice(index, 1);
+                      setCourse({ ...course, learningOutcomes: newOutcomes });
+                    }}
+                    className="p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="mt-6">
+            <label className="block text-sm font-medium mb-1">Target Audience (কাদের জন্য)</label>
+            <textarea 
+              value={course.targetAudience || ''} onChange={e => setCourse({...course, targetAudience: e.target.value})} rows={2}
+              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors custom-scrollbar"
+              placeholder={`e.g. ${course.category === 'primary' ? '৩য় থেকে ৫ম শ্রেণীর বাচ্চাদের জন্য' : 'যারা ওয়েব ডেভেলপমেন্ট শিখতে চায়'}`}
+            />
+          </div>
+
+          <hr className="border-foreground/10 my-6" />
+
+          {/* Testimonials */}
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">Student Testimonials (শিক্ষার্থীদের মতামত)</h2>
+            <button 
+              type="button" 
+              onClick={() => setCourse({ ...course, testimonials: [...(course.testimonials || []), { name: '', role: '', text: '', rating: 5 }] })}
+              className="px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors"
+            >
+              <Plus className="w-4 h-4" /> Add Testimonial
+            </button>
+          </div>
+          <div className="space-y-4">
+            {(!course.testimonials || course.testimonials.length === 0) ? (
+              <div className="text-center p-6 border border-dashed border-foreground/20 rounded-xl text-foreground/50">
+                No testimonials added yet.
+              </div>
+            ) : (
+              course.testimonials.map((testi: any, index: number) => (
+                <div key={index} className="p-4 bg-foreground/5 border border-foreground/10 rounded-xl space-y-3 relative group">
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const newTesti = [...course.testimonials];
+                      newTesti.splice(index, 1);
+                      setCourse({ ...course, testimonials: newTesti });
+                    }}
+                    className="absolute top-4 right-4 p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pr-12">
+                    <div className="md:col-span-1">
+                      <label className="block text-xs font-bold mb-1 uppercase tracking-wider text-foreground/60">Student Name</label>
+                      <input 
+                        type="text" value={testi.name} 
+                        onChange={e => { const arr = [...course.testimonials]; arr[index].name = e.target.value; setCourse({ ...course, testimonials: arr }); }}
+                        className="w-full px-4 py-2 bg-background border border-foreground/10 rounded-lg focus:border-orange-500 transition-colors"
+                      />
+                    </div>
+                    <div className="md:col-span-1">
+                      <label className="block text-xs font-bold mb-1 uppercase tracking-wider text-foreground/60">Role / University</label>
+                      <input 
+                        type="text" value={testi.role} placeholder="e.g. DU Student"
+                        onChange={e => { const arr = [...course.testimonials]; arr[index].role = e.target.value; setCourse({ ...course, testimonials: arr }); }}
+                        className="w-full px-4 py-2 bg-background border border-foreground/10 rounded-lg focus:border-orange-500 transition-colors"
+                      />
+                    </div>
+                    <div className="md:col-span-1">
+                      <label className="block text-xs font-bold mb-1 uppercase tracking-wider text-foreground/60">Rating (1-5)</label>
+                      <input 
+                        type="number" min="1" max="5" value={testi.rating} 
+                        onChange={e => { const arr = [...course.testimonials]; arr[index].rating = Number(e.target.value); setCourse({ ...course, testimonials: arr }); }}
+                        className="w-full px-4 py-2 bg-background border border-foreground/10 rounded-lg focus:border-orange-500 transition-colors"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold mb-1 uppercase tracking-wider text-foreground/60">Review Text</label>
+                    <textarea 
+                      value={testi.text} rows={2}
+                      onChange={e => { const arr = [...course.testimonials]; arr[index].text = e.target.value; setCourse({ ...course, testimonials: arr }); }}
                       className="w-full px-4 py-2 bg-background border border-foreground/10 rounded-lg focus:border-orange-500 transition-colors custom-scrollbar"
                     />
                   </div>

@@ -188,7 +188,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
 
             <LearningOutcomes outcomes={course.learningOutcomes} />
             <TargetAudience audience={course.targetAudience} />
-            <CourseCurriculum modules={course.modules} />
+            <CourseCurriculum modules={course.modules} routineImageUrl={course.routineImageUrl} />
 
             {course.studyRoutineUrl && (
               <section className="bg-blue-500/10 border border-blue-500/20 p-8 rounded-lg flex flex-col md:flex-row items-center justify-between gap-6">

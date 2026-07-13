@@ -22,8 +22,8 @@ export default function CourseSettingsPage() {
   const [message, setMessage] = useState('');
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isUploadingSlider, setIsUploadingSlider] = useState(false);
-
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+  const [isUploadingRoutine, setIsUploadingRoutine] = useState(false);
 
   const handleUploadCover = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -78,6 +78,21 @@ export default function CourseSettingsPage() {
     updated.splice(index, 1);
     setCourse({ ...course, galleryImages: updated });
   };
+
+  const handleUploadRoutine = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setIsUploadingRoutine(true);
+      try {
+        const url = await uploadImageToImgBB(e.target.files[0]);
+        setCourse((prev: any) => ({ ...prev, routineImageUrl: url }));
+      } catch (err) {
+        console.error(err);
+        alert('Failed to upload routine image.');
+      }
+      setIsUploadingRoutine(false);
+    }
+  };
+
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -144,6 +159,7 @@ export default function CourseSettingsPage() {
         successMessage: course.category === 'intermediate' ? (course.successMessage || '') : '',
         careerMessage: (course.category === 'honours' || course.category === 'masters' || course.category === 'skills') ? (course.careerMessage || '') : '',
         studyRoutineUrl: course.studyRoutineUrl || '',
+        routineImageUrl: course.routineImageUrl || '',
       });
       setMessage('Settings updated successfully!');
       setTimeout(() => setMessage(''), 3000);
@@ -275,6 +291,25 @@ export default function CourseSettingsPage() {
               placeholder="https://drive.google.com/..."
               className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Class Routine Image (Optional)</label>
+            <p className="text-xs text-foreground/50 mb-3">Upload an image of the class routine to be displayed on the course details page.</p>
+            <div className="flex items-center gap-4">
+              {course.routineImageUrl && (
+                <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-foreground/20">
+                  <img src={course.routineImageUrl} alt="Class Routine" className="w-full h-full object-cover" />
+                  <button type="button" onClick={() => setCourse({...course, routineImageUrl: ''})} className="absolute top-1 right-1 p-1 bg-black/50 hover:bg-red-500 rounded-full text-white transition-colors">
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+              <label className="flex flex-col items-center justify-center w-32 h-32 bg-background border-2 border-dashed border-foreground/20 rounded-lg cursor-pointer hover:border-orange-500 hover:bg-orange-500/5 transition-colors">
+                {isUploadingRoutine ? <Loader2 className="w-6 h-6 animate-spin text-orange-500" /> : <ImagePlus className="w-6 h-6 text-foreground/40" />}
+                <span className="text-xs text-foreground/50 mt-1">Upload Routine</span>
+                <input type="file" accept="image/*" onChange={handleUploadRoutine} className="hidden" disabled={isUploadingRoutine} />
+              </label>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

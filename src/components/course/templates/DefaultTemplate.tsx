@@ -183,7 +183,7 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
 
             <LearningOutcomes outcomes={course.learningOutcomes} />
             <TargetAudience audience={course.targetAudience} />
-            <CourseCurriculum modules={course.modules} />
+            <CourseCurriculum modules={course.modules} routineImageUrl={course.routineImageUrl} />
 
             {course.instructors && course.instructors.length > 0 && (
               <section className="animate-in slide-in-from-bottom-4 duration-700 delay-300">

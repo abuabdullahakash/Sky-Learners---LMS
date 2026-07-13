@@ -1,4 +1,5 @@
-import { PlayCircle, Lock, FileText } from 'lucide-react';
+import { useState } from 'react';
+import { PlayCircle, Lock, FileText, Download, X, Calendar } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -7,10 +8,12 @@ import {
 } from "@/components/ui/accordion";
 import { useTranslations } from 'next-intl';
 
-export default function CourseCurriculum({ modules }: { modules: any[] }) {
+export default function CourseCurriculum({ modules, routineImageUrl }: { modules: any[], routineImageUrl?: string }) {
   const t = useTranslations('CourseDetails');
+  const [isRoutineOpen, setIsRoutineOpen] = useState(false);
 
-  if (!modules || modules.length === 0) return null;
+  if ((!modules || modules.length === 0) && !routineImageUrl) return null;
+
 
   return (
     <section className="animate-in slide-in-from-bottom-4 duration-700 delay-200">
@@ -140,6 +143,56 @@ export default function CourseCurriculum({ modules }: { modules: any[] }) {
           ))}
         </Accordion>
       </div>
+
+      {routineImageUrl && (
+        <div className="mt-8 bg-background border border-orange-100 dark:border-foreground/10 rounded-xl p-6 shadow-md shadow-orange-900/5 dark:shadow-none animate-in slide-in-from-bottom-4 duration-700 delay-300">
+          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <Calendar className="w-6 h-6 text-orange-500" />
+            {t('classRoutine') || 'ক্লাস রুটিন'}
+          </h3>
+          <div 
+            onClick={() => setIsRoutineOpen(true)}
+            className="relative w-full max-w-sm aspect-video rounded-xl overflow-hidden border-2 border-foreground/10 cursor-pointer group hover:border-orange-500 transition-colors"
+          >
+            <img src={routineImageUrl} alt="Class Routine" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+              <span className="text-white font-bold bg-orange-500 px-4 py-2 rounded-lg shadow-lg">View Full Routine</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Routine Lightbox */}
+      {isRoutineOpen && routineImageUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300">
+          <button 
+            onClick={() => setIsRoutineOpen(false)}
+            className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-red-500 text-white rounded-full transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          
+          <div className="relative w-full max-w-5xl max-h-[90vh] flex flex-col items-center gap-4 animate-in zoom-in-95 duration-300">
+            <div className="relative w-full flex-1 overflow-auto rounded-xl border border-white/20 bg-black/50">
+              <img 
+                src={routineImageUrl} 
+                alt="Class Routine Full" 
+                className="w-full h-auto object-contain"
+              />
+            </div>
+            
+            <a 
+              href={routineImageUrl} 
+              download="Class-Routine.png"
+              target="_blank"
+              className="flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl shadow-lg transition-colors"
+            >
+              <Download className="w-5 h-5" />
+              {t('downloadRoutine') || 'Download Routine'}
+            </a>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

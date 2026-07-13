@@ -167,7 +167,7 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
 
             <LearningOutcomes outcomes={course.learningOutcomes} />
             <TargetAudience audience={course.targetAudience} />
-            <CourseCurriculum modules={course.modules} />
+            <CourseCurriculum modules={course.modules} routineImageUrl={course.routineImageUrl} />
 
             {course.studyRoutineUrl && (
               <section className="bg-red-500/10 border border-red-500/20 p-8 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 mt-12">

@@ -75,14 +75,18 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
 
         {/* Slider Controls (Bottom Center) */}
         {hasSlider && course.sliderImages.length > 1 && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-20">
-            {course.sliderImages.map((_: any, idx: number) => (
-              <div 
-                key={idx} 
-                onClick={() => setCurrentSlide(idx)} 
-                className={`transition-all duration-500 cursor-pointer rounded-full ${idx === currentSlide ? 'bg-gradient-to-r from-emerald-400 to-teal-500 w-10 h-2.5 shadow-[0_0_15px_rgba(16,185,129,0.6)]' : 'bg-white/40 w-2.5 h-2.5 hover:bg-white/80'}`} 
-              />
-            ))}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-20">
+            <span className="text-white/80 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
+            <div className="flex items-center gap-3">
+              {course.sliderImages.map((_: any, idx: number) => (
+                <div 
+                  key={idx} 
+                  onClick={() => setCurrentSlide(idx)} 
+                  className={`transition-all duration-500 cursor-pointer rounded-full ${idx === currentSlide ? 'bg-gradient-to-r from-emerald-400 to-teal-500 w-10 h-2.5 shadow-[0_0_15px_rgba(16,185,129,0.6)]' : 'bg-white/40 w-2.5 h-2.5 hover:bg-white/80'}`} 
+                />
+              ))}
+            </div>
+            <span className="text-white/40 text-xs font-bold">{String(course.sliderImages.length).padStart(2, '0')}</span>
           </div>
         )}
 

@@ -1,9 +1,29 @@
 import { Target, CheckCircle2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { curatedIcons, CuratedIconName } from '@/lib/icons';
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
 
 export default function LearningOutcomes({ outcomes }: { outcomes?: any[] }) {
   const t = useTranslations('CourseDetails');
+  const shapesRef = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    shapesRef.current.forEach((shape, index) => {
+      if (!shape) return;
+      gsap.to(shape, {
+        y: "random(-10, 10)",
+        x: "random(-10, 10)",
+        scale: "random(0.95, 1.05)",
+        rotation: "random(-5, 5)",
+        duration: "random(4, 6)",
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+        delay: index * 0.3,
+      });
+    });
+  }, []);
 
   // Fallback data if outcomes are not provided in DB
   const defaultOutcomes = [
@@ -37,14 +57,29 @@ export default function LearningOutcomes({ outcomes }: { outcomes?: any[] }) {
             'bg-amber-50/50 hover:bg-amber-100/50 dark:bg-amber-900/10 dark:hover:bg-amber-900/20 border-amber-100 dark:border-amber-800/30 text-amber-600 dark:text-amber-400',
             'bg-cyan-50/50 hover:bg-cyan-100/50 dark:bg-cyan-900/10 dark:hover:bg-cyan-900/20 border-cyan-100 dark:border-cyan-800/30 text-cyan-600 dark:text-cyan-400'
           ];
+          const shapeColors = [
+            'bg-blue-400/20 dark:bg-blue-500/10',
+            'bg-emerald-400/20 dark:bg-emerald-500/10',
+            'bg-violet-400/20 dark:bg-violet-500/10',
+            'bg-pink-400/20 dark:bg-pink-500/10',
+            'bg-amber-400/20 dark:bg-amber-500/10',
+            'bg-cyan-400/20 dark:bg-cyan-500/10'
+          ];
           const colorClass = colors[i % colors.length];
+          const shapeColorClass = shapeColors[i % shapeColors.length];
 
           return (
-            <div key={i} className={`flex items-start gap-4 p-5 rounded-lg transition-colors border group ${colorClass}`}>
-              <div className="p-2 bg-white/60 dark:bg-black/20 rounded-md shrink-0 transition-transform group-hover:scale-110 shadow-sm">
+            <div key={i} className={`flex items-start gap-4 p-5 rounded-lg transition-colors border group relative overflow-hidden ${colorClass}`}>
+              {/* Animated Background Shape */}
+              <div 
+                ref={el => { shapesRef.current[i] = el; }}
+                className={`absolute -right-6 -top-6 w-32 h-32 rounded-full blur-3xl ${shapeColorClass} pointer-events-none`}
+              />
+              
+              <div className="p-2 bg-white/60 dark:bg-black/20 rounded-md shrink-0 transition-transform group-hover:scale-110 shadow-sm relative z-10">
                 <IconComponent className="w-6 h-6" />
               </div>
-              <p className="text-foreground/80 font-medium leading-relaxed mt-1">{text}</p>
+              <p className="text-foreground/80 font-medium leading-relaxed mt-1 relative z-10">{text}</p>
             </div>
           );
         })}

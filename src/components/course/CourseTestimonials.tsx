@@ -1,8 +1,28 @@
 import { Star, MessageSquareQuote } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
 
 export default function CourseTestimonials({ testimonials }: { testimonials?: any[] }) {
   const t = useTranslations('CourseDetails');
+  const shapesRef = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    shapesRef.current.forEach((shape, index) => {
+      if (!shape) return;
+      gsap.to(shape, {
+        y: "random(-10, 10)",
+        x: "random(-10, 10)",
+        scale: "random(0.95, 1.05)",
+        rotation: "random(-5, 5)",
+        duration: "random(4, 6)",
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+        delay: index * 0.3,
+      });
+    });
+  }, []);
 
   // Fallback data
   const defaultTestimonials = [
@@ -26,10 +46,22 @@ export default function CourseTestimonials({ testimonials }: { testimonials?: an
             'bg-blue-50/30 border-blue-100/50 dark:bg-blue-900/5 dark:border-blue-800/20',
             'bg-green-50/30 border-green-100/50 dark:bg-green-900/5 dark:border-green-800/20'
           ];
+          const shapeColors = [
+            'bg-orange-400/20 dark:bg-orange-500/10',
+            'bg-blue-400/20 dark:bg-blue-500/10',
+            'bg-green-400/20 dark:bg-green-500/10'
+          ];
           const colorClass = colors[i % colors.length];
+          const shapeColorClass = shapeColors[i % shapeColors.length];
 
           return (
             <div key={i} className={`rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border ${colorClass} relative overflow-hidden group`}>
+              {/* Animated Background Shape */}
+              <div 
+                ref={el => { shapesRef.current[i] = el; }}
+                className={`absolute -left-6 -bottom-6 w-32 h-32 rounded-full blur-3xl ${shapeColorClass} pointer-events-none`}
+              />
+              
               <div className="absolute top-4 right-4 opacity-5 group-hover:opacity-10 transition-opacity">
                 <MessageSquareQuote className="w-16 h-16" />
               </div>

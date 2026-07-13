@@ -76,7 +76,7 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
         ) : null}
 
         <div className="w-full max-w-7xl mx-auto relative z-20 h-full flex items-center">
-          <div className="hidden lg:flex absolute left-4 xl:left-0 top-1/2 -translate-y-1/2 flex-col items-center gap-6 w-16">
+          <div className="hidden lg:flex absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 flex-col items-center gap-6 w-16">
             {hasSlider && course.sliderImages.length > 1 && (
               <>
                 <span className="text-white/70 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
@@ -90,7 +90,7 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
             )}
           </div>
 
-          <div className="hidden lg:flex absolute right-4 xl:right-0 top-1/2 -translate-y-1/2 flex-col items-center gap-10 w-20 z-20">
+          <div className="hidden lg:flex absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 flex-col items-center gap-10 w-20 z-20">
             {course.introVideoUrl && (
               <button onClick={() => setIsVideoModalOpen(true)} className="flex flex-col items-center gap-3 group cursor-pointer">
                 <div className="relative w-14 h-14 flex items-center justify-center">

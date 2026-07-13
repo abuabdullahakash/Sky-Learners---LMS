@@ -77,60 +77,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
           </div>
         ) : null}
 
-        {/* Navigation Wrapper to keep them inside content boundary */}
-        {hasSlider && course.sliderImages.length > 1 && (
-          <div className="absolute bottom-10 left-0 right-0 z-20 pointer-events-none">
-            <div className="w-full max-w-7xl mx-auto px-4 relative h-10 pointer-events-auto">
-              
-              {/* Slider Controls (Bottom Left) */}
-              <div className="absolute left-4 flex items-center gap-4">
-                <span className="text-white/80 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
-                <div className="flex items-center gap-3">
-                  {course.sliderImages.map((_: any, idx: number) => (
-                    <div 
-                      key={idx} 
-                      onClick={() => setCurrentSlide(idx)} 
-                      className={`transition-all duration-500 cursor-pointer rounded-full ${idx === currentSlide ? 'bg-gradient-to-r from-blue-400 to-pink-500 w-10 h-2.5 shadow-[0_0_15px_rgba(236,72,153,0.6)]' : 'bg-white/40 w-2.5 h-2.5 hover:bg-white/80'}`} 
-                    />
-                  ))}
-                </div>
-                <span className="text-white/40 text-xs font-bold">{String(course.sliderImages.length).padStart(2, '0')}</span>
-              </div>
 
-              {/* Next/Prev Navigation */}
-              <div className="absolute right-4 flex items-center gap-3">
-                <button 
-                  onClick={() => setCurrentSlide((currentSlide === 0 ? course.sliderImages.length - 1 : currentSlide - 1))}
-                  className="w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all shadow-lg hover:scale-105"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button 
-                  onClick={() => setCurrentSlide((currentSlide + 1) % course.sliderImages.length)}
-                  className="w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all shadow-lg hover:scale-105"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-
-            </div>
-          </div>
-        )}
-
-        {/* Video Button & Stats (Right Sidebar) */}
-        <div className="hidden lg:flex absolute right-4 xl:right-0 top-1/2 -translate-y-1/2 flex-col items-center gap-10 w-20 z-20">
-          {course.introVideoUrl && (
-            <button onClick={() => setIsVideoModalOpen(true)} className="flex flex-col items-center gap-3 group cursor-pointer">
-              <div className="relative w-14 h-14 flex items-center justify-center">
-                <div className={`absolute inset-0 rounded-full animate-ping opacity-75 ${hasCover ? 'bg-white/40' : 'bg-primary/40'}`}></div>
-                <div className={`relative w-14 h-14 rounded-full border flex items-center justify-center transition-all duration-300 shadow-lg ${hasCover ? 'bg-white/10 border-white/20 text-white group-hover:bg-white group-hover:text-black group-hover:scale-110 shadow-white/20' : 'bg-primary/10 border-primary/20 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 shadow-primary/20'}`}>
-                  <PlayCircle className="w-6 h-6 fill-current" />
-                </div>
-              </div>
-              <span className={`text-[10px] font-bold uppercase tracking-widest text-center transition-all duration-300 whitespace-pre-line group-hover:-translate-y-1 ${hasCover ? 'text-white/60 group-hover:text-white' : 'text-foreground/60 group-hover:text-primary'}`}>{t('watchTrailer')}</span>
-            </button>
-          )}
-        </div>
 
         <div className={`w-full max-w-7xl mx-auto px-4 relative z-20 h-full flex flex-col justify-center ${textColor}`}>
           <Link href="/courses" className={`inline-flex items-center gap-2 font-semibold mb-8 transition-colors ${hasCover ? 'text-white/70 hover:text-white' : 'text-foreground/60 hover:text-foreground'}`}>
@@ -148,6 +95,57 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
               {course.subtitle || t('descriptionFallbackPrimary')}
             </p>
           </div>
+
+          {/* Video Button (Right Sidebar) */}
+          <div className="hidden lg:flex absolute right-4 top-1/2 -translate-y-1/2 flex-col items-center gap-10 w-20 z-20">
+            {course.introVideoUrl && (
+              <button onClick={() => setIsVideoModalOpen(true)} className="flex flex-col items-center gap-3 group cursor-pointer">
+                <div className="relative w-14 h-14 flex items-center justify-center">
+                  <div className={`absolute inset-0 rounded-full animate-ping opacity-75 ${hasCover ? 'bg-white/40' : 'bg-primary/40'}`}></div>
+                  <div className={`relative w-14 h-14 rounded-full border flex items-center justify-center transition-all duration-300 shadow-lg ${hasCover ? 'bg-white/10 border-white/20 text-white group-hover:bg-white group-hover:text-black group-hover:scale-110 shadow-white/20' : 'bg-primary/10 border-primary/20 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 shadow-primary/20'}`}>
+                    <PlayCircle className="w-6 h-6 fill-current" />
+                  </div>
+                </div>
+                <span className={`text-[10px] font-bold uppercase tracking-widest text-center transition-all duration-300 whitespace-pre-line group-hover:-translate-y-1 ${hasCover ? 'text-white/60 group-hover:text-white' : 'text-foreground/60 group-hover:text-primary'}`}>{t('watchTrailer')}</span>
+              </button>
+            )}
+          </div>
+
+          {/* Slider Controls */}
+          {hasSlider && course.sliderImages.length > 1 && (
+            <div className="absolute bottom-10 left-4 flex items-center gap-10 z-20">
+              {/* Pagination Dots */}
+              <div className="flex items-center gap-4">
+                <span className="text-white/80 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
+                <div className="flex items-center gap-3">
+                  {course.sliderImages.map((_: any, idx: number) => (
+                    <div 
+                      key={idx} 
+                      onClick={() => setCurrentSlide(idx)} 
+                      className={`transition-all duration-500 cursor-pointer rounded-full ${idx === currentSlide ? 'bg-gradient-to-r from-blue-400 to-pink-500 w-10 h-2.5 shadow-[0_0_15px_rgba(236,72,153,0.6)]' : 'bg-white/40 w-2.5 h-2.5 hover:bg-white/80'}`} 
+                    />
+                  ))}
+                </div>
+                <span className="text-white/40 text-xs font-bold">{String(course.sliderImages.length).padStart(2, '0')}</span>
+              </div>
+
+              {/* Next/Prev Navigation */}
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setCurrentSlide((currentSlide === 0 ? course.sliderImages.length - 1 : currentSlide - 1))}
+                  className="w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all shadow-lg hover:scale-105"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button 
+                  onClick={() => setCurrentSlide((currentSlide + 1) % course.sliderImages.length)}
+                  className="w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all shadow-lg hover:scale-105"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

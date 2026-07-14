@@ -154,3 +154,11 @@ body {
     @apply font-sans;
   }
 }
+/* Fix for React Quill spacing */
+.ql-editor p {
+  margin-bottom: 1em !important;
+}
+.ql-editor p:empty,
+.ql-editor p:has(br) {
+  min-height: 1.5em;
+}

@@ -190,7 +190,7 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
               <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-foreground/5 dark:to-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-emerald-100 border-r-emerald-100 dark:border-y-foreground/10 dark:border-r-foreground/10 leading-relaxed text-lg  relative overflow-hidden group">
                 <div className="relative z-10 text-foreground/80">
                   <div 
-                  className="prose prose-sm sm:prose-base dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-blue-500 hover:prose-a:text-blue-600 prose-img:rounded-xl prose-p:leading-relaxed text-foreground/90"
+                  className="prose prose-sm sm:prose-base dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-blue-500 hover:prose-a:text-blue-600 prose-img:rounded-xl prose-p:leading-relaxed text-foreground/90 break-words whitespace-pre-wrap"
                   dangerouslySetInnerHTML={{ __html: course.detailedDescription || t('descriptionFallbackSkill') }}
                 />
                 </div>

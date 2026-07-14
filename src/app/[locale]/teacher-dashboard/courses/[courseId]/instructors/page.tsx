@@ -16,6 +16,7 @@ type Instructor = {
   background: string;
   role: string;
   photoUrl: string;
+  coverUrl?: string;
   bio?: string;
   responsibility?: string;
   facebookUrl?: string;
@@ -49,6 +50,8 @@ export default function CourseInstructorsPage() {
   const [newProfileUrl, setNewProfileUrl] = useState('');
   const [newPhoto, setNewPhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>('');
+  const [newCover, setNewCover] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string>('');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -73,6 +76,14 @@ export default function CourseInstructorsPage() {
     fetchCourse();
   }, [user, courseId, router]);
 
+  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setNewCover(file);
+      setCoverPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -95,6 +106,8 @@ export default function CourseInstructorsPage() {
     setNewProfileUrl('');
     setNewPhoto(null);
     setPhotoPreview('');
+    setNewCover(null);
+    setCoverPreview('');
     setError('');
   };
 
@@ -110,6 +123,8 @@ export default function CourseInstructorsPage() {
     setNewLinkedinUrl(inst.linkedinUrl || '');
     setNewProfileUrl(inst.profileUrl || '');
     setPhotoPreview(inst.photoUrl);
+    setCoverPreview(inst.coverUrl || '');
+    setNewCover(null);
     setNewPhoto(null);
     setIsAdding(true);
   };
@@ -129,17 +144,18 @@ export default function CourseInstructorsPage() {
     setError('');
 
     try {
-      let photoUrl = photoPreview; // Use existing photo by default
-      if (newPhoto) {
-        photoUrl = await uploadImageToImgBB(newPhoto);
-      }
+      let photoUrl = photoPreview;
+      if (newPhoto) photoUrl = await uploadImageToImgBB(newPhoto);
+      let coverUrl = coverPreview;
+      if (newCover) coverUrl = await uploadImageToImgBB(newCover);
 
       let updatedInstructors;
       
       if (editingInstructorId) {
         updatedInstructors = instructors.map(inst => 
           inst.id === editingInstructorId 
-            ? { ...inst, name: newName, background: newBackground, role: newRole, photoUrl, bio: newBio, responsibility: newResponsibility, facebookUrl: newFacebookUrl, youtubeUrl: newYoutubeUrl, linkedinUrl: newLinkedinUrl, profileUrl: newProfileUrl }
+            ? { ...inst, name: newName, background: newBackground, role: newRole,
+            coverUrl, photoUrl, bio: newBio, responsibility: newResponsibility, facebookUrl: newFacebookUrl, youtubeUrl: newYoutubeUrl, linkedinUrl: newLinkedinUrl, profileUrl: newProfileUrl }
             : inst
         );
       } else {
@@ -149,6 +165,7 @@ export default function CourseInstructorsPage() {
           background: newBackground,
           role: newRole,
           photoUrl,
+          coverUrl,
           bio: newBio,
           responsibility: newResponsibility,
           facebookUrl: newFacebookUrl,
@@ -211,6 +228,7 @@ export default function CourseInstructorsPage() {
 
           <div className="flex flex-col md:flex-row gap-8">
             <div className="shrink-0 flex flex-col items-center">
+              <label className="block text-sm font-medium mb-1 text-center">Profile Photo <span className="text-red-500">*</span></label>
               <div className="relative w-32 h-32 rounded-full border-2 border-dashed border-foreground/20 bg-foreground/5 hover:border-orange-500/50 flex flex-col items-center justify-center cursor-pointer overflow-hidden group">
                 <input 
                   type="file" accept="image/*" onChange={handleImageChange}
@@ -226,6 +244,30 @@ export default function CourseInstructorsPage() {
                   </>
                 )}
                 {photoPreview && (
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                    <span className="text-white text-xs font-bold">Change</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            
+            <div className="shrink-0 flex flex-col items-center">
+              <label className="block text-sm font-medium mb-1 text-center">Cover Photo</label>
+              <div className="relative w-48 h-32 rounded-2xl border-2 border-dashed border-foreground/20 bg-foreground/5 hover:border-orange-500/50 flex flex-col items-center justify-center cursor-pointer overflow-hidden group">
+                <input 
+                  type="file" accept="image/*" onChange={handleCoverChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                />
+                {coverPreview ? (
+                  <Image src={coverPreview} alt="Cover Preview" fill className="object-cover" />
+                ) : (
+                  <>
+                    <ImagePlus className="w-8 h-8 text-foreground/40 group-hover:text-orange-500 mb-1" />
+                    <span className="text-xs text-foreground/50 font-medium text-center px-2">Upload Cover<br/>(Optional)</span>
+                  </>
+                )}
+                {coverPreview && (
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                     <span className="text-white text-xs font-bold">Change</span>
                   </div>

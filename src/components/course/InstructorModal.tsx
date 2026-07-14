@@ -47,6 +47,7 @@ export function InstructorModal({ instructor, isOpen, onClose }: InstructorModal
 
               {/* Header / Cover Area */}
               <div className="relative h-32 md:h-40 bg-gradient-to-r from-primary/20 via-purple-500/20 to-blue-500/20 shrink-0">
+                {instructor.coverUrl && <img src={instructor.coverUrl} alt="Cover" className="absolute inset-0 w-full h-full object-cover opacity-90 mix-blend-overlay" />}
                 <div className="absolute -bottom-16 left-8">
                   <div className="w-32 h-32 rounded-full border-4 border-background overflow-hidden bg-foreground/5 shadow-lg relative">
                     <Image

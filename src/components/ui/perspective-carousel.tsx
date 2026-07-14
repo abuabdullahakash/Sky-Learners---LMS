@@ -167,13 +167,10 @@ export function PerspectiveCarousel({
                     aria-label={`Show ${item.name}`}
                     aria-current={isActive ? "true" : undefined}
                     className="w-full cursor-pointer text-left focus:outline-none"
-                    onClick={() => {
-                      selectSlide(index);
-                      onItemClick?.(item);
-                    }}
+                    onClick={() => selectSlide(index)}
                   >
                     <div className={cn(
-                      "bg-background border border-foreground/10 rounded-3xl flex flex-col overflow-hidden shadow-sm transition-all h-[320px] group",
+                      "bg-background/80 backdrop-blur-md border border-foreground/10 rounded-3xl flex flex-col overflow-hidden shadow-xl transition-all h-[320px] group dark:shadow-black/50 dark:bg-neutral-900/80",
                       isActive ? "border-primary/50 shadow-xl shadow-primary/20 ring-1 ring-primary/30" : "hover:border-primary/30"
                     )}>
                       {/* Top Half: Image */}
@@ -200,9 +197,7 @@ export function PerspectiveCarousel({
                         </p>
                         
                         <div className="mt-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:-translate-y-1">
-                          <span className="px-4 py-1.5 bg-primary/10 text-primary font-bold text-xs rounded-full border border-primary/20">
-                            View Profile
-                          </span>
+                          <button type="button" onClick={(e) => { e.stopPropagation(); onItemClick?.(item); }} className="px-5 py-1.5 bg-primary text-white hover:bg-primary/90 font-bold text-xs rounded-full shadow-lg shadow-primary/30 transition-all hover:scale-105 active:scale-95">View Profile</button>
                         </div>
                       </div>
                     </div>

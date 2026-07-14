@@ -169,19 +169,31 @@ body {
 
 
 /* Fix for React Quill Lists - Scoped to Frontend Only */
-.frontend-quill-render .ql-editor ul {
-  padding-left: 1.25rem !important;
-  margin-bottom: 1em !important;
-}
+.frontend-quill-render .ql-editor ul,
 .frontend-quill-render .ql-editor ol {
-  padding-left: 1.25rem !important;
+  padding-left: 1.5rem !important;
   margin-bottom: 1em !important;
 }
+
 .frontend-quill-render .ql-editor ul > li {
   list-style-type: disc !important;
   margin-bottom: 0.25em !important;
+  padding-left: 0 !important;
 }
+
 .frontend-quill-render .ql-editor ol > li {
   list-style-type: decimal !important;
   margin-bottom: 0.25em !important;
+  padding-left: 0 !important;
 }
+
+/* Convert Quill's indent padding to margin so markers move with the text */
+.frontend-quill-render .ql-editor li.ql-indent-1 { margin-left: 3em !important; }
+.frontend-quill-render .ql-editor li.ql-indent-2 { margin-left: 6em !important; }
+.frontend-quill-render .ql-editor li.ql-indent-3 { margin-left: 9em !important; }
+.frontend-quill-render .ql-editor li.ql-indent-4 { margin-left: 12em !important; }
+.frontend-quill-render .ql-editor li.ql-indent-5 { margin-left: 15em !important; }
+.frontend-quill-render .ql-editor li.ql-indent-6 { margin-left: 18em !important; }
+.frontend-quill-render .ql-editor li.ql-indent-7 { margin-left: 21em !important; }
+.frontend-quill-render .ql-editor li.ql-indent-8 { margin-left: 24em !important; }
+.frontend-quill-render .ql-editor li.ql-indent-9 { margin-left: 27em !important; }

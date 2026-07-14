@@ -83,11 +83,12 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
     case 'high_school':
       return <SchoolTemplate course={course} currentSlide={currentSlide} setCurrentSlide={setCurrentSlide} />;
     case 'intermediate':
-      return <AdmissionTemplate course={course} currentSlide={currentSlide} setCurrentSlide={setCurrentSlide} />;
     case 'honours':
     case 'skills':
     case 'masters':
       return <SkillTemplate course={course} currentSlide={currentSlide} setCurrentSlide={setCurrentSlide} />;
+    case 'admission':
+      return <AdmissionTemplate course={course} currentSlide={currentSlide} setCurrentSlide={setCurrentSlide} />;
     default:
       return <DefaultTemplate course={course} currentSlide={currentSlide} setCurrentSlide={setCurrentSlide} />;
   }

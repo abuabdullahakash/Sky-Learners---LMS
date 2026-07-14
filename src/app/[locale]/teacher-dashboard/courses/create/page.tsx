@@ -60,7 +60,7 @@ export default function CreateCoursePage() {
         courseType,
         category, // Used as Education Level
         eduClass: (category === 'primary' || category === 'high_school' || category === 'intermediate') ? eduClass : '',
-        department: (category === 'intermediate' || category === 'honours' || category === 'masters') ? department : '',
+        department: (category === 'intermediate' || category === 'honours' || category === 'masters' || category === 'admission') ? department : '',
         year: (category === 'honours' || category === 'masters') ? year : '',
         coachingName: courseType === 'coaching' ? coachingName : '',
         price: Number(price),
@@ -159,6 +159,7 @@ export default function CreateCoursePage() {
                   <option value="primary" className="bg-background text-foreground">Primary School</option>
                   <option value="high_school" className="bg-background text-foreground">High School</option>
                   <option value="intermediate" className="bg-background text-foreground">Intermediate / HSC</option>
+                  <option value="admission" className="bg-background text-foreground">Admission</option>
                   <option value="honours" className="bg-background text-foreground">Honours / Undergrad</option>
                   <option value="masters" className="bg-background text-foreground">Masters / Postgrad</option>
                   <option value="skills" className="bg-background text-foreground">Skills / Others</option>
@@ -216,6 +217,19 @@ export default function CreateCoursePage() {
                     <option value="commerce" className="bg-background text-foreground">Commerce</option>
                   </select>
                 </div>
+              </div>
+            )}
+
+            {category === 'admission' && (
+              <div>
+                <label className="block text-sm font-medium mb-1 text-foreground/80">Target Segment / Unit <span className="text-red-500">*</span></label>
+                <select value={department} onChange={(e) => setDepartment(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 transition-all appearance-none" required>
+                  <option value="" disabled className="bg-background text-foreground">Select Target Segment</option>
+                  <option value="engineering" className="bg-background text-foreground">Engineering</option>
+                  <option value="medical" className="bg-background text-foreground">Medical</option>
+                  <option value="university" className="bg-background text-foreground">University (A/B/C/D Unit)</option>
+                  <option value="iba" className="bg-background text-foreground">IBA / BUP</option>
+                </select>
               </div>
             )}
 

@@ -324,6 +324,7 @@ export default function CourseSettingsPage() {
                 <option value="primary" className="bg-background text-foreground">Primary School</option>
                 <option value="high_school" className="bg-background text-foreground">High School</option>
                 <option value="intermediate" className="bg-background text-foreground">Intermediate / HSC</option>
+                <option value="admission" className="bg-background text-foreground">Admission</option>
                 <option value="honours" className="bg-background text-foreground">Honours / Undergrad</option>
                 <option value="masters" className="bg-background text-foreground">Masters / Postgrad</option>
                 <option value="skills" className="bg-background text-foreground">Skills / Others</option>
@@ -379,6 +380,19 @@ export default function CourseSettingsPage() {
             </div>
           )}
 
+          {course.category === 'admission' && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Target Segment / Unit</label>
+              <select value={course.department || ''} onChange={e => setCourse({...course, department: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none">
+                <option value="" disabled className="bg-background text-foreground">Select Target Segment</option>
+                <option value="engineering" className="bg-background text-foreground">Engineering</option>
+                <option value="medical" className="bg-background text-foreground">Medical</option>
+                <option value="university" className="bg-background text-foreground">University (A/B/C/D Unit)</option>
+                <option value="iba" className="bg-background text-foreground">IBA / BUP</option>
+              </select>
+            </div>
+          )}
+
           {(course.category === 'honours' || course.category === 'masters') && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -412,7 +426,7 @@ export default function CourseSettingsPage() {
             </div>
           )}
 
-          {course.category === 'intermediate' && (
+          {(course.category === 'intermediate' || course.category === 'admission') && (
             <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
               <label className="block text-sm font-medium mb-1 text-red-600">চান্স পাওয়ার নিশ্চয়তা / স্পেশাল ফোকাস (Success Message)</label>
               <textarea 

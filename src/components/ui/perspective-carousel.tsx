@@ -129,11 +129,11 @@ export function PerspectiveCarousel({
       aria-label="Perspective image carousel"
       tabIndex={tabIndex ?? 0}
       onKeyDown={handleKeyDown}
-      className={cn("relative isolate h-full w-full overflow-hidden", className)}
+      className={cn("relative isolate h-full w-full flex flex-col gap-6 overflow-visible", className)}
       {...props}
     >
       <div
-        className={cn("absolute inset-0 overflow-hidden", viewportClassName)}
+        className={cn("relative flex-1 overflow-hidden", viewportClassName)}
         style={{ perspective: "1200px" }}
       >
         <motion.div
@@ -195,9 +195,15 @@ export function PerspectiveCarousel({
                         <p className="text-foreground/90 font-bold text-sm mb-2 line-clamp-1">
                           {item.role || 'Instructor'}
                         </p>
-                        <p className="text-foreground/60 font-medium text-xs line-clamp-2 leading-relaxed px-2">
+                        <p className="text-foreground/60 font-medium text-xs line-clamp-2 leading-relaxed px-2 mb-3">
                           {item.background}
                         </p>
+                        
+                        <div className="mt-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:-translate-y-1">
+                          <span className="px-4 py-1.5 bg-primary/10 text-primary font-bold text-xs rounded-full border border-primary/20">
+                            View Profile
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </button>
@@ -211,7 +217,7 @@ export function PerspectiveCarousel({
       {showControls && (
         <div
           className={cn(
-            "absolute inset-x-4 bottom-5 z-10 mx-auto flex w-fit items-center justify-center gap-3 rounded-full border border-neutral-300/80 bg-neutral-200/70 px-2 text-neutral-700 shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-neutral-900/70 dark:text-neutral-100",
+            "mx-auto flex w-fit items-center justify-center gap-3 rounded-full border border-neutral-300/80 bg-neutral-200/70 px-2 py-1 text-neutral-700 shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-neutral-900/70 dark:text-neutral-100",
             controlsClassName
           )}
         >

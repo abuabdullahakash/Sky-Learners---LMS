@@ -40,7 +40,7 @@ export default function CourseInstructorsPage() {
   const [editingInstructorId, setEditingInstructorId] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [newBackground, setNewBackground] = useState('');
-  const [newRole, setNewRole] = useState('Lead Instructor');
+  const [newRole, setNewRole] = useState('');
   const [newBio, setNewBio] = useState('');
   const [newResponsibility, setNewResponsibility] = useState('');
   const [newFacebookUrl, setNewFacebookUrl] = useState('');
@@ -86,7 +86,7 @@ export default function CourseInstructorsPage() {
     setEditingInstructorId(null);
     setNewName('');
     setNewBackground('');
-    setNewRole('Lead Instructor');
+    setNewRole('');
     setNewBio('');
     setNewResponsibility('');
     setNewFacebookUrl('');
@@ -116,8 +116,8 @@ export default function CourseInstructorsPage() {
 
   const handleSaveInstructor = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName || !newBackground) {
-      setError('Name and Background are required.');
+    if (!newName || !newBackground || !newRole) {
+      setError('Name, Background, and Role are required.');
       return;
     }
     if (!editingInstructorId && !newPhoto && !photoPreview) {
@@ -244,12 +244,7 @@ export default function CourseInstructorsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Role <span className="text-red-500">*</span></label>
-                <select value={newRole} onChange={e => setNewRole(e.target.value)} className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none" required>
-                  <option value="Lead Instructor">Lead Instructor</option>
-                  <option value="Guest Lecturer">Guest Lecturer</option>
-                  <option value="Subject Expert">Subject Expert</option>
-                  <option value="Doubt Solving Assistant">Doubt Solving Assistant</option>
-                </select>
+                <input type="text" value={newRole} onChange={e => setNewRole(e.target.value)} placeholder="e.g. Lead Instructor, Math Expert" className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" required />
               </div>
             </div>
           </div>

@@ -74,7 +74,7 @@ export default function CourseFeatures({ course }: { course: any }) {
   return (
     <section className="animate-in slide-in-from-bottom-4 duration-700 mt-8 mb-12">
       <h2 className="text-3xl font-bold mb-6">কোর্সে যা যা থাকছে</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         {features.map((feature, i) => {
           const colors = [
             'bg-blue-50/50 hover:bg-blue-100/50 dark:bg-blue-900/10 dark:hover:bg-blue-900/20 border-blue-200/50 dark:border-blue-800/30 text-blue-700 dark:text-blue-400',

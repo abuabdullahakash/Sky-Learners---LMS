@@ -185,6 +185,135 @@ export default function CourseSettingsPage() {
         {message && <div className="p-4 bg-green-500/10 text-green-500 rounded-xl mb-4 font-medium">{message}</div>}
         
         <div className="space-y-4">
+
+          {/* 1. Education Level & Foundation */}
+          <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+            <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">1. Education Level & Foundation</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className={course.courseType === 'individual' ? "md:col-span-2" : ""}>
+              <label className="block text-sm font-medium mb-1">Education Level (Category)</label>
+              <select 
+                value={course.category || ''} 
+                onChange={e => setCourse({...course, category: e.target.value, eduClass: '', department: '', year: ''})}
+                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none"
+              >
+                <option value="" disabled className="bg-background text-foreground">Select Level</option>
+                <option value="primary" className="bg-background text-foreground">Primary School</option>
+                <option value="high_school" className="bg-background text-foreground">High School</option>
+                <option value="intermediate" className="bg-background text-foreground">Intermediate / HSC</option>
+                <option value="admission" className="bg-background text-foreground">Admission</option>
+                <option value="honours" className="bg-background text-foreground">Honours / Undergrad</option>
+                <option value="masters" className="bg-background text-foreground">Masters / Postgrad</option>
+                <option value="skills" className="bg-background text-foreground">Skills / Others</option>
+              </select>
+            </div>
+            {course.courseType !== 'individual' && (
+              <div>
+                <label className="block text-sm font-medium mb-1">Your School / Coaching Name</label>
+                <input 
+                  type="text" value={course.coachingName || ''} onChange={e => setCourse({...course, coachingName: e.target.value})}
+                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                  placeholder="e.g. ABC Coaching Center"
+                />
+              </div>
+            )}
+          </div>
+          {(course.category === 'primary' || course.category === 'high_school') && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Class</label>
+              <select 
+                value={course.eduClass || ''} onChange={e => setCourse({...course, eduClass: e.target.value})}
+                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none"
+              >
+                <option value="" disabled className="bg-background text-foreground">Select Class</option>
+                {course.category === 'primary' 
+                  ? Array.from({length: 5}, (_, i) => <option key={i+1} value={i+1} className="bg-background text-foreground">Class {i+1}</option>)
+                  : Array.from({length: 5}, (_, i) => <option key={i+6} value={i+6} className="bg-background text-foreground">Class {i+6}</option>)
+                }
+              </select>
+            </div>
+          )}
+          {course.category === 'intermediate' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Class</label>
+                <select value={course.eduClass || ''} onChange={e => setCourse({...course, eduClass: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none">
+                  <option value="" disabled className="bg-background text-foreground">Select Class</option>
+                  <option value="11" className="bg-background text-foreground">Class 11</option>
+                  <option value="12" className="bg-background text-foreground">Class 12</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Group</label>
+                <select value={course.department || ''} onChange={e => setCourse({...course, department: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none">
+                  <option value="" disabled className="bg-background text-foreground">Select Group</option>
+                  <option value="science" className="bg-background text-foreground">Science</option>
+                  <option value="arts" className="bg-background text-foreground">Arts (Humanities)</option>
+                  <option value="commerce" className="bg-background text-foreground">Commerce</option>
+                </select>
+              </div>
+            </div>
+          )}
+          {course.category === 'admission' && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Target Segment / Unit</label>
+              <select value={course.department || ''} onChange={e => setCourse({...course, department: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none">
+                <option value="" disabled className="bg-background text-foreground">Select Target Segment</option>
+                <option value="engineering" className="bg-background text-foreground">Engineering</option>
+                <option value="medical" className="bg-background text-foreground">Medical</option>
+                <option value="university" className="bg-background text-foreground">University (A/B/C/D Unit)</option>
+                <option value="iba" className="bg-background text-foreground">IBA / BUP</option>
+              </select>
+            </div>
+          )}
+          {(course.category === 'honours' || course.category === 'masters') && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Department / Subject</label>
+                <input 
+                  type="text" value={course.department || ''} onChange={e => setCourse({...course, department: e.target.value})}
+                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                  placeholder="e.g. Physics"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Year / Semester</label>
+                <input 
+                  type="text" value={course.year || ''} onChange={e => setCourse({...course, year: e.target.value})}
+                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                  placeholder="e.g. 1st Year"
+                />
+              </div>
+            </div>
+          )}
+          </div>
+
+
+          {/* 2. Hero Section Information */}
+          <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+            <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">2. Hero Section Information</h3>
+          <div>
+            <label className="block text-sm font-medium mb-1">Course Title</label>
+            <input 
+              type="text" value={course.title || ''} onChange={e => setCourse({...course, title: e.target.value})}
+              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Subtitle</label>
+            <textarea 
+              value={course.subtitle || ''} onChange={e => setCourse({...course, subtitle: e.target.value})} rows={3}
+              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors custom-scrollbar"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Intro Video URL (YouTube/Facebook)</label>
+            <input 
+              type="text" value={course.introVideoUrl || ''} onChange={e => setCourse({...course, introVideoUrl: e.target.value})}
+              placeholder="https://youtube.com/watch?v=..."
+              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+            />
+          </div>
           {/* Cover & Slider Images */}
           <div className="space-y-6 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
             <div>
@@ -245,37 +374,12 @@ export default function CourseSettingsPage() {
               </div>
             </div>
           </div>
+          </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Course Title</label>
-            <input 
-              type="text" value={course.title || ''} onChange={e => setCourse({...course, title: e.target.value})}
-              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Contact Number (For Inquiries)</label>
-            <input 
-              type="text" value={course.contactNumber || ''} onChange={e => setCourse({...course, contactNumber: e.target.value})}
-              placeholder="e.g. 16910 or 017XXXXXXX"
-              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Intro Video URL (YouTube/Facebook)</label>
-            <input 
-              type="text" value={course.introVideoUrl || ''} onChange={e => setCourse({...course, introVideoUrl: e.target.value})}
-              placeholder="https://youtube.com/watch?v=..."
-              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Subtitle</label>
-            <textarea 
-              value={course.subtitle || ''} onChange={e => setCourse({...course, subtitle: e.target.value})} rows={3}
-              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors custom-scrollbar"
-            />
-          </div>
+
+          {/* 3. Course Overview & Marketing */}
+          <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+            <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">3. Course Overview & Marketing</h3>
           <div>
             <label className="block text-sm font-medium mb-1">Detailed Description (HTML/Text)</label>
             <textarea 
@@ -284,278 +388,47 @@ export default function CourseSettingsPage() {
               placeholder="Provide a detailed description of what this course offers..."
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Study Routine / Syllabus Link (Optional PDF or Drive Link)</label>
+          <hr className="border-foreground/10 my-6" />
+          <h2 className="text-xl font-bold mb-4">Marketing Stats & Features</h2>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Total Live Classes</label>
+              <input type="number" value={course.totalLiveClasses || ''} onChange={e => setCourse({...course, totalLiveClasses: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Total Videos</label>
+              <input type="number" value={course.totalVideoLessons || ''} onChange={e => setCourse({...course, totalVideoLessons: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Total Exams</label>
+              <input type="number" value={course.totalExams || ''} onChange={e => setCourse({...course, totalExams: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Total Notes/PDFs</label>
+              <input type="number" value={course.totalPdfs || ''} onChange={e => setCourse({...course, totalPdfs: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+            </div>
+          </div>
+          
+          <div className="mt-4 flex items-center gap-3">
             <input 
-              type="text" value={course.studyRoutineUrl || ''} onChange={e => setCourse({...course, studyRoutineUrl: e.target.value})}
-              placeholder="https://drive.google.com/..."
-              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+              type="checkbox" 
+              id="doubtSolving" 
+              checked={course.hasDoubtSolving || false} 
+              onChange={e => setCourse({...course, hasDoubtSolving: e.target.checked})} 
+              className="w-5 h-5 accent-orange-500"
             />
+            <label htmlFor="doubtSolving" className="text-sm font-medium cursor-pointer">
+              Includes 24/7 Doubt Solving Support / Group
+            </label>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Class Routine Image (Optional)</label>
-            <p className="text-xs text-foreground/50 mb-3">Upload an image of the class routine to be displayed on the course details page.</p>
-            <div className="flex items-center gap-4">
-              {course.routineImageUrl && (
-                <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-foreground/20">
-                  <img src={course.routineImageUrl} alt="Class Routine" className="w-full h-full object-cover" />
-                  <button type="button" onClick={() => setCourse({...course, routineImageUrl: ''})} className="absolute top-1 right-1 p-1 bg-black/50 hover:bg-red-500 rounded-full text-white transition-colors">
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
-              <label className="flex flex-col items-center justify-center w-32 h-32 bg-background border-2 border-dashed border-foreground/20 rounded-lg cursor-pointer hover:border-orange-500 hover:bg-orange-500/5 transition-colors">
-                {isUploadingRoutine ? <Loader2 className="w-6 h-6 animate-spin text-orange-500" /> : <ImagePlus className="w-6 h-6 text-foreground/40" />}
-                <span className="text-xs text-foreground/50 mt-1">Upload Routine</span>
-                <input type="file" accept="image/*" onChange={handleUploadRoutine} className="hidden" disabled={isUploadingRoutine} />
-              </label>
-            </div>
+        </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className={course.courseType === 'individual' ? "md:col-span-2" : ""}>
-              <label className="block text-sm font-medium mb-1">Education Level (Category)</label>
-              <select 
-                value={course.category || ''} 
-                onChange={e => setCourse({...course, category: e.target.value, eduClass: '', department: '', year: ''})}
-                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none"
-              >
-                <option value="" disabled className="bg-background text-foreground">Select Level</option>
-                <option value="primary" className="bg-background text-foreground">Primary School</option>
-                <option value="high_school" className="bg-background text-foreground">High School</option>
-                <option value="intermediate" className="bg-background text-foreground">Intermediate / HSC</option>
-                <option value="admission" className="bg-background text-foreground">Admission</option>
-                <option value="honours" className="bg-background text-foreground">Honours / Undergrad</option>
-                <option value="masters" className="bg-background text-foreground">Masters / Postgrad</option>
-                <option value="skills" className="bg-background text-foreground">Skills / Others</option>
-              </select>
-            </div>
-            {course.courseType !== 'individual' && (
-              <div>
-                <label className="block text-sm font-medium mb-1">Your School / Coaching Name</label>
-                <input 
-                  type="text" value={course.coachingName || ''} onChange={e => setCourse({...course, coachingName: e.target.value})}
-                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
-                  placeholder="e.g. ABC Coaching Center"
-                />
-              </div>
-            )}
-          </div>
 
-          {(course.category === 'primary' || course.category === 'high_school') && (
-            <div>
-              <label className="block text-sm font-medium mb-1">Class</label>
-              <select 
-                value={course.eduClass || ''} onChange={e => setCourse({...course, eduClass: e.target.value})}
-                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none"
-              >
-                <option value="" disabled className="bg-background text-foreground">Select Class</option>
-                {course.category === 'primary' 
-                  ? Array.from({length: 5}, (_, i) => <option key={i+1} value={i+1} className="bg-background text-foreground">Class {i+1}</option>)
-                  : Array.from({length: 5}, (_, i) => <option key={i+6} value={i+6} className="bg-background text-foreground">Class {i+6}</option>)
-                }
-              </select>
-            </div>
-          )}
-
-          {course.category === 'intermediate' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Class</label>
-                <select value={course.eduClass || ''} onChange={e => setCourse({...course, eduClass: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none">
-                  <option value="" disabled className="bg-background text-foreground">Select Class</option>
-                  <option value="11" className="bg-background text-foreground">Class 11</option>
-                  <option value="12" className="bg-background text-foreground">Class 12</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Group</label>
-                <select value={course.department || ''} onChange={e => setCourse({...course, department: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none">
-                  <option value="" disabled className="bg-background text-foreground">Select Group</option>
-                  <option value="science" className="bg-background text-foreground">Science</option>
-                  <option value="arts" className="bg-background text-foreground">Arts (Humanities)</option>
-                  <option value="commerce" className="bg-background text-foreground">Commerce</option>
-                </select>
-              </div>
-            </div>
-          )}
-
-          {course.category === 'admission' && (
-            <div>
-              <label className="block text-sm font-medium mb-1">Target Segment / Unit</label>
-              <select value={course.department || ''} onChange={e => setCourse({...course, department: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none">
-                <option value="" disabled className="bg-background text-foreground">Select Target Segment</option>
-                <option value="engineering" className="bg-background text-foreground">Engineering</option>
-                <option value="medical" className="bg-background text-foreground">Medical</option>
-                <option value="university" className="bg-background text-foreground">University (A/B/C/D Unit)</option>
-                <option value="iba" className="bg-background text-foreground">IBA / BUP</option>
-              </select>
-            </div>
-          )}
-
-          {(course.category === 'honours' || course.category === 'masters') && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Department / Subject</label>
-                <input 
-                  type="text" value={course.department || ''} onChange={e => setCourse({...course, department: e.target.value})}
-                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
-                  placeholder="e.g. Physics"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Year / Semester</label>
-                <input 
-                  type="text" value={course.year || ''} onChange={e => setCourse({...course, year: e.target.value})}
-                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
-                  placeholder="e.g. 1st Year"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Category-Specific Dynamic Fields */}
-          {(course.category === 'primary' || course.category === 'high_school') && (
-            <div className="p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl">
-              <label className="block text-sm font-medium mb-1 text-blue-600">অভিভাবকদের উদ্দেশ্যে বার্তা (Message for Parents)</label>
-              <textarea 
-                value={course.parentMessage || ''} onChange={e => setCourse({...course, parentMessage: e.target.value})} rows={3}
-                className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-blue-500 transition-colors custom-scrollbar"
-                placeholder="উদাহরণ: আপনার সন্তানের উজ্জ্বল ভবিষ্যতের জন্য একটি শক্ত ভিত্তি তৈরি করা অত্যন্ত জরুরি..."
-              />
-            </div>
-          )}
-
-          {(course.category === 'intermediate' || course.category === 'admission') && (
-            <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
-              <label className="block text-sm font-medium mb-1 text-red-600">চান্স পাওয়ার নিশ্চয়তা / স্পেশাল ফোকাস (Success Message)</label>
-              <textarea 
-                value={course.successMessage || ''} onChange={e => setCourse({...course, successMessage: e.target.value})} rows={3}
-                className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-red-500 transition-colors custom-scrollbar"
-                placeholder="উদাহরণ: ঢাকা বিশ্ববিদ্যালয়ে চান্স পাওয়ার ১০০% প্রস্তুতি এবং স্পেশাল গাইডলাইন..."
-              />
-            </div>
-          )}
-
-          {(course.category === 'honours' || course.category === 'masters' || course.category === 'skills') && (
-            <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
-              <label className="block text-sm font-medium mb-1 text-emerald-600">ক্যারিয়ার গাইডেন্স / পোর্টফোলিও (Career Message)</label>
-              <textarea 
-                value={course.careerMessage || ''} onChange={e => setCourse({...course, careerMessage: e.target.value})} rows={3}
-                className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-emerald-500 transition-colors custom-scrollbar"
-                placeholder="উদাহরণ: কোর্স শেষে আপনার প্রফেশনাল পোর্টফোলিও তৈরি করা হবে যা চাকরিতে সাহায্য করবে..."
-              />
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Regular Price (BDT)</label>
-              <input 
-                type="number" value={course.price || ''} onChange={e => setCourse({...course, price: e.target.value})}
-                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Discount Price (Optional)</label>
-              <input 
-                type="number" value={course.discountPrice || ''} onChange={e => setCourse({...course, discountPrice: e.target.value})}
-                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Discount Valid Until</label>
-              <input 
-                type="date" value={course.discountValidUntil || ''} onChange={e => setCourse({...course, discountValidUntil: e.target.value})}
-                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
-              />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Class Start Date</label>
-              <input 
-                type="date" value={course.classStartDate || ''} onChange={e => setCourse({...course, classStartDate: e.target.value})}
-                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Course Validity</label>
-              <input 
-                type="text" value={course.courseValidity || ''} onChange={e => setCourse({...course, courseValidity: e.target.value})} placeholder="e.g. 6 Months, Till Admission Test"
-                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
-              />
-            </div>
-          </div>
-
-          <hr className="border-foreground/10 my-6" />
-          
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">Frequently Asked Questions (FAQs)</h2>
-            <button 
-              type="button" 
-              onClick={() => setCourse({ ...course, faqs: [...(course.faqs || []), { question: '', answer: '' }] })}
-              className="px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors"
-            >
-              <Plus className="w-4 h-4" /> Add FAQ
-            </button>
-          </div>
-          
-          <div className="space-y-4">
-            {(!course.faqs || course.faqs.length === 0) ? (
-              <div className="text-center p-6 border border-dashed border-foreground/20 rounded-xl text-foreground/50">
-                No FAQs added yet.
-              </div>
-            ) : (
-              course.faqs.map((faq: any, index: number) => (
-                <div key={index} className="p-4 bg-foreground/5 border border-foreground/10 rounded-xl space-y-3 relative group">
-                  <button 
-                    type="button" 
-                    onClick={() => {
-                      const newFaqs = [...course.faqs];
-                      newFaqs.splice(index, 1);
-                      setCourse({ ...course, faqs: newFaqs });
-                    }}
-                    className="absolute top-4 right-4 p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                  <div className="pr-12">
-                    <label className="block text-xs font-bold mb-1 uppercase tracking-wider text-foreground/60">Question</label>
-                    <input 
-                      type="text" 
-                      value={faq.question} 
-                      onChange={e => {
-                        const newFaqs = [...course.faqs];
-                        newFaqs[index].question = e.target.value;
-                        setCourse({ ...course, faqs: newFaqs });
-                      }}
-                      placeholder="e.g. What is this course about?"
-                      className="w-full px-4 py-2 bg-background border border-foreground/10 rounded-lg focus:border-orange-500 transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold mb-1 uppercase tracking-wider text-foreground/60">Answer</label>
-                    <textarea 
-                      value={faq.answer} 
-                      onChange={e => {
-                        const newFaqs = [...course.faqs];
-                        newFaqs[index].answer = e.target.value;
-                        setCourse({ ...course, faqs: newFaqs });
-                      }}
-                      placeholder="Answer goes here..."
-                      rows={2}
-                      className="w-full px-4 py-2 bg-background border border-foreground/10 rounded-lg focus:border-orange-500 transition-colors custom-scrollbar"
-                    />
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          <hr className="border-foreground/10 my-6" />
-
+          {/* 4. Learning & Target Audience */}
+          <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+            <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">4. Learning & Target Audience</h3>
           {/* Learning Outcomes */}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold">Learning Outcomes (কী কী শিখবেন)</h2>
@@ -609,7 +482,6 @@ export default function CourseSettingsPage() {
               ))
             )}
           </div>
-
           <div className="mt-6">
             <label className="block text-sm font-medium mb-1">Target Audience (কাদের জন্য)</label>
             <textarea 
@@ -618,8 +490,45 @@ export default function CourseSettingsPage() {
               placeholder={`e.g. ${course.category === 'primary' ? '৩য় থেকে ৫ম শ্রেণীর বাচ্চাদের জন্য' : 'যারা ওয়েব ডেভেলপমেন্ট শিখতে চায়'}`}
             />
           </div>
+          </div>
 
-          <hr className="border-foreground/10 my-6" />
+
+          {/* 5. Special Messages & Social Proof */}
+          <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+            <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">5. Special Messages & Social Proof</h3>
+          {/* Category-Specific Dynamic Fields */}
+          {(course.category === 'primary' || course.category === 'high_school') && (
+            <div className="p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl">
+              <label className="block text-sm font-medium mb-1 text-blue-600">অভিভাবকদের উদ্দেশ্যে বার্তা (Message for Parents)</label>
+              <textarea 
+                value={course.parentMessage || ''} onChange={e => setCourse({...course, parentMessage: e.target.value})} rows={3}
+                className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-blue-500 transition-colors custom-scrollbar"
+                placeholder="উদাহরণ: আপনার সন্তানের উজ্জ্বল ভবিষ্যতের জন্য একটি শক্ত ভিত্তি তৈরি করা অত্যন্ত জরুরি..."
+              />
+            </div>
+          )}
+
+          {(course.category === 'intermediate' || course.category === 'admission') && (
+            <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
+              <label className="block text-sm font-medium mb-1 text-red-600">চান্স পাওয়ার নিশ্চয়তা / স্পেশাল ফোকাস (Success Message)</label>
+              <textarea 
+                value={course.successMessage || ''} onChange={e => setCourse({...course, successMessage: e.target.value})} rows={3}
+                className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-red-500 transition-colors custom-scrollbar"
+                placeholder="উদাহরণ: ঢাকা বিশ্ববিদ্যালয়ে চান্স পাওয়ার ১০০% প্রস্তুতি এবং স্পেশাল গাইডলাইন..."
+              />
+            </div>
+          )}
+
+          {(course.category === 'honours' || course.category === 'masters' || course.category === 'skills') && (
+            <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
+              <label className="block text-sm font-medium mb-1 text-emerald-600">ক্যারিয়ার গাইডেন্স / পোর্টফোলিও (Career Message)</label>
+              <textarea 
+                value={course.careerMessage || ''} onChange={e => setCourse({...course, careerMessage: e.target.value})} rows={3}
+                className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-emerald-500 transition-colors custom-scrollbar"
+                placeholder="উদাহরণ: কোর্স শেষে আপনার প্রফেশনাল পোর্টফোলিও তৈরি করা হবে যা চাকরিতে সাহায্য করবে..."
+              />
+            </div>
+          )}
 
           {/* Testimonials */}
           <div className="flex items-center justify-between mb-4">
@@ -689,42 +598,164 @@ export default function CourseSettingsPage() {
               ))
             )}
           </div>
+          </div>
 
+
+          {/* 6. Frequently Asked Questions */}
+          <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+            <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">6. Frequently Asked Questions</h3>
           <hr className="border-foreground/10 my-6" />
-          <h2 className="text-xl font-bold mb-4">Marketing Stats & Features</h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">Frequently Asked Questions (FAQs)</h2>
+            <button 
+              type="button" 
+              onClick={() => setCourse({ ...course, faqs: [...(course.faqs || []), { question: '', answer: '' }] })}
+              className="px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors"
+            >
+              <Plus className="w-4 h-4" /> Add FAQ
+            </button>
+          </div>
+          
+          <div className="space-y-4">
+            {(!course.faqs || course.faqs.length === 0) ? (
+              <div className="text-center p-6 border border-dashed border-foreground/20 rounded-xl text-foreground/50">
+                No FAQs added yet.
+              </div>
+            ) : (
+              course.faqs.map((faq: any, index: number) => (
+                <div key={index} className="p-4 bg-foreground/5 border border-foreground/10 rounded-xl space-y-3 relative group">
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const newFaqs = [...course.faqs];
+                      newFaqs.splice(index, 1);
+                      setCourse({ ...course, faqs: newFaqs });
+                    }}
+                    className="absolute top-4 right-4 p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <div className="pr-12">
+                    <label className="block text-xs font-bold mb-1 uppercase tracking-wider text-foreground/60">Question</label>
+                    <input 
+                      type="text" 
+                      value={faq.question} 
+                      onChange={e => {
+                        const newFaqs = [...course.faqs];
+                        newFaqs[index].question = e.target.value;
+                        setCourse({ ...course, faqs: newFaqs });
+                      }}
+                      placeholder="e.g. What is this course about?"
+                      className="w-full px-4 py-2 bg-background border border-foreground/10 rounded-lg focus:border-orange-500 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold mb-1 uppercase tracking-wider text-foreground/60">Answer</label>
+                    <textarea 
+                      value={faq.answer} 
+                      onChange={e => {
+                        const newFaqs = [...course.faqs];
+                        newFaqs[index].answer = e.target.value;
+                        setCourse({ ...course, faqs: newFaqs });
+                      }}
+                      placeholder="Answer goes here..."
+                      rows={2}
+                      className="w-full px-4 py-2 bg-background border border-foreground/10 rounded-lg focus:border-orange-500 transition-colors custom-scrollbar"
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          </div>
+
+
+          {/* 7. Pricing, Dates & Contact */}
+          <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+            <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">7. Pricing, Dates & Contact</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Total Live Classes</label>
-              <input type="number" value={course.totalLiveClasses || ''} onChange={e => setCourse({...course, totalLiveClasses: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+              <label className="block text-sm font-medium mb-1">Regular Price (BDT)</label>
+              <input 
+                type="number" value={course.price || ''} onChange={e => setCourse({...course, price: e.target.value})}
+                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Total Videos</label>
-              <input type="number" value={course.totalVideoLessons || ''} onChange={e => setCourse({...course, totalVideoLessons: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+              <label className="block text-sm font-medium mb-1">Discount Price (Optional)</label>
+              <input 
+                type="number" value={course.discountPrice || ''} onChange={e => setCourse({...course, discountPrice: e.target.value})}
+                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Total Exams</label>
-              <input type="number" value={course.totalExams || ''} onChange={e => setCourse({...course, totalExams: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Total Notes/PDFs</label>
-              <input type="number" value={course.totalPdfs || ''} onChange={e => setCourse({...course, totalPdfs: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+              <label className="block text-sm font-medium mb-1">Discount Valid Until</label>
+              <input 
+                type="date" value={course.discountValidUntil || ''} onChange={e => setCourse({...course, discountValidUntil: e.target.value})}
+                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+              />
             </div>
           </div>
           
-          <div className="mt-4 flex items-center gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Class Start Date</label>
+              <input 
+                type="date" value={course.classStartDate || ''} onChange={e => setCourse({...course, classStartDate: e.target.value})}
+                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Course Validity</label>
+              <input 
+                type="text" value={course.courseValidity || ''} onChange={e => setCourse({...course, courseValidity: e.target.value})} placeholder="e.g. 6 Months, Till Admission Test"
+                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Contact Number (For Inquiries)</label>
             <input 
-              type="checkbox" 
-              id="doubtSolving" 
-              checked={course.hasDoubtSolving || false} 
-              onChange={e => setCourse({...course, hasDoubtSolving: e.target.checked})} 
-              className="w-5 h-5 accent-orange-500"
+              type="text" value={course.contactNumber || ''} onChange={e => setCourse({...course, contactNumber: e.target.value})}
+              placeholder="e.g. 16910 or 017XXXXXXX"
+              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
             />
-            <label htmlFor="doubtSolving" className="text-sm font-medium cursor-pointer">
-              Includes 24/7 Doubt Solving Support / Group
-            </label>
           </div>
-        </div>
+          </div>
+
+
+          {/* 8. Study Materials */}
+          <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+            <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">8. Study Materials</h3>
+          <div>
+            <label className="block text-sm font-medium mb-2">Class Routine Image (Optional)</label>
+            <p className="text-xs text-foreground/50 mb-3">Upload an image of the class routine to be displayed on the course details page.</p>
+            <div className="flex items-center gap-4">
+              {course.routineImageUrl && (
+                <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-foreground/20">
+                  <img src={course.routineImageUrl} alt="Class Routine" className="w-full h-full object-cover" />
+                  <button type="button" onClick={() => setCourse({...course, routineImageUrl: ''})} className="absolute top-1 right-1 p-1 bg-black/50 hover:bg-red-500 rounded-full text-white transition-colors">
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+              <label className="flex flex-col items-center justify-center w-32 h-32 bg-background border-2 border-dashed border-foreground/20 rounded-lg cursor-pointer hover:border-orange-500 hover:bg-orange-500/5 transition-colors">
+                {isUploadingRoutine ? <Loader2 className="w-6 h-6 animate-spin text-orange-500" /> : <ImagePlus className="w-6 h-6 text-foreground/40" />}
+                <span className="text-xs text-foreground/50 mt-1">Upload Routine</span>
+                <input type="file" accept="image/*" onChange={handleUploadRoutine} className="hidden" disabled={isUploadingRoutine} />
+              </label>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Study Routine / Syllabus Link (Optional PDF or Drive Link)</label>
+            <input 
+              type="text" value={course.studyRoutineUrl || ''} onChange={e => setCourse({...course, studyRoutineUrl: e.target.value})}
+              placeholder="https://drive.google.com/..."
+              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+            />
+          </div>
+          </div>
         
         <div className="flex justify-end pt-4 border-t border-foreground/10 mt-6">
           <button type="submit" disabled={isSaving} className="px-8 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-all shadow-lg hover:shadow-orange-500/30 flex items-center gap-2">

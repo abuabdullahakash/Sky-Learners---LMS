@@ -177,3 +177,10 @@ body {
 .ql-editor li {
   margin-bottom: 0.25em !important;
 }
+
+.ql-editor ul > li {
+  list-style-type: disc !important;
+}
+.ql-editor ol > li {
+  list-style-type: decimal !important;
+}

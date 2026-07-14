@@ -167,7 +167,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
                 <Heart className="w-6 h-6" /> 
                 অভিভাবকদের উদ্দেশ্যে
               </h3>
-              <p className="text-foreground/80 leading-relaxed whitespace-pre-wrap">
+              <p className="text-foreground/80 leading-relaxed ">
                 {course.parentMessage || "আপনার সন্তানের উজ্জ্বল ভবিষ্যতের জন্য একটি শক্ত ভিত্তি তৈরি করা অত্যন্ত জরুরি। আমাদের এই কোর্সটি এমনভাবে সাজানো হয়েছে যাতে পড়াশোনা তাদের কাছে বোঝা না মনে হয়ে আনন্দদায়ক মনে হয়।"}
               </p>
             </section>
@@ -176,14 +176,17 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
 
             <section>
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-foreground/5 dark:to-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-blue-100 border-r-blue-100 dark:border-y-foreground/10 dark:border-r-foreground/10 leading-relaxed text-lg whitespace-pre-wrap relative overflow-hidden group">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-foreground/5 dark:to-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-blue-100 border-r-blue-100 dark:border-y-foreground/10 dark:border-r-foreground/10 leading-relaxed text-lg  relative overflow-hidden group">
                 {/* Animated Background Shape */}
                 <div 
                   ref={el => { shapeRefs.current[0] = el; }}
                   className="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-blue-500/10 dark:bg-blue-500/20 opacity-40 dark:opacity-30 pointer-events-none"
                 />
                 <div className="relative z-10 text-foreground/80">
-                  {course.detailedDescription || t('descriptionFallbackPrimary')}
+                  <div 
+                  className="prose prose-sm sm:prose-base dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-blue-500 hover:prose-a:text-blue-600 prose-img:rounded-xl prose-p:leading-relaxed text-foreground/90"
+                  dangerouslySetInnerHTML={{ __html: course.detailedDescription || t('descriptionFallbackPrimary') }}
+                />
                 </div>
               </div>
             </section>

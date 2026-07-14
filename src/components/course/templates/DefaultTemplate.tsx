@@ -178,8 +178,11 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
           <div className="lg:col-span-2 space-y-12">
             <section>
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
-              <div className="bg-foreground/5 p-6 rounded-2xl border border-foreground/10 text-foreground/80 leading-relaxed text-lg whitespace-pre-wrap">
-                {course.detailedDescription || t('descriptionFallback')}
+              <div className="bg-foreground/5 p-6 rounded-2xl border border-foreground/10 text-foreground/80 leading-relaxed text-lg ">
+                <div 
+                  className="prose prose-sm sm:prose-base dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-blue-500 hover:prose-a:text-blue-600 prose-img:rounded-xl prose-p:leading-relaxed text-foreground/90"
+                  dangerouslySetInnerHTML={{ __html: course.detailedDescription || t('descriptionFallback') }}
+                />
               </div>
             </section>
 

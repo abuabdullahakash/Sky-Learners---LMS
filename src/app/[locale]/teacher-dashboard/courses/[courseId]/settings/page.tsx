@@ -9,6 +9,7 @@ import { Save, ImagePlus, Trash2, X, Loader2, Plus } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import { uploadImageToImgBB } from '@/lib/imgbb';
 import { IconPicker } from '@/components/ui/IconPicker';
+import { RichTextEditor } from '@/components/ui/RichTextEditor';
 import toast from 'react-hot-toast';
 
 export default function CourseSettingsPage() {
@@ -379,9 +380,9 @@ export default function CourseSettingsPage() {
             <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">3. Course Overview & Marketing</h3>
           <div>
             <label className="block text-sm font-medium mb-1">Detailed Description (HTML/Text)</label>
-            <textarea 
-              value={course.detailedDescription || ''} onChange={e => setCourse({...course, detailedDescription: e.target.value})} rows={6}
-              className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors custom-scrollbar"
+            <RichTextEditor 
+              value={course.detailedDescription || ''}
+              onChange={(value) => setCourse({ ...course, detailedDescription: value })}
               placeholder="Provide a detailed description of what this course offers..."
             />
           </div>

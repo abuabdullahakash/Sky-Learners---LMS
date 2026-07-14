@@ -150,7 +150,7 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
                   <Target className="w-6 h-6" /> 
                   স্পেশাল ফোকাস / নিশ্চয়তা
                 </h3>
-                <p className="text-foreground/80 leading-relaxed whitespace-pre-wrap font-medium">
+                <p className="text-foreground/80 leading-relaxed  font-medium">
                   {course.successMessage}
                 </p>
               </section>
@@ -160,9 +160,12 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
 
             <section>
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
-              <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-foreground/5 dark:to-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-red-100 border-r-red-100 dark:border-y-foreground/10 dark:border-r-foreground/10 leading-relaxed text-lg whitespace-pre-wrap relative overflow-hidden group">
+              <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-foreground/5 dark:to-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-red-100 border-r-red-100 dark:border-y-foreground/10 dark:border-r-foreground/10 leading-relaxed text-lg  relative overflow-hidden group">
                 <div className="relative z-10 text-foreground/80">
-                  {course.detailedDescription || t('descriptionFallbackHsc')}
+                  <div 
+                  className="prose prose-sm sm:prose-base dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-blue-500 hover:prose-a:text-blue-600 prose-img:rounded-xl prose-p:leading-relaxed text-foreground/90"
+                  dangerouslySetInnerHTML={{ __html: course.detailedDescription || t('descriptionFallbackHsc') }}
+                />
                 </div>
               </div>
             </section>

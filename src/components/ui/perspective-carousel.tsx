@@ -187,18 +187,18 @@ export function PerspectiveCarousel({
                       
                       {/* Bottom Half: Text */}
                       <div className="flex-1 flex flex-col items-center justify-start p-5 text-center z-10 -mt-10 relative">
-                        <h3 className="text-2xl font-extrabold mb-1.5 line-clamp-1 bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-blue-500">
+                        <h3 className="text-2xl font-extrabold mb-1.5 line-clamp-1 bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-600 to-blue-600 dark:from-primary dark:via-purple-400 dark:to-blue-400">
                           {item.name}
                         </h3>
-                        <p className="text-foreground/90 font-bold text-sm mb-2 line-clamp-1">
+                        <p className="text-foreground/90 dark:text-foreground font-bold text-sm mb-2 line-clamp-1">
                           {item.role || 'Instructor'}
                         </p>
-                        <p className="text-foreground/60 font-medium text-xs line-clamp-2 leading-relaxed px-2 mb-3">
+                        <p className="text-foreground/60 dark:text-foreground/80 font-medium text-xs line-clamp-2 leading-relaxed px-2 mb-3">
                           {item.background}
                         </p>
                         
                         <div className="mt-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:-translate-y-1">
-                          <button type="button" onClick={(e) => { e.stopPropagation(); onItemClick?.(item); }} className="px-5 py-1.5 bg-primary text-white hover:bg-primary/90 font-bold text-xs rounded-full shadow-lg shadow-primary/30 transition-all hover:scale-105 active:scale-95">View Profile</button>
+                          <button type="button" onClick={(e) => { e.stopPropagation(); onItemClick?.(item); }} className="px-5 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs rounded-full shadow-lg shadow-primary/30 transition-all hover:scale-105 active:scale-95">View Profile</button>
                         </div>
                       </div>
                     </div>

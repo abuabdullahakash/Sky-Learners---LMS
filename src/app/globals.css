@@ -163,24 +163,25 @@ body {
   min-height: 1.5em;
 }
 
-/* Fix for React Quill Lists */
-.ql-editor ul {
+
+
+
+
+
+/* Fix for React Quill Lists - Scoped to Frontend Only */
+.frontend-quill-render .ql-editor ul {
+  padding-left: 1.25rem !important;
+  margin-bottom: 1em !important;
+}
+.frontend-quill-render .ql-editor ol {
+  padding-left: 1.25rem !important;
+  margin-bottom: 1em !important;
+}
+.frontend-quill-render .ql-editor ul > li {
   list-style-type: disc !important;
-  padding-left: 1.5em !important;
-  margin-bottom: 1em !important;
-}
-.ql-editor ol {
-  list-style-type: decimal !important;
-  padding-left: 1.5em !important;
-  margin-bottom: 1em !important;
-}
-.ql-editor li {
   margin-bottom: 0.25em !important;
 }
-
-.ql-editor ul > li {
-  list-style-type: disc !important;
-}
-.ql-editor ol > li {
+.frontend-quill-render .ql-editor ol > li {
   list-style-type: decimal !important;
+  margin-bottom: 0.25em !important;
 }

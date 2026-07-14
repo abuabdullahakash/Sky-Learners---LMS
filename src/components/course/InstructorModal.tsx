@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Facebook, Youtube, Linkedin, Globe, BookOpen } from 'lucide-react';
+import { X, Users, Video, Briefcase, Globe, BookOpen } from 'lucide-react';
 import { PerspectiveCarouselItem } from '@/components/ui/perspective-carousel';
 import Image from 'next/image';
 
@@ -91,17 +91,17 @@ export function InstructorModal({ instructor, isOpen, onClose }: InstructorModal
                   <div className="pt-6 border-t border-foreground/10 flex flex-wrap gap-3">
                     {instructor.facebookUrl && (
                       <a href={instructor.facebookUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2] hover:text-white rounded-xl transition-colors font-medium text-sm">
-                        <Facebook className="w-4 h-4" /> Facebook
+                        <Users className="w-4 h-4" /> Facebook
                       </a>
                     )}
                     {instructor.youtubeUrl && (
                       <a href={instructor.youtubeUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-[#FF0000]/10 text-[#FF0000] hover:bg-[#FF0000] hover:text-white rounded-xl transition-colors font-medium text-sm">
-                        <Youtube className="w-4 h-4" /> YouTube
+                        <Video className="w-4 h-4" /> YouTube
                       </a>
                     )}
                     {instructor.linkedinUrl && (
                       <a href={instructor.linkedinUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-[#0A66C2]/10 text-[#0A66C2] hover:bg-[#0A66C2] hover:text-white rounded-xl transition-colors font-medium text-sm">
-                        <Linkedin className="w-4 h-4" /> LinkedIn
+                        <Briefcase className="w-4 h-4" /> LinkedIn
                       </a>
                     )}
                     {instructor.profileUrl && (

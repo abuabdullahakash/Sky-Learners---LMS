@@ -2,10 +2,10 @@
 
 import React, { useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import 'react-quill/dist/quill.snow.css'; // Import Quill styles
+import 'react-quill-new/dist/quill.snow.css'; // Import Quill styles
 
 // Dynamically import ReactQuill to disable SSR
-const ReactQuill = dynamic(() => import('react-quill'), { 
+const ReactQuill = dynamic(() => import('react-quill-new'), { 
   ssr: false, 
   loading: () => <div className="h-64 w-full bg-foreground/5 animate-pulse rounded-2xl flex items-center justify-center text-foreground/50">Loading editor...</div>
 });

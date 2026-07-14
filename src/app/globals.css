@@ -162,3 +162,18 @@ body {
 .ql-editor p:has(br) {
   min-height: 1.5em;
 }
+
+/* Fix for React Quill Lists */
+.ql-editor ul {
+  list-style-type: disc !important;
+  padding-left: 1.5em !important;
+  margin-bottom: 1em !important;
+}
+.ql-editor ol {
+  list-style-type: decimal !important;
+  padding-left: 1.5em !important;
+  margin-bottom: 1em !important;
+}
+.ql-editor li {
+  margin-bottom: 0.25em !important;
+}

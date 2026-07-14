@@ -193,7 +193,7 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
                   <Users className="w-8 h-8 text-primary" /> 
                   {t('instructors')}
                 </h2>
-                <div className="w-full h-[400px] py-10 relative">
+                <div className="w-full h-[460px] py-10 relative">
                   <PerspectiveCarousel items={course.instructors} onItemClick={(item) => setSelectedInstructor(item)} 
                     slideWidth={300}
                     rotationStep={40}
@@ -255,6 +255,7 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
           videoUrl={course.introVideoUrl} 
         />
       )}
+      <InstructorModal instructor={selectedInstructor} isOpen={!!selectedInstructor} onClose={() => setSelectedInstructor(null)} />
     </div>
   );
 }

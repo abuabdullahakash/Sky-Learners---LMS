@@ -133,7 +133,7 @@ export function PerspectiveCarousel({
       {...props}
     >
       <div
-        className={cn("relative flex-1 overflow-hidden", viewportClassName)}
+        className={cn("relative flex-1 overflow-visible py-4", viewportClassName)}
         style={{ perspective: "1200px" }}
       >
         <motion.div

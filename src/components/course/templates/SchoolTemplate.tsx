@@ -1,4 +1,5 @@
 "use client";
+import 'react-quill-new/dist/quill.snow.css';
 
 import { useRef, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -184,7 +185,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
                 />
                 <div className="relative z-10 text-foreground/80">
                   <div 
-                  className="prose prose-sm sm:prose-base dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-blue-500 hover:prose-a:text-blue-600 prose-img:rounded-xl prose-p:leading-relaxed text-foreground/90 break-words whitespace-pre-wrap"
+                  className="ql-snow ql-editor !p-0 text-foreground/90 break-words"
                   dangerouslySetInnerHTML={{ __html: course.detailedDescription || t('descriptionFallbackPrimary') }}
                 />
                 </div>

@@ -17,6 +17,7 @@ export interface PerspectiveCarouselItem {
   youtubeUrl?: string;
   linkedinUrl?: string;
   profileUrl?: string;
+  coverUrl?: string;
 }
 
 export interface PerspectiveCarouselProps

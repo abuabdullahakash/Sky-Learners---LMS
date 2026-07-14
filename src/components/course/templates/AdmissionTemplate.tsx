@@ -193,8 +193,7 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
                   {t('instructors')}
                 </h2>
                 <div className="w-full h-[400px] py-10 relative">
-                  <PerspectiveCarousel 
-                    items={course.instructors} 
+                  <PerspectiveCarousel items={course.instructors} onItemClick={(item) => setSelectedInstructor(item)} 
                     slideWidth={300}
                     rotationStep={40}
                   />

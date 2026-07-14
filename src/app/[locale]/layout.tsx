@@ -7,6 +7,7 @@ import { getMessages } from 'next-intl/server';
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -56,6 +57,7 @@ export default async function RootLayout({
                 {children}
               </main>
               <Footer />
+              <Toaster position="bottom-right" toastOptions={{ style: { background: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)' } }} />
             </ThemeProvider>
           </AuthProvider>
         </NextIntlClientProvider>

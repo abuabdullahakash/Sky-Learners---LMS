@@ -9,6 +9,7 @@ import { Save, ImagePlus, Trash2, X, Loader2, Plus } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import { uploadImageToImgBB } from '@/lib/imgbb';
 import { IconPicker } from '@/components/ui/IconPicker';
+import toast from 'react-hot-toast';
 
 export default function CourseSettingsPage() {
   const { user } = useAuth();
@@ -19,7 +20,6 @@ export default function CourseSettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [course, setCourse] = useState<any>(null);
-  const [message, setMessage] = useState('');
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isUploadingSlider, setIsUploadingSlider] = useState(false);
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
@@ -125,7 +125,6 @@ export default function CourseSettingsPage() {
     e.preventDefault();
     if (!course) return;
     setIsSaving(true);
-    setMessage('');
     try {
       await updateDoc(doc(db, 'courses', courseId), {
         title: course.title,
@@ -161,8 +160,7 @@ export default function CourseSettingsPage() {
         studyRoutineUrl: course.studyRoutineUrl || '',
         routineImageUrl: course.routineImageUrl || '',
       });
-      setMessage('Settings updated successfully!');
-      setTimeout(() => setMessage(''), 3000);
+      toast.success('Settings updated successfully!');
     } catch (error) {
       console.error("Error updating course", error);
     } finally {
@@ -182,7 +180,6 @@ export default function CourseSettingsPage() {
 
       <form onSubmit={handleSaveBasicInfo} className="bg-background p-6 md:p-8 rounded-3xl border border-foreground/10 space-y-6 shadow-sm">
         <h2 className="text-xl font-bold mb-2">Basic Information</h2>
-        {message && <div className="p-4 bg-green-500/10 text-green-500 rounded-xl mb-4 font-medium">{message}</div>}
         
         <div className="space-y-4">
 

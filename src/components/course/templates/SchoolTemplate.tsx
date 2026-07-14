@@ -184,10 +184,9 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
                   className="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-blue-500/10 dark:bg-blue-500/20 opacity-40 dark:opacity-30 pointer-events-none"
                 />
                 <div className="relative z-10 text-foreground/80">
-                  <div 
-                  className="ql-snow ql-editor !p-0 text-foreground/90 break-words"
-                  dangerouslySetInnerHTML={{ __html: course.detailedDescription || t('descriptionFallbackPrimary') }}
-                />
+                  <div className="ql-snow">
+                    <div className="ql-editor !p-0 text-foreground/90 break-words whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: course.detailedDescription || t('descriptionFallbackPrimary')  }} />
+                  </div>
                 </div>
               </div>
             </section>

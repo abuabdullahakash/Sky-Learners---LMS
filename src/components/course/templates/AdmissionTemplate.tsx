@@ -163,10 +163,9 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
               <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-foreground/5 dark:to-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-red-100 border-r-red-100 dark:border-y-foreground/10 dark:border-r-foreground/10 leading-relaxed text-lg  relative overflow-hidden group">
                 <div className="relative z-10 text-foreground/80">
-                  <div 
-                  className="ql-snow ql-editor !p-0 text-foreground/90 break-words"
-                  dangerouslySetInnerHTML={{ __html: course.detailedDescription || t('descriptionFallbackHsc') }}
-                />
+                  <div className="ql-snow">
+                    <div className="ql-editor !p-0 text-foreground/90 break-words whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: course.detailedDescription || t('descriptionFallbackHsc')  }} />
+                  </div>
                 </div>
               </div>
             </section>

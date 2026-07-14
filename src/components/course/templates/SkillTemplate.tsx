@@ -190,10 +190,9 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
               <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-foreground/5 dark:to-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-emerald-100 border-r-emerald-100 dark:border-y-foreground/10 dark:border-r-foreground/10 leading-relaxed text-lg  relative overflow-hidden group">
                 <div className="relative z-10 text-foreground/80">
-                  <div 
-                  className="ql-snow ql-editor !p-0 text-foreground/90 break-words"
-                  dangerouslySetInnerHTML={{ __html: course.detailedDescription || t('descriptionFallbackSkill') }}
-                />
+                  <div className="ql-snow">
+                    <div className="ql-editor !p-0 text-foreground/90 break-words whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: course.detailedDescription || t('descriptionFallbackSkill')  }} />
+                  </div>
                 </div>
               </div>
             </section>

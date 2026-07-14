@@ -180,10 +180,9 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
             <section>
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
               <div className="bg-foreground/5 p-6 rounded-2xl border border-foreground/10 text-foreground/80 leading-relaxed text-lg ">
-                <div 
-                  className="ql-snow ql-editor !p-0 text-foreground/90 break-words"
-                  dangerouslySetInnerHTML={{ __html: course.detailedDescription || t('descriptionFallback') }}
-                />
+                <div className="ql-snow">
+                    <div className="ql-editor !p-0 text-foreground/90 break-words whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: course.detailedDescription || t('descriptionFallback')  }} />
+                  </div>
               </div>
             </section>
 

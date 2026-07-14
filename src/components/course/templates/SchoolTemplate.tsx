@@ -255,6 +255,14 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
 
         </div>
       </div>
+
+      {course.introVideoUrl && (
+        <VideoModal 
+          isOpen={isVideoModalOpen} 
+          onClose={() => setIsVideoModalOpen(false)} 
+          videoUrl={course.introVideoUrl} 
+        />
+      )}
     </div>
   );
 }

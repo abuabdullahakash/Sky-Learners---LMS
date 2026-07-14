@@ -6,7 +6,8 @@ import { Link } from '@/i18n/routing';
 import { Users, Clock, CheckCircle2, ArrowLeft, PlayCircle, Image as ImageIcon } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { PerspectiveCarousel } from '@/components/ui/perspective-carousel';
+import { PerspectiveCarousel, PerspectiveCarouselItem } from '@/components/ui/perspective-carousel';
+import { InstructorModal } from '@/components/course/InstructorModal';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import CourseCurriculum from '../CourseCurriculum';
 import LearningOutcomes from '../LearningOutcomes';
@@ -18,6 +19,7 @@ import { VideoModal } from '@/components/ui/VideoModal';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function DefaultTemplate({ course, currentSlide, setCurrentSlide }: { course: any, currentSlide: number, setCurrentSlide: (s: number) => void }) {
+  const [selectedInstructor, setSelectedInstructor] = useState<PerspectiveCarouselItem | null>(null);
   const t = useTranslations('CourseDetails');
   const galleryRef = useRef<HTMLDivElement>(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);

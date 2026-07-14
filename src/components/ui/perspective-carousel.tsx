@@ -11,6 +11,12 @@ export interface PerspectiveCarouselItem {
   role?: string;
   background?: string;
   photoUrl?: string;
+  bio?: string;
+  responsibility?: string;
+  facebookUrl?: string;
+  youtubeUrl?: string;
+  linkedinUrl?: string;
+  profileUrl?: string;
 }
 
 export interface PerspectiveCarouselProps
@@ -19,6 +25,7 @@ export interface PerspectiveCarouselProps
   activeIndex?: number;
   defaultActiveIndex?: number;
   onActiveIndexChange?: (index: number) => void;
+  onItemClick?: (item: PerspectiveCarouselItem) => void;
   loop?: boolean;
   slideWidth?: number;
   rotationStep?: number;
@@ -46,6 +53,7 @@ export function PerspectiveCarousel({
   activeIndex,
   defaultActiveIndex = 0,
   onActiveIndexChange,
+  onItemClick,
   loop = false,
   slideWidth = 200,
   rotationStep = 60,
@@ -159,7 +167,10 @@ export function PerspectiveCarousel({
                     aria-label={`Show ${item.name}`}
                     aria-current={isActive ? "true" : undefined}
                     className="w-full cursor-pointer text-left focus:outline-none"
-                    onClick={() => selectSlide(index)}
+                    onClick={() => {
+                      selectSlide(index);
+                      onItemClick?.(item);
+                    }}
                   >
                     <div className={cn(
                       "bg-background border border-foreground/10 rounded-3xl flex flex-col overflow-hidden shadow-sm transition-all h-[320px] group",

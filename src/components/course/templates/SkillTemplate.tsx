@@ -6,7 +6,8 @@ import { ArrowLeft, Briefcase, Award, Users, Image as ImageIcon, PlayCircle, Che
 import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { PerspectiveCarousel } from '@/components/ui/perspective-carousel';
+import { PerspectiveCarousel, PerspectiveCarouselItem } from '@/components/ui/perspective-carousel';
+import { InstructorModal } from '@/components/course/InstructorModal';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import CourseCurriculum from '../CourseCurriculum';
 import LearningOutcomes from '../LearningOutcomes';
@@ -17,6 +18,7 @@ import CourseFeatures from '../CourseFeatures';
 import { VideoModal } from '@/components/ui/VideoModal';
 
 export default function SkillTemplate({ course, currentSlide, setCurrentSlide }: { course: any, currentSlide: number, setCurrentSlide: (s: number) => void }) {
+  const [selectedInstructor, setSelectedInstructor] = useState<PerspectiveCarouselItem | null>(null);
   const t = useTranslations('CourseDetails');
   const galleryRef = useRef<HTMLDivElement>(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);

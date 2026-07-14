@@ -16,6 +16,12 @@ type Instructor = {
   background: string;
   role: string;
   photoUrl: string;
+  bio?: string;
+  responsibility?: string;
+  facebookUrl?: string;
+  youtubeUrl?: string;
+  linkedinUrl?: string;
+  profileUrl?: string;
 };
 
 export default function CourseInstructorsPage() {
@@ -35,6 +41,12 @@ export default function CourseInstructorsPage() {
   const [newName, setNewName] = useState('');
   const [newBackground, setNewBackground] = useState('');
   const [newRole, setNewRole] = useState('Lead Instructor');
+  const [newBio, setNewBio] = useState('');
+  const [newResponsibility, setNewResponsibility] = useState('');
+  const [newFacebookUrl, setNewFacebookUrl] = useState('');
+  const [newYoutubeUrl, setNewYoutubeUrl] = useState('');
+  const [newLinkedinUrl, setNewLinkedinUrl] = useState('');
+  const [newProfileUrl, setNewProfileUrl] = useState('');
   const [newPhoto, setNewPhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>('');
   const [error, setError] = useState('');
@@ -75,6 +87,12 @@ export default function CourseInstructorsPage() {
     setNewName('');
     setNewBackground('');
     setNewRole('Lead Instructor');
+    setNewBio('');
+    setNewResponsibility('');
+    setNewFacebookUrl('');
+    setNewYoutubeUrl('');
+    setNewLinkedinUrl('');
+    setNewProfileUrl('');
     setNewPhoto(null);
     setPhotoPreview('');
     setError('');
@@ -85,6 +103,12 @@ export default function CourseInstructorsPage() {
     setNewName(inst.name);
     setNewBackground(inst.background);
     setNewRole(inst.role);
+    setNewBio(inst.bio || '');
+    setNewResponsibility(inst.responsibility || '');
+    setNewFacebookUrl(inst.facebookUrl || '');
+    setNewYoutubeUrl(inst.youtubeUrl || '');
+    setNewLinkedinUrl(inst.linkedinUrl || '');
+    setNewProfileUrl(inst.profileUrl || '');
     setPhotoPreview(inst.photoUrl);
     setNewPhoto(null);
     setIsAdding(true);
@@ -115,7 +139,7 @@ export default function CourseInstructorsPage() {
       if (editingInstructorId) {
         updatedInstructors = instructors.map(inst => 
           inst.id === editingInstructorId 
-            ? { ...inst, name: newName, background: newBackground, role: newRole, photoUrl }
+            ? { ...inst, name: newName, background: newBackground, role: newRole, photoUrl, bio: newBio, responsibility: newResponsibility, facebookUrl: newFacebookUrl, youtubeUrl: newYoutubeUrl, linkedinUrl: newLinkedinUrl, profileUrl: newProfileUrl }
             : inst
         );
       } else {
@@ -124,7 +148,13 @@ export default function CourseInstructorsPage() {
           name: newName,
           background: newBackground,
           role: newRole,
-          photoUrl
+          photoUrl,
+          bio: newBio,
+          responsibility: newResponsibility,
+          facebookUrl: newFacebookUrl,
+          youtubeUrl: newYoutubeUrl,
+          linkedinUrl: newLinkedinUrl,
+          profileUrl: newProfileUrl
         };
         updatedInstructors = [...instructors, newInstructor];
       }
@@ -223,6 +253,43 @@ export default function CourseInstructorsPage() {
               </div>
             </div>
           </div>
+
+          {/* Extended Information */}
+          <div className="space-y-4 pt-4 border-t border-foreground/5">
+            <h3 className="font-bold text-sm text-foreground/70 uppercase tracking-wider">Additional Details (Optional)</h3>
+            
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Topic / Responsibility (কী পড়াবেন)</label>
+                <input type="text" value={newResponsibility} onChange={e => setNewResponsibility(e.target.value)} placeholder="e.g. Physics 1st Paper, MCQ Solving" className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Short Bio</label>
+                <textarea value={newBio} onChange={e => setNewBio(e.target.value)} placeholder="e.g. 5+ years of teaching experience..." rows={2} className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 custom-scrollbar" />
+              </div>
+            </div>
+
+            <h3 className="font-bold text-sm text-foreground/70 uppercase tracking-wider pt-2">Social Links & Profile</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Facebook URL</label>
+                <input type="text" value={newFacebookUrl} onChange={e => setNewFacebookUrl(e.target.value)} placeholder="https://facebook.com/..." className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">YouTube URL</label>
+                <input type="text" value={newYoutubeUrl} onChange={e => setNewYoutubeUrl(e.target.value)} placeholder="https://youtube.com/..." className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">LinkedIn URL</label>
+                <input type="text" value={newLinkedinUrl} onChange={e => setNewLinkedinUrl(e.target.value)} placeholder="https://linkedin.com/..." className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Website Profile URL</label>
+                <input type="text" value={newProfileUrl} onChange={e => setNewProfileUrl(e.target.value)} placeholder="Link to profile on SkyLearners..." className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+              </div>
+            </div>
+          </div>
+
           <div className="flex justify-end pt-4 border-t border-foreground/10">
             <button type="submit" disabled={isSaving} className="px-6 py-2.5 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-colors flex items-center gap-2">
               <Save className="w-4 h-4" /> {isSaving ? 'Uploading...' : 'Save Instructor'}

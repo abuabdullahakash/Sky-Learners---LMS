@@ -145,20 +145,13 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
           <div className="lg:col-span-2 space-y-12">
-            {course.successMessage && (
-              <section className="bg-red-900/10 dark:bg-red-900/20 p-8 rounded-3xl border border-red-200 dark:border-red-900/30">
-                <h3 className="text-2xl font-bold mb-4 flex items-center gap-3 text-red-700 dark:text-red-400">
-                  <Target className="w-6 h-6" /> 
-                  স্পেশাল ফোকাস / নিশ্চয়তা
-                </h3>
-                <p className="text-foreground/80 leading-relaxed  font-medium">
-                  {course.successMessage}
-                </p>
-              </section>
-            )}
-
+            <TargetAudience audience={course.targetAudience} />
+            
             <CourseFeatures course={course} />
 
+            
+            <LearningOutcomes outcomes={course.learningOutcomes} />
+            
             <section>
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
               <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-foreground/5 dark:to-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-red-100 border-r-red-100 dark:border-y-foreground/10 dark:border-r-foreground/10 leading-relaxed text-lg  relative overflow-hidden group">
@@ -170,10 +163,7 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
               </div>
             </section>
 
-            <LearningOutcomes outcomes={course.learningOutcomes} />
-            <TargetAudience audience={course.targetAudience} />
-            <CourseCurriculum modules={course.modules} routineImageUrl={course.routineImageUrl} />
-
+            
             {course.studyRoutineUrl && (
               <section className="bg-red-500/10 border border-red-500/20 p-8 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 mt-12">
                 <div>
@@ -189,6 +179,10 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
               </section>
             )}
 
+            
+            <CourseCurriculum modules={course.modules} routineImageUrl={course.routineImageUrl} />
+
+            
             {course.instructors && course.instructors.length > 0 && (
               <section className="animate-in slide-in-from-bottom-4 duration-700 delay-300 mt-12">
                 <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
@@ -204,8 +198,10 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
               </section>
             )}
 
+            
             <CourseTestimonials testimonials={course.testimonials} />
 
+            
             {course.faqs && course.faqs.length > 0 && (
               <section className="mt-12">
                 <h2 className="text-3xl font-bold mb-6">{t('faqs')}</h2>

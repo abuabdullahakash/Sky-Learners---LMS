@@ -172,20 +172,13 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
           <div className="lg:col-span-2 space-y-12">
-            {course.careerMessage && (
-              <section className="bg-emerald-900/10 dark:bg-emerald-900/20 p-8 rounded-3xl border border-emerald-200 dark:border-emerald-900/30">
-                <h3 className="text-2xl font-bold mb-4 flex items-center gap-3 text-emerald-700 dark:text-emerald-400">
-                  <Briefcase className="w-6 h-6" /> 
-                  ক্যারিয়ার ও পোর্টফোলিও গাইডেন্স
-                </h3>
-                <p className="text-foreground/80 leading-relaxed  font-medium">
-                  {course.careerMessage}
-                </p>
-              </section>
-            )}
-
+            <TargetAudience audience={course.targetAudience} />
+            
             <CourseFeatures course={course} />
 
+            
+            <LearningOutcomes outcomes={course.learningOutcomes} />
+            
             <section>
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
               <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-foreground/5 dark:to-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-emerald-100 border-r-emerald-100 dark:border-y-foreground/10 dark:border-r-foreground/10 leading-relaxed text-lg  relative overflow-hidden group">
@@ -197,10 +190,10 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
               </div>
             </section>
 
-            <LearningOutcomes outcomes={course.learningOutcomes} />
-            <TargetAudience audience={course.targetAudience} />
+            
             <CourseCurriculum modules={course.modules} routineImageUrl={course.routineImageUrl} />
 
+            
             {course.instructors && course.instructors.length > 0 && (
               <section className="animate-in slide-in-from-bottom-4 duration-700 delay-300 mt-12">
                 <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
@@ -216,6 +209,10 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
               </section>
             )}
 
+            
+            <CourseTestimonials testimonials={course.testimonials} />
+
+            
             {course.galleryImages && course.galleryImages.length > 0 && (
               <section className="mt-12" ref={galleryRef}>
                 <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
@@ -233,8 +230,7 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
               </section>
             )}
 
-            <CourseTestimonials testimonials={course.testimonials} />
-
+            
             {course.faqs && course.faqs.length > 0 && (
               <section className="mt-12">
                 <h2 className="text-3xl font-bold mb-6">{t('faqs')}</h2>

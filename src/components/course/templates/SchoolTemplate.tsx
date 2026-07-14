@@ -162,6 +162,13 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
           <div className="lg:col-span-2 space-y-12">
+            <TargetAudience audience={course.targetAudience} />
+            
+            <CourseFeatures course={course} />
+
+            
+            <LearningOutcomes outcomes={course.learningOutcomes} />
+            
             {/* Message for Parents */}
             <section className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-8 rounded-lg border border-blue-100 dark:border-blue-800/30">
               <h3 className="text-2xl font-bold mb-4 flex items-center gap-3 text-blue-700 dark:text-blue-400">
@@ -173,8 +180,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
               </p>
             </section>
 
-            <CourseFeatures course={course} />
-
+            
             <section>
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-foreground/5 dark:to-foreground/5 p-6 rounded-lg border-l-4 border-l-primary border-y border-r border-y-blue-100 border-r-blue-100 dark:border-y-foreground/10 dark:border-r-foreground/10 leading-relaxed text-lg  relative overflow-hidden group">
@@ -191,10 +197,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
               </div>
             </section>
 
-            <LearningOutcomes outcomes={course.learningOutcomes} />
-            <TargetAudience audience={course.targetAudience} />
-            <CourseCurriculum modules={course.modules} routineImageUrl={course.routineImageUrl} />
-
+            
             {course.studyRoutineUrl && (
               <section className="bg-blue-500/10 border border-blue-500/20 p-8 rounded-lg flex flex-col md:flex-row items-center justify-between gap-6">
                 <div>
@@ -210,6 +213,10 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
               </section>
             )}
 
+            
+            <CourseCurriculum modules={course.modules} routineImageUrl={course.routineImageUrl} />
+
+            
             {course.instructors && course.instructors.length > 0 && (
               <section className="animate-in slide-in-from-bottom-4 duration-700 delay-300">
                 <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
@@ -225,8 +232,10 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
               </section>
             )}
 
+            
             <CourseTestimonials testimonials={course.testimonials} />
 
+            
             {course.faqs && course.faqs.length > 0 && (
               <section className="mt-12">
                 <h2 className="text-3xl font-bold mb-6">{t('faqs')}</h2>

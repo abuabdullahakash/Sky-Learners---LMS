@@ -10,6 +10,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { PerspectiveCarousel, PerspectiveCarouselItem } from '@/components/ui/perspective-carousel';
 import { InstructorModal } from '@/components/course/InstructorModal';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import CourseFeatures from '../CourseFeatures';
 import CourseCurriculum from '../CourseCurriculum';
 import LearningOutcomes from '../LearningOutcomes';
 import TargetAudience from '../TargetAudience';
@@ -177,6 +178,11 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
           <div className="lg:col-span-2 space-y-12">
+            <TargetAudience audience={course.targetAudience} />
+            <CourseFeatures course={course} />
+            
+            <LearningOutcomes outcomes={course.learningOutcomes} />
+            
             <section>
               <h2 className="text-3xl font-bold mb-6">{t('description')}</h2>
               <div className="bg-foreground/5 p-6 rounded-2xl border border-foreground/10 text-foreground/80 leading-relaxed text-lg ">
@@ -186,10 +192,10 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
               </div>
             </section>
 
-            <LearningOutcomes outcomes={course.learningOutcomes} />
-            <TargetAudience audience={course.targetAudience} />
+            
             <CourseCurriculum modules={course.modules} routineImageUrl={course.routineImageUrl} />
 
+            
             {course.instructors && course.instructors.length > 0 && (
               <section className="animate-in slide-in-from-bottom-4 duration-700 delay-300">
                 <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
@@ -205,6 +211,10 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
               </section>
             )}
 
+            
+            <CourseTestimonials testimonials={course.testimonials} />
+
+            
             {course.galleryImages && course.galleryImages.length > 0 && (
               <section className="mt-12" ref={galleryRef}>
                 <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
@@ -222,8 +232,7 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
               </section>
             )}
 
-            <CourseTestimonials testimonials={course.testimonials} />
-
+            
             {course.faqs && course.faqs.length > 0 && (
               <section className="mt-12">
                 <h2 className="text-3xl font-bold mb-6">{t('faqs')}</h2>

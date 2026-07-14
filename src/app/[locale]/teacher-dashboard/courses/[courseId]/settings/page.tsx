@@ -320,13 +320,13 @@ export default function CourseSettingsPage() {
                 onChange={e => setCourse({...course, category: e.target.value, eduClass: '', department: '', year: ''})}
                 className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none"
               >
-                <option value="" disabled>Select Level</option>
-                <option value="primary">Primary School</option>
-                <option value="high_school">High School</option>
-                <option value="intermediate">Intermediate / HSC</option>
-                <option value="honours">Honours / Undergrad</option>
-                <option value="masters">Masters / Postgrad</option>
-                <option value="skills">Skills / Others</option>
+                <option value="" disabled className="bg-background text-foreground">Select Level</option>
+                <option value="primary" className="bg-background text-foreground">Primary School</option>
+                <option value="high_school" className="bg-background text-foreground">High School</option>
+                <option value="intermediate" className="bg-background text-foreground">Intermediate / HSC</option>
+                <option value="honours" className="bg-background text-foreground">Honours / Undergrad</option>
+                <option value="masters" className="bg-background text-foreground">Masters / Postgrad</option>
+                <option value="skills" className="bg-background text-foreground">Skills / Others</option>
               </select>
             </div>
             <div>
@@ -346,10 +346,10 @@ export default function CourseSettingsPage() {
                 value={course.eduClass || ''} onChange={e => setCourse({...course, eduClass: e.target.value})}
                 className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none"
               >
-                <option value="" disabled>Select Class</option>
+                <option value="" disabled className="bg-background text-foreground">Select Class</option>
                 {course.category === 'primary' 
-                  ? Array.from({length: 5}, (_, i) => <option key={i+1} value={i+1}>Class {i+1}</option>)
-                  : Array.from({length: 5}, (_, i) => <option key={i+6} value={i+6}>Class {i+6}</option>)
+                  ? Array.from({length: 5}, (_, i) => <option key={i+1} value={i+1} className="bg-background text-foreground">Class {i+1}</option>)
+                  : Array.from({length: 5}, (_, i) => <option key={i+6} value={i+6} className="bg-background text-foreground">Class {i+6}</option>)
                 }
               </select>
             </div>
@@ -360,18 +360,18 @@ export default function CourseSettingsPage() {
               <div>
                 <label className="block text-sm font-medium mb-1">Class</label>
                 <select value={course.eduClass || ''} onChange={e => setCourse({...course, eduClass: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none">
-                  <option value="" disabled>Select Class</option>
-                  <option value="11">Class 11</option>
-                  <option value="12">Class 12</option>
+                  <option value="" disabled className="bg-background text-foreground">Select Class</option>
+                  <option value="11" className="bg-background text-foreground">Class 11</option>
+                  <option value="12" className="bg-background text-foreground">Class 12</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Group</label>
                 <select value={course.department || ''} onChange={e => setCourse({...course, department: e.target.value})} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none">
-                  <option value="" disabled>Select Group</option>
-                  <option value="science">Science</option>
-                  <option value="arts">Arts (Humanities)</option>
-                  <option value="commerce">Commerce</option>
+                  <option value="" disabled className="bg-background text-foreground">Select Group</option>
+                  <option value="science" className="bg-background text-foreground">Science</option>
+                  <option value="arts" className="bg-background text-foreground">Arts (Humanities)</option>
+                  <option value="commerce" className="bg-background text-foreground">Commerce</option>
                 </select>
               </div>
             </div>

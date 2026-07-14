@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Plus, Trash2, Save, Users, ImagePlus, User } from 'lucide-react';
+import { Plus, Trash2, Save, Users, ImagePlus, User, Edit2 } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import Image from 'next/image';
 import { uploadImageToImgBB } from '@/lib/imgbb';
@@ -31,6 +31,7 @@ export default function CourseInstructorsPage() {
 
   // New Instructor Form State
   const [isAdding, setIsAdding] = useState(false);
+  const [editingInstructorId, setEditingInstructorId] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [newBackground, setNewBackground] = useState('');
   const [newRole, setNewRole] = useState('Lead Instructor');
@@ -68,10 +69,35 @@ export default function CourseInstructorsPage() {
     }
   };
 
-  const handleAddInstructor = async (e: React.FormEvent) => {
+  const resetForm = () => {
+    setIsAdding(false);
+    setEditingInstructorId(null);
+    setNewName('');
+    setNewBackground('');
+    setNewRole('Lead Instructor');
+    setNewPhoto(null);
+    setPhotoPreview('');
+    setError('');
+  };
+
+  const handleEdit = (inst: Instructor) => {
+    setEditingInstructorId(inst.id);
+    setNewName(inst.name);
+    setNewBackground(inst.background);
+    setNewRole(inst.role);
+    setPhotoPreview(inst.photoUrl);
+    setNewPhoto(null);
+    setIsAdding(true);
+  };
+
+  const handleSaveInstructor = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName || !newBackground || !newPhoto) {
-      setError('Name, Background, and Photo are required.');
+    if (!newName || !newBackground) {
+      setError('Name and Background are required.');
+      return;
+    }
+    if (!editingInstructorId && !newPhoto && !photoPreview) {
+      setError('Photo is required.');
       return;
     }
 
@@ -79,30 +105,37 @@ export default function CourseInstructorsPage() {
     setError('');
 
     try {
-      const photoUrl = await uploadImageToImgBB(newPhoto);
+      let photoUrl = photoPreview; // Use existing photo by default
+      if (newPhoto) {
+        photoUrl = await uploadImageToImgBB(newPhoto);
+      }
 
-      const newInstructor: Instructor = {
-        id: Date.now().toString(),
-        name: newName,
-        background: newBackground,
-        role: newRole,
-        photoUrl
-      };
-
-      const updatedInstructors = [...instructors, newInstructor];
+      let updatedInstructors;
+      
+      if (editingInstructorId) {
+        updatedInstructors = instructors.map(inst => 
+          inst.id === editingInstructorId 
+            ? { ...inst, name: newName, background: newBackground, role: newRole, photoUrl }
+            : inst
+        );
+      } else {
+        const newInstructor: Instructor = {
+          id: Date.now().toString(),
+          name: newName,
+          background: newBackground,
+          role: newRole,
+          photoUrl
+        };
+        updatedInstructors = [...instructors, newInstructor];
+      }
       
       await updateDoc(doc(db, 'courses', courseId), { instructors: updatedInstructors });
       setInstructors(updatedInstructors);
       
-      setIsAdding(false);
-      setNewName('');
-      setNewBackground('');
-      setNewRole('Lead Instructor');
-      setNewPhoto(null);
-      setPhotoPreview('');
+      resetForm();
     } catch (err) {
       console.error(err);
-      setError('Failed to add instructor. Please try again.');
+      setError('Failed to save instructor. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -131,17 +164,17 @@ export default function CourseInstructorsPage() {
           <p className="text-foreground/70">Add teachers, guest lecturers, or doubt solving assistants for this course.</p>
         </div>
         {!isAdding && (
-          <button onClick={() => setIsAdding(true)} className="px-5 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2 whitespace-nowrap">
+          <button onClick={() => { resetForm(); setIsAdding(true); }} className="px-5 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2 whitespace-nowrap">
             <Plus className="w-5 h-5" /> Add Instructor
           </button>
         )}
       </div>
 
       {isAdding && (
-        <form onSubmit={handleAddInstructor} className="bg-background border border-foreground/10 p-6 rounded-3xl shadow-sm space-y-6">
+        <form onSubmit={handleSaveInstructor} className="bg-background border border-foreground/10 p-6 rounded-3xl shadow-sm space-y-6">
           <div className="flex justify-between items-center mb-2">
-            <h2 className="text-lg font-bold">Add New Instructor</h2>
-            <button type="button" onClick={() => setIsAdding(false)} className="text-sm text-foreground/50 hover:text-foreground">Cancel</button>
+            <h2 className="text-lg font-bold">{editingInstructorId ? 'Edit Instructor' : 'Add New Instructor'}</h2>
+            <button type="button" onClick={resetForm} className="text-sm text-foreground/50 hover:text-foreground">Cancel</button>
           </div>
           
           {error && <div className="p-3 bg-red-500/10 text-red-500 rounded-xl text-sm font-medium">{error}</div>}
@@ -151,7 +184,8 @@ export default function CourseInstructorsPage() {
               <div className="relative w-32 h-32 rounded-full border-2 border-dashed border-foreground/20 bg-foreground/5 hover:border-orange-500/50 flex flex-col items-center justify-center cursor-pointer overflow-hidden group">
                 <input 
                   type="file" accept="image/*" onChange={handleImageChange}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" required
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                  {...(!editingInstructorId && !photoPreview ? { required: true } : {})}
                 />
                 {photoPreview ? (
                   <Image src={photoPreview} alt="Preview" fill className="object-cover" />
@@ -207,13 +241,22 @@ export default function CourseInstructorsPage() {
         ) : (
           instructors.map((inst) => (
             <div key={inst.id} className="bg-background border border-foreground/10 p-5 rounded-2xl flex flex-col items-center text-center gap-4 hover:border-orange-500/30 transition-colors shadow-sm relative group">
-              <button 
-                onClick={() => handleDelete(inst.id)} 
-                className="absolute top-3 right-3 p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl opacity-0 group-hover:opacity-100 transition-all"
-                title="Remove Instructor"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                <button 
+                  onClick={() => handleEdit(inst)} 
+                  className="p-2 bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white rounded-xl transition-all"
+                  title="Edit Instructor"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={() => handleDelete(inst.id)} 
+                  className="p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all"
+                  title="Remove Instructor"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
               
               <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-foreground/10 bg-foreground/5 shrink-0 relative">
                 {inst.photoUrl ? (

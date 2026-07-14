@@ -313,7 +313,7 @@ export default function CourseSettingsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+            <div className={course.courseType === 'individual' ? "md:col-span-2" : ""}>
               <label className="block text-sm font-medium mb-1">Education Level (Category)</label>
               <select 
                 value={course.category || ''} 
@@ -329,14 +329,16 @@ export default function CourseSettingsPage() {
                 <option value="skills" className="bg-background text-foreground">Skills / Others</option>
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Your School / Coaching Name</label>
-              <input 
-                type="text" value={course.coachingName || ''} onChange={e => setCourse({...course, coachingName: e.target.value})}
-                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
-                placeholder="e.g. ABC Coaching Center"
-              />
-            </div>
+            {course.courseType !== 'individual' && (
+              <div>
+                <label className="block text-sm font-medium mb-1">Your School / Coaching Name</label>
+                <input 
+                  type="text" value={course.coachingName || ''} onChange={e => setCourse({...course, coachingName: e.target.value})}
+                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                  placeholder="e.g. ABC Coaching Center"
+                />
+              </div>
+            )}
           </div>
 
           {(course.category === 'primary' || course.category === 'high_school') && (

@@ -16,6 +16,7 @@ export default function CreateCoursePage() {
   
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
+  const [courseType, setCourseType] = useState('coaching');
   const [category, setCategory] = useState(''); // Education Level
   const [eduClass, setEduClass] = useState('');
   const [department, setDepartment] = useState('');
@@ -56,11 +57,12 @@ export default function CreateCoursePage() {
         teacherId: user.uid,
         title,
         subtitle,
+        courseType,
         category, // Used as Education Level
         eduClass: (category === 'primary' || category === 'high_school' || category === 'intermediate') ? eduClass : '',
         department: (category === 'intermediate' || category === 'honours' || category === 'masters') ? department : '',
         year: (category === 'honours' || category === 'masters') ? year : '',
-        coachingName,
+        coachingName: courseType === 'coaching' ? coachingName : '',
         price: Number(price),
         thumbnailUrl,
         isPublished: false, // Draft by default
@@ -125,8 +127,22 @@ export default function CreateCoursePage() {
               ></textarea>
             </div>
 
+            <div>
+              <label className="block text-sm font-medium mb-2 text-foreground/80">Course Type <span className="text-red-500">*</span></label>
+              <div className="flex gap-4 flex-col sm:flex-row">
+                <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${courseType === 'individual' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
+                  <input type="radio" name="courseType" value="individual" checked={courseType === 'individual'} onChange={() => setCourseType('individual')} className="accent-orange-500 w-4 h-4" />
+                  <span className="text-sm font-medium">Individual Teacher</span>
+                </label>
+                <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${courseType === 'coaching' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
+                  <input type="radio" name="courseType" value="coaching" checked={courseType === 'coaching'} onChange={() => setCourseType('coaching')} className="accent-orange-500 w-4 h-4" />
+                  <span className="text-sm font-medium">Coaching Center</span>
+                </label>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+              <div className={courseType === 'individual' ? "md:col-span-2" : ""}>
                 <label className="block text-sm font-medium mb-1 text-foreground/80">Education Level (Category) <span className="text-red-500">*</span></label>
                 <select 
                   value={category}
@@ -148,17 +164,19 @@ export default function CreateCoursePage() {
                   <option value="skills" className="bg-background text-foreground">Skills / Others</option>
                 </select>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-foreground/80">Your School / Coaching Name <span className="text-red-500">*</span></label>
-                <input 
-                  type="text" 
-                  value={coachingName}
-                  onChange={(e) => setCoachingName(e.target.value)}
-                  placeholder="e.g. ABC Coaching Center"
-                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all"
-                  required
-                />
-              </div>
+              {courseType === 'coaching' && (
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-foreground/80">Your School / Coaching Name <span className="text-red-500">*</span></label>
+                  <input 
+                    type="text" 
+                    value={coachingName}
+                    onChange={(e) => setCoachingName(e.target.value)}
+                    placeholder="e.g. ABC Coaching Center"
+                    className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all"
+                    required
+                  />
+                </div>
+              )}
             </div>
 
             {(category === 'primary' || category === 'high_school') && (

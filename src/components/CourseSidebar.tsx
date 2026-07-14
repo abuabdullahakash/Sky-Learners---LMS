@@ -13,6 +13,7 @@ export default function CourseSidebar() {
   const courseId = params.courseId as string;
   const [courseTitle, setCourseTitle] = useState('Loading...');
   const [isPublished, setIsPublished] = useState(false);
+  const [courseType, setCourseType] = useState('coaching');
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -20,8 +21,10 @@ export default function CourseSidebar() {
         const docRef = doc(db, 'courses', courseId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setCourseTitle(docSnap.data().title);
-          setIsPublished(docSnap.data().isPublished);
+          const data = docSnap.data();
+          setCourseTitle(data.title);
+          setIsPublished(data.isPublished);
+          setCourseType(data.courseType || 'coaching');
         }
       } catch (error) {
         console.error("Error fetching course title", error);
@@ -73,7 +76,7 @@ export default function CourseSidebar() {
       </div>
 
       <div className="p-3 space-y-1 overflow-y-auto custom-scrollbar flex-1">
-        {menuItems.map((item) => {
+        {menuItems.filter(item => courseType === 'individual' ? item.name !== 'Instructors' : true).map((item) => {
           // Check if path matches. Next-intl usePathname does not include locale.
           const isActive = item.exact 
             ? pathname === item.href 

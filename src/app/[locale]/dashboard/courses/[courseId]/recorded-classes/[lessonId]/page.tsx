@@ -142,18 +142,39 @@ export default function LessonVideoPage() {
             style={{ position: 'absolute', top: 0, left: 0 }}
           />
         ) : activeLesson.videoUrl ? (
-          // @ts-ignore: ReactPlayer types might not be fully compatible with React 19 yet
-          <ReactPlayer
-            url={activeLesson.videoUrl}
-            width="100%"
-            height="100%"
-            controls
-            onProgress={(state: any) => {
-              setWatchProgress(state.played);
-              if (state.played >= 0.8) setHasReachedThreshold(true);
-            }}
-            style={{ position: 'absolute', top: 0, left: 0 }}
-          />
+          (() => {
+            const isGoogleDrive = activeLesson.videoUrl.includes('drive.google.com');
+            const isYouTube = activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be');
+            const isVimeo = activeLesson.videoUrl.includes('vimeo.com');
+            
+            // If it's a known supported tracking platform, use ReactPlayer
+            if (isYouTube || isVimeo || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i)) {
+              return (
+                // @ts-ignore
+                <ReactPlayer
+                  url={activeLesson.videoUrl}
+                  width="100%"
+                  height="100%"
+                  controls
+                  onProgress={(state: any) => {
+                    setWatchProgress(state.played);
+                    if (state.played >= 0.8) setHasReachedThreshold(true);
+                  }}
+                  style={{ position: 'absolute', top: 0, left: 0 }}
+                />
+              );
+            }
+            
+            // Otherwise fallback to iframe (e.g. Google Drive preview links)
+            return (
+              <iframe 
+                src={activeLesson.videoUrl} 
+                className="w-full h-full absolute inset-0"
+                allowFullScreen
+                title={activeLesson.title}
+              ></iframe>
+            );
+          })()
         ) : (
           <div className="text-center text-white/50 p-6 absolute inset-0 flex flex-col items-center justify-center">
             <PlayCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
@@ -196,17 +217,41 @@ export default function LessonVideoPage() {
                   style={{ width: `${Math.min(watchProgress * 100, 100)}%` }}
                 ></div>
               </div>
-              {!hasReachedThreshold && activeLesson.videoSource !== 'facebook_private' && activeLesson.videoUrl && (
-                <p className="text-[11px] text-gray-400 mt-1.5">Watch at least 80% to mark as completed.</p>
-              )}
+              {(() => {
+                const isTrackable = activeLesson.videoSource === 'facebook_public' || 
+                  (activeLesson.videoUrl && (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i)));
+                  
+                if (!hasReachedThreshold && isTrackable && activeLesson.videoUrl) {
+                  return <p className="text-[11px] text-gray-400 mt-1.5">Watch at least 80% to mark as completed.</p>;
+                }
+                if (!isTrackable && activeLesson.videoUrl && activeLesson.videoSource !== 'facebook_private') {
+                   return <p className="text-[11px] text-gray-400 mt-1.5">Video tracking not supported for this source.</p>;
+                }
+                return null;
+              })()}
             </div>
 
             <button 
-              disabled={(!hasReachedThreshold && activeLesson.videoSource !== 'facebook_private' && activeLesson.videoUrl) || isCompleted}
+              disabled={(() => {
+                if (isCompleted) return true;
+                if (!activeLesson.videoUrl) return false; // can complete if no video
+                if (activeLesson.videoSource === 'facebook_private') return false; // can complete if private fb
+                
+                const isTrackable = activeLesson.videoSource === 'facebook_public' || 
+                  (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i));
+                
+                if (isTrackable) return !hasReachedThreshold;
+                return false; // Not trackable (like Google Drive) -> allow completion
+              })()}
               onClick={() => setIsCompleted(true)}
               className={`px-6 py-2.5 font-bold rounded-xl transition-all flex items-center gap-2 shadow-lg 
                 ${isCompleted ? 'bg-green-500 text-white shadow-green-500/20' 
-                : hasReachedThreshold || activeLesson.videoSource === 'facebook_private' || !activeLesson.videoUrl
+                : (() => {
+                    const isTrackable = activeLesson.videoSource === 'facebook_public' || 
+                      (activeLesson.videoUrl && (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i)));
+                    
+                    return hasReachedThreshold || !isTrackable || !activeLesson.videoUrl;
+                  })()
                   ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/20 hover:shadow-orange-500/40 hover:scale-105 active:scale-95'
                   : 'bg-gray-200 dark:bg-foreground/10 text-gray-400 dark:text-foreground/30 cursor-not-allowed shadow-none'}
               `}
@@ -215,7 +260,11 @@ export default function LessonVideoPage() {
                 <>
                   <CheckCircle className="w-5 h-5" /> Completed
                 </>
-              ) : !hasReachedThreshold && activeLesson.videoSource !== 'facebook_private' && activeLesson.videoUrl ? (
+              ) : (() => {
+                  const isTrackable = activeLesson.videoSource === 'facebook_public' || 
+                    (activeLesson.videoUrl && (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i)));
+                  return !hasReachedThreshold && isTrackable && activeLesson.videoUrl;
+                })() ? (
                 <>
                   <Lock className="w-5 h-5" /> Mark as Completed
                 </>

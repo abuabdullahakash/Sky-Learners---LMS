@@ -7,8 +7,7 @@ import { doc, getDoc, addDoc, collection, setDoc } from 'firebase/firestore';
 import { useParams, useRouter } from 'next/navigation';
 import { PlayCircle, CheckCircle, ArrowLeft, Loader2, Lock, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import dynamic from 'next/dynamic';
-const ReactPlayer = dynamic(() => import('react-player/lazy'), { ssr: false });
+import ReactPlayer from 'react-player';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import toast from 'react-hot-toast';
@@ -183,7 +182,9 @@ export default function LessonVideoPage() {
                   onReady={() => {
                     if (initialProgress && !initialSeekDoneRef.current) {
                       if (initialProgress.playedSeconds > 0) {
-                        playerRef.current?.seekTo(initialProgress.playedSeconds, 'seconds');
+                        if (typeof playerRef.current?.seekTo === 'function') {
+                          playerRef.current.seekTo(initialProgress.playedSeconds, 'seconds');
+                        }
                       }
                       initialSeekDoneRef.current = true;
                     }

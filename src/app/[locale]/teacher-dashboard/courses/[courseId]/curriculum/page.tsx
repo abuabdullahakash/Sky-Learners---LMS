@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Plus, GripVertical, Video as VideoIcon, Image as ImageIcon, Trash2, Upload, Loader2, X, FileText } from 'lucide-react';
+import { Plus, GripVertical, Video as VideoIcon, Image as ImageIcon, Trash2, Upload, Loader2, X, FileText, Settings, Calendar, User, BookOpen, CheckCircle } from 'lucide-react';
 import { uploadImageToImgBB } from '@/lib/imgbb';
 
 export default function CourseCurriculumPage() {
@@ -15,7 +15,24 @@ export default function CourseCurriculumPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [course, setCourse] = useState<any>(null);
-  const [uploadingThumbnail, setUploadingThumbnail] = useState<string | null>(null);
+
+  // Modals state
+  const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false);
+  const [newSubject, setNewSubject] = useState('');
+  
+  const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
+  const [editingModuleId, setEditingModuleId] = useState<string | null>(null);
+  
+  // Lesson form state
+  const [lessonTitle, setLessonTitle] = useState('');
+  const [lessonVideoUrl, setLessonVideoUrl] = useState('');
+  const [lessonInstructor, setLessonInstructor] = useState('');
+  const [lessonSubject, setLessonSubject] = useState('');
+  const [lessonNoteUrl, setLessonNoteUrl] = useState('');
+  const [lessonFreePreview, setLessonFreePreview] = useState(false);
+  const [lessonThumbnail, setLessonThumbnail] = useState<File | null>(null);
+  const [lessonThumbnailUrl, setLessonThumbnailUrl] = useState('');
+  const [isUploadingLesson, setIsUploadingLesson] = useState(false);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -26,6 +43,8 @@ export default function CourseCurriculumPage() {
         if (docSnap.exists() && docSnap.data().teacherId === user.uid) {
           const data = docSnap.data();
           if (!data.modules) data.modules = [];
+          if (!data.subjects) data.subjects = [];
+          if (!data.instructors) data.instructors = [];
           setCourse(data);
         }
       } catch (error) {
@@ -48,20 +67,6 @@ export default function CourseCurriculumPage() {
     await updateDoc(doc(db, 'courses', courseId), { modules: updatedModules });
   };
 
-  const handleAddLesson = async (moduleId: string) => {
-    const updatedModules = course.modules.map((mod: any) => {
-      if (mod.id === moduleId) {
-        return {
-          ...mod,
-          lessons: [...mod.lessons, { id: Date.now().toString(), title: 'New Lesson', videoUrl: '', isFreePreview: false }]
-        };
-      }
-      return mod;
-    });
-    setCourse({ ...course, modules: updatedModules });
-    await updateDoc(doc(db, 'courses', courseId), { modules: updatedModules });
-  };
-
   const handleUpdateModule = async (moduleId: string, newTitle: string) => {
     const updatedModules = course.modules.map((mod: any) => 
       mod.id === moduleId ? { ...mod, title: newTitle } : mod
@@ -70,39 +75,87 @@ export default function CourseCurriculumPage() {
     await updateDoc(doc(db, 'courses', courseId), { modules: updatedModules });
   };
 
-  const handleUpdateLesson = async (moduleId: string, lessonId: string, field: string, value: any) => {
-    const updatedModules = course.modules.map((mod: any) => {
-      if (mod.id === moduleId) {
-        return {
-          ...mod,
-          lessons: mod.lessons.map((lesson: any) => 
-            lesson.id === lessonId ? { ...lesson, [field]: value } : lesson
-          )
-        };
-      }
-      return mod;
-    });
-    setCourse({ ...course, modules: updatedModules });
-    await updateDoc(doc(db, 'courses', courseId), { modules: updatedModules });
+  // --- Subject Management ---
+  const handleAddSubject = async () => {
+    if (!newSubject.trim()) return;
+    const updatedSubjects = [...(course.subjects || []), newSubject.trim()];
+    setCourse({ ...course, subjects: updatedSubjects });
+    await updateDoc(doc(db, 'courses', courseId), { subjects: updatedSubjects });
+    setNewSubject('');
   };
 
-  const handleUploadThumbnail = async (moduleId: string, lessonId: string, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    try {
-      setUploadingThumbnail(lessonId);
-      const url = await uploadImageToImgBB(file);
-      await handleUpdateLesson(moduleId, lessonId, 'thumbnailUrl', url);
-    } catch (error) {
-      console.error("Error uploading thumbnail", error);
-    } finally {
-      setUploadingThumbnail(null);
+  const handleRemoveSubject = async (index: number) => {
+    const updatedSubjects = [...course.subjects];
+    updatedSubjects.splice(index, 1);
+    setCourse({ ...course, subjects: updatedSubjects });
+    await updateDoc(doc(db, 'courses', courseId), { subjects: updatedSubjects });
+  };
+
+  // --- Lesson Management ---
+  const openLessonModal = (moduleId: string) => {
+    setEditingModuleId(moduleId);
+    setLessonTitle('');
+    setLessonVideoUrl('');
+    setLessonInstructor('');
+    setLessonSubject('');
+    setLessonNoteUrl('');
+    setLessonFreePreview(false);
+    setLessonThumbnail(null);
+    setLessonThumbnailUrl('');
+    setIsLessonModalOpen(true);
+  };
+
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setLessonThumbnail(file);
+      setLessonThumbnailUrl(URL.createObjectURL(file));
     }
   };
 
-  const handleRemoveThumbnail = async (moduleId: string, lessonId: string) => {
-    await handleUpdateLesson(moduleId, lessonId, 'thumbnailUrl', '');
+  const handleSaveLesson = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingModuleId || !lessonTitle || !lessonVideoUrl) return;
+    
+    setIsUploadingLesson(true);
+    try {
+      let finalThumbnailUrl = lessonThumbnailUrl;
+      // Upload new thumbnail if provided
+      if (lessonThumbnail) {
+        finalThumbnailUrl = await uploadImageToImgBB(lessonThumbnail);
+      }
+
+      const newLesson = {
+        id: Date.now().toString(),
+        title: lessonTitle,
+        videoUrl: lessonVideoUrl,
+        instructor: lessonInstructor,
+        subject: lessonSubject,
+        noteUrl: lessonNoteUrl,
+        isFreePreview: lessonFreePreview,
+        thumbnailUrl: finalThumbnailUrl,
+        uploadDate: new Date().toISOString()
+      };
+
+      const updatedModules = course.modules.map((mod: any) => {
+        if (mod.id === editingModuleId) {
+          return {
+            ...mod,
+            lessons: [...(mod.lessons || []), newLesson]
+          };
+        }
+        return mod;
+      });
+
+      setCourse({ ...course, modules: updatedModules });
+      await updateDoc(doc(db, 'courses', courseId), { modules: updatedModules });
+      
+      setIsLessonModalOpen(false);
+    } catch (error) {
+      console.error("Error saving lesson", error);
+    } finally {
+      setIsUploadingLesson(false);
+    }
   };
 
   const handleRemoveLesson = async (moduleId: string, lessonId: string) => {
@@ -121,19 +174,24 @@ export default function CourseCurriculumPage() {
     await updateDoc(doc(db, 'courses', courseId), { modules: updatedModules });
   };
 
-  if (isLoading) return <div className="flex justify-center items-center h-64">Loading...</div>;
+  if (isLoading) return <div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 animate-spin text-orange-500" /></div>;
   if (!course) return null;
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500 relative">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold mb-2">Curriculum Builder</h1>
           <p className="text-foreground/70">Organize your course into modules and add video lessons.</p>
         </div>
-        <button onClick={handleAddModule} className="px-5 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2">
-          <Plus className="w-5 h-5" /> Add Module
-        </button>
+        <div className="flex gap-3">
+          <button onClick={() => setIsSubjectModalOpen(true)} className="px-4 py-2.5 bg-background border border-foreground/10 text-foreground rounded-xl font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2">
+            <Settings className="w-4 h-4" /> Subject Settings
+          </button>
+          <button onClick={handleAddModule} className="px-5 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2">
+            <Plus className="w-5 h-5" /> Add Module
+          </button>
+        </div>
       </div>
 
       <div className="space-y-6">
@@ -147,7 +205,7 @@ export default function CourseCurriculumPage() {
                 onChange={(e) => handleUpdateModule(module.id, e.target.value)}
                 className="flex-1 bg-transparent font-bold focus:outline-none border-b border-transparent focus:border-orange-500/50"
               />
-              <button onClick={() => handleAddLesson(module.id)} className="text-sm px-3 py-1.5 bg-background border border-foreground/10 rounded-lg hover:border-orange-500 hover:text-orange-500 font-medium transition-colors">
+              <button onClick={() => openLessonModal(module.id)} className="text-sm px-4 py-1.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-bold transition-colors shadow-sm">
                 + Add Lesson
               </button>
             </div>
@@ -157,71 +215,41 @@ export default function CourseCurriculumPage() {
                 <div className="text-center p-4 text-foreground/40 text-sm">No lessons added yet.</div>
               ) : (
                 module.lessons?.map((lesson: any, lIndex: number) => (
-                  <div key={lesson.id} className="flex flex-col gap-3 p-4 bg-foreground/5 rounded-xl border border-foreground/10 hover:border-foreground/20 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <VideoIcon className="w-4 h-4 text-orange-500" />
-                      <span className="font-semibold text-sm">Lesson {lIndex + 1}:</span>
-                      <input 
-                        type="text" value={lesson.title}
-                        onChange={(e) => handleUpdateLesson(module.id, lesson.id, 'title', e.target.value)}
-                        className="flex-1 bg-background px-3 py-1.5 rounded-lg border border-foreground/10 text-sm focus:outline-none focus:border-orange-500"
-                        placeholder="Lesson Title"
-                      />
-                    </div>
-                    <div className="flex items-center gap-3 pl-7">
-                      <input 
-                        type="text" value={lesson.videoUrl}
-                        onChange={(e) => handleUpdateLesson(module.id, lesson.id, 'videoUrl', e.target.value)}
-                        className="flex-1 bg-background px-3 py-1.5 rounded-lg border border-foreground/10 text-sm focus:outline-none focus:border-orange-500"
-                        placeholder="YouTube or Vimeo URL"
-                      />
-                      <label className="flex items-center gap-2 text-sm cursor-pointer whitespace-nowrap">
-                        <input 
-                          type="checkbox" checked={lesson.isFreePreview}
-                          onChange={(e) => handleUpdateLesson(module.id, lesson.id, 'isFreePreview', e.target.checked)}
-                          className="w-4 h-4 accent-orange-500"
-                        />
-                        Free Preview
-                      </label>
-                    </div>
-                    <div className="flex items-center gap-3 pl-7">
-                      <FileText className="w-4 h-4 text-blue-500" />
-                      <input 
-                        type="text" value={lesson.noteUrl || ''}
-                        onChange={(e) => handleUpdateLesson(module.id, lesson.id, 'noteUrl', e.target.value)}
-                        className="flex-1 bg-background px-3 py-1.5 rounded-lg border border-foreground/10 text-sm focus:outline-none focus:border-orange-500"
-                        placeholder="Google Drive PDF Link for Class Note (Optional)"
-                      />
-                    </div>
-                    <div className="flex flex-wrap items-center gap-3 pl-7">
-                      <ImageIcon className="w-4 h-4 text-orange-400" />
+                  <div key={lesson.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-foreground/5 rounded-xl border border-foreground/10 hover:border-orange-500/30 transition-colors">
+                    <div className="flex items-center gap-4 flex-1">
                       {lesson.thumbnailUrl ? (
-                        <div className="flex items-center gap-3 flex-1">
-                          <img src={lesson.thumbnailUrl} alt="Thumbnail" className="h-10 w-16 object-cover rounded border border-foreground/10" />
-                          <button onClick={() => handleRemoveThumbnail(module.id, lesson.id)} className="text-red-500 hover:bg-red-50 px-2 py-1.5 rounded-lg transition-colors text-sm flex items-center gap-1">
-                            <X className="w-4 h-4" /> Remove
-                          </button>
-                        </div>
+                        <img src={lesson.thumbnailUrl} alt="Thumbnail" className="w-20 h-12 object-cover rounded-lg border border-foreground/10 flex-shrink-0" />
                       ) : (
-                        <div className="flex-1 relative">
-                          <input 
-                            type="file" accept="image/*"
-                            onChange={(e) => handleUploadThumbnail(module.id, lesson.id, e)}
-                            className="hidden" id={`thumbnail-${lesson.id}`}
-                            disabled={uploadingThumbnail === lesson.id}
-                          />
-                          <label htmlFor={`thumbnail-${lesson.id}`} className={`flex items-center justify-center gap-2 border border-dashed border-foreground/20 rounded-lg px-3 py-2 text-sm cursor-pointer hover:bg-foreground/5 transition-colors ${uploadingThumbnail === lesson.id ? 'opacity-50 pointer-events-none' : ''}`}>
-                            {uploadingThumbnail === lesson.id ? <Loader2 className="w-4 h-4 animate-spin text-orange-500" /> : <Upload className="w-4 h-4 text-foreground/50" />}
-                            <span className="text-foreground/50">Upload Thumbnail (Optional)</span>
-                          </label>
+                        <div className="w-20 h-12 bg-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <VideoIcon className="w-6 h-6 text-foreground/30" />
                         </div>
                       )}
                       
-                      <div className="ml-auto flex items-center gap-2">
-                        <button onClick={() => handleRemoveLesson(module.id, lesson.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete Lesson">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                      <div>
+                        <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
+                          <span className="text-orange-500">Lesson {lIndex + 1}:</span> {lesson.title}
+                          {lesson.isFreePreview && (
+                            <span className="text-[10px] bg-green-500/10 text-green-500 px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">Free Preview</span>
+                          )}
+                        </h4>
+                        <div className="flex items-center gap-3 mt-1.5 text-xs text-foreground/60">
+                          {lesson.subject && (
+                            <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> {lesson.subject}</span>
+                          )}
+                          {lesson.instructor && (
+                            <span className="flex items-center gap-1"><User className="w-3 h-3" /> {lesson.instructor}</span>
+                          )}
+                          {lesson.uploadDate && (
+                            <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(lesson.uploadDate).toLocaleDateString()}</span>
+                          )}
+                        </div>
                       </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 mt-2 sm:mt-0 w-full sm:w-auto justify-end">
+                      <button onClick={() => handleRemoveLesson(module.id, lesson.id)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors" title="Delete Lesson">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                 ))
@@ -237,6 +265,181 @@ export default function CourseCurriculumPage() {
           </div>
         )}
       </div>
+
+      {/* --- Subject Settings Modal --- */}
+      {isSubjectModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-3xl p-6 w-full max-w-md shadow-2xl relative">
+            <button onClick={() => setIsSubjectModalOpen(false)} className="absolute top-4 right-4 p-2 hover:bg-foreground/5 rounded-full transition-colors">
+              <X className="w-5 h-5 text-foreground/50" />
+            </button>
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Settings className="w-5 h-5 text-orange-500" /> Course Subjects</h2>
+            <p className="text-sm text-foreground/60 mb-4">Add subjects here to select them easily when uploading lessons.</p>
+            
+            <div className="flex gap-2 mb-6">
+              <input 
+                type="text" value={newSubject} onChange={(e) => setNewSubject(e.target.value)}
+                placeholder="e.g. Physics 1st Paper"
+                className="flex-1 bg-foreground/5 px-4 py-2.5 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-orange-500"
+                onKeyDown={(e) => e.key === 'Enter' && handleAddSubject()}
+              />
+              <button onClick={handleAddSubject} className="px-4 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors">
+                Add
+              </button>
+            </div>
+
+            <div className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+              {course.subjects?.length === 0 ? (
+                <div className="text-center py-6 text-foreground/40 text-sm">No subjects added yet.</div>
+              ) : (
+                course.subjects?.map((subject: string, idx: number) => (
+                  <div key={idx} className="flex justify-between items-center bg-foreground/5 px-4 py-2.5 rounded-xl border border-foreground/10">
+                    <span className="text-sm font-medium">{subject}</span>
+                    <button onClick={() => handleRemoveSubject(idx)} className="text-red-500 hover:text-red-600">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- Add Lesson Modal --- */}
+      {isLessonModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-3xl w-full max-w-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div className="sticky top-0 bg-background/95 backdrop-blur-sm z-10 p-6 border-b border-foreground/10 flex justify-between items-center">
+              <h2 className="text-xl font-bold flex items-center gap-2"><VideoIcon className="w-5 h-5 text-orange-500" /> Upload Lesson</h2>
+              <button onClick={() => setIsLessonModalOpen(false)} className="p-2 hover:bg-foreground/5 rounded-full transition-colors">
+                <X className="w-5 h-5 text-foreground/50" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSaveLesson} className="p-6 space-y-5">
+              
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-foreground/80">Lesson Title *</label>
+                <input 
+                  type="text" required value={lessonTitle} onChange={(e) => setLessonTitle(e.target.value)}
+                  placeholder="e.g. Newton's First Law"
+                  className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-orange-500"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-foreground/80">Video URL *</label>
+                <input 
+                  type="url" required value={lessonVideoUrl} onChange={(e) => setLessonVideoUrl(e.target.value)}
+                  placeholder="YouTube, Vimeo, Facebook, or Drive URL"
+                  className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-orange-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {course.courseType === 'coaching' && (
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-foreground/80">Instructor (Optional)</label>
+                    <select 
+                      value={lessonInstructor} onChange={(e) => setLessonInstructor(e.target.value)}
+                      className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-orange-500 appearance-none"
+                    >
+                      <option value="">Select Instructor...</option>
+                      {course.instructors?.map((inst: any) => (
+                        <option key={inst.id} value={inst.name}>{inst.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-bold text-foreground/80">Subject (Optional)</label>
+                  <select 
+                    value={lessonSubject} onChange={(e) => setLessonSubject(e.target.value)}
+                    className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-orange-500 appearance-none"
+                  >
+                    <option value="">Select Subject...</option>
+                    {course.subjects?.map((sub: string, idx: number) => (
+                      <option key={idx} value={sub}>{sub}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-foreground/80">Class Note PDF Link (Optional)</label>
+                <div className="flex relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500">
+                    <FileText className="w-4 h-4" />
+                  </div>
+                  <input 
+                    type="url" value={lessonNoteUrl} onChange={(e) => setLessonNoteUrl(e.target.value)}
+                    placeholder="Google Drive link (Anyone with the link)"
+                    className="w-full bg-foreground/5 pl-10 pr-4 py-3 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-foreground/80">Video Thumbnail (Optional)</label>
+                <div className="flex items-center gap-4">
+                  <div className="w-24 h-16 bg-foreground/5 rounded-xl border border-dashed border-foreground/20 flex items-center justify-center overflow-hidden flex-shrink-0">
+                    {lessonThumbnailUrl ? (
+                      <img src={lessonThumbnailUrl} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <ImageIcon className="w-6 h-6 text-foreground/30" />
+                    )}
+                  </div>
+                  <div className="flex-1 relative">
+                    <input 
+                      type="file" accept="image/*" onChange={handleThumbnailChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <div className="bg-foreground/5 border border-foreground/10 px-4 py-2.5 rounded-xl text-sm font-medium text-foreground/80 flex items-center gap-2 hover:bg-foreground/10 transition-colors inline-flex">
+                      <Upload className="w-4 h-4" /> Choose Image
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-foreground/10 flex items-center justify-between">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <div className="relative flex items-center justify-center">
+                    <input 
+                      type="checkbox" checked={lessonFreePreview} onChange={(e) => setLessonFreePreview(e.target.checked)}
+                      className="peer sr-only"
+                    />
+                    <div className="w-5 h-5 border-2 border-foreground/30 rounded flex items-center justify-center transition-all peer-checked:bg-orange-500 peer-checked:border-orange-500">
+                      <CheckCircle className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" />
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-sm font-bold block">Free Preview</span>
+                    <span className="text-xs text-foreground/60 block">Allow anyone to watch this video for free.</span>
+                  </div>
+                </label>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs text-foreground/50 pt-2">
+                <Calendar className="w-3 h-3" />
+                Upload Date: {new Date().toLocaleDateString()}
+              </div>
+
+              <div className="pt-4 sticky bottom-0 bg-background pb-2">
+                <button 
+                  type="submit" 
+                  disabled={isUploadingLesson}
+                  className="w-full py-3.5 bg-orange-500 text-white font-bold rounded-xl shadow-lg hover:bg-orange-600 transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isUploadingLesson ? <><Loader2 className="w-5 h-5 animate-spin" /> Uploading...</> : 'Upload Lesson'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

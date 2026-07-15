@@ -114,8 +114,15 @@ export default function StudentRecordedClasses() {
                   Module {lesson.moduleIndex}: {lesson.moduleTitle}
                 </span>
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary transition-colors line-clamp-1">{lesson.title}</h3>
-                {lesson.description ? (
-                  <p className="text-sm text-gray-500 dark:text-foreground/70 line-clamp-2 mb-3">{lesson.description}</p>
+                
+                <div className="flex items-center gap-3 mb-2 text-xs text-gray-500 dark:text-foreground/60">
+                  {lesson.subject && <span className="bg-gray-100 dark:bg-foreground/10 px-2 py-0.5 rounded text-gray-700 dark:text-foreground/80">{lesson.subject}</span>}
+                  {lesson.instructor && <span>By {lesson.instructor}</span>}
+                  {lesson.uploadDate && <span>• {new Date(lesson.uploadDate).toLocaleDateString()}</span>}
+                </div>
+
+                {lesson.noteUrl ? (
+                  <p className="text-sm text-blue-500 flex items-center gap-1 mb-3"><svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Class note available</p>
                 ) : (
                   <p className="text-sm text-gray-500 dark:text-foreground/70 mb-3 italic">No class notes available.</p>
                 )}
@@ -148,8 +155,15 @@ export default function StudentRecordedClasses() {
                   Module {lesson.moduleIndex}: {lesson.moduleTitle}
                 </span>
                 <h3 className="text-base font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary transition-colors line-clamp-2">{lesson.title}</h3>
-                {lesson.description ? (
-                  <p className="text-sm text-gray-500 dark:text-foreground/70 line-clamp-2 mt-auto">{lesson.description}</p>
+                
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2 text-xs text-gray-500 dark:text-foreground/60">
+                  {lesson.subject && <span className="bg-gray-100 dark:bg-foreground/10 px-2 py-0.5 rounded text-gray-700 dark:text-foreground/80">{lesson.subject}</span>}
+                  {lesson.instructor && <span>By {lesson.instructor}</span>}
+                  {lesson.uploadDate && <span>• {new Date(lesson.uploadDate).toLocaleDateString()}</span>}
+                </div>
+
+                {lesson.noteUrl ? (
+                  <p className="text-sm text-blue-500 flex items-center gap-1 mt-auto"><svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Class note available</p>
                 ) : (
                   <p className="text-sm text-gray-500 dark:text-foreground/70 mt-auto italic">No class notes.</p>
                 )}

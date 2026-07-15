@@ -263,6 +263,7 @@ export default function LessonVideoPage() {
                   lessonTitle: activeLesson.title,
                   studentId: user.uid,
                   studentName: profile?.fullName || user.displayName || 'Student',
+                  studentPhotoUrl: profile?.photoUrl || user.photoURL || '',
                   subject: reportSubject,
                   note: reportNote,
                   screenshotUrl: imgUrl,

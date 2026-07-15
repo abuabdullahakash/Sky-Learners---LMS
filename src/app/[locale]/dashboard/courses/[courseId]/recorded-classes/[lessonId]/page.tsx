@@ -148,12 +148,20 @@ export default function LessonVideoPage() {
             const isYouTube = activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be');
             const isVimeo = activeLesson.videoUrl.includes('vimeo.com');
             
+            let finalVideoUrl = activeLesson.videoUrl;
+            if (isYouTube) {
+              const match = activeLesson.videoUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]{11})/);
+              if (match && match[1]) {
+                finalVideoUrl = `https://www.youtube.com/watch?v=${match[1]}`;
+              }
+            }
+            
             // If it's a known supported tracking platform and hasn't errored out, use ReactPlayer
             if (!videoError && (isYouTube || isVimeo || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i))) {
               return (
                 // @ts-ignore
                 <ReactPlayer
-                  url={activeLesson.videoUrl}
+                  url={finalVideoUrl}
                   width="100%"
                   height="100%"
                   controls
@@ -174,7 +182,7 @@ export default function LessonVideoPage() {
             // Otherwise fallback to iframe (e.g. Google Drive, or if ReactPlayer fails)
             // For YouTube fallback, we need to convert to embed URL
             const fallbackUrl = isYouTube 
-              ? activeLesson.videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/').split('&')[0]
+              ? finalVideoUrl.replace('watch?v=', 'embed/')
               : activeLesson.videoUrl;
               
             return (

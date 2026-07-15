@@ -495,7 +495,7 @@ export default function CourseCurriculumPage() {
                     />
                   </div>
 
-                  {isVideoFacebook && (
+                  {isVideoFacebook && !lessonVideoUrl.includes('/groups/') && (
                     <div className="bg-orange-500/10 border border-orange-500/20 p-4 rounded-xl flex items-start gap-3 animate-in fade-in zoom-in duration-300">
                       <div className="mt-0.5">
                         <input

@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, addDoc, collection } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useParams, useRouter } from 'next/navigation';
 import { PlayCircle, CheckCircle, ArrowLeft, Loader2, Lock, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';
@@ -22,11 +22,9 @@ export default function LessonVideoPage() {
   const [activeLesson, setActiveLesson] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Tracking states
-  const [watchProgress, setWatchProgress] = useState(0);
-  const [hasReachedThreshold, setHasReachedThreshold] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   // Issue Reporting
   const t = useTranslations('CourseDetails');
@@ -37,8 +35,33 @@ export default function LessonVideoPage() {
   const [reportScreenshot, setReportScreenshot] = useState<File | null>(null);
   const [reportScreenshotUrl, setReportScreenshotUrl] = useState('');
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
-
   useEffect(() => {
+    const initializeTracking = async (lesson: any, courseData: any) => {
+      if (!user || !lesson || !courseData) return;
+      
+      try {
+        // Save to last_accessed
+        await setDoc(doc(db, 'last_accessed', user.uid), {
+          courseId,
+          lessonId,
+          courseTitle: courseData.title || '',
+          lessonTitle: lesson.title || '',
+          category: courseData.category || '',
+          thumbnailUrl: courseData.thumbnailUrl || '',
+          duration: lesson.duration || '0 Minutes',
+          timestamp: new Date().toISOString()
+        }, { merge: true });
+
+        // Check if already completed
+        const completedDoc = await getDoc(doc(db, 'completed_lessons', `${user.uid}_${courseId}_${lessonId}`));
+        if (completedDoc.exists()) {
+          setIsCompleted(true);
+        }
+      } catch (error) {
+        console.error("Error initializing tracking", error);
+      }
+    };
+
     const fetchCourse = async () => {
       try {
         const docRef = doc(db, 'courses', courseId);
@@ -61,6 +84,9 @@ export default function LessonVideoPage() {
             }
           }
           setActiveLesson(foundLesson);
+          if (foundLesson) {
+            initializeTracking(foundLesson, data);
+          }
         }
       } catch (error) {
         console.error("Error fetching course", error);
@@ -68,8 +94,8 @@ export default function LessonVideoPage() {
         setIsLoading(false);
       }
     };
-    if (courseId && lessonId) fetchCourse();
-  }, [courseId, lessonId]);
+    if (courseId && lessonId && user) fetchCourse();
+  }, [courseId, lessonId, user]);
 
   if (isLoading) {
     return (
@@ -162,10 +188,6 @@ export default function LessonVideoPage() {
                   height="100%"
                   controls
                   config={{ youtube: { playerVars: { origin: typeof window !== 'undefined' ? window.location.origin : '' } } }}
-                  onProgress={(state: any) => {
-                    setWatchProgress(state.played);
-                    if (state.played >= 0.8) setHasReachedThreshold(true);
-                  }}
                   onError={(e: any) => {
                     console.error('ReactPlayer Error:', e);
                     setVideoError(true);
@@ -218,70 +240,42 @@ export default function LessonVideoPage() {
         )}
         
         <div className="mt-8 pt-6 border-t border-gray-100 dark:border-foreground/10">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            
-            {/* Progress indicator */}
-            <div className="flex-1 w-full max-w-sm">
-              <div className="flex justify-between text-xs font-bold text-gray-500 mb-1.5">
-                <span>Watch Progress</span>
-                <span>{Math.round(watchProgress * 100)}%</span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-foreground/10 rounded-full h-2.5 overflow-hidden">
-                <div 
-                  className={`h-2.5 rounded-full transition-all duration-300 ${hasReachedThreshold ? 'bg-green-500' : 'bg-orange-500'}`} 
-                  style={{ width: `${Math.min(watchProgress * 100, 100)}%` }}
-                ></div>
-              </div>
-              {(() => {
-                const isTrackable = !videoError && (activeLesson.videoSource === 'facebook_public' || 
-                  (activeLesson.videoUrl && (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i))));
-                  
-                if (!hasReachedThreshold && isTrackable && activeLesson.videoUrl) {
-                  return <p className="text-[11px] text-gray-400 mt-1.5">Watch at least 80% to mark as completed.</p>;
-                }
-                if (!isTrackable && activeLesson.videoUrl && activeLesson.videoSource !== 'facebook_private') {
-                   return <p className="text-[11px] text-gray-400 mt-1.5">Video tracking not supported for this source.</p>;
-                }
-                return null;
-              })()}
-            </div>
-
+          <div className="flex items-center justify-end">
             <button 
-              disabled={(() => {
-                if (isCompleted) return true;
-                if (!activeLesson.videoUrl) return false; // can complete if no video
-                if (activeLesson.videoSource === 'facebook_private') return false; // can complete if private fb
-                
-                const isTrackable = !videoError && (activeLesson.videoSource === 'facebook_public' || 
-                  (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i)));
-                
-                if (isTrackable) return !hasReachedThreshold;
-                return false; // Not trackable (like Google Drive) -> allow completion
-              })()}
-              onClick={() => setIsCompleted(true)}
+              disabled={isCompleted || isCompleting}
+              onClick={async () => {
+                if (!user || isCompleted) return;
+                setIsCompleting(true);
+                try {
+                  await setDoc(doc(db, 'completed_lessons', `${user.uid}_${courseId}_${lessonId}`), {
+                    studentId: user.uid,
+                    courseId,
+                    lessonId,
+                    courseTitle: course?.title || '',
+                    lessonTitle: activeLesson.title || '',
+                    timestamp: new Date().toISOString()
+                  });
+                  setIsCompleted(true);
+                  toast.success("Lesson marked as completed!");
+                } catch (error) {
+                  console.error("Error marking as completed", error);
+                  toast.error("Failed to mark as completed. Please try again.");
+                } finally {
+                  setIsCompleting(false);
+                }
+              }}
               className={`px-6 py-2.5 font-bold rounded-xl transition-all flex items-center gap-2 shadow-lg 
                 ${isCompleted ? 'bg-green-500 text-white shadow-green-500/20' 
-                : (() => {
-                    const isTrackable = !videoError && (activeLesson.videoSource === 'facebook_public' || 
-                      (activeLesson.videoUrl && (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i))));
-                    
-                    return hasReachedThreshold || !isTrackable || !activeLesson.videoUrl;
-                  })()
-                  ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/20 hover:shadow-orange-500/40 hover:scale-105 active:scale-95'
-                  : 'bg-gray-200 dark:bg-foreground/10 text-gray-400 dark:text-foreground/30 cursor-not-allowed shadow-none'}
+                : 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/20 hover:shadow-orange-500/40 hover:scale-105 active:scale-95'}
               `}
             >
-              {isCompleted ? (
+              {isCompleting ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" /> Saving...
+                </>
+              ) : isCompleted ? (
                 <>
                   <CheckCircle className="w-5 h-5" /> Completed
-                </>
-              ) : (() => {
-                  const isTrackable = !videoError && (activeLesson.videoSource === 'facebook_public' || 
-                    (activeLesson.videoUrl && (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i))));
-                  return !hasReachedThreshold && isTrackable && activeLesson.videoUrl;
-                })() ? (
-                <>
-                  <Lock className="w-5 h-5" /> Mark as Completed
                 </>
               ) : (
                 <>

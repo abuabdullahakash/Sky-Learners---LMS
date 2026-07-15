@@ -17,6 +17,8 @@ export default function DashboardOverview() {
   const containerRef = useRef<HTMLDivElement>(null);
   
   const [enrolledCount, setEnrolledCount] = useState<number | null>(null);
+  const [completedCount, setCompletedCount] = useState<number>(0);
+  const [lastAccessed, setLastAccessed] = useState<any>(null);
   const [recommendedCourses, setRecommendedCourses] = useState<any[]>([]);
 
   useEffect(() => {
@@ -33,6 +35,20 @@ export default function DashboardOverview() {
         );
         const enrollmentsSnap = await getDocs(enrollmentsQuery);
         setEnrolledCount(enrollmentsSnap.size);
+
+        // Fetch completed lessons count
+        const completedRef = collection(db, 'completed_lessons');
+        const completedQuery = query(completedRef, where('studentId', '==', user.uid));
+        const completedSnap = await getDocs(completedQuery);
+        setCompletedCount(completedSnap.size);
+
+        // Fetch last accessed lesson
+        const lastAccessedRef = collection(db, 'last_accessed');
+        const lastAccessedQuery = query(lastAccessedRef, where('__name__', '==', user.uid));
+        const lastAccessedSnap = await getDocs(lastAccessedQuery);
+        if (!lastAccessedSnap.empty) {
+          setLastAccessed(lastAccessedSnap.docs[0].data());
+        }
 
         // Fetch recommended courses
         const coursesRef = collection(db, 'courses');
@@ -78,8 +94,8 @@ export default function DashboardOverview() {
 
   const stats = [
     { title: t('enrolled'), value: enrolledCount !== null ? enrolledCount : '-', icon: BookOpen, color: 'from-blue-500 to-cyan-400', shadow: 'shadow-blue-500/20' },
-    { title: t('completed'), value: '12', icon: CheckCircle, color: 'from-green-500 to-emerald-400', shadow: 'shadow-green-500/20' },
-    { title: t('score'), value: '85%', icon: Trophy, color: 'from-orange-500 to-yellow-400', shadow: 'shadow-orange-500/20' },
+    { title: t('completed'), value: completedCount.toString(), icon: CheckCircle, color: 'from-green-500 to-emerald-400', shadow: 'shadow-green-500/20' },
+    { title: t('score'), value: (completedCount * 10).toString(), icon: Trophy, color: 'from-orange-500 to-yellow-400', shadow: 'shadow-orange-500/20' },
   ];
 
   return (
@@ -149,48 +165,68 @@ export default function DashboardOverview() {
             </Link>
           </div>
           
-          <div className="bg-white dark:bg-foreground/5 rounded-3xl p-3 border border-gray-200 dark:border-foreground/10 flex flex-col sm:flex-row items-stretch gap-4 group hover:border-primary/40 transition-all duration-300 shadow-md hover:shadow-2xl dark:shadow-none dark:hover:shadow-primary/5 cursor-pointer relative overflow-hidden">
-            {/* Glossy overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+          {lastAccessed ? (
+            <Link href={`/dashboard/courses/${lastAccessed.courseId}/recorded-classes/${lastAccessed.lessonId}`} className="block">
+              <div className="bg-white dark:bg-foreground/5 rounded-3xl p-3 border border-gray-200 dark:border-foreground/10 flex flex-col sm:flex-row items-stretch gap-4 group hover:border-primary/40 transition-all duration-300 shadow-md hover:shadow-2xl dark:shadow-none dark:hover:shadow-primary/5 cursor-pointer relative overflow-hidden">
+                {/* Glossy overlay */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
-            <div className="w-full sm:w-56 h-48 sm:h-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl relative overflow-hidden flex-shrink-0 group-hover:scale-[1.02] transition-transform duration-500 shadow-inner">
-              <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent"></div>
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white">
-                <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-xl">
-                  <PlayCircle className="w-8 h-8 text-white fill-white/20" />
+                <div className="w-full sm:w-56 h-48 sm:h-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl relative overflow-hidden flex-shrink-0 group-hover:scale-[1.02] transition-transform duration-500 shadow-inner">
+                  {lastAccessed.thumbnailUrl ? (
+                    <img src={lastAccessed.thumbnailUrl} alt={lastAccessed.courseTitle} className="w-full h-full object-cover" />
+                  ) : (
+                    <>
+                      <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent"></div>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white">
+                        <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-xl">
+                          <PlayCircle className="w-8 h-8 text-white fill-white/20" />
+                        </div>
+                        <span className="font-bold tracking-widest text-white/90 line-clamp-2">{lastAccessed.courseTitle}</span>
+                      </div>
+                    </>
+                  )}
+                  {lastAccessed.thumbnailUrl && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <PlayCircle className="w-12 h-12 text-white drop-shadow-lg" />
+                    </div>
+                  )}
                 </div>
-                <span className="font-bold tracking-widest text-white/90">PHYSICS 101</span>
-              </div>
-            </div>
-            
-            <div className="flex-1 p-4 sm:p-5 flex flex-col justify-between">
-              <div>
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full uppercase tracking-wider border border-accent/20">{t('continueBtn')}</span>
-                  <span className="flex items-center gap-1 text-foreground/50 text-sm font-medium">
-                    <Clock className="w-4 h-4" />
-                    15 {t('timeLeft')}
-                  </span>
-                </div>
-                <h3 className="text-2xl font-bold mt-3 group-hover:text-primary transition-colors text-gray-900 dark:text-white">Motion and Mechanics</h3>
-                <p className="text-foreground/70 dark:text-foreground/60 mt-2 line-clamp-2 leading-relaxed">
-                  Learn the fundamental laws of motion formulated by Sir Isaac Newton and how they apply to real-world objects.
-                </p>
-              </div>
-              
-              <div className="mt-6">
-                <div className="flex justify-between text-sm font-bold mb-2">
-                  <span className="text-primary">{t('progress')}</span>
-                  <span className="text-gray-900 dark:text-white">45%</span>
-                </div>
-                <div className="w-full bg-foreground/10 rounded-full h-3 overflow-hidden shadow-inner">
-                  <div className="bg-gradient-to-r from-primary to-accent h-full rounded-full w-[45%] relative">
-                    <div className="absolute top-0 bottom-0 left-0 right-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.15)_50%,rgba(255,255,255,0.15)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem] animate-[progress_1s_linear_infinite]"></div>
+                
+                <div className="flex-1 p-4 sm:p-5 flex flex-col justify-center">
+                  <div>
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full uppercase tracking-wider border border-accent/20">{lastAccessed.category || t('continueBtn')}</span>
+                      <span className="flex items-center gap-1 text-foreground/50 text-sm font-medium">
+                        <Clock className="w-4 h-4" />
+                        {lastAccessed.duration}
+                      </span>
+                    </div>
+                    <h3 className="text-2xl font-bold mt-3 group-hover:text-primary transition-colors text-gray-900 dark:text-white line-clamp-2">{lastAccessed.lessonTitle}</h3>
+                    <p className="text-foreground/70 dark:text-foreground/60 mt-2 line-clamp-2 leading-relaxed">
+                      {lastAccessed.courseTitle}
+                    </p>
+                  </div>
+                  
+                  <div className="mt-6 flex items-center justify-between">
+                    <span className="text-sm font-bold text-primary flex items-center gap-1">
+                      Resume <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </span>
                   </div>
                 </div>
               </div>
+            </Link>
+          ) : (
+            <div className="bg-white dark:bg-foreground/5 rounded-3xl p-8 border border-gray-200 dark:border-foreground/10 text-center shadow-sm">
+              <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <PlayCircle className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Start Learning</h3>
+              <p className="text-foreground/60 mb-6">You haven't watched any lessons recently. Go to your courses and pick a topic to start!</p>
+              <Link href="/dashboard/courses" className="px-6 py-2.5 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all inline-flex">
+                Go to Courses
+              </Link>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Sidebar / Upcoming */}

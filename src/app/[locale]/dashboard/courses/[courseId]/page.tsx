@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { useAuth } from '@/context/AuthContext';
 import { useParams } from 'next/navigation';
 import { Clock, CheckCircle2, PlayCircle, Trophy, BookOpen, AlertCircle } from 'lucide-react';
 import { Link } from '@/i18n/routing';
@@ -13,6 +14,10 @@ export default function StudentCourseOverview() {
   const courseId = params.courseId as string;
   const [course, setCourse] = useState<any>(null);
   const t = useTranslations('Dashboard.courseOverview');
+  const { user } = useAuth();
+  
+  const [completedCount, setCompletedCount] = useState<number>(0);
+  const [totalLessons, setTotalLessons] = useState<number>(0);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -20,7 +25,30 @@ export default function StudentCourseOverview() {
         const docRef = doc(db, 'courses', courseId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setCourse(docSnap.data());
+          const courseData = docSnap.data();
+          setCourse(courseData);
+
+          // Calculate total lessons
+          let total = 0;
+          if (courseData.modules) {
+            courseData.modules.forEach((module: any) => {
+              if (module.lessons) {
+                total += module.lessons.length;
+              }
+            });
+          }
+          setTotalLessons(total);
+
+          // Fetch completed lessons
+          if (user) {
+            const completedQuery = query(
+              collection(db, 'completed_lessons'),
+              where('studentId', '==', user.uid),
+              where('courseId', '==', courseId)
+            );
+            const completedSnap = await getDocs(completedQuery);
+            setCompletedCount(completedSnap.size);
+          }
         }
       } catch (error) {
         console.error("Error fetching course", error);
@@ -44,17 +72,17 @@ export default function StudentCourseOverview() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 dark:from-blue-500/20 dark:to-blue-600/20 border border-blue-200 dark:border-blue-500/30 rounded-3xl p-6 flex flex-col items-center justify-center text-center shadow-sm">
           <BookOpen className="w-8 h-8 text-blue-600 dark:text-blue-400 mb-3" />
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">0%</h3>
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0}%</h3>
           <p className="text-sm font-bold text-blue-600/80 dark:text-blue-400/80 uppercase tracking-wider">{t('progress')}</p>
         </div>
         <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 dark:from-green-500/20 dark:to-green-600/20 border border-green-200 dark:border-green-500/30 rounded-3xl p-6 flex flex-col items-center justify-center text-center shadow-sm">
           <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400 mb-3" />
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">0</h3>
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{completedCount}</h3>
           <p className="text-sm font-bold text-green-600/80 dark:text-green-400/80 uppercase tracking-wider">{t('lessonsCompleted')}</p>
         </div>
         <div className="bg-gradient-to-br from-orange-500/10 to-red-500/10 dark:from-orange-500/20 dark:to-red-500/20 border border-orange-200 dark:border-orange-500/30 rounded-3xl p-6 flex flex-col items-center justify-center text-center shadow-sm">
           <Trophy className="w-8 h-8 text-orange-600 dark:text-orange-400 mb-3" />
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">0</h3>
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{completedCount * 10}</h3>
           <p className="text-sm font-bold text-orange-600/80 dark:text-orange-400/80 uppercase tracking-wider">{t('pointsEarned')}</p>
         </div>
       </div>

@@ -91,6 +91,14 @@ export default function CourseCurriculumPage() {
     await updateDoc(doc(db, 'courses', courseId), { modules: updatedModules });
   };
 
+  const handleRemoveModule = async (moduleId: string) => {
+    if (!confirm('Are you sure you want to delete this module and ALL of its lessons? This action cannot be undone.')) return;
+    
+    const updatedModules = course.modules.filter((mod: any) => mod.id !== moduleId);
+    setCourse({ ...course, modules: updatedModules });
+    await updateDoc(doc(db, 'courses', courseId), { modules: updatedModules });
+  };
+
   // --- Subject Management ---
   const handleAddSubject = async () => {
     if (!newSubject.trim()) return;
@@ -254,10 +262,10 @@ export default function CourseCurriculumPage() {
         </div>
         <div className="flex flex-col gap-3 w-full md:w-auto">
           <div className="flex gap-3">
-            <button onClick={() => setIsSubjectModalOpen(true)} className="flex-1 justify-center px-4 py-2 bg-background border border-foreground/10 text-foreground rounded-xl font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2">
+            <button onClick={() => setIsSubjectModalOpen(true)} className="flex-1 justify-center px-4 py-2 bg-background border border-foreground/10 text-foreground rounded-xl font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap">
               <Settings className="w-4 h-4" /> Subjects
             </button>
-            <button onClick={handleAddModule} className="flex-1 justify-center px-4 py-2 bg-background border border-foreground/10 text-foreground rounded-xl font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2">
+            <button onClick={handleAddModule} className="flex-1 justify-center px-4 py-2 bg-background border border-foreground/10 text-foreground rounded-xl font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap">
               <Plus className="w-4 h-4" /> Add Module
             </button>
           </div>
@@ -299,6 +307,9 @@ export default function CourseCurriculumPage() {
                 />
                 <button onClick={() => openLessonModal(module.id)} className="text-sm px-3 py-1.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-bold transition-colors shadow-sm ml-2 whitespace-nowrap flex items-center gap-1">
                   <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Add Lesson</span>
+                </button>
+                <button onClick={() => handleRemoveModule(module.id)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors ml-1" title="Delete Module">
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
               

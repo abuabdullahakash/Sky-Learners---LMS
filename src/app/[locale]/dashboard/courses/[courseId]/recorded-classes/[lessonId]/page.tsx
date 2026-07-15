@@ -8,7 +8,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { PlayCircle, CheckCircle, ArrowLeft, Loader2, Lock, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import dynamic from 'next/dynamic';
-const ReactPlayer = dynamic(() => import('react-player'), { ssr: false });
+const ReactPlayer = dynamic(() => import('react-player/lazy'), { ssr: false });
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import toast from 'react-hot-toast';

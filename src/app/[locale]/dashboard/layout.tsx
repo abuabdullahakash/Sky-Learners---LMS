@@ -10,8 +10,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  // Hide main sidebar if the route is /dashboard/courses/[courseId] or deeper
-  const isCourseDashboard = pathname.includes('/dashboard/courses/') && pathname.split('/').length > 4;
+  
+  const parts = pathname.split('/');
+  const coursesIndex = parts.indexOf('courses');
+  // Check if we are inside a specific course dashboard
+  const isCourseDashboard = coursesIndex !== -1 && parts.length > coursesIndex + 1;
 
   return (
     <ProtectedRoute allowedRoles={['student']}>

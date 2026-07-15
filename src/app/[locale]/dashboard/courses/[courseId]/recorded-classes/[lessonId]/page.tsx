@@ -25,6 +25,7 @@ export default function LessonVideoPage() {
   const [watchProgress, setWatchProgress] = useState(0);
   const [hasReachedThreshold, setHasReachedThreshold] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [videoError, setVideoError] = useState(false);
 
   // Issue Reporting
   const t = useTranslations('CourseDetails');
@@ -147,8 +148,8 @@ export default function LessonVideoPage() {
             const isYouTube = activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be');
             const isVimeo = activeLesson.videoUrl.includes('vimeo.com');
             
-            // If it's a known supported tracking platform, use ReactPlayer
-            if (isYouTube || isVimeo || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i)) {
+            // If it's a known supported tracking platform and hasn't errored out, use ReactPlayer
+            if (!videoError && (isYouTube || isVimeo || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i))) {
               return (
                 // @ts-ignore
                 <ReactPlayer
@@ -156,21 +157,32 @@ export default function LessonVideoPage() {
                   width="100%"
                   height="100%"
                   controls
+                  config={{ youtube: { playerVars: { origin: typeof window !== 'undefined' ? window.location.origin : '' } } }}
                   onProgress={(state: any) => {
                     setWatchProgress(state.played);
                     if (state.played >= 0.8) setHasReachedThreshold(true);
+                  }}
+                  onError={(e: any) => {
+                    console.error('ReactPlayer Error:', e);
+                    setVideoError(true);
                   }}
                   style={{ position: 'absolute', top: 0, left: 0 }}
                 />
               );
             }
             
-            // Otherwise fallback to iframe (e.g. Google Drive preview links)
+            // Otherwise fallback to iframe (e.g. Google Drive, or if ReactPlayer fails)
+            // For YouTube fallback, we need to convert to embed URL
+            const fallbackUrl = isYouTube 
+              ? activeLesson.videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/').split('&')[0]
+              : activeLesson.videoUrl;
+              
             return (
               <iframe 
-                src={activeLesson.videoUrl} 
-                className="w-full h-full absolute inset-0"
+                src={fallbackUrl} 
+                className="w-full h-full absolute inset-0 border-0"
                 allowFullScreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 title={activeLesson.title}
               ></iframe>
             );
@@ -218,8 +230,8 @@ export default function LessonVideoPage() {
                 ></div>
               </div>
               {(() => {
-                const isTrackable = activeLesson.videoSource === 'facebook_public' || 
-                  (activeLesson.videoUrl && (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i)));
+                const isTrackable = !videoError && (activeLesson.videoSource === 'facebook_public' || 
+                  (activeLesson.videoUrl && (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i))));
                   
                 if (!hasReachedThreshold && isTrackable && activeLesson.videoUrl) {
                   return <p className="text-[11px] text-gray-400 mt-1.5">Watch at least 80% to mark as completed.</p>;
@@ -237,8 +249,8 @@ export default function LessonVideoPage() {
                 if (!activeLesson.videoUrl) return false; // can complete if no video
                 if (activeLesson.videoSource === 'facebook_private') return false; // can complete if private fb
                 
-                const isTrackable = activeLesson.videoSource === 'facebook_public' || 
-                  (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i));
+                const isTrackable = !videoError && (activeLesson.videoSource === 'facebook_public' || 
+                  (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i)));
                 
                 if (isTrackable) return !hasReachedThreshold;
                 return false; // Not trackable (like Google Drive) -> allow completion
@@ -247,8 +259,8 @@ export default function LessonVideoPage() {
               className={`px-6 py-2.5 font-bold rounded-xl transition-all flex items-center gap-2 shadow-lg 
                 ${isCompleted ? 'bg-green-500 text-white shadow-green-500/20' 
                 : (() => {
-                    const isTrackable = activeLesson.videoSource === 'facebook_public' || 
-                      (activeLesson.videoUrl && (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i)));
+                    const isTrackable = !videoError && (activeLesson.videoSource === 'facebook_public' || 
+                      (activeLesson.videoUrl && (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i))));
                     
                     return hasReachedThreshold || !isTrackable || !activeLesson.videoUrl;
                   })()
@@ -261,8 +273,8 @@ export default function LessonVideoPage() {
                   <CheckCircle className="w-5 h-5" /> Completed
                 </>
               ) : (() => {
-                  const isTrackable = activeLesson.videoSource === 'facebook_public' || 
-                    (activeLesson.videoUrl && (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i)));
+                  const isTrackable = !videoError && (activeLesson.videoSource === 'facebook_public' || 
+                    (activeLesson.videoUrl && (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') || activeLesson.videoUrl.includes('vimeo.com') || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i))));
                   return !hasReachedThreshold && isTrackable && activeLesson.videoUrl;
                 })() ? (
                 <>

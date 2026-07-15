@@ -7,12 +7,14 @@ import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 export default function StudentCourseSidebar() {
   const pathname = usePathname();
   const params = useParams();
   const courseId = params.courseId as string;
   const [course, setCourse] = useState<any>(null);
+  const t = useTranslations('Dashboard.courseSidebar');
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -30,20 +32,20 @@ export default function StudentCourseSidebar() {
   }, [courseId]);
 
   const menuItems = [
-    { name: 'Overview', href: `/dashboard/courses/${courseId}`, icon: LayoutDashboard, exact: true },
-    { name: 'Curriculum', href: `/dashboard/courses/${courseId}/curriculum`, icon: BookOpen },
-    { name: 'Live Classes', href: `/dashboard/courses/${courseId}/live-classes`, icon: Video },
-    { name: 'Resources', href: `/dashboard/courses/${courseId}/resources`, icon: FileText },
-    { name: 'Exams & Quizzes', href: `/dashboard/courses/${courseId}/exams`, icon: CheckSquare },
-    { name: 'Community', href: `/dashboard/courses/${courseId}/community`, icon: MessageSquare },
+    { name: t('overview'), href: `/dashboard/courses/${courseId}`, icon: LayoutDashboard, exact: true },
+    { name: t('curriculum'), href: `/dashboard/courses/${courseId}/curriculum`, icon: BookOpen },
+    { name: t('liveClasses'), href: `/dashboard/courses/${courseId}/live-classes`, icon: Video },
+    { name: t('resources'), href: `/dashboard/courses/${courseId}/resources`, icon: FileText },
+    { name: t('exams'), href: `/dashboard/courses/${courseId}/exams`, icon: CheckSquare },
+    { name: t('community'), href: `/dashboard/courses/${courseId}/community`, icon: MessageSquare },
   ];
 
   return (
     <aside className="w-64 bg-white dark:bg-foreground/5 rounded-3xl border border-gray-200 dark:border-foreground/10 shadow-md dark:shadow-none flex flex-col h-[calc(100vh-140px)] sticky top-24 overflow-hidden">
       
       <div className="p-4 border-b border-gray-100 dark:border-foreground/10">
-        <Link href="/dashboard/courses" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:text-foreground/60 dark:hover:text-foreground transition-colors mb-4">
-          <ArrowLeft className="w-4 h-4" /> Back to My Courses
+        <Link href="/dashboard/courses" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:text-foreground/60 dark:hover:text-foreground transition-colors mb-4 font-medium">
+          <ArrowLeft className="w-4 h-4" /> {t('back')}
         </Link>
         {course?.thumbnailUrl && (
           <div className="w-full h-24 relative rounded-xl overflow-hidden mb-3 border border-gray-100 dark:border-foreground/10">
@@ -71,8 +73,8 @@ export default function StudentCourseSidebar() {
               href={item.href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 font-medium text-sm ${
                 isActive 
-                  ? 'bg-primary text-white shadow-lg shadow-primary/20' 
-                  : 'hover:bg-gray-50 dark:hover:bg-foreground/5 text-gray-600 dark:text-foreground/70 hover:text-gray-900 dark:hover:text-foreground'
+                  ? 'bg-primary text-white shadow-lg shadow-primary/20 dark:bg-primary dark:text-white dark:shadow-primary/30' 
+                  : 'hover:bg-gray-50 dark:hover:bg-foreground/5 text-gray-600 dark:text-foreground/70 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               <Icon className="w-4 h-4" />

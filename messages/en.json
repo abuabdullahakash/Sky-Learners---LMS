@@ -12,6 +12,27 @@
     "login": "Login"
   },
   "Dashboard": {
+    "courseSidebar": {
+      "back": "Back to My Courses",
+      "overview": "Overview",
+      "curriculum": "Curriculum",
+      "liveClasses": "Live Classes",
+      "resources": "Resources",
+      "exams": "Exams & Quizzes",
+      "community": "Community"
+    },
+    "courseOverview": {
+      "welcome": "Welcome to",
+      "summary": "Here is a quick summary of your progress and course details.",
+      "progress": "Progress",
+      "lessonsCompleted": "Lessons Completed",
+      "pointsEarned": "Points Earned",
+      "readyToStart": "Ready to start?",
+      "diveInto": "Dive into the curriculum and begin your first lesson.",
+      "goToCurriculum": "Go to Curriculum",
+      "latestAnnouncements": "Latest Announcements",
+      "noAnnouncements": "No announcements yet."
+    },
     "sidebar": {
       "overview": "Overview",
       "courses": "My Courses",

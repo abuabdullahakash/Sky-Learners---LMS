@@ -12,6 +12,27 @@
     "login": "লগইন"
   },
   "Dashboard": {
+    "courseSidebar": {
+      "back": "আমার কোর্সে ফিরে যান",
+      "overview": "ওভারভিউ",
+      "curriculum": "সিলেবাস",
+      "liveClasses": "লাইভ ক্লাস",
+      "resources": "ম্যাটেরিয়ালস",
+      "exams": "কুইজ ও এক্সাম",
+      "community": "কমিউনিটি"
+    },
+    "courseOverview": {
+      "welcome": "স্বাগতম,",
+      "summary": "এখানে আপনার প্রোগ্রেস এবং কোর্সের বিস্তারিত সংক্ষেপে দেওয়া হলো।",
+      "progress": "প্রোগ্রেস",
+      "lessonsCompleted": "সম্পন্ন করা লেসন",
+      "pointsEarned": "অর্জিত পয়েন্ট",
+      "readyToStart": "শুরু করতে প্রস্তুত?",
+      "diveInto": "সিলেবাসে যান এবং আপনার প্রথম লেসন শুরু করুন।",
+      "goToCurriculum": "সিলেবাসে যান",
+      "latestAnnouncements": "সর্বশেষ নোটিশ",
+      "noAnnouncements": "এখনো কোনো নোটিশ নেই।"
+    },
     "sidebar": {
       "overview": "ওভারভিউ",
       "courses": "আমার কোর্স",

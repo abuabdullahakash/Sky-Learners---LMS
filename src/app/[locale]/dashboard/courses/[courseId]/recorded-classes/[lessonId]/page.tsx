@@ -3,11 +3,15 @@
 
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, addDoc, collection } from 'firebase/firestore';
 import { useParams, useRouter } from 'next/navigation';
-import { PlayCircle, CheckCircle, ArrowLeft, Loader2, Lock } from 'lucide-react';
+import { PlayCircle, CheckCircle, ArrowLeft, Loader2, Lock, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import ReactPlayer from 'react-player';
+import { useTranslations } from 'next-intl';
+import { useAuth } from '@/context/AuthContext';
+import toast from 'react-hot-toast';
+import { uploadImageToImgBB } from '@/lib/imgbb';
 
 export default function LessonVideoPage() {
   const params = useParams();
@@ -21,6 +25,16 @@ export default function LessonVideoPage() {
   const [watchProgress, setWatchProgress] = useState(0);
   const [hasReachedThreshold, setHasReachedThreshold] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+
+  // Issue Reporting
+  const t = useTranslations('CourseDetails');
+  const { user, profile } = useAuth();
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportSubject, setReportSubject] = useState('');
+  const [reportNote, setReportNote] = useState('');
+  const [reportScreenshot, setReportScreenshot] = useState<File | null>(null);
+  const [reportScreenshotUrl, setReportScreenshotUrl] = useState('');
+  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -76,9 +90,10 @@ export default function LessonVideoPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-3">
-        <Link 
+    <div className="max-w-4xl mx-auto space-y-6 relative">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <Link 
           href={`/dashboard/courses/${courseId}/recorded-classes`}
           className="p-2 hover:bg-gray-100 dark:hover:bg-foreground/10 rounded-full transition-colors text-gray-600 dark:text-foreground/70"
         >
@@ -92,6 +107,14 @@ export default function LessonVideoPage() {
             {activeLesson.uploadDate && <span>• {new Date(activeLesson.uploadDate).toLocaleDateString()}</span>}
           </div>
         </div>
+        </div>
+        <button 
+          onClick={() => setIsReportModalOpen(true)}
+          className="px-4 py-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl text-sm font-bold transition-colors flex items-center gap-2"
+        >
+          <AlertCircle className="w-4 h-4" />
+          <span className="hidden sm:inline">{t('getHelp')}</span>
+        </button>
       </div>
 
       <div className="bg-black rounded-2xl aspect-video relative overflow-hidden shadow-lg flex items-center justify-center">
@@ -205,6 +228,127 @@ export default function LessonVideoPage() {
           </div>
         </div>
       </div>
+
+      {/* Report Issue Modal */}
+      {isReportModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-background w-full max-w-lg rounded-3xl p-6 shadow-2xl relative border border-foreground/10 animate-in zoom-in duration-300">
+            <button 
+              onClick={() => setIsReportModalOpen(false)}
+              className="absolute right-4 top-4 p-2 bg-foreground/5 hover:bg-foreground/10 rounded-full transition-colors text-foreground/60"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <h2 className="text-2xl font-bold mb-1 flex items-center gap-2">
+              <AlertCircle className="w-6 h-6 text-red-500" />
+              {t('reportIssue')}
+            </h2>
+            <p className="text-foreground/60 text-sm mb-6">Lesson: {activeLesson.title}</p>
+            
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (!reportSubject || !reportNote || !user) return;
+              setIsSubmittingReport(true);
+              
+              try {
+                let imgUrl = '';
+                if (reportScreenshot) {
+                  imgUrl = await uploadImageToImgBB(reportScreenshot);
+                }
+                
+                await addDoc(collection(db, 'lesson_issues'), {
+                  courseId,
+                  lessonId,
+                  lessonTitle: activeLesson.title,
+                  studentId: user.uid,
+                  studentName: profile?.fullName || user.displayName || 'Student',
+                  subject: reportSubject,
+                  note: reportNote,
+                  screenshotUrl: imgUrl,
+                  status: 'open',
+                  createdAt: new Date().toISOString()
+                });
+                
+                toast.success(t('issueSuccess'));
+                setIsReportModalOpen(false);
+                setReportSubject('');
+                setReportNote('');
+                setReportScreenshot(null);
+                setReportScreenshotUrl('');
+              } catch (error) {
+                console.error("Error submitting report", error);
+                toast.error("Failed to submit report. Please try again.");
+              } finally {
+                setIsSubmittingReport(false);
+              }
+            }} className="space-y-4">
+              
+              <div>
+                <label className="text-sm font-bold text-foreground/80">{t('issueSubject')} *</label>
+                <input 
+                  type="text" required 
+                  value={reportSubject} onChange={(e) => setReportSubject(e.target.value)}
+                  placeholder={t('issueSubjectPlaceholder')}
+                  className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 focus:outline-none focus:border-red-500 mt-1"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-bold text-foreground/80">{t('issueNote')} *</label>
+                <textarea 
+                  required rows={4}
+                  value={reportNote} onChange={(e) => setReportNote(e.target.value)}
+                  placeholder={t('issueNotePlaceholder')}
+                  className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 focus:outline-none focus:border-red-500 mt-1 resize-none"
+                ></textarea>
+              </div>
+
+              <div>
+                <label className="text-sm font-bold text-foreground/80 mb-2 block">{t('issueScreenshot')}</label>
+                {reportScreenshotUrl ? (
+                  <div className="relative inline-block">
+                    <img src={reportScreenshotUrl} alt="Preview" className="h-24 rounded-lg object-cover border border-foreground/20" />
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        setReportScreenshot(null);
+                        setReportScreenshotUrl('');
+                      }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <label className="cursor-pointer bg-foreground/5 hover:bg-foreground/10 px-4 py-2.5 rounded-xl border border-foreground/10 flex items-center gap-2 text-sm font-bold transition-colors">
+                      <ImageIcon className="w-4 h-4 text-foreground/60" />
+                      Upload Image
+                      <input 
+                        type="file" className="hidden" accept="image/*"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            setReportScreenshot(e.target.files[0]);
+                            setReportScreenshotUrl(URL.createObjectURL(e.target.files[0]));
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+                )}
+              </div>
+
+              <button 
+                type="submit" disabled={isSubmittingReport || !reportSubject || !reportNote}
+                className="w-full py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-colors flex justify-center items-center gap-2 mt-4 disabled:opacity-50"
+              >
+                {isSubmittingReport ? <Loader2 className="w-5 h-5 animate-spin" /> : t('submitIssue')}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

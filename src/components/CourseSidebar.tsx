@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, usePathname } from '@/i18n/routing';
-import { LayoutDashboard, BookOpen, Video, FileText, CheckSquare, MessageSquare, Settings, ArrowLeft, Users, ClipboardList, GraduationCap } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Video, FileText, CheckSquare, MessageSquare, Settings, ArrowLeft, Users, ClipboardList, GraduationCap, AlertCircle } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -54,6 +54,7 @@ export default function CourseSidebar() {
     { name: 'Enrollments', href: `/teacher-dashboard/courses/${courseId}/enrollments`, icon: ClipboardList },
     { name: 'Students', href: `/teacher-dashboard/courses/${courseId}/students`, icon: GraduationCap },
     { name: 'Curriculum', href: `/teacher-dashboard/courses/${courseId}/curriculum`, icon: BookOpen },
+    { name: 'Student Issues', href: `/teacher-dashboard/courses/${courseId}/issues`, icon: AlertCircle },
     { name: 'Live Classes', href: `/teacher-dashboard/courses/${courseId}/live-classes`, icon: Video },
     { name: 'Resources', href: `/teacher-dashboard/courses/${courseId}/resources`, icon: FileText },
     { name: 'Exams & Quizzes', href: `/teacher-dashboard/courses/${courseId}/exams`, icon: CheckSquare },

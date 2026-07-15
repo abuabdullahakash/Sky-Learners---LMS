@@ -20,7 +20,8 @@
       "liveClasses": "Live Classes",
       "resources": "Resources",
       "exams": "Exams & Quizzes",
-      "community": "Community"
+      "community": "Community",
+      "studentIssues": "Student Issues"
     },
     "courseOverview": {
       "welcome": "Welcome to",
@@ -253,6 +254,16 @@
     "gallery": "Course Gallery",
     "testimonials": "Student Reviews",
     "faqs": "Frequently Asked Questions",
+    "getHelp": "Get Help",
+    "reportIssue": "Report an Issue",
+    "issueSubject": "Subject / Issue Type",
+    "issueSubjectPlaceholder": "e.g. Video is not playing",
+    "issueNote": "Detailed Note",
+    "issueNotePlaceholder": "Describe your problem in detail...",
+    "issueScreenshot": "Screenshot (Optional)",
+    "submitIssue": "Submit Report",
+    "submitting": "Submitting...",
+    "issueSuccess": "Your report has been submitted!",
     "pricingCard": {
       "courseFee": "Course Fee",
       "modules": "Total Modules",

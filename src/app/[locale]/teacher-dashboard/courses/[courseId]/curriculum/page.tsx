@@ -5,8 +5,31 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Plus, GripVertical, Video as VideoIcon, Image as ImageIcon, Trash2, Upload, Loader2, X, FileText, Settings, Calendar, User, BookOpen, CheckCircle, Search, ChevronDown, ChevronRight, Edit2 } from 'lucide-react';
+import { Plus, GripVertical, Video as VideoIcon, Image as ImageIcon, Trash2, Upload, Loader2, X, FileText, Settings, Calendar, User, BookOpen, CheckCircle, Search, ChevronDown, ChevronRight, Edit2, HardDrive, Link as LinkIcon, AlertTriangle, PlayCircle } from 'lucide-react';
 import { uploadImageToImgBB } from '@/lib/imgbb';
+
+const scanVideoUrl = (url: string, isPrivateGroupCheck: boolean = false) => {
+  if (!url) return null;
+  const isFb = url.includes('facebook.com') || url.includes('fb.watch') || url.includes('fb.com');
+  const isFbPrivate = isPrivateGroupCheck || (isFb && url.includes('/groups/'));
+
+  if (url.includes('youtube.com') || url.includes('youtu.be')) {
+    return { type: 'youtube', platform: 'YouTube', icon: <PlayCircle className="w-5 h-5 text-red-500" />, valid: true, message: 'Valid YouTube URL. Tracking supported.' };
+  }
+  if (isFb) {
+    if (isFbPrivate) {
+      return { type: 'facebook_private', platform: 'Private Facebook Group', icon: <AlertTriangle className="w-5 h-5 text-orange-500" />, valid: true, message: 'Private group video. Cannot be embedded, but students can watch directly on Facebook. Tracking disabled.' };
+    }
+    return { type: 'facebook_public', platform: 'Public Facebook Video', icon: <LinkIcon className="w-5 h-5 text-blue-500" />, valid: true, message: 'Valid public Facebook video. Tracking supported.' };
+  }
+  if (url.includes('drive.google.com')) {
+    return { type: 'drive', platform: 'Google Drive', icon: <HardDrive className="w-5 h-5 text-green-500" />, valid: true, message: 'Google Drive link. Will be embedded via iframe. Tracking disabled.' };
+  }
+  if (url.match(/\.(mp4|webm|ogg)$/i)) {
+    return { type: 'direct', platform: 'Direct Video File', icon: <VideoIcon className="w-5 h-5 text-purple-500" />, valid: true, message: 'Direct video file. Tracking supported.' };
+  }
+  return { type: 'unknown', platform: 'Unknown / Other', icon: <LinkIcon className="w-5 h-5 text-gray-500" />, valid: false, message: 'Unrecognized URL. System will try to embed it via iframe. Tracking disabled. May not play properly.' };
+};
 
 export default function CourseCurriculumPage() {
   const { user } = useAuth();
@@ -176,9 +199,10 @@ export default function CourseCurriculumPage() {
 
       let updatedModules = [...course.modules];
 
-      let videoSource = 'youtube';
-      if (isVideoFacebook) {
-        videoSource = isFacebookPrivate ? 'facebook_private' : 'facebook_public';
+      let videoSource = 'unknown';
+      const scanResult = scanVideoUrl(lessonVideoUrl, isFacebookPrivate);
+      if (scanResult) {
+        videoSource = scanResult.type;
       }
 
       if (editingLessonId) {
@@ -494,6 +518,26 @@ export default function CourseCurriculumPage() {
                       className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-orange-500 mt-1 transition-colors"
                     />
                   </div>
+
+                  {lessonVideoUrl && (() => {
+                    const scan = scanVideoUrl(lessonVideoUrl, isFacebookPrivate);
+                    if (!scan) return null;
+                    return (
+                      <div className={`mt-2 p-4 rounded-xl border flex items-start gap-3 animate-in fade-in zoom-in duration-300 ${scan.valid ? 'bg-green-500/10 border-green-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
+                        <div className="mt-0.5 p-1.5 bg-background rounded-lg shadow-sm">
+                          {scan.icon}
+                        </div>
+                        <div>
+                          <p className={`text-sm font-bold ${scan.valid ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
+                            {scan.platform}
+                          </p>
+                          <p className="text-xs text-foreground/70 mt-1">
+                            {scan.message}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {isVideoFacebook && !lessonVideoUrl.includes('/groups/') && (
                     <div className="bg-orange-500/10 border border-orange-500/20 p-4 rounded-xl flex items-start gap-3 animate-in fade-in zoom-in duration-300">

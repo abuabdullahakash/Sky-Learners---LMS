@@ -7,7 +7,8 @@ import { doc, getDoc, addDoc, collection } from 'firebase/firestore';
 import { useParams, useRouter } from 'next/navigation';
 import { PlayCircle, CheckCircle, ArrowLeft, Loader2, Lock, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import ReactPlayer from 'react-player';
+import dynamic from 'next/dynamic';
+const ReactPlayer = dynamic(() => import('react-player'), { ssr: false });
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import toast from 'react-hot-toast';
@@ -129,35 +130,30 @@ export default function LessonVideoPage() {
               Watch on Facebook
             </a>
           </div>
-        ) : activeLesson.videoUrl && activeLesson.videoSource === 'facebook_public' ? (
-          // @ts-ignore: ReactPlayer types might not be fully compatible with React 19 yet
-          <ReactPlayer
-            url={activeLesson.videoUrl}
-            width="100%"
-            height="100%"
-            controls
-            onProgress={(state: any) => {
-              setWatchProgress(state.played);
-              if (state.played >= 0.8) setHasReachedThreshold(true);
-            }}
-            style={{ position: 'absolute', top: 0, left: 0 }}
-          />
         ) : activeLesson.videoUrl ? (
           (() => {
-            const isGoogleDrive = activeLesson.videoUrl.includes('drive.google.com');
-            const isYouTube = activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be');
-            const isVimeo = activeLesson.videoUrl.includes('vimeo.com');
-            
+            // Fallback for old videos that don't have videoSource
+            let currentSource = activeLesson.videoSource;
+            if (!currentSource || currentSource === 'unknown') {
+              if (activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be')) currentSource = 'youtube';
+              else if (activeLesson.videoUrl.includes('facebook.com') || activeLesson.videoUrl.includes('fb.watch') || activeLesson.videoUrl.includes('fb.com')) currentSource = 'facebook_public';
+              else if (activeLesson.videoUrl.includes('drive.google.com')) currentSource = 'drive';
+              else if (activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i)) currentSource = 'direct';
+              else currentSource = 'unknown';
+            }
+
+            const isTrackable = !videoError && ['youtube', 'facebook_public', 'direct', 'vimeo'].includes(currentSource);
+
             let finalVideoUrl = activeLesson.videoUrl;
-            if (isYouTube) {
+            if (currentSource === 'youtube') {
               const match = activeLesson.videoUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]{11})/);
               if (match && match[1]) {
                 finalVideoUrl = `https://www.youtube.com/watch?v=${match[1]}`;
               }
             }
-            
+
             // If it's a known supported tracking platform and hasn't errored out, use ReactPlayer
-            if (!videoError && (isYouTube || isVimeo || activeLesson.videoUrl.match(/\.(mp4|webm|ogg)$/i))) {
+            if (isTrackable) {
               return (
                 // @ts-ignore
                 <ReactPlayer
@@ -179,9 +175,8 @@ export default function LessonVideoPage() {
               );
             }
             
-            // Otherwise fallback to iframe (e.g. Google Drive, or if ReactPlayer fails)
-            // For YouTube fallback, we need to convert to embed URL
-            const fallbackUrl = isYouTube 
+            // Otherwise fallback to iframe (e.g. Google Drive, unknown, or if ReactPlayer fails)
+            const fallbackUrl = currentSource === 'youtube' 
               ? finalVideoUrl.replace('watch?v=', 'embed/')
               : activeLesson.videoUrl;
               

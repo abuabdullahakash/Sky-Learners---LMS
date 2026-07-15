@@ -40,6 +40,10 @@ export default function CourseCurriculumPage() {
   const [lessonThumbnailUrl, setLessonThumbnailUrl] = useState('');
   const [isUploadingLesson, setIsUploadingLesson] = useState(false);
 
+  // Hybrid Video states
+  const [isVideoFacebook, setIsVideoFacebook] = useState(false);
+  const [isFacebookPrivate, setIsFacebookPrivate] = useState(false);
+
   useEffect(() => {
     const fetchCourse = async () => {
       if (!user) return;
@@ -129,6 +133,10 @@ export default function CourseCurriculumPage() {
       setLessonFreePreview(lesson.isFreePreview || false);
       setLessonThumbnail(null);
       setLessonThumbnailUrl(lesson.thumbnailUrl || '');
+      
+      const source = lesson.videoSource || 'youtube';
+      setIsVideoFacebook(source.includes('facebook'));
+      setIsFacebookPrivate(source === 'facebook_private');
     } else {
       // Add mode
       setEditingModuleId(moduleId || (course.modules?.length > 0 ? course.modules[0].id : null));
@@ -141,6 +149,8 @@ export default function CourseCurriculumPage() {
       setLessonFreePreview(false);
       setLessonThumbnail(null);
       setLessonThumbnailUrl('');
+      setIsVideoFacebook(false);
+      setIsFacebookPrivate(false);
     }
     setIsLessonModalOpen(true);
   };
@@ -166,6 +176,11 @@ export default function CourseCurriculumPage() {
 
       let updatedModules = [...course.modules];
 
+      let videoSource = 'youtube';
+      if (isVideoFacebook) {
+        videoSource = isFacebookPrivate ? 'facebook_private' : 'facebook_public';
+      }
+
       if (editingLessonId) {
         // Edit existing lesson
         updatedModules = updatedModules.map((mod: any) => {
@@ -182,6 +197,7 @@ export default function CourseCurriculumPage() {
                   noteUrl: lessonNoteUrl,
                   isFreePreview: lessonFreePreview,
                   thumbnailUrl: finalThumbnailUrl,
+                  videoSource: videoSource,
                 } : l
               )
             };
@@ -199,6 +215,7 @@ export default function CourseCurriculumPage() {
           noteUrl: lessonNoteUrl,
           isFreePreview: lessonFreePreview,
           thumbnailUrl: finalThumbnailUrl,
+          videoSource: videoSource,
           uploadDate: new Date().toISOString()
         };
 
@@ -457,16 +474,50 @@ export default function CourseCurriculumPage() {
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-foreground/80">Video URL *</label>
-                  <input 
-                    type="url" required value={lessonVideoUrl} onChange={(e) => setLessonVideoUrl(e.target.value)}
-                    placeholder="YouTube, Vimeo, Facebook, or Drive URL"
-                    className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-orange-500"
-                  />
-                </div>
+                <div>
+                    <label className="text-sm font-bold text-foreground/80">Video URL *</label>
+                    <input 
+                      type="url" required 
+                      value={lessonVideoUrl} 
+                      onChange={(e) => {
+                        const url = e.target.value;
+                        setLessonVideoUrl(url);
+                        const isFb = url.includes('facebook.com') || url.includes('fb.watch') || url.includes('fb.com');
+                        setIsVideoFacebook(isFb);
+                        if (isFb && url.includes('/groups/')) {
+                          setIsFacebookPrivate(true);
+                        } else if (!isFb) {
+                          setIsFacebookPrivate(false);
+                        }
+                      }}
+                      placeholder="e.g. https://www.youtube.com/watch?v=..."
+                      className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-orange-500 mt-1 transition-colors"
+                    />
+                  </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {isVideoFacebook && (
+                    <div className="bg-orange-500/10 border border-orange-500/20 p-4 rounded-xl flex items-start gap-3 animate-in fade-in zoom-in duration-300">
+                      <div className="mt-0.5">
+                        <input
+                          type="checkbox"
+                          id="privateGroupCheck"
+                          checked={isFacebookPrivate}
+                          onChange={(e) => setIsFacebookPrivate(e.target.checked)}
+                          className="w-4 h-4 rounded border-foreground/20 text-orange-500 focus:ring-orange-500"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="privateGroupCheck" className="text-sm font-bold text-foreground cursor-pointer">
+                          Is this video from a Private Facebook Group?
+                        </label>
+                        <p className="text-xs text-foreground/60 mt-1">
+                          Private group videos cannot be embedded. Students will see a button to watch it directly on Facebook instead.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {course.courseType === 'coaching' && (
                     <div className="space-y-1.5">
                       <label className="text-sm font-bold text-foreground/80">Instructor (Optional)</label>

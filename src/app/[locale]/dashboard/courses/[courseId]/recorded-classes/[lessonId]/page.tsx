@@ -88,17 +88,35 @@ export default function LessonVideoPage() {
       </div>
 
       <div className="bg-black rounded-2xl aspect-video relative overflow-hidden shadow-lg flex items-center justify-center">
-        {activeLesson.videoUrl ? (
+        {activeLesson.videoUrl && activeLesson.videoSource === 'facebook_private' ? (
+          <div className="w-full h-full absolute inset-0 flex flex-col items-center justify-center bg-blue-600/5 dark:bg-blue-900/20">
+            <svg className="w-16 h-16 text-blue-600 mb-4 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+            <h3 className="text-2xl font-bold text-white mb-2">Private Facebook Video</h3>
+            <p className="text-white/70 mb-6 max-w-md text-center px-4">This video is hosted in a private Facebook group. For security reasons, it cannot be embedded here.</p>
+            <a href={activeLesson.videoUrl} target="_blank" rel="noopener noreferrer" className="px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 hover:scale-105 active:scale-95 flex items-center gap-2">
+              <PlayCircle className="w-5 h-5" />
+              Watch on Facebook
+            </a>
+          </div>
+        ) : activeLesson.videoUrl && activeLesson.videoSource === 'facebook_public' ? (
+          <iframe 
+            src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(activeLesson.videoUrl)}&show_text=false&width=auto`}
+            className="w-full h-full absolute inset-0 border-0 overflow-hidden"
+            allowFullScreen
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            title={activeLesson.title}
+          ></iframe>
+        ) : activeLesson.videoUrl ? (
           <iframe 
             src={activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') 
-              ? activeLesson.videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/') 
+              ? activeLesson.videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/').split('&')[0] 
               : activeLesson.videoUrl} 
             className="w-full h-full absolute inset-0"
             allowFullScreen
             title={activeLesson.title}
           ></iframe>
         ) : (
-          <div className="text-center text-white/50 p-6">
+          <div className="text-center text-white/50 p-6 absolute inset-0 flex flex-col items-center justify-center">
             <PlayCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
             <p>No video available for this lesson.</p>
           </div>

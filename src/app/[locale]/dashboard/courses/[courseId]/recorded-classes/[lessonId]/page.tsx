@@ -7,7 +7,8 @@ import { doc, getDoc, addDoc, collection, setDoc } from 'firebase/firestore';
 import { useParams, useRouter } from 'next/navigation';
 import { PlayCircle, CheckCircle, ArrowLeft, Loader2, Lock, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import ReactPlayer from 'react-player';
+import ReactPlayer from 'react-player/lazy';
+import { Suspense } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import toast from 'react-hot-toast';
@@ -171,54 +172,56 @@ export default function LessonVideoPage() {
             // If it's a known supported tracking platform and hasn't errored out, use ReactPlayer
             if (isTrackable) {
               return (
-                // @ts-ignore
-                <ReactPlayer
-                  ref={playerRef}
-                  url={finalVideoUrl}
-                  width="100%"
-                  height="100%"
-                  controls
-                  config={{ youtube: { playerVars: { origin: typeof window !== 'undefined' ? window.location.origin : '' } } }}
-                  onReady={() => {
-                    if (initialProgress && !initialSeekDoneRef.current) {
-                      if (initialProgress.playedSeconds > 0) {
-                        if (typeof playerRef.current?.seekTo === 'function') {
-                          playerRef.current.seekTo(initialProgress.playedSeconds, 'seconds');
+                <Suspense fallback={<div className="flex h-full items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
+                  {/* @ts-ignore */}
+                  <ReactPlayer
+                    ref={playerRef}
+                    url={finalVideoUrl}
+                    width="100%"
+                    height="100%"
+                    controls
+                    config={{ youtube: { playerVars: { origin: typeof window !== 'undefined' ? window.location.origin : '' } } }}
+                    onReady={() => {
+                      if (initialProgress && !initialSeekDoneRef.current) {
+                        if (initialProgress.playedSeconds > 0) {
+                          if (typeof playerRef.current?.seekTo === 'function') {
+                            playerRef.current.seekTo(initialProgress.playedSeconds, 'seconds');
+                          }
                         }
+                        initialSeekDoneRef.current = true;
                       }
-                      initialSeekDoneRef.current = true;
-                    }
-                  }}
-                  onDuration={(d: number) => setDuration(d)}
-                  onProgress={(state: any) => {
-                    setWatchProgress(state.played);
-                    if (state.played >= 0.8) setHasReachedThreshold(true);
-                    
-                    const now = Date.now();
-                    if (now - lastSaveTimeRef.current > 10000 && user && course) {
-                      lastSaveTimeRef.current = now;
-                      setDoc(doc(db, 'lesson_progress', `${user.uid}_${courseId}_${lessonId}`), {
-                        studentId: user.uid,
-                        courseId,
-                        lessonId,
-                        progress: state.played,
-                        playedSeconds: state.playedSeconds,
-                        duration: duration || 0,
-                        isCompleted: isCompleted,
-                        lastWatched: new Date().toISOString(),
-                        lessonTitle: activeLesson.title,
-                        courseTitle: course.title,
-                        courseCategory: course.category || '',
-                        thumbnailUrl: course.thumbnailUrl || ''
-                      }, { merge: true }).catch(console.error);
-                    }
-                  }}
-                  onError={(e: any) => {
-                    console.error('ReactPlayer Error:', e);
-                    setVideoError(true);
-                  }}
-                  style={{ position: 'absolute', top: 0, left: 0 }}
-                />
+                    }}
+                    onDuration={(d: number) => setDuration(d)}
+                    onProgress={(state: any) => {
+                      setWatchProgress(state.played);
+                      if (state.played >= 0.8) setHasReachedThreshold(true);
+                      
+                      const now = Date.now();
+                      if (now - lastSaveTimeRef.current > 10000 && user && course) {
+                        lastSaveTimeRef.current = now;
+                        setDoc(doc(db, 'lesson_progress', `${user.uid}_${courseId}_${lessonId}`), {
+                          studentId: user.uid,
+                          courseId,
+                          lessonId,
+                          progress: state.played,
+                          playedSeconds: state.playedSeconds,
+                          duration: duration || 0,
+                          isCompleted: isCompleted,
+                          lastWatched: new Date().toISOString(),
+                          lessonTitle: activeLesson.title,
+                          courseTitle: course.title,
+                          courseCategory: course.category || '',
+                          thumbnailUrl: course.thumbnailUrl || ''
+                        }, { merge: true }).catch(console.error);
+                      }
+                    }}
+                    onError={(e: any) => {
+                      console.error('ReactPlayer Error:', e);
+                      setVideoError(true);
+                    }}
+                    style={{ position: 'absolute', top: 0, left: 0 }}
+                  />
+                </Suspense>
               );
             }
             

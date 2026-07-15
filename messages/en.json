@@ -15,7 +15,8 @@
     "courseSidebar": {
       "back": "Back to My Courses",
       "overview": "Overview",
-      "curriculum": "Curriculum",
+      "recordedClasses": "Recorded Classes",
+      "syllabus": "Syllabus",
       "liveClasses": "Live Classes",
       "resources": "Resources",
       "exams": "Exams & Quizzes",

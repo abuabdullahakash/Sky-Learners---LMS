@@ -33,7 +33,8 @@ export default function StudentCourseSidebar() {
 
   const menuItems = [
     { name: t('overview'), href: `/dashboard/courses/${courseId}`, icon: LayoutDashboard, exact: true },
-    { name: t('curriculum'), href: `/dashboard/courses/${courseId}/curriculum`, icon: BookOpen },
+    { name: t('recordedClasses'), href: `/dashboard/courses/${courseId}/recorded-classes`, icon: Video },
+    { name: t('syllabus'), href: `/dashboard/courses/${courseId}/syllabus`, icon: BookOpen },
     { name: t('liveClasses'), href: `/dashboard/courses/${courseId}/live-classes`, icon: Video },
     { name: t('resources'), href: `/dashboard/courses/${courseId}/resources`, icon: FileText },
     { name: t('exams'), href: `/dashboard/courses/${courseId}/exams`, icon: CheckSquare },
@@ -73,8 +74,8 @@ export default function StudentCourseSidebar() {
               href={item.href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 font-medium text-sm ${
                 isActive 
-                  ? 'bg-primary text-white shadow-lg shadow-primary/20 dark:bg-primary dark:text-white dark:shadow-primary/30' 
-                  : 'hover:bg-gray-50 dark:hover:bg-foreground/5 text-gray-600 dark:text-foreground/70 hover:text-gray-900 dark:hover:text-white'
+                  ? 'bg-primary text-white shadow-lg shadow-primary/20 dark:bg-orange-500 dark:text-white dark:shadow-orange-500/30' 
+                  : 'hover:bg-gray-50 dark:hover:bg-orange-500/10 text-gray-600 dark:text-foreground/70 hover:text-gray-900 dark:hover:text-orange-500'
               }`}
             >
               <Icon className="w-4 h-4" />

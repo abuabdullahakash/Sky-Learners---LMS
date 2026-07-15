@@ -2,26 +2,77 @@
 
 import { useTranslations } from 'next-intl';
 import { useState, useEffect } from 'react';
-import { User, Shield, Bell, CreditCard, Camera, CheckCircle2, XCircle, Eye, EyeOff } from 'lucide-react';
+import { User, Shield, Bell, CreditCard, Camera, CheckCircle2, XCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
+import { db } from '@/lib/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
 
 export default function SettingsPage() {
   const t = useTranslations('Dashboard.settings');
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'preferences' | 'billing'>('profile');
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { user, userData } = useAuth();
-  const [eduLevel, setEduLevel] = useState(userData?.eduLevel || '');
+  const { user, userData, refreshUserData } = useAuth();
+  
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Sync eduLevel when userData is loaded
+  // Form states
+  const [name, setName] = useState(user?.displayName || '');
+  const [phone, setPhone] = useState(userData?.phone || '');
+  const [dob, setDob] = useState(userData?.dob || '');
+  const [gender, setGender] = useState(userData?.gender || '');
+  const [institution, setInstitution] = useState(userData?.institution || '');
+  const [eduLevel, setEduLevel] = useState(userData?.eduLevel || '');
+  const [studentClass, setStudentClass] = useState(userData?.class || '');
+  const [department, setDepartment] = useState(userData?.department || '');
+  const [year, setYear] = useState(userData?.year || '');
+
+  // Sync states when userData or user is loaded
   useEffect(() => {
-    if (userData?.eduLevel) {
-      setEduLevel(userData.eduLevel);
+    if (user?.displayName && !name) setName(user.displayName);
+    if (userData) {
+      if (userData.phone) setPhone(userData.phone);
+      if (userData.dob) setDob(userData.dob);
+      if (userData.gender) setGender(userData.gender);
+      if (userData.institution) setInstitution(userData.institution);
+      if (userData.eduLevel) setEduLevel(userData.eduLevel);
+      if (userData.class) setStudentClass(userData.class);
+      if (userData.department) setDepartment(userData.department);
+      if (userData.year) setYear(userData.year);
     }
-  }, [userData]);
+  }, [user, userData]);
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        name,
+        phone,
+        dob,
+        gender,
+        institution,
+        eduLevel,
+        class: studentClass,
+        department,
+        year,
+      });
+      // Try to refresh user data in context if possible
+      if (refreshUserData) {
+        await refreshUserData();
+      }
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("Failed to update profile. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const tabs = [
     { id: 'profile', label: t('tabs.profile'), icon: User },
@@ -107,20 +158,20 @@ export default function SettingsPage() {
                       <label className="block text-sm text-foreground/70">{t('profile.name')}</label>
                       <span className="text-xs text-foreground/50">{t('profile.nameHint')}</span>
                     </div>
-                    <input type="text" defaultValue={user?.displayName || ''} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                   </div>
                   <div>
                     <label className="block text-sm text-foreground/70 mb-1">{t('profile.phone')}</label>
-                    <input type="tel" defaultValue={userData?.phone || ''} placeholder="+880 1XXX-XXXXXX" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                    <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+880 1XXX-XXXXXX" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm text-foreground/70 mb-1">{t('profile.dob')}</label>
-                      <input type="date" defaultValue={userData?.dob || ''} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-foreground" />
+                      <input type="date" value={dob} onChange={(e) => setDob(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-foreground" />
                     </div>
                     <div>
                       <label className="block text-sm text-foreground/70 mb-1">{t('profile.gender')}</label>
-                      <select defaultValue={userData?.gender || ''} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
+                      <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
                         <option value="" disabled className="bg-background text-foreground">Select Gender</option>
                         <option value="Male" className="bg-background text-foreground">Male</option>
                         <option value="Female" className="bg-background text-foreground">Female</option>
@@ -143,7 +194,7 @@ export default function SettingsPage() {
                        eduLevel === 'honours' || eduLevel === 'masters' ? t('profile.uniName') : 
                        t('profile.institutionName')}
                     </label>
-                    <input type="text" defaultValue={userData?.institution || ''} placeholder="e.g. Dhaka College" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                    <input type="text" value={institution} onChange={(e) => setInstitution(e.target.value)} placeholder="e.g. Dhaka College" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                   </div>
 
                   {/* Field 2: Education Level */}
@@ -151,7 +202,12 @@ export default function SettingsPage() {
                     <label className="block text-sm text-foreground/70 mb-1">{t('profile.eduLevel')}</label>
                     <select 
                       value={eduLevel}
-                      onChange={(e) => setEduLevel(e.target.value)}
+                      onChange={(e) => {
+                        setEduLevel(e.target.value);
+                        setStudentClass(''); // Reset dependent fields when level changes
+                        setDepartment('');
+                        setYear('');
+                      }}
                       className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none"
                     >
                       <option value="" disabled className="bg-background text-foreground">Select Education Level</option>
@@ -167,11 +223,11 @@ export default function SettingsPage() {
                   {(eduLevel === 'primary' || eduLevel === 'high_school') && (
                     <div>
                       <label className="block text-sm text-foreground/70 mb-1">{t('profile.class')}</label>
-                      <select defaultValue={userData?.class || ''} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
+                      <select value={studentClass} onChange={(e) => setStudentClass(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
                         <option value="" disabled className="bg-background text-foreground">Select Class</option>
                         {eduLevel === 'primary' 
-                          ? Array.from({length: 5}, (_, i) => <option key={i+1} value={i+1} className="bg-background text-foreground">Class {i+1}</option>)
-                          : Array.from({length: 5}, (_, i) => <option key={i+6} value={i+6} className="bg-background text-foreground">Class {i+6}</option>)
+                          ? Array.from({length: 5}, (_, i) => <option key={i+1} value={String(i+1)} className="bg-background text-foreground">Class {i+1}</option>)
+                          : Array.from({length: 5}, (_, i) => <option key={i+6} value={String(i+6)} className="bg-background text-foreground">Class {i+6}</option>)
                         }
                       </select>
                     </div>
@@ -181,7 +237,7 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm text-foreground/70 mb-1">{t('profile.class')}</label>
-                        <select defaultValue={userData?.class || ''} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
+                        <select value={studentClass} onChange={(e) => setStudentClass(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
                           <option value="" disabled className="bg-background text-foreground">Select Class</option>
                           <option value="11" className="bg-background text-foreground">Class 11</option>
                           <option value="12" className="bg-background text-foreground">Class 12</option>
@@ -189,7 +245,7 @@ export default function SettingsPage() {
                       </div>
                       <div>
                         <label className="block text-sm text-foreground/70 mb-1">{t('profile.group')}</label>
-                        <select defaultValue={userData?.department || ''} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
+                        <select value={department} onChange={(e) => setDepartment(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
                           <option value="" disabled className="bg-background text-foreground">Select Group</option>
                           <option value="science" className="bg-background text-foreground">Science</option>
                           <option value="arts" className="bg-background text-foreground">Arts (Humanities)</option>
@@ -203,11 +259,11 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm text-foreground/70 mb-1">{t('profile.department')}</label>
-                        <input type="text" defaultValue={userData?.department || ''} placeholder="e.g. Physics" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                        <input type="text" value={department} onChange={(e) => setDepartment(e.target.value)} placeholder="e.g. Physics" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                       </div>
                       <div>
                         <label className="block text-sm text-foreground/70 mb-1">{t('profile.year')}</label>
-                        <input type="text" defaultValue={userData?.year || ''} placeholder="e.g. 1st Year" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                        <input type="text" value={year} onChange={(e) => setYear(e.target.value)} placeholder="e.g. 1st Year" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                       </div>
                     </div>
                   )}
@@ -218,9 +274,11 @@ export default function SettingsPage() {
 
             <div className="flex justify-end pt-4">
               <button 
-                onClick={() => setShowSuccessModal(true)}
-                className="px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all hover:-translate-y-0.5"
+                onClick={handleSaveProfile}
+                disabled={isSaving}
+                className="px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all hover:-translate-y-0.5 flex items-center gap-2"
               >
+                {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                 {t('profile.saveBtn')}
               </button>
             </div>

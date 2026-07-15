@@ -6,8 +6,10 @@ import { User, Shield, Bell, CreditCard, Camera, CheckCircle2, XCircle, Eye, Eye
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
-import { db } from '@/lib/firebase';
+import { db, auth } from '@/lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
+import { updateProfile } from 'firebase/auth';
+import { uploadImageToImgBB } from '@/lib/imgbb';
 
 export default function SettingsPage() {
   const t = useTranslations('Dashboard.settings');
@@ -18,9 +20,11 @@ export default function SettingsPage() {
   
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   // Form states
   const [name, setName] = useState(user?.displayName || '');
+  const [photoUrl, setPhotoUrl] = useState(user?.photoURL || '');
   const [phone, setPhone] = useState(userData?.phone || '');
   const [dob, setDob] = useState(userData?.dob || '');
   const [gender, setGender] = useState(userData?.gender || '');
@@ -33,6 +37,7 @@ export default function SettingsPage() {
   // Sync states when userData or user is loaded
   useEffect(() => {
     if (user?.displayName && !name) setName(user.displayName);
+    if (user?.photoURL && !photoUrl) setPhotoUrl(user.photoURL);
     if (userData) {
       if (userData.phone) setPhone(userData.phone);
       if (userData.dob) setDob(userData.dob);
@@ -45,10 +50,35 @@ export default function SettingsPage() {
     }
   }, [user, userData]);
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    try {
+      const url = await uploadImageToImgBB(file);
+      setPhotoUrl(url);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
   const handleSaveProfile = async () => {
     if (!user) return;
     setIsSaving(true);
     try {
+      // Update Firebase Auth profile
+      if (auth.currentUser) {
+        await updateProfile(auth.currentUser, {
+          displayName: name,
+          photoURL: photoUrl || user.photoURL,
+        });
+      }
+
+      // Update Firestore user document
       const userRef = doc(db, 'users', user.uid);
       await updateDoc(userRef, {
         name,
@@ -60,6 +90,7 @@ export default function SettingsPage() {
         class: studentClass,
         department,
         year,
+        photoUrl: photoUrl || user.photoURL || '',
       });
       // Try to refresh user data in context if possible
       if (refreshUserData) {
@@ -128,23 +159,29 @@ export default function SettingsPage() {
 
             {/* Profile Picture */}
             <div className="flex items-center gap-6">
-              <div className="relative group w-24 h-24 rounded-full overflow-hidden border-2 border-primary/20 bg-foreground/5">
-                {user?.photoURL ? (
-                  <Image src={user.photoURL} alt="Profile" fill className="object-cover" />
+              <div className="relative group w-24 h-24 rounded-full overflow-hidden border-2 border-primary/20 bg-foreground/5 flex-shrink-0">
+                {isUploadingImage ? (
+                  <div className="w-full h-full flex items-center justify-center bg-background/50 backdrop-blur-sm">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  </div>
+                ) : photoUrl || user?.photoURL ? (
+                  <Image src={photoUrl || user?.photoURL || ''} alt="Profile" fill className="object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-foreground/30">
-                    {user?.displayName?.charAt(0) || user?.email?.charAt(0) || '?'}
+                    {name?.charAt(0) || user?.displayName?.charAt(0) || user?.email?.charAt(0) || '?'}
                   </div>
                 )}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                   <Camera className="w-6 h-6 text-white" />
-                </div>
+                  <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isUploadingImage} />
+                </label>
               </div>
               <div>
                 <h3 className="font-semibold text-lg">{t('profile.picture')}</h3>
-                <button className="mt-2 px-4 py-2 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg font-medium transition-colors">
-                  {t('profile.uploadBtn')}
-                </button>
+                <label className="mt-2 inline-block px-4 py-2 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg font-medium transition-colors cursor-pointer">
+                  {isUploadingImage ? <Loader2 className="w-5 h-5 animate-spin" /> : t('profile.uploadBtn')}
+                  <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isUploadingImage} />
+                </label>
               </div>
             </div>
 
@@ -162,7 +199,7 @@ export default function SettingsPage() {
                   </div>
                   <div>
                     <label className="block text-sm text-foreground/70 mb-1">{t('profile.phone')}</label>
-                    <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+880 1XXX-XXXXXX" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                    <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t('profile.phonePlaceholder')} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -172,10 +209,10 @@ export default function SettingsPage() {
                     <div>
                       <label className="block text-sm text-foreground/70 mb-1">{t('profile.gender')}</label>
                       <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
-                        <option value="" disabled className="bg-background text-foreground">Select Gender</option>
-                        <option value="Male" className="bg-background text-foreground">Male</option>
-                        <option value="Female" className="bg-background text-foreground">Female</option>
-                        <option value="Other" className="bg-background text-foreground">Other</option>
+                        <option value="" disabled className="bg-background text-foreground">{t('profile.selectGender')}</option>
+                        <option value="Male" className="bg-background text-foreground">{t('profile.male')}</option>
+                        <option value="Female" className="bg-background text-foreground">{t('profile.female')}</option>
+                        <option value="Other" className="bg-background text-foreground">{t('profile.other')}</option>
                       </select>
                     </div>
                   </div>
@@ -194,7 +231,7 @@ export default function SettingsPage() {
                        eduLevel === 'honours' || eduLevel === 'masters' ? t('profile.uniName') : 
                        t('profile.institutionName')}
                     </label>
-                    <input type="text" value={institution} onChange={(e) => setInstitution(e.target.value)} placeholder="e.g. Dhaka College" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                    <input type="text" value={institution} onChange={(e) => setInstitution(e.target.value)} placeholder={t('profile.instPlaceholder')} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                   </div>
 
                   {/* Field 2: Education Level */}
@@ -210,7 +247,7 @@ export default function SettingsPage() {
                       }}
                       className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none"
                     >
-                      <option value="" disabled className="bg-background text-foreground">Select Education Level</option>
+                      <option value="" disabled className="bg-background text-foreground">{t('profile.selectLevel')}</option>
                       <option value="primary" className="bg-background text-foreground">{t('profile.levels.primary')}</option>
                       <option value="high_school" className="bg-background text-foreground">{t('profile.levels.high_school')}</option>
                       <option value="intermediate" className="bg-background text-foreground">{t('profile.levels.intermediate')}</option>
@@ -224,10 +261,10 @@ export default function SettingsPage() {
                     <div>
                       <label className="block text-sm text-foreground/70 mb-1">{t('profile.class')}</label>
                       <select value={studentClass} onChange={(e) => setStudentClass(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
-                        <option value="" disabled className="bg-background text-foreground">Select Class</option>
+                        <option value="" disabled className="bg-background text-foreground">{t('profile.selectClass')}</option>
                         {eduLevel === 'primary' 
-                          ? Array.from({length: 5}, (_, i) => <option key={i+1} value={String(i+1)} className="bg-background text-foreground">Class {i+1}</option>)
-                          : Array.from({length: 5}, (_, i) => <option key={i+6} value={String(i+6)} className="bg-background text-foreground">Class {i+6}</option>)
+                          ? Array.from({length: 5}, (_, i) => <option key={i+1} value={String(i+1)} className="bg-background text-foreground">{t('profile.classPrefix')} {i+1}</option>)
+                          : Array.from({length: 5}, (_, i) => <option key={i+6} value={String(i+6)} className="bg-background text-foreground">{t('profile.classPrefix')} {i+6}</option>)
                         }
                       </select>
                     </div>
@@ -238,18 +275,18 @@ export default function SettingsPage() {
                       <div>
                         <label className="block text-sm text-foreground/70 mb-1">{t('profile.class')}</label>
                         <select value={studentClass} onChange={(e) => setStudentClass(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
-                          <option value="" disabled className="bg-background text-foreground">Select Class</option>
-                          <option value="11" className="bg-background text-foreground">Class 11</option>
-                          <option value="12" className="bg-background text-foreground">Class 12</option>
+                          <option value="" disabled className="bg-background text-foreground">{t('profile.selectClass')}</option>
+                          <option value="11" className="bg-background text-foreground">{t('profile.classPrefix')} 11</option>
+                          <option value="12" className="bg-background text-foreground">{t('profile.classPrefix')} 12</option>
                         </select>
                       </div>
                       <div>
                         <label className="block text-sm text-foreground/70 mb-1">{t('profile.group')}</label>
                         <select value={department} onChange={(e) => setDepartment(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
-                          <option value="" disabled className="bg-background text-foreground">Select Group</option>
-                          <option value="science" className="bg-background text-foreground">Science</option>
-                          <option value="arts" className="bg-background text-foreground">Arts (Humanities)</option>
-                          <option value="commerce" className="bg-background text-foreground">Commerce (Business Studies)</option>
+                          <option value="" disabled className="bg-background text-foreground">{t('profile.selectGroup')}</option>
+                          <option value="science" className="bg-background text-foreground">{t('profile.science')}</option>
+                          <option value="arts" className="bg-background text-foreground">{t('profile.arts')}</option>
+                          <option value="commerce" className="bg-background text-foreground">{t('profile.commerce')}</option>
                         </select>
                       </div>
                     </div>
@@ -259,11 +296,11 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm text-foreground/70 mb-1">{t('profile.department')}</label>
-                        <input type="text" value={department} onChange={(e) => setDepartment(e.target.value)} placeholder="e.g. Physics" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                        <input type="text" value={department} onChange={(e) => setDepartment(e.target.value)} placeholder={t('profile.deptPlaceholder')} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                       </div>
                       <div>
                         <label className="block text-sm text-foreground/70 mb-1">{t('profile.year')}</label>
-                        <input type="text" value={year} onChange={(e) => setYear(e.target.value)} placeholder="e.g. 1st Year" className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
+                        <input type="text" value={year} onChange={(e) => setYear(e.target.value)} placeholder={t('profile.yearPlaceholder')} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
                       </div>
                     </div>
                   )}

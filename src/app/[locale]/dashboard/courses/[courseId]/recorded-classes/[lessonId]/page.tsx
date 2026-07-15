@@ -1,9 +1,9 @@
 // @ts-nocheck
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, addDoc, collection } from 'firebase/firestore';
+import { doc, getDoc, addDoc, collection, setDoc } from 'firebase/firestore';
 import { useParams, useRouter } from 'next/navigation';
 import { PlayCircle, CheckCircle, ArrowLeft, Loader2, Lock, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';
@@ -27,6 +27,11 @@ export default function LessonVideoPage() {
   const [hasReachedThreshold, setHasReachedThreshold] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const playerRef = useRef<any>(null);
+  const [duration, setDuration] = useState(0);
+  const lastSaveTimeRef = useRef<number>(0);
+  const initialSeekDoneRef = useRef(false);
+  const [initialProgress, setInitialProgress] = useState<{playedSeconds: number, progress: number} | null>(null);
 
   // Issue Reporting
   const t = useTranslations('CourseDetails');
@@ -62,6 +67,18 @@ export default function LessonVideoPage() {
           }
           setActiveLesson(foundLesson);
         }
+
+        if (user) {
+          const progressRef = doc(db, 'lesson_progress', `${user.uid}_${courseId}_${lessonId}`);
+          const progressSnap = await getDoc(progressRef);
+          if (progressSnap.exists()) {
+            const pData = progressSnap.data();
+            setInitialProgress({ playedSeconds: pData.playedSeconds || 0, progress: pData.progress || 0 });
+            setWatchProgress(pData.progress || 0);
+            if (pData.progress >= 0.8) setHasReachedThreshold(true);
+            if (pData.isCompleted) setIsCompleted(true);
+          }
+        }
       } catch (error) {
         console.error("Error fetching course", error);
       } finally {
@@ -69,7 +86,7 @@ export default function LessonVideoPage() {
       }
     };
     if (courseId && lessonId) fetchCourse();
-  }, [courseId, lessonId]);
+  }, [courseId, lessonId, user]);
 
   if (isLoading) {
     return (
@@ -157,14 +174,43 @@ export default function LessonVideoPage() {
               return (
                 // @ts-ignore
                 <ReactPlayer
+                  ref={playerRef}
                   url={finalVideoUrl}
                   width="100%"
                   height="100%"
                   controls
                   config={{ youtube: { playerVars: { origin: typeof window !== 'undefined' ? window.location.origin : '' } } }}
+                  onReady={() => {
+                    if (initialProgress && !initialSeekDoneRef.current) {
+                      if (initialProgress.playedSeconds > 0) {
+                        playerRef.current?.seekTo(initialProgress.playedSeconds, 'seconds');
+                      }
+                      initialSeekDoneRef.current = true;
+                    }
+                  }}
+                  onDuration={(d: number) => setDuration(d)}
                   onProgress={(state: any) => {
                     setWatchProgress(state.played);
                     if (state.played >= 0.8) setHasReachedThreshold(true);
+                    
+                    const now = Date.now();
+                    if (now - lastSaveTimeRef.current > 10000 && user && course) {
+                      lastSaveTimeRef.current = now;
+                      setDoc(doc(db, 'lesson_progress', `${user.uid}_${courseId}_${lessonId}`), {
+                        studentId: user.uid,
+                        courseId,
+                        lessonId,
+                        progress: state.played,
+                        playedSeconds: state.playedSeconds,
+                        duration: duration || 0,
+                        isCompleted: isCompleted,
+                        lastWatched: new Date().toISOString(),
+                        lessonTitle: activeLesson.title,
+                        courseTitle: course.title,
+                        courseCategory: course.category || '',
+                        thumbnailUrl: course.thumbnailUrl || ''
+                      }, { merge: true }).catch(console.error);
+                    }
                   }}
                   onError={(e: any) => {
                     console.error('ReactPlayer Error:', e);
@@ -258,7 +304,23 @@ export default function LessonVideoPage() {
                 if (isTrackable) return !hasReachedThreshold;
                 return false; // Not trackable (like Google Drive) -> allow completion
               })()}
-              onClick={() => setIsCompleted(true)}
+              onClick={() => {
+                setIsCompleted(true);
+                if (user && course) {
+                  setDoc(doc(db, 'lesson_progress', `${user.uid}_${courseId}_${lessonId}`), {
+                    studentId: user.uid,
+                    courseId,
+                    lessonId,
+                    progress: watchProgress > 0 ? watchProgress : 1.0,
+                    isCompleted: true,
+                    lastWatched: new Date().toISOString(),
+                    lessonTitle: activeLesson.title,
+                    courseTitle: course.title,
+                    courseCategory: course.category || '',
+                    thumbnailUrl: course.thumbnailUrl || ''
+                  }, { merge: true }).catch(console.error);
+                }
+              }}
               className={`px-6 py-2.5 font-bold rounded-xl transition-all flex items-center gap-2 shadow-lg 
                 ${isCompleted ? 'bg-green-500 text-white shadow-green-500/20' 
                 : (() => {

@@ -247,19 +247,21 @@ export default function CourseCurriculumPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 relative">
       
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+      <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold mb-2">Curriculum Builder</h1>
           <p className="text-foreground/70">Organize your course into modules and add video lessons.</p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <button onClick={() => setIsSubjectModalOpen(true)} className="px-4 py-2 bg-background border border-foreground/10 text-foreground rounded-xl font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2">
-            <Settings className="w-4 h-4" /> Subjects
-          </button>
-          <button onClick={handleAddModule} className="px-4 py-2 bg-background border border-foreground/10 text-foreground rounded-xl font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Add Module
-          </button>
-          <button onClick={() => openLessonModal()} className="px-5 py-2 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2">
+        <div className="flex flex-col gap-3 w-full md:w-auto">
+          <div className="flex gap-3">
+            <button onClick={() => setIsSubjectModalOpen(true)} className="flex-1 justify-center px-4 py-2 bg-background border border-foreground/10 text-foreground rounded-xl font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2">
+              <Settings className="w-4 h-4" /> Subjects
+            </button>
+            <button onClick={handleAddModule} className="flex-1 justify-center px-4 py-2 bg-background border border-foreground/10 text-foreground rounded-xl font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2">
+              <Plus className="w-4 h-4" /> Add Module
+            </button>
+          </div>
+          <button onClick={() => openLessonModal()} className="w-full justify-center px-5 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2">
             <VideoIcon className="w-4 h-4" /> Add Lesson
           </button>
         </div>
@@ -425,12 +427,12 @@ export default function CourseCurriculumPage() {
                     required 
                     value={editingModuleId || ''} 
                     onChange={(e) => setEditingModuleId(e.target.value)}
-                    className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-orange-500 appearance-none"
+                    className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-orange-500 appearance-none dark:bg-[#1f1f1f]"
                     disabled={course.modules?.length === 0}
                   >
-                    {course.modules?.length === 0 && <option value="">No modules available - Add a module first</option>}
+                    {course.modules?.length === 0 && <option value="" className="bg-background text-foreground">No modules available - Add a module first</option>}
                     {course.modules?.map((mod: any, idx: number) => (
-                      <option key={mod.id} value={mod.id}>Module {idx + 1}: {mod.title}</option>
+                      <option key={mod.id} value={mod.id} className="bg-background text-foreground">Module {idx + 1}: {mod.title}</option>
                     ))}
                   </select>
                 </div>
@@ -459,11 +461,11 @@ export default function CourseCurriculumPage() {
                       <label className="text-sm font-bold text-foreground/80">Instructor (Optional)</label>
                       <select 
                         value={lessonInstructor} onChange={(e) => setLessonInstructor(e.target.value)}
-                        className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-orange-500 appearance-none"
+                        className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-orange-500 appearance-none dark:bg-[#1f1f1f]"
                       >
-                        <option value="">Select Instructor...</option>
+                        <option value="" className="bg-background text-foreground">Select Instructor...</option>
                         {course.instructors?.map((inst: any) => (
-                          <option key={inst.id} value={inst.name}>{inst.name}</option>
+                          <option key={inst.id} value={inst.name} className="bg-background text-foreground">{inst.name}</option>
                         ))}
                       </select>
                     </div>
@@ -473,11 +475,11 @@ export default function CourseCurriculumPage() {
                     <label className="text-sm font-bold text-foreground/80">Subject (Optional)</label>
                     <select 
                       value={lessonSubject} onChange={(e) => setLessonSubject(e.target.value)}
-                      className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-orange-500 appearance-none"
+                      className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-orange-500 appearance-none dark:bg-[#1f1f1f]"
                     >
-                      <option value="">Select Subject...</option>
+                      <option value="" className="bg-background text-foreground">Select Subject...</option>
                       {course.subjects?.map((sub: string, idx: number) => (
-                        <option key={idx} value={sub}>{sub}</option>
+                        <option key={idx} value={sub} className="bg-background text-foreground">{sub}</option>
                       ))}
                     </select>
                   </div>

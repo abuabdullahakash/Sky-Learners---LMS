@@ -6,11 +6,65 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { BookOpen, CheckCircle, Trophy, PlayCircle, ArrowRight, Sparkles, Flame, Clock } from 'lucide-react';
 import { Link } from '@/i18n/routing';
+import { db } from '@/lib/firebase';
+import { collection, query, where, getDocs, limit } from 'firebase/firestore';
+import { useState } from 'react';
+import Image from 'next/image';
 
 export default function DashboardOverview() {
   const t = useTranslations('Dashboard.overview');
-  const { user } = useAuth();
+  const { user, userData } = useAuth();
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  const [enrolledCount, setEnrolledCount] = useState<number | null>(null);
+  const [recommendedCourses, setRecommendedCourses] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user) return;
+
+      try {
+        // Fetch approved enrollments count
+        const enrollmentsRef = collection(db, 'enrollments');
+        const enrollmentsQuery = query(
+          enrollmentsRef,
+          where('studentId', '==', user.uid),
+          where('status', '==', 'approved')
+        );
+        const enrollmentsSnap = await getDocs(enrollmentsQuery);
+        setEnrolledCount(enrollmentsSnap.size);
+
+        // Fetch recommended courses
+        const coursesRef = collection(db, 'courses');
+        let courseQuery = query(coursesRef, where('isPublished', '==', true), limit(3));
+        
+        if (userData?.eduLevel) {
+          courseQuery = query(
+            coursesRef,
+            where('isPublished', '==', true),
+            where('category', '==', userData.eduLevel),
+            limit(3)
+          );
+        }
+
+        const courseSnap = await getDocs(courseQuery);
+        let coursesData = courseSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Fallback if no category matches
+        if (coursesData.length === 0 && userData?.eduLevel) {
+          const fallbackQuery = query(coursesRef, where('isPublished', '==', true), limit(3));
+          const fallbackSnap = await getDocs(fallbackQuery);
+          coursesData = fallbackSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        }
+
+        setRecommendedCourses(coursesData);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
+
+    fetchData();
+  }, [user, userData?.eduLevel]);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -23,7 +77,7 @@ export default function DashboardOverview() {
   }, []);
 
   const stats = [
-    { title: t('enrolled'), value: '4', icon: BookOpen, color: 'from-blue-500 to-cyan-400', shadow: 'shadow-blue-500/20' },
+    { title: t('enrolled'), value: enrolledCount !== null ? enrolledCount : '-', icon: BookOpen, color: 'from-blue-500 to-cyan-400', shadow: 'shadow-blue-500/20' },
     { title: t('completed'), value: '12', icon: CheckCircle, color: 'from-green-500 to-emerald-400', shadow: 'shadow-green-500/20' },
     { title: t('score'), value: '85%', icon: Trophy, color: 'from-orange-500 to-yellow-400', shadow: 'shadow-orange-500/20' },
   ];
@@ -44,18 +98,18 @@ export default function DashboardOverview() {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold mb-4">
               <Flame className="w-4 h-4" />
-              <span>3 Day Streak!</span>
+              <span>{t('streak')}</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-3 tracking-tight">
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-3 tracking-tight text-gray-900 dark:text-white">
               {t('welcome')}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">{user?.displayName?.split(' ')[0] || 'Student'}</span>! 👋
             </h1>
-            <p className="text-foreground/70 text-lg max-w-xl leading-relaxed">
-              {t('subtitle')} We have exciting new modules waiting for you today.
+            <p className="text-foreground/80 dark:text-foreground/70 text-lg max-w-xl leading-relaxed">
+              {t('subtitle')} {t('newModules')}
             </p>
           </div>
           
-          <button className="px-6 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 group">
-            Resume Learning
+          <button className="px-6 py-3 bg-primary text-primary-foreground font-bold rounded-xl shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 group">
+            {t('resumeLearning')}
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
@@ -66,7 +120,7 @@ export default function DashboardOverview() {
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="group relative bg-foreground/5 rounded-3xl p-6 border border-foreground/10 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:bg-foreground/10 overflow-hidden cursor-default">
+            <div key={index} className="group relative bg-white dark:bg-foreground/5 rounded-3xl p-6 border border-gray-200 dark:border-foreground/10 hover:border-primary/30 dark:hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-xl dark:shadow-none dark:hover:bg-foreground/10 overflow-hidden cursor-default">
               <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${stat.color} opacity-10 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-500`}></div>
               
               <div className="flex items-center gap-5 relative z-10">
@@ -89,13 +143,13 @@ export default function DashboardOverview() {
         {/* Main Focus / Continue Learning */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex justify-between items-end">
-            <h2 className="text-2xl font-bold tracking-tight">{t('continue')}</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{t('continue')}</h2>
             <Link href="/dashboard/courses" className="text-primary text-sm font-semibold hover:underline flex items-center gap-1">
-              View all <ArrowRight className="w-4 h-4" />
+              {t('viewAll')} <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
           
-          <div className="bg-foreground/5 rounded-3xl p-3 border border-foreground/10 flex flex-col sm:flex-row items-stretch gap-4 group hover:border-primary/40 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/5 cursor-pointer relative overflow-hidden">
+          <div className="bg-white dark:bg-foreground/5 rounded-3xl p-3 border border-gray-200 dark:border-foreground/10 flex flex-col sm:flex-row items-stretch gap-4 group hover:border-primary/40 transition-all duration-300 shadow-md hover:shadow-2xl dark:shadow-none dark:hover:shadow-primary/5 cursor-pointer relative overflow-hidden">
             {/* Glossy overlay */}
             <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
@@ -112,22 +166,22 @@ export default function DashboardOverview() {
             <div className="flex-1 p-4 sm:p-5 flex flex-col justify-between">
               <div>
                 <div className="flex justify-between items-start mb-2">
-                  <span className="text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full uppercase tracking-wider border border-accent/20">Chapter 3</span>
+                  <span className="text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full uppercase tracking-wider border border-accent/20">{t('continueBtn')}</span>
                   <span className="flex items-center gap-1 text-foreground/50 text-sm font-medium">
                     <Clock className="w-4 h-4" />
-                    15 mins left
+                    15 {t('timeLeft')}
                   </span>
                 </div>
-                <h3 className="text-2xl font-bold mt-3 group-hover:text-primary transition-colors">Motion and Mechanics</h3>
-                <p className="text-foreground/60 mt-2 line-clamp-2 leading-relaxed">
+                <h3 className="text-2xl font-bold mt-3 group-hover:text-primary transition-colors text-gray-900 dark:text-white">Motion and Mechanics</h3>
+                <p className="text-foreground/70 dark:text-foreground/60 mt-2 line-clamp-2 leading-relaxed">
                   Learn the fundamental laws of motion formulated by Sir Isaac Newton and how they apply to real-world objects.
                 </p>
               </div>
               
               <div className="mt-6">
                 <div className="flex justify-between text-sm font-bold mb-2">
-                  <span className="text-primary">Progress</span>
-                  <span>45%</span>
+                  <span className="text-primary">{t('progress')}</span>
+                  <span className="text-gray-900 dark:text-white">45%</span>
                 </div>
                 <div className="w-full bg-foreground/10 rounded-full h-3 overflow-hidden shadow-inner">
                   <div className="bg-gradient-to-r from-primary to-accent h-full rounded-full w-[45%] relative">
@@ -141,8 +195,8 @@ export default function DashboardOverview() {
 
         {/* Sidebar / Upcoming */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold tracking-tight">Upcoming Tasks</h2>
-          <div className="bg-foreground/5 rounded-3xl p-6 border border-foreground/10 space-y-4 relative overflow-hidden backdrop-blur-md">
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{t('upcomingTasks')}</h2>
+          <div className="bg-white dark:bg-foreground/5 rounded-3xl p-6 border border-gray-200 dark:border-foreground/10 space-y-4 relative overflow-hidden backdrop-blur-md shadow-md dark:shadow-none">
             
             <div className="flex items-start gap-4 p-4 bg-background/50 rounded-2xl hover:bg-primary/5 transition-colors cursor-pointer group border border-transparent hover:border-primary/20">
               <div className="w-12 h-12 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
@@ -164,8 +218,8 @@ export default function DashboardOverview() {
               </div>
             </div>
 
-            <button className="w-full py-3 mt-2 text-sm font-bold text-foreground/60 hover:text-primary transition-colors border-t border-foreground/10 pt-4">
-              View Calendar
+            <button className="w-full py-3 mt-2 text-sm font-bold text-gray-500 hover:text-primary dark:text-foreground/60 dark:hover:text-primary transition-colors border-t border-gray-100 dark:border-foreground/10 pt-4">
+              {t('viewCalendar')}
             </button>
           </div>
         </div>
@@ -173,59 +227,41 @@ export default function DashboardOverview() {
       </div>
 
       {/* Ongoing Courses (Based on Profile) */}
-      <div className="space-y-6 pt-8 border-t border-foreground/10">
+      <div className="space-y-6 pt-8 border-t border-gray-200 dark:border-foreground/10">
         <div className="flex justify-between items-end">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">Ongoing Courses</h2>
-            <p className="text-foreground/60 text-sm mt-1">Based on your academic profile</p>
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{t('ongoingCourses')}</h2>
+            <p className="text-gray-500 dark:text-foreground/60 text-sm mt-1">{t('basedOnProfile')}</p>
           </div>
-          <button className="text-primary text-sm font-semibold hover:underline flex items-center gap-1">
-            Browse more <ArrowRight className="w-4 h-4" />
-          </button>
+          <Link href="/dashboard/recommended" className="text-primary text-sm font-semibold hover:underline flex items-center gap-1">
+            {t('browseMore')} <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Course 1 */}
-          <div className="bg-foreground/5 rounded-3xl p-4 border border-foreground/10 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group cursor-pointer">
-            <div className="h-40 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl mb-4 relative overflow-hidden">
-              <div className="absolute inset-0 bg-black/10"></div>
-              <div className="absolute bottom-3 left-3 bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg text-white text-xs font-bold">Physics</div>
+          {recommendedCourses.map((course, index) => (
+            <Link key={course.id} href={`/courses/${course.id}`} className="bg-white dark:bg-foreground/5 rounded-3xl p-4 border border-gray-200 dark:border-foreground/10 hover:border-primary/30 dark:hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-xl dark:shadow-none group cursor-pointer flex flex-col">
+              <div className="h-40 bg-gradient-to-br from-primary/80 to-accent rounded-2xl mb-4 relative overflow-hidden flex-shrink-0">
+                {course.thumbnailUrl ? (
+                  <Image src={course.thumbnailUrl} alt={course.title} fill className="object-cover" />
+                ) : (
+                  <div className="absolute inset-0 bg-black/10"></div>
+                )}
+                <div className="absolute bottom-3 left-3 bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg text-white text-xs font-bold capitalize shadow-sm">{course.category || 'Course'}</div>
+              </div>
+              <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors text-gray-900 dark:text-white line-clamp-2">{course.title}</h3>
+              <p className="text-gray-600 dark:text-foreground/60 text-sm mb-4 line-clamp-2 flex-1">{course.subtitle || 'Learn from the best instructors.'}</p>
+              <div className="flex justify-between items-center text-sm font-medium mt-auto pt-2 border-t border-gray-100 dark:border-foreground/10">
+                <span className="text-gray-500 dark:text-foreground/50">{course.totalVideoLessons || 0} {t('lessons')}</span>
+                <span className="text-primary font-bold">{t('continueBtn')}</span>
+              </div>
+            </Link>
+          ))}
+          {recommendedCourses.length === 0 && (
+            <div className="col-span-full py-10 text-center text-gray-500">
+              No recommended courses available right now.
             </div>
-            <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">Quantum Mechanics Fundamentals</h3>
-            <p className="text-foreground/60 text-sm mb-4 line-clamp-2">Understand the basic principles of quantum theory and wave-particle duality.</p>
-            <div className="flex justify-between items-center text-sm font-medium">
-              <span className="text-foreground/50">24 Lessons</span>
-              <span className="text-primary">Continue</span>
-            </div>
-          </div>
-
-          {/* Course 2 */}
-          <div className="bg-foreground/5 rounded-3xl p-4 border border-foreground/10 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group cursor-pointer">
-            <div className="h-40 bg-gradient-to-br from-green-500 to-emerald-400 rounded-2xl mb-4 relative overflow-hidden">
-              <div className="absolute inset-0 bg-black/10"></div>
-              <div className="absolute bottom-3 left-3 bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg text-white text-xs font-bold">Mathematics</div>
-            </div>
-            <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">Calculus II: Integration</h3>
-            <p className="text-foreground/60 text-sm mb-4 line-clamp-2">Master advanced integration techniques and their applications in physics.</p>
-            <div className="flex justify-between items-center text-sm font-medium">
-              <span className="text-foreground/50">18 Lessons</span>
-              <span className="text-primary">Continue</span>
-            </div>
-          </div>
-
-          {/* Course 3 */}
-          <div className="bg-foreground/5 rounded-3xl p-4 border border-foreground/10 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group cursor-pointer">
-            <div className="h-40 bg-gradient-to-br from-orange-500 to-yellow-400 rounded-2xl mb-4 relative overflow-hidden">
-              <div className="absolute inset-0 bg-black/10"></div>
-              <div className="absolute bottom-3 left-3 bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg text-white text-xs font-bold">Chemistry</div>
-            </div>
-            <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">Organic Chemistry Basics</h3>
-            <p className="text-foreground/60 text-sm mb-4 line-clamp-2">Introduction to organic compounds, structure, and reactivity.</p>
-            <div className="flex justify-between items-center text-sm font-medium">
-              <span className="text-foreground/50">32 Lessons</span>
-              <span className="text-primary">Continue</span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 

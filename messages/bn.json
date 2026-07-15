@@ -25,7 +25,20 @@
       "enrolled": "এনরোল করা কোর্স",
       "completed": "সম্পন্ন করা লেসন",
       "score": "গড় নম্বর",
-      "continue": "পড়া চালিয়ে যান"
+      "continue": "পড়া চালিয়ে যান",
+      "streak": "৩ দিনের স্ট্রিক!",
+      "newModules": "আপনার জন্য আজ দারুণ কিছু নতুন মডিউল অপেক্ষা করছে।",
+      "resumeLearning": "পড়া চালিয়ে যান",
+      "viewAll": "সব দেখুন",
+      "upcomingTasks": "আসন্ন কাজসমূহ",
+      "viewCalendar": "ক্যালেন্ডার দেখুন",
+      "ongoingCourses": "আপনার জন্য রেকমেন্ডেড কোর্স",
+      "basedOnProfile": "আপনার একাডেমিক প্রোফাইল অনুযায়ী",
+      "browseMore": "আরও দেখুন",
+      "progress": "অগ্রগতি",
+      "timeLeft": "মিনিট বাকি",
+      "lessons": "লেসন",
+      "continueBtn": "চালিয়ে যান"
     },
     "settings": {
       "title": "সেটিংস",

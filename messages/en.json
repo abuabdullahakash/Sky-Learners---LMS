@@ -25,7 +25,20 @@
       "enrolled": "Enrolled Courses",
       "completed": "Completed Lessons",
       "score": "Average Score",
-      "continue": "Continue Learning"
+      "continue": "Continue Learning",
+      "streak": "3 Day Streak!",
+      "newModules": "We have exciting new modules waiting for you today.",
+      "resumeLearning": "Resume Learning",
+      "viewAll": "View all",
+      "upcomingTasks": "Upcoming Tasks",
+      "viewCalendar": "View Calendar",
+      "ongoingCourses": "Ongoing Courses",
+      "basedOnProfile": "Based on your academic profile",
+      "browseMore": "Browse more",
+      "progress": "Progress",
+      "timeLeft": "mins left",
+      "lessons": "Lessons",
+      "continueBtn": "Continue"
     },
     "settings": {
       "title": "Settings",

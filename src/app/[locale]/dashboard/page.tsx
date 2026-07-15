@@ -18,25 +18,12 @@ export default function DashboardOverview() {
   
   const [enrolledCount, setEnrolledCount] = useState<number | null>(null);
   const [recommendedCourses, setRecommendedCourses] = useState<any[]>([]);
-  const [latestProgress, setLatestProgress] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       if (!user) return;
 
       try {
-        // Fetch latest video progress for dynamic "Continue Learning"
-        const progressRef = collection(db, 'lesson_progress');
-        const progressQuery = query(progressRef, where('studentId', '==', user.uid));
-        const progressSnap = await getDocs(progressQuery);
-        
-        if (!progressSnap.empty) {
-          const allProgress = progressSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
-          // Sort by lastWatched descending manually to avoid needing a composite index
-          allProgress.sort((a, b) => new Date(b.lastWatched || 0).getTime() - new Date(a.lastWatched || 0).getTime());
-          setLatestProgress(allProgress[0]);
-        }
-
         // Fetch approved enrollments count
         const enrollmentsRef = collection(db, 'enrollments');
         const enrollmentsQuery = query(
@@ -162,63 +149,48 @@ export default function DashboardOverview() {
             </Link>
           </div>
           
-          {latestProgress ? (
-            <Link href={`/dashboard/courses/${latestProgress.courseId}/recorded-classes/${latestProgress.lessonId}`} className="bg-white dark:bg-foreground/5 rounded-3xl p-3 border border-gray-200 dark:border-foreground/10 flex flex-col sm:flex-row items-stretch gap-4 group hover:border-primary/40 transition-all duration-300 shadow-md hover:shadow-2xl dark:shadow-none dark:hover:shadow-primary/5 cursor-pointer relative overflow-hidden block">
-              {/* Glossy overlay */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+          <div className="bg-white dark:bg-foreground/5 rounded-3xl p-3 border border-gray-200 dark:border-foreground/10 flex flex-col sm:flex-row items-stretch gap-4 group hover:border-primary/40 transition-all duration-300 shadow-md hover:shadow-2xl dark:shadow-none dark:hover:shadow-primary/5 cursor-pointer relative overflow-hidden">
+            {/* Glossy overlay */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
-              <div className="w-full sm:w-56 h-48 sm:h-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl relative overflow-hidden flex-shrink-0 group-hover:scale-[1.02] transition-transform duration-500 shadow-inner">
-                {latestProgress.thumbnailUrl ? (
-                  <Image src={latestProgress.thumbnailUrl} alt={latestProgress.courseTitle} fill className="object-cover opacity-80 mix-blend-overlay" />
-                ) : (
-                  <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent"></div>
-                )}
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white">
-                  <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-xl">
-                    <PlayCircle className="w-8 h-8 text-white fill-white/20" />
-                  </div>
-                  <span className="font-bold tracking-widest text-white/90 drop-shadow-md line-clamp-1">{latestProgress.courseCategory || 'COURSE'}</span>
+            <div className="w-full sm:w-56 h-48 sm:h-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl relative overflow-hidden flex-shrink-0 group-hover:scale-[1.02] transition-transform duration-500 shadow-inner">
+              <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent"></div>
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-xl">
+                  <PlayCircle className="w-8 h-8 text-white fill-white/20" />
                 </div>
+                <span className="font-bold tracking-widest text-white/90">PHYSICS 101</span>
+              </div>
+            </div>
+            
+            <div className="flex-1 p-4 sm:p-5 flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full uppercase tracking-wider border border-accent/20">{t('continueBtn')}</span>
+                  <span className="flex items-center gap-1 text-foreground/50 text-sm font-medium">
+                    <Clock className="w-4 h-4" />
+                    15 {t('timeLeft')}
+                  </span>
+                </div>
+                <h3 className="text-2xl font-bold mt-3 group-hover:text-primary transition-colors text-gray-900 dark:text-white">Motion and Mechanics</h3>
+                <p className="text-foreground/70 dark:text-foreground/60 mt-2 line-clamp-2 leading-relaxed">
+                  Learn the fundamental laws of motion formulated by Sir Isaac Newton and how they apply to real-world objects.
+                </p>
               </div>
               
-              <div className="flex-1 p-4 sm:p-5 flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full uppercase tracking-wider border border-accent/20">{t('continueBtn')}</span>
-                    <span className="flex items-center gap-1 text-foreground/50 text-sm font-medium">
-                      <Clock className="w-4 h-4" />
-                      {latestProgress.duration > 0 ? Math.max(1, Math.round((latestProgress.duration - (latestProgress.playedSeconds || 0)) / 60)) : 0} {t('timeLeft')}
-                    </span>
-                  </div>
-                  <h3 className="text-2xl font-bold mt-3 group-hover:text-primary transition-colors text-gray-900 dark:text-white line-clamp-2">{latestProgress.lessonTitle}</h3>
-                  <p className="text-foreground/70 dark:text-foreground/60 mt-2 line-clamp-1 font-medium bg-foreground/5 inline-block px-2 py-1 rounded-md text-sm">
-                    {latestProgress.courseTitle}
-                  </p>
+              <div className="mt-6">
+                <div className="flex justify-between text-sm font-bold mb-2">
+                  <span className="text-primary">{t('progress')}</span>
+                  <span className="text-gray-900 dark:text-white">45%</span>
                 </div>
-                
-                <div className="mt-6">
-                  <div className="flex justify-between text-sm font-bold mb-2">
-                    <span className="text-primary">{t('progress')}</span>
-                    <span className="text-gray-900 dark:text-white">{Math.round((latestProgress.progress || 0) * 100)}%</span>
-                  </div>
-                  <div className="w-full bg-foreground/10 rounded-full h-3 overflow-hidden shadow-inner">
-                    <div className="bg-gradient-to-r from-primary to-accent h-full rounded-full relative" style={{ width: `${Math.min(Math.round((latestProgress.progress || 0) * 100), 100)}%` }}>
-                      <div className="absolute top-0 bottom-0 left-0 right-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.15)_50%,rgba(255,255,255,0.15)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem] animate-[progress_1s_linear_infinite]"></div>
-                    </div>
+                <div className="w-full bg-foreground/10 rounded-full h-3 overflow-hidden shadow-inner">
+                  <div className="bg-gradient-to-r from-primary to-accent h-full rounded-full w-[45%] relative">
+                    <div className="absolute top-0 bottom-0 left-0 right-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.15)_50%,rgba(255,255,255,0.15)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem] animate-[progress_1s_linear_infinite]"></div>
                   </div>
                 </div>
               </div>
-            </Link>
-          ) : (
-            <div className="bg-white dark:bg-foreground/5 rounded-3xl p-8 border border-gray-200 dark:border-foreground/10 text-center flex flex-col items-center justify-center h-48 shadow-sm">
-              <BookOpen className="w-12 h-12 text-primary/40 mb-3" />
-              <h3 className="text-lg font-bold text-foreground mb-1">Start Learning</h3>
-              <p className="text-foreground/60 text-sm max-w-md">You haven't watched any videos yet. Browse your enrolled courses and pick up a new skill today!</p>
-              <Link href="/dashboard/courses" className="mt-4 px-6 py-2 bg-primary/10 text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-colors">
-                Go to My Courses
-              </Link>
             </div>
-          )}
+          </div>
         </div>
 
         {/* Sidebar / Upcoming */}

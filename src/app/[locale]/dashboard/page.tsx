@@ -21,6 +21,18 @@ export default function DashboardOverview() {
   const [lastAccessed, setLastAccessed] = useState<any>(null);
   const [recommendedCourses, setRecommendedCourses] = useState<any[]>([]);
 
+  const formatTimeAgo = (timestamp: string) => {
+    if (!timestamp) return 'Just now';
+    const diff = Date.now() - new Date(timestamp).getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    const days = Math.floor(hours / 24);
+    return `${days} day${days > 1 ? 's' : ''} ago`;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       if (!user) return;
@@ -195,10 +207,10 @@ export default function DashboardOverview() {
                 <div className="flex-1 p-4 sm:p-5 flex flex-col justify-center">
                   <div>
                     <div className="flex justify-between items-start mb-2">
-                      <span className="text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full uppercase tracking-wider border border-accent/20">{lastAccessed.category || t('continueBtn')}</span>
-                      <span className="flex items-center gap-1 text-foreground/50 text-sm font-medium">
-                        <Clock className="w-4 h-4" />
-                        {lastAccessed.duration}
+                      <span className="text-xs font-bold text-gray-800 dark:text-gray-100 bg-gray-200/50 dark:bg-white/10 px-3 py-1 rounded-full uppercase tracking-wider border border-gray-300 dark:border-white/20 shadow-sm">{lastAccessed.category || t('continueBtn')}</span>
+                      <span className="flex items-center gap-1 text-foreground/70 dark:text-foreground/60 text-sm font-semibold bg-gray-100 dark:bg-foreground/5 px-2 py-1 rounded-lg">
+                        <Clock className="w-4 h-4 text-primary" />
+                        {formatTimeAgo(lastAccessed.timestamp)}
                       </span>
                     </div>
                     <h3 className="text-2xl font-bold mt-3 group-hover:text-primary transition-colors text-gray-900 dark:text-white line-clamp-2">{lastAccessed.lessonTitle}</h3>

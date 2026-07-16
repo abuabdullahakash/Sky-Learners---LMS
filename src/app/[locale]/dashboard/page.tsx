@@ -141,8 +141,8 @@ export default function DashboardOverview() {
         <div className="absolute top-0 right-0 p-8 opacity-20 pointer-events-none">
           <Sparkles className="w-32 h-32 text-primary animate-pulse" />
         </div>
-        <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-primary/30 blur-[80px] rounded-full pointer-events-none"></div>
-        <div className="absolute top-[-50px] left-[-50px] w-40 h-40 bg-accent/20 blur-[60px] rounded-full pointer-events-none"></div>
+        <div className="absolute -bottom-20 -right-20 w-96 h-96 opacity-30 pointer-events-none rounded-full" style={{ background: 'radial-gradient(circle, var(--color-primary) 0%, transparent 70%)' }}></div>
+        <div className="absolute top-[-50px] left-[-50px] w-64 h-64 opacity-20 pointer-events-none rounded-full" style={{ background: 'radial-gradient(circle, var(--color-accent) 0%, transparent 70%)' }}></div>
 
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>

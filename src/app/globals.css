@@ -97,7 +97,6 @@
 
 body {
   background-color: var(--background);
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 @theme inline {
@@ -152,9 +151,6 @@ body {
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
   a, button, [role="button"] {
     @apply cursor-pointer;
   }

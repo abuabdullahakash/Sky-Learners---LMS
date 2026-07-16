@@ -22,9 +22,19 @@ const hindSiliguri = Hind_Siliguri({
   display: "swap",
 });
 
+import { Viewport } from 'next';
+
+export const viewport: Viewport = {
+  themeColor: '#09090b',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export const metadata: Metadata = {
   title: "SkyLearners - LMS",
   description: "Get all academic content here",
+  manifest: "/manifest.json",
 };
 
 export default async function RootLayout({

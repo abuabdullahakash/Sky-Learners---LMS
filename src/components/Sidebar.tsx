@@ -18,7 +18,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 hidden md:flex flex-col justify-between h-full">
+    <aside className="w-64 hidden md:flex flex-col justify-between sticky top-[120px] lg:top-[160px] h-[calc(100vh-140px)] lg:h-[calc(100vh-180px)] overflow-y-auto overflow-x-hidden border-r border-foreground/5 pr-4 custom-scrollbar">
       <div className="p-4 space-y-2">
         {menuItems.map((item) => {
           const isActive = pathname === item.href;

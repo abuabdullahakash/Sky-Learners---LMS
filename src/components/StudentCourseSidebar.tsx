@@ -42,7 +42,7 @@ export default function StudentCourseSidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-white dark:bg-foreground/5 rounded-3xl border border-gray-200 dark:border-foreground/10 shadow-md dark:shadow-none flex flex-col h-[calc(100vh-140px)] sticky top-24 overflow-hidden">
+    <aside className="w-64 bg-white dark:bg-foreground/5 rounded-3xl border border-gray-200 dark:border-foreground/10 shadow-md dark:shadow-none flex flex-col h-[calc(100vh-140px)] lg:h-[calc(100vh-180px)] sticky top-[120px] lg:top-[160px] overflow-hidden">
       
       <div className="p-4 border-b border-gray-100 dark:border-foreground/10">
         <Link href="/dashboard/courses" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:text-foreground/60 dark:hover:text-foreground transition-colors mb-4 font-medium">

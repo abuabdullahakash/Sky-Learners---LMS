@@ -16,7 +16,7 @@ import TargetAudience from '../TargetAudience';
 import CourseTestimonials from '../CourseTestimonials';
 import StickyPricingCard from '../StickyPricingCard';
 import CourseFeatures from '../CourseFeatures';
-import { Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { VideoModal } from '@/components/ui/VideoModal';
 
 gsap.registerPlugin(ScrollTrigger);

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useRouter } from '@/i18n/routing';
 import { PlayCircle, Lock, FileText, Download, X, Calendar, Loader2 } from 'lucide-react';
 import {
   Accordion,
@@ -8,8 +9,9 @@ import {
 } from "@/components/ui/accordion";
 import { useTranslations } from 'next-intl';
 
-export default function CourseCurriculum({ modules, routineImageUrl }: { modules: any[], routineImageUrl?: string }) {
+export default function CourseCurriculum({ modules, routineImageUrl, courseId }: { modules: any[], routineImageUrl?: string, courseId?: string }) {
   const t = useTranslations('CourseDetails');
+  const router = useRouter();
   const [isRoutineOpen, setIsRoutineOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isLockedPopupOpen, setIsLockedPopupOpen] = useState(false);
@@ -247,7 +249,11 @@ export default function CourseCurriculum({ modules, routineImageUrl }: { modules
             <button 
               onClick={() => {
                 setIsLockedPopupOpen(false);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (courseId) {
+                  router.push(`/courses/${courseId}/checkout`);
+                } else {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
               }}
               className="w-full py-3.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-base"
             >

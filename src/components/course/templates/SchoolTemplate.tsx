@@ -223,7 +223,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
             )}
 
             
-            <CourseCurriculum modules={course.modules} routineImageUrl={course.routineImageUrl} />
+            <CourseCurriculum modules={course.modules} routineImageUrl={course.routineImageUrl} courseId={course.id} />
 
             
             {course.instructors && course.instructors.length > 0 && (

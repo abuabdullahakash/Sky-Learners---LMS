@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
@@ -13,6 +13,7 @@ import Image from 'next/image';
 
 export default function DashboardOverview() {
   const t = useTranslations('Dashboard.overview');
+  const locale = useLocale();
   const { user, userData } = useAuth();
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -22,15 +23,36 @@ export default function DashboardOverview() {
   const [recommendedCourses, setRecommendedCourses] = useState<any[]>([]);
 
   const formatTimeAgo = (timestamp: string) => {
-    if (!timestamp) return 'Just now';
+    if (!timestamp) return t('timeAgo.justNow');
     const diff = Date.now() - new Date(timestamp).getTime();
     const minutes = Math.floor(diff / 60000);
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    if (minutes < 1) return t('timeAgo.justNow');
+    
+    const formatNumber = (num: number) => new Intl.NumberFormat(locale === 'bn' ? 'bn-BD' : 'en-US').format(num);
+    
+    if (minutes === 1) return t('timeAgo.minuteAgo');
+    if (minutes < 60) return t('timeAgo.minutesAgo', { minutes: formatNumber(minutes) });
+    
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    if (hours === 1) return t('timeAgo.hourAgo');
+    if (hours < 24) return t('timeAgo.hoursAgo', { hours: formatNumber(hours) });
+    
     const days = Math.floor(hours / 24);
-    return `${days} day${days > 1 ? 's' : ''} ago`;
+    if (days === 1) return t('timeAgo.dayAgo');
+    return t('timeAgo.daysAgo', { days: formatNumber(days) });
+  };
+
+  const getCategoryTranslation = (cat: string) => {
+    if (!cat) return t('continueBtn');
+    const lowerCat = cat.toLowerCase();
+    switch (lowerCat) {
+      case 'intermediate': return t('categories.intermediate');
+      case 'primary': return t('categories.primary');
+      case 'high_school': return t('categories.high_school');
+      case 'honours': return t('categories.honours');
+      case 'masters': return t('categories.masters');
+      default: return cat;
+    }
   };
 
   useEffect(() => {
@@ -207,7 +229,7 @@ export default function DashboardOverview() {
                 <div className="flex-1 p-4 sm:p-5 flex flex-col justify-center">
                   <div>
                     <div className="flex justify-between items-start mb-2">
-                      <span className="text-xs font-bold text-gray-800 dark:text-gray-100 bg-gray-200/50 dark:bg-white/10 px-3 py-1 rounded-full uppercase tracking-wider border border-gray-300 dark:border-white/20 shadow-sm">{lastAccessed.category || t('continueBtn')}</span>
+                      <span className="text-xs font-bold text-gray-800 dark:text-gray-100 bg-gray-200/50 dark:bg-white/10 px-3 py-1 rounded-full uppercase tracking-wider border border-gray-300 dark:border-white/20 shadow-sm">{getCategoryTranslation(lastAccessed.category)}</span>
                       <span className="flex items-center gap-1 text-foreground/70 dark:text-foreground/60 text-sm font-semibold bg-gray-100 dark:bg-foreground/5 px-2 py-1 rounded-lg">
                         <Clock className="w-4 h-4 text-primary" />
                         {formatTimeAgo(lastAccessed.timestamp)}
@@ -221,7 +243,7 @@ export default function DashboardOverview() {
                   
                   <div className="mt-6 flex items-center justify-between">
                     <span className="text-sm font-bold text-primary flex items-center gap-1">
-                      Resume <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      {t('resumeAction')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </span>
                   </div>
                 </div>

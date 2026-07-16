@@ -61,7 +61,24 @@
       "progress": "অগ্রগতি",
       "timeLeft": "মিনিট বাকি",
       "lessons": "লেসন",
-      "continueBtn": "চালিয়ে যান"
+      "continueBtn": "চালিয়ে যান",
+      "timeAgo": {
+        "justNow": "এইমাত্র",
+        "minuteAgo": "১ মিনিট আগে",
+        "minutesAgo": "{minutes} মিনিট আগে",
+        "hourAgo": "১ ঘন্টা আগে",
+        "hoursAgo": "{hours} ঘন্টা আগে",
+        "dayAgo": "১ দিন আগে",
+        "daysAgo": "{days} দিন আগে"
+      },
+      "categories": {
+        "intermediate": "ইন্টারমিডিয়েট",
+        "primary": "প্রাইমারি",
+        "high_school": "হাই স্কুল",
+        "honours": "অনার্স",
+        "masters": "মাস্টার্স"
+      },
+      "resumeAction": "শুরু করুন"
     },
     "settings": {
       "title": "সেটিংস",

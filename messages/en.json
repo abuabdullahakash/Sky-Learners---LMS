@@ -61,7 +61,24 @@
       "progress": "Progress",
       "timeLeft": "mins left",
       "lessons": "Lessons",
-      "continueBtn": "Continue"
+      "continueBtn": "Continue",
+      "timeAgo": {
+        "justNow": "Just now",
+        "minuteAgo": "1 minute ago",
+        "minutesAgo": "{minutes} minutes ago",
+        "hourAgo": "1 hour ago",
+        "hoursAgo": "{hours} hours ago",
+        "dayAgo": "1 day ago",
+        "daysAgo": "{days} days ago"
+      },
+      "categories": {
+        "intermediate": "Intermediate",
+        "primary": "Primary",
+        "high_school": "High School",
+        "honours": "Honours",
+        "masters": "Masters"
+      },
+      "resumeAction": "Resume"
     },
     "settings": {
       "title": "Settings",

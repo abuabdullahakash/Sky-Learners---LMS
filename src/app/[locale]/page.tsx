@@ -13,7 +13,6 @@ export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subRef = useRef<HTMLParagraphElement>(null);
-  const btnRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
   const bgImageRef = useRef<HTMLImageElement>(null);
 
@@ -35,11 +34,6 @@ export default function Home() {
       { opacity: 0, y: 30 },
       { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" },
       "-=0.4"
-    )
-    .fromTo(btnRef.current,
-      { opacity: 0, scale: 0.8 },
-      { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.7)" },
-      "-=0.2"
     )
     .fromTo(cardsRef.current?.children || [],
       { opacity: 0, y: 40 },
@@ -73,15 +67,6 @@ export default function Home() {
         <p ref={subRef} className="text-lg md:text-2xl text-foreground/90 mb-10 max-w-2xl mx-auto font-medium drop-shadow-md">
           {t('subtitle')}
         </p>
-        
-        <div ref={btnRef} className="flex gap-4 justify-center">
-          <Link href="/register" className="px-8 py-4 bg-primary text-primary-foreground rounded-full font-bold text-lg shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] transition-all hover:-translate-y-1">
-            {t('getStarted')}
-          </Link>
-          <Link href="/courses" className="px-8 py-4 bg-secondary text-secondary-foreground rounded-full font-bold text-lg shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all hover:-translate-y-1">
-            {t('courses')}
-          </Link>
-        </div>
       </div>
 
       {/* Feature Cards */}

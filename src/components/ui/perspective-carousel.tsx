@@ -197,8 +197,14 @@ export function PerspectiveCarousel({
                           {item.background}
                         </p>
                         
-                        <div className="mt-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:-translate-y-1">
-                          <button type="button" onClick={(e) => { e.stopPropagation(); onItemClick?.(item); }} className="px-5 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs rounded-full shadow-lg shadow-primary/30 transition-all hover:scale-105 active:scale-95">View Profile</button>
+                        <div className="mt-auto transition-all duration-300 w-full flex justify-center pb-1">
+                          <button 
+                            type="button" 
+                            onClick={(e) => { e.stopPropagation(); onItemClick?.(item); }} 
+                            className="px-5 py-2 font-bold text-xs rounded-full shadow-md transition-all duration-300 flex items-center justify-center gap-1.5 bg-orange-100/90 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800 hover:bg-gradient-to-r hover:from-orange-500 hover:to-orange-600 hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-orange-500/30 hover:-translate-y-0.5 active:scale-95 w-[80%]"
+                          >
+                            View Profile
+                          </button>
                         </div>
                       </div>
                     </div>

@@ -197,11 +197,11 @@ export function PerspectiveCarousel({
                           {item.background}
                         </p>
                         
-                        <div className="mt-auto transition-all duration-300 w-full flex justify-center pb-1">
+                        <div className={cn("mt-auto transition-all duration-300 w-full flex justify-center pb-1", isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none")}>
                           <button 
                             type="button" 
                             onClick={(e) => { e.stopPropagation(); onItemClick?.(item); }} 
-                            className="px-5 py-2 font-bold text-xs rounded-full shadow-md transition-all duration-300 flex items-center justify-center gap-1.5 bg-orange-100/90 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800 hover:bg-gradient-to-r hover:from-orange-500 hover:to-orange-600 hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-orange-500/30 hover:-translate-y-0.5 active:scale-95 w-[80%]"
+                            className="px-5 py-2 font-bold text-xs rounded-full shadow-sm transition-all duration-300 flex items-center justify-center bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800 hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white hover:border-transparent hover:shadow-md hover:shadow-orange-500/30 active:scale-95 w-[80%]"
                           >
                             View Profile
                           </button>

@@ -12,6 +12,7 @@ export default function CourseCurriculum({ modules, routineImageUrl }: { modules
   const t = useTranslations('CourseDetails');
   const [isRoutineOpen, setIsRoutineOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isLockedPopupOpen, setIsLockedPopupOpen] = useState(false);
 
   const handleDownload = async (url: string) => {
     try {
@@ -139,19 +140,27 @@ export default function CourseCurriculum({ modules, routineImageUrl }: { modules
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
                         {lesson.noteUrl && (
-                          <a href={lesson.noteUrl} target="_blank" className={`px-4 py-2 font-bold rounded-lg text-xs transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap text-center !no-underline hover:!text-white flex items-center gap-1.5 ${theme.btn}`}>
-                            <FileText className="w-4 h-4" />
-                            {t('classNote')}
-                          </a>
+                          lesson.isFreePreview ? (
+                            <a href={lesson.noteUrl} target="_blank" className={`px-4 py-2 font-bold rounded-lg text-xs transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap text-center !no-underline hover:!text-white flex items-center gap-1.5 ${theme.btn}`}>
+                              <FileText className="w-4 h-4" />
+                              {t('classNote')}
+                            </a>
+                          ) : (
+                            <button onClick={(e) => { e.stopPropagation(); setIsLockedPopupOpen(true); }} className="px-4 py-2 font-bold rounded-lg text-xs transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap flex items-center gap-1.5 bg-orange-100/80 dark:bg-orange-900/40 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800 hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500">
+                              <Lock className="w-3.5 h-3.5" />
+                              {t('classNote')}
+                            </button>
+                          )
                         )}
                         {lesson.isFreePreview ? (
                           <a href={lesson.videoUrl || '#'} target={lesson.videoUrl ? "_blank" : "_self"} className={`px-5 py-2.5 font-bold rounded-lg text-xs transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap text-center sm:text-left !no-underline hover:!text-white ${theme.btn}`}>
                             {t('watch')}
                           </a>
                         ) : (
-                          <span className="text-xs text-foreground/40 font-semibold px-2 shrink-0">
+                          <button onClick={(e) => { e.stopPropagation(); setIsLockedPopupOpen(true); }} className="px-5 py-2 font-bold rounded-lg text-xs transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap flex items-center gap-1.5 bg-orange-100/80 dark:bg-orange-900/40 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800 hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500">
+                            <Lock className="w-3.5 h-3.5" />
                             {t('locked')}
-                          </span>
+                          </button>
                         )}
                       </div>
                     </div>
@@ -210,6 +219,39 @@ export default function CourseCurriculum({ modules, routineImageUrl }: { modules
             >
               {isDownloading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
               {t('downloadRoutine').includes('CourseDetails.') ? 'Download Routine' : t('downloadRoutine')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Locked Content Popup */}
+      {isLockedPopupOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="relative w-full max-w-md bg-background rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col items-center text-center animate-in zoom-in-95 duration-300 border border-border">
+            <button 
+              onClick={() => setIsLockedPopupOpen(false)}
+              className="absolute top-4 right-4 p-2 bg-foreground/5 hover:bg-foreground/10 text-foreground/70 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/40 text-orange-500 rounded-full flex items-center justify-center mb-6 shadow-inner">
+              <Lock className="w-8 h-8" />
+            </div>
+            
+            <h3 className="text-2xl font-bold mb-3">{t('lockedContent') || 'কন্টেন্টটি লক করা আছে!'}</h3>
+            <p className="text-foreground/70 mb-8 leading-relaxed">
+              {t('enrollToAccess') || 'এই লেসনটি এবং ক্লাস নোটটি দেখতে চাইলে আপনাকে কোর্সটিতে ভর্তি হতে হবে। এখনই কোর্সে ভর্তি হয়ে আপনার শেখা শুরু করুন!'}
+            </p>
+            
+            <button 
+              onClick={() => {
+                setIsLockedPopupOpen(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="w-full py-3.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-base"
+            >
+              {t('enrollNow') || 'কোর্সে যুক্ত হোন'}
             </button>
           </div>
         </div>

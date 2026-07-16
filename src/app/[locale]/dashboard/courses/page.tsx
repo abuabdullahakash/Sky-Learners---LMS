@@ -182,8 +182,8 @@ function CourseCard({ item, t }: { item: EnrolledCourse; t: any }) {
       <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-blue-500 via-purple-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" style={{ margin: '-2px' }}></div>
       <div className="absolute inset-0 bg-white dark:bg-[#0f172a] rounded-[2rem] z-[-5]"></div>
 
-      {/* Subtle background glow */}
-      <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${gradientClass} opacity-10 dark:opacity-20 blur-3xl rounded-full pointer-events-none group-hover:scale-150 transition-transform duration-700`}></div>
+      {/* Subtle background glow - replaced blur with radial gradient for performance */}
+      <div className={`absolute top-0 right-0 w-48 h-48 opacity-10 dark:opacity-20 pointer-events-none group-hover:scale-150 transition-transform duration-700`} style={{ background: 'radial-gradient(circle at top right, currentColor 0%, transparent 70%)', color: 'var(--primary)' }}></div>
 
       {/* Thumbnail */}
       <div className="relative aspect-[16/9] w-full bg-gray-100 dark:bg-foreground/5 flex-shrink-0 overflow-hidden rounded-t-[2rem]">

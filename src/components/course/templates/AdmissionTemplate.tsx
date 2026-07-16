@@ -4,7 +4,7 @@ import 'react-quill-new/dist/quill.snow.css';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { ArrowLeft, Target, Trophy, Clock, Users, Download, PlayCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Target, Trophy, Clock, Users, Download, PlayCircle, ChevronLeft, ChevronRight, User } from 'lucide-react';
 import { PerspectiveCarousel, PerspectiveCarouselItem } from '@/components/ui/perspective-carousel';
 import { InstructorModal } from '@/components/course/InstructorModal';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -80,6 +80,15 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
                 <span className="font-bold">শতভাগ ফোকাসড সিলেবাস</span>
               </div>
             </div>
+            
+            {course.teacherId && (
+              <div className="mt-8">
+                <Link href={`/teachers/${course.teacherId}`} target="_blank" className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-md hover:shadow-lg group border backdrop-blur-md ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20 hover:border-white/40' : 'bg-primary/5 hover:bg-primary/10 text-primary border-primary/20 hover:border-primary/40'}`}>
+                  <User className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  {t('viewProfile')}
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 

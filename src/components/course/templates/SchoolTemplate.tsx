@@ -4,7 +4,7 @@ import 'react-quill-new/dist/quill.snow.css';
 import { useRef, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { Users, Clock, ArrowLeft, PlayCircle, Image as ImageIcon, Heart, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Users, Clock, CheckCircle2, ArrowLeft, PlayCircle, Star, Image as ImageIcon, Heart, ChevronLeft, ChevronRight, User } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { PerspectiveCarousel, PerspectiveCarouselItem } from '@/components/ui/perspective-carousel';
@@ -97,6 +97,15 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
             <p className={`text-xl mb-10 leading-relaxed ${hasCover ? 'text-white/80' : 'text-foreground/80'}`}>
               {course.subtitle || t('descriptionFallbackPrimary')}
             </p>
+            
+            {course.teacherId && (
+              <div className="mt-2">
+                <Link href={`/teachers/${course.teacherId}`} target="_blank" className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-md hover:shadow-lg group border backdrop-blur-md ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20 hover:border-white/40' : 'bg-primary/5 hover:bg-primary/10 text-primary border-primary/20 hover:border-primary/40'}`}>
+                  <User className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  {t('viewProfile')}
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 

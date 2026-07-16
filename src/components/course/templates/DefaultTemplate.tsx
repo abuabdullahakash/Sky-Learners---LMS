@@ -4,7 +4,7 @@ import 'react-quill-new/dist/quill.snow.css';
 import { useRef, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { Users, Clock, CheckCircle2, ArrowLeft, PlayCircle, Image as ImageIcon } from 'lucide-react';
+import { Users, Clock, CheckCircle2, ArrowLeft, PlayCircle, Image as ImageIcon, User } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { PerspectiveCarousel, PerspectiveCarouselItem } from '@/components/ui/perspective-carousel';
@@ -145,9 +145,12 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
                     <p className={`text-xs uppercase tracking-wide ${softColor}`}>{t('instructor')}</p>
                     <p className="font-bold text-base mt-0.5">{course.coachingName || 'Instructor'}</p>
                     {course.teacherId && (
-                      <Link href={`/teachers/${course.teacherId}`} target="_blank" className="text-primary text-xs hover:underline mt-0.5 inline-block font-bold">
-                        {t('viewProfile')}
-                      </Link>
+                      <div className="mt-2.5">
+                        <Link href={`/teachers/${course.teacherId}`} target="_blank" className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 shadow-sm hover:shadow-md group border backdrop-blur-md ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20 hover:border-white/40' : 'bg-primary/5 hover:bg-primary/10 text-primary border-primary/20 hover:border-primary/40'}`}>
+                          <User className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                          {t('viewProfile')}
+                        </Link>
+                      </div>
                     )}
                   </div>
                 </div>

@@ -273,8 +273,8 @@ export default function DashboardOverview() {
                 <Clock className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="font-bold text-foreground">Math Quiz: Algebra</h4>
-                <p className="text-sm text-foreground/50 mt-1">Today, 8:00 PM</p>
+                <h4 className="font-bold text-foreground">{t('mathQuiz')}</h4>
+                <p className="text-sm text-foreground/50 mt-1">{t('today')}, 8:00 PM</p>
               </div>
             </div>
 
@@ -283,8 +283,8 @@ export default function DashboardOverview() {
                 <BookOpen className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="font-bold text-foreground">Submit Chemistry Assignment</h4>
-                <p className="text-sm text-foreground/50 mt-1">Tomorrow, 11:59 PM</p>
+                <h4 className="font-bold text-foreground">{t('chemistryAssign')}</h4>
+                <p className="text-sm text-foreground/50 mt-1">{t('tomorrow')}, 11:59 PM</p>
               </div>
             </div>
 
@@ -317,10 +317,10 @@ export default function DashboardOverview() {
                 ) : (
                   <div className="absolute inset-0 bg-black/10"></div>
                 )}
-                <div className="absolute bottom-3 left-3 bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg text-white text-xs font-bold capitalize shadow-sm">{course.category || 'Course'}</div>
+                <div className="absolute bottom-3 left-3 bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg text-white text-xs font-bold capitalize shadow-sm">{course.category || t('categories.primary')}</div>
               </div>
               <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors text-gray-900 dark:text-white line-clamp-2">{course.title}</h3>
-              <p className="text-gray-600 dark:text-foreground/60 text-sm mb-4 line-clamp-2 flex-1">{course.subtitle || 'Learn from the best instructors.'}</p>
+              <p className="text-gray-600 dark:text-foreground/60 text-sm mb-4 line-clamp-2 flex-1">{course.subtitle || t('defaultSubtitle')}</p>
               <div className="flex justify-between items-center text-sm font-medium mt-auto pt-2 border-t border-gray-100 dark:border-foreground/10">
                 <span className="text-gray-500 dark:text-foreground/50">{course.totalVideoLessons || 0} {t('lessons')}</span>
                 <span className="text-primary font-bold">{t('continueBtn')}</span>
@@ -329,7 +329,7 @@ export default function DashboardOverview() {
           ))}
           {recommendedCourses.length === 0 && (
             <div className="col-span-full py-10 text-center text-gray-500">
-              No recommended courses available right now.
+              {t('noRecommended')}
             </div>
           )}
         </div>

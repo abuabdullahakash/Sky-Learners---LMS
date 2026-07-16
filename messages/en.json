@@ -42,6 +42,23 @@
       "settings": "Settings",
       "logout": "Logout"
     },
+    "myCourses": {
+      "title": "My Courses",
+      "subtitle": "Track your learning progress and pending enrollments.",
+      "noCoursesTitle": "No Courses Found",
+      "noCoursesDesc": "You haven't enrolled in any courses yet. Explore our catalog and start learning today!",
+      "browseBtn": "Browse Courses",
+      "pendingApproval": "Pending Approval",
+      "activeCourses": "Active Courses",
+      "unavailableDetails": "Course details unavailable",
+      "noImage": "No Image",
+      "statusPending": "Pending",
+      "statusActive": "Active",
+      "defaultCategory": "Course",
+      "progress": "Progress",
+      "waitingApproval": "Waiting for Approval",
+      "startLearning": "Start Learning"
+    },
     "overview": {
       "welcome": "Welcome back",
       "subtitle": "Ready to learn something new today?",
@@ -62,6 +79,12 @@
       "timeLeft": "mins left",
       "lessons": "Lessons",
       "continueBtn": "Continue",
+      "noRecommended": "No recommended courses available right now.",
+      "defaultSubtitle": "Learn from the best instructors.",
+      "mathQuiz": "Math Quiz: Algebra",
+      "chemistryAssign": "Submit Chemistry Assignment",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
       "timeAgo": {
         "justNow": "Just now",
         "minuteAgo": "1 minute ago",

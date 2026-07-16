@@ -42,6 +42,23 @@
       "settings": "সেটিংস",
       "logout": "লগআউট"
     },
+    "myCourses": {
+      "title": "আমার কোর্স",
+      "subtitle": "আপনার লার্নিং প্রোগ্রেস এবং পেন্ডিং কোর্সগুলো ট্র্যাক করুন।",
+      "noCoursesTitle": "কোনো কোর্স পাওয়া যায়নি",
+      "noCoursesDesc": "আপনি এখনও কোনো কোর্সে যুক্ত হননি। আমাদের ক্যাটালগ দেখুন এবং আজই শেখা শুরু করুন!",
+      "browseBtn": "কোর্সগুলো দেখুন",
+      "pendingApproval": "অ্যাপ্রুভালের অপেক্ষায়",
+      "activeCourses": "অ্যাক্টিভ কোর্স",
+      "unavailableDetails": "কোর্সের বিস্তারিত তথ্য পাওয়া যাচ্ছে না",
+      "noImage": "ছবি নেই",
+      "statusPending": "পেন্ডিং",
+      "statusActive": "অ্যাক্টিভ",
+      "defaultCategory": "কোর্স",
+      "progress": "প্রোগ্রেস",
+      "waitingApproval": "অ্যাপ্রুভালের জন্য অপেক্ষমাণ",
+      "startLearning": "শুরু করুন"
+    },
     "overview": {
       "welcome": "ফিরে আসার জন্য স্বাগতম",
       "subtitle": "আজ নতুন কিছু শিখতে প্রস্তুত?",
@@ -62,6 +79,12 @@
       "timeLeft": "মিনিট বাকি",
       "lessons": "লেসন",
       "continueBtn": "চালিয়ে যান",
+      "noRecommended": "এই মুহূর্তে কোনো রেকমেন্ডেড কোর্স নেই।",
+      "defaultSubtitle": "সেরা ইন্সট্রাক্টরদের কাছ থেকে শিখুন।",
+      "mathQuiz": "ম্যাথ কুইজ: অ্যালজেব্রা",
+      "chemistryAssign": "কেমিস্ট্রি অ্যাসাইনমেন্ট জমা দিন",
+      "today": "আজ",
+      "tomorrow": "আগামীকাল",
       "timeAgo": {
         "justNow": "এইমাত্র",
         "minuteAgo": "১ মিনিট আগে",

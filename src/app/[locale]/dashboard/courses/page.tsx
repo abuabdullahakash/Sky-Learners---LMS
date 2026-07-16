@@ -7,6 +7,7 @@ import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firesto
 import { Link } from '@/i18n/routing';
 import { BookOpen, Clock, CheckCircle2, PlayCircle, AlertCircle, Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 type EnrolledCourse = {
   enrollmentId: string;
@@ -20,6 +21,7 @@ export default function StudentCoursesPage() {
   const { user } = useAuth();
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const t = useTranslations('Dashboard.myCourses');
 
   useEffect(() => {
     const fetchMyCourses = async () => {
@@ -86,8 +88,8 @@ export default function StudentCoursesPage() {
       
       {/* Header */}
       <div>
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-3">My Courses</h1>
-        <p className="text-foreground/70 text-lg">Track your learning progress and pending enrollments.</p>
+        <h1 className="text-3xl md:text-4xl font-extrabold mb-3">{t('title')}</h1>
+        <p className="text-foreground/70 text-lg">{t('subtitle')}</p>
       </div>
 
       {courses.length === 0 ? (
@@ -95,13 +97,13 @@ export default function StudentCoursesPage() {
           <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-6">
             <BookOpen className="w-10 h-10" />
           </div>
-          <h2 className="text-2xl font-bold mb-2">No Courses Found</h2>
-          <p className="text-foreground/60 max-w-md mb-8">You haven't enrolled in any courses yet. Explore our catalog and start learning today!</p>
+          <h2 className="text-2xl font-bold mb-2">{t('noCoursesTitle')}</h2>
+          <p className="text-foreground/60 max-w-md mb-8">{t('noCoursesDesc')}</p>
           <Link 
             href="/courses" 
             className="px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/30"
           >
-            Browse Courses
+            {t('browseBtn')}
           </Link>
         </div>
       ) : (
@@ -112,11 +114,11 @@ export default function StudentCoursesPage() {
             <div className="space-y-6">
               <h2 className="text-2xl font-bold flex items-center gap-2">
                 <Clock className="w-6 h-6 text-orange-500" />
-                Pending Approval
+                {t('pendingApproval')}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {pendingCourses.map((item) => (
-                  <CourseCard key={item.enrollmentId} item={item} />
+                  <CourseCard key={item.enrollmentId} item={item} t={t} />
                 ))}
               </div>
             </div>
@@ -127,11 +129,11 @@ export default function StudentCoursesPage() {
             <div className="space-y-6">
               <h2 className="text-2xl font-bold flex items-center gap-2">
                 <CheckCircle2 className="w-6 h-6 text-green-500" />
-                Active Courses
+                {t('activeCourses')}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {approvedCourses.map((item) => (
-                  <CourseCard key={item.enrollmentId} item={item} />
+                  <CourseCard key={item.enrollmentId} item={item} t={t} />
                 ))}
               </div>
             </div>
@@ -143,14 +145,14 @@ export default function StudentCoursesPage() {
   );
 }
 
-function CourseCard({ item }: { item: EnrolledCourse }) {
+function CourseCard({ item, t }: { item: EnrolledCourse; t: any }) {
   const course = item.courseDetails;
   
   if (!course) {
     return (
       <div className="bg-foreground/5 rounded-3xl border border-foreground/10 p-6 flex items-center gap-4 text-foreground/50">
         <AlertCircle className="w-6 h-6" />
-        Course details unavailable
+        {t('unavailableDetails')}
       </div>
     );
   }
@@ -163,9 +165,9 @@ function CourseCard({ item }: { item: EnrolledCourse }) {
       {/* Thumbnail */}
       <div className="relative aspect-[16/9] w-full bg-foreground/10 flex-shrink-0">
         {course.thumbnailUrl ? (
-          <Image src={course.thumbnailUrl} alt={course.title || 'Course'} fill className={`object-cover transition-transform duration-500 ${!isPending && 'group-hover:scale-105'}`} />
+          <Image src={course.thumbnailUrl} alt={course.title || t('defaultCategory')} fill className={`object-cover transition-transform duration-500 ${!isPending && 'group-hover:scale-105'}`} />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-foreground/30">No Image</div>
+          <div className="w-full h-full flex items-center justify-center text-foreground/30">{t('noImage')}</div>
         )}
         
         {/* Status Badge */}
@@ -174,7 +176,7 @@ function CourseCard({ item }: { item: EnrolledCourse }) {
             isPending ? 'bg-orange-500/90 text-white' : 'bg-green-500/90 text-white'
           }`}>
             {isPending ? <Clock className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
-            {isPending ? 'Pending' : 'Active'}
+            {isPending ? t('statusPending') : t('statusActive')}
           </span>
         </div>
       </div>
@@ -182,7 +184,7 @@ function CourseCard({ item }: { item: EnrolledCourse }) {
       {/* Content */}
       <div className="p-6 flex flex-col flex-grow">
         <div className="text-xs font-bold text-primary mb-2 uppercase tracking-wider">
-          {course.category || 'Course'}
+          {course.category || t('defaultCategory')}
         </div>
         <h3 className="text-xl font-bold mb-3 line-clamp-2">{course.title}</h3>
         
@@ -190,7 +192,7 @@ function CourseCard({ item }: { item: EnrolledCourse }) {
         {!isPending && (
           <div className="mt-auto pt-4 mb-4">
              <div className="flex justify-between text-xs font-bold mb-2">
-                <span className="text-primary">Progress</span>
+                <span className="text-primary">{t('progress')}</span>
                 <span>0%</span>
               </div>
               <div className="w-full bg-foreground/10 rounded-full h-2 overflow-hidden shadow-inner">
@@ -203,7 +205,7 @@ function CourseCard({ item }: { item: EnrolledCourse }) {
           {isPending ? (
             <div className="w-full py-2.5 bg-foreground/5 text-foreground/50 rounded-xl font-semibold text-center text-sm flex items-center justify-center gap-2 cursor-not-allowed">
               <Clock className="w-4 h-4" />
-              Waiting for Approval
+              {t('waitingApproval')}
             </div>
           ) : (
             <Link 
@@ -211,7 +213,7 @@ function CourseCard({ item }: { item: EnrolledCourse }) {
               className="w-full py-2.5 bg-primary text-white rounded-xl font-bold text-center text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 hover:-translate-y-0.5"
             >
               <PlayCircle className="w-4 h-4" />
-              Start Learning
+              {t('startLearning')}
             </Link>
           )}
         </div>

@@ -24,6 +24,14 @@ export default function StickyPricingCard({ course }: { course: any }) {
     }
   }, []);
 
+  let isDiscountValid = false;
+  if (course?.discountPrice && course?.discountValidUntil) {
+    const validUntil = new Date(course.discountValidUntil);
+    if (validUntil >= new Date()) {
+      isDiscountValid = true;
+    }
+  }
+
   return (
     <div className="lg:col-span-1 space-y-6 sticky top-24 h-fit pb-12">
       <div className="bg-gradient-to-b from-background to-blue-50/20 dark:from-background dark:to-blue-900/5 border border-blue-100 dark:border-foreground/10 rounded-xl p-6 shadow-xl relative overflow-hidden group">
@@ -33,9 +41,16 @@ export default function StickyPricingCard({ course }: { course: any }) {
         />
         <div className="text-center mb-6 relative z-10">
           <p className="text-foreground/50 font-bold uppercase tracking-wider mb-2">{t('pricingCard.courseFee')}</p>
-          <div className="text-5xl font-extrabold text-primary">
-            ৳{course.price}
-          </div>
+          {isDiscountValid ? (
+            <div className="flex flex-col items-center justify-center">
+              <div className="text-xl font-bold text-foreground/40 line-through">৳{course.price}</div>
+              <div className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-rose-500">৳{course.discountPrice}</div>
+            </div>
+          ) : (
+            <div className="text-5xl font-extrabold text-primary">
+              ৳{course.price}
+            </div>
+          )}
         </div>
         
         <ul className="space-y-4 mb-8 relative z-10">

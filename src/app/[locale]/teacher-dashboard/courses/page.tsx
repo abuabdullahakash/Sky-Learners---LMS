@@ -19,6 +19,8 @@ type Course = {
   totalVideoLessons?: number;
   totalExams?: number;
   courseValidity?: string;
+  discountPrice?: number;
+  discountValidUntil?: any;
 };
 
 export default function CoursesListPage() {
@@ -149,7 +151,16 @@ export default function CoursesListPage() {
                 </div>
 
                 <div className="flex items-center justify-between mt-auto pt-4 border-t border-foreground/10">
-                  <div className="text-lg font-extrabold">৳{course.price}</div>
+                  <div className="flex flex-col">
+                    {course.discountPrice && course.discountValidUntil && new Date() <= (course.discountValidUntil?.toDate ? course.discountValidUntil.toDate() : new Date(course.discountValidUntil)) ? (
+                      <>
+                        <span className="text-[10px] text-foreground/50 line-through">৳{course.price}</span>
+                        <span className="text-lg font-extrabold text-orange-500">৳{course.discountPrice}</span>
+                      </>
+                    ) : (
+                      <span className="text-lg font-extrabold">৳{course.price}</span>
+                    )}
+                  </div>
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();

@@ -87,8 +87,8 @@ export default function CoursesPage() {
               // Discount Logic
               let isDiscountValid = false;
               let expiryDate = null;
-              if (course.discountPrice && course.discountExpiry) {
-                expiryDate = course.discountExpiry?.toDate ? course.discountExpiry.toDate() : new Date(course.discountExpiry);
+              if (course.discountPrice && course.discountValidUntil) {
+                expiryDate = course.discountValidUntil?.toDate ? course.discountValidUntil.toDate() : new Date(course.discountValidUntil);
                 if (expiryDate && expiryDate > new Date()) {
                   isDiscountValid = true;
                 }

@@ -472,9 +472,21 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
                 <span>কোর্স ফি</span>
                 <span>৳{course?.price || 0}</span>
               </div>
+              {course?.discountPrice && course?.discountValidUntil && new Date() <= new Date(course.discountValidUntil) && (
+                <div className="flex justify-between text-green-600 font-medium">
+                  <span>ডিসকাউন্ট</span>
+                  <span>-৳{(course?.price || 0) - course.discountPrice}</span>
+                </div>
+              )}
               <div className="flex justify-between font-extrabold text-xl pt-2 border-t border-foreground/10">
                 <span>সর্বমোট</span>
-                <span className="text-primary">৳{course?.price || 0}</span>
+                <span className="text-primary">
+                  ৳{
+                    course?.discountPrice && course?.discountValidUntil && new Date() <= new Date(course.discountValidUntil) 
+                    ? course.discountPrice 
+                    : (course?.price || 0)
+                  }
+                </span>
               </div>
             </div>
 

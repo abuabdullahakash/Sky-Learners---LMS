@@ -1,17 +1,20 @@
 "use client";
 
-import { useState } from 'react';
+import { useParams } from 'next/navigation';
 import { useRouter } from '@/i18n/routing';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { uploadImageToImgBB } from '@/lib/imgbb';
 import { ImagePlus, Loader2, ArrowLeft } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 
-export default function CreateCoursePage() {
+export default function EditCoursePage() {
   const router = useRouter();
+  const params = useParams();
+  const courseId = params.courseId as string;
   const { user } = useAuth();
   
   const [title, setTitle] = useState('');
@@ -27,7 +30,36 @@ export default function CreateCoursePage() {
   const [thumbnailPreview, setThumbnailPreview] = useState<string>('');
   
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!courseId) return;
+    const fetchCourse = async () => {
+      try {
+        const courseDoc = await getDoc(doc(db, 'courses', courseId));
+        if (courseDoc.exists()) {
+          const data = courseDoc.data();
+          setTitle(data.title || '');
+          setSubtitle(data.subtitle || '');
+          setCourseType(data.courseType || 'coaching');
+          setCategory(data.category || '');
+          setEduClass(data.eduClass || '');
+          setDepartment(data.department || '');
+          setYear(data.year || '');
+          setCoachingName(data.coachingName || '');
+          setPrice(data.price ? data.price.toString() : '');
+          setThumbnailPreview(data.thumbnailUrl || '');
+        }
+      } catch (err) {
+        console.error("Error fetching course", err);
+        setError("Failed to load course details.");
+      } finally {
+        setIsFetching(false);
+      }
+    };
+    fetchCourse();
+  }, [courseId]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -39,8 +71,8 @@ export default function CreateCoursePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
-    if (!title || !category || !price || !thumbnail) {
+    if (!user || !courseId) return;
+    if (!title || !category || !price || (!thumbnail && !thumbnailPreview)) {
       setError('Please fill in all required fields and upload a thumbnail.');
       return;
     }
@@ -49,12 +81,14 @@ export default function CreateCoursePage() {
     setError('');
 
     try {
-      // 1. Upload Thumbnail to ImgBB
-      const thumbnailUrl = await uploadImageToImgBB(thumbnail);
+      // 1. Upload Thumbnail to ImgBB if changed
+      let thumbnailUrl = thumbnailPreview;
+      if (thumbnail) {
+        thumbnailUrl = await uploadImageToImgBB(thumbnail);
+      }
 
-      // 2. Save Course to Firestore
+      // 2. Update Course in Firestore
       const courseData = {
-        teacherId: user.uid,
         title,
         subtitle,
         courseType,
@@ -62,38 +96,36 @@ export default function CreateCoursePage() {
         eduClass: (category === 'primary' || category === 'high_school' || category === 'intermediate') ? eduClass : '',
         department: (category === 'intermediate' || category === 'honours' || category === 'masters' || category === 'admission') ? department : '',
         year: (category === 'honours' || category === 'masters') ? year : '',
-        isFullClassCourse: true,
-        subjects: [],
         coachingName: courseType === 'coaching' ? coachingName : '',
         price: Number(price),
         thumbnailUrl,
-        isPublished: false, // Draft by default
-        modules: [],
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
       };
 
-      const docRef = await addDoc(collection(db, 'courses'), courseData);
+      await updateDoc(doc(db, 'courses', courseId), courseData);
       
-      // 3. Redirect to the course builder page
-      router.push(`/teacher-dashboard/courses/${docRef.id}`);
+      // 3. Redirect back to dashboard listing
+      router.push('/teacher-dashboard/courses');
       
     } catch (err: any) {
-      console.error('Error creating course:', err);
-      setError(err.message || 'Failed to create course. Please try again.');
+      console.error('Error updating course:', err);
+      setError(err.message || 'Failed to update course. Please try again.');
       setIsLoading(false);
     }
   };
+
+  if (isFetching) {
+    return <div className="flex justify-center items-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+  }
 
   return (
     <div className="max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
       
       <div className="mb-8">
-        <Link href="/teacher-dashboard" className="inline-flex items-center gap-2 text-foreground/60 hover:text-foreground transition-colors mb-4">
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+        <Link href="/teacher-dashboard/courses" className="inline-flex items-center gap-2 text-foreground/60 hover:text-foreground transition-colors mb-4">
+          <ArrowLeft className="w-4 h-4" /> Back to My Courses
         </Link>
-        <h1 className="text-3xl font-extrabold mb-2">Create a New Course</h1>
-        <p className="text-foreground/70">Start by giving your course a name and basic details. You can add videos and curriculum later.</p>
+        <h1 className="text-3xl font-extrabold mb-2">Edit Basic Information</h1>
+        <p className="text-foreground/70">Change the core identity of your course.</p>
       </div>
 
       <div className="bg-background/40 backdrop-blur-md border border-foreground/10 rounded-3xl p-8 shadow-xl">
@@ -283,12 +315,11 @@ export default function CreateCoursePage() {
               <label className="block text-sm font-medium mb-2 text-foreground/80">Course Thumbnail <span className="text-red-500">*</span></label>
               
               <div className="relative group w-full aspect-video md:aspect-[21/9] rounded-2xl border-2 border-dashed border-foreground/20 hover:border-orange-500/50 bg-foreground/5 flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-colors">
-                <input 
+                  <input 
                   type="file" 
                   accept="image/*" 
                   onChange={handleImageChange}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                  required
                 />
                 
                 {thumbnailPreview ? (
@@ -326,9 +357,9 @@ export default function CreateCoursePage() {
               className="px-8 py-3 bg-orange-500 text-white hover:bg-orange-600 rounded-xl font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 flex items-center gap-2"
             >
               {isLoading ? (
-                <><Loader2 className="w-5 h-5 animate-spin" /> Creating...</>
+                <><Loader2 className="w-5 h-5 animate-spin" /> Saving...</>
               ) : (
-                'Create Course & Continue'
+                'Save Changes'
               )}
             </button>
           </div>

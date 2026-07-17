@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
-import { Link } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { PlusCircle, Search, Video, MoreVertical, Edit, Trash2, Users, CheckSquare, Calendar } from 'lucide-react';
 import Image from 'next/image';
 
@@ -23,6 +23,7 @@ type Course = {
 
 export default function CoursesListPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -117,7 +118,11 @@ export default function CoursesListPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map((course) => (
-            <div key={course.id} className="group bg-foreground/5 rounded-3xl border border-foreground/10 overflow-hidden hover:border-orange-500/30 hover:shadow-xl hover:shadow-orange-500/5 transition-all">
+            <div 
+              key={course.id} 
+              onClick={() => router.push(`/teacher-dashboard/courses/${course.id}`)}
+              className="cursor-pointer group bg-foreground/5 rounded-3xl border border-foreground/10 overflow-hidden hover:border-orange-500/30 hover:shadow-xl hover:shadow-orange-500/5 transition-all flex flex-col"
+            >
               
               <div className="relative aspect-[16/9] w-full bg-foreground/10">
                 {course.thumbnailUrl ? (
@@ -145,12 +150,15 @@ export default function CoursesListPage() {
 
                 <div className="flex items-center justify-between mt-auto pt-4 border-t border-foreground/10">
                   <div className="text-lg font-extrabold">৳{course.price}</div>
-                  <Link 
-                    href={`/teacher-dashboard/courses/${course.id}`}
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/teacher-dashboard/courses/${course.id}/edit`);
+                    }}
                     className="flex items-center gap-2 px-4 py-2 bg-foreground/10 hover:bg-orange-500 hover:text-white rounded-lg font-semibold transition-colors"
                   >
                     <Edit className="w-4 h-4" /> Edit Course
-                  </Link>
+                  </button>
                 </div>
               </div>
 

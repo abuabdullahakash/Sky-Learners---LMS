@@ -303,9 +303,8 @@ export default function CourseSettingsPage() {
                   placeholder="e.g. 1st Year"
                 />
               </div>
-                </div>
-              </div>
-            )}
+            </div>
+          )}
             
             {course.category && course.category !== 'skills' && (
               <div className="bg-foreground/5 p-5 rounded-2xl border border-foreground/10 space-y-4">

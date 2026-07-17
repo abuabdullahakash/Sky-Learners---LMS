@@ -95,7 +95,7 @@ export default function CoursesPage() {
               }
 
               return (
-                <div key={course.id} className="bg-background rounded-3xl border border-foreground/10 hover:border-orange-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-orange-500/10 hover:-translate-y-2 overflow-hidden group flex flex-col relative">
+                <div key={course.id} className="bg-background rounded-[14px] border border-foreground/10 hover:border-orange-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-orange-500/10 hover:-translate-y-2 overflow-hidden group flex flex-col relative">
                   
                   {isDiscountValid && (
                     <div className="absolute top-0 left-0 w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white text-[10px] font-bold py-1 px-4 text-center z-20 uppercase tracking-widest shadow-md">
@@ -112,20 +112,42 @@ export default function CoursesPage() {
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="absolute top-4 right-4 bg-background/80 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-extrabold shadow-lg border border-white/10 text-foreground">
-                      {badgeText}
-                    </div>
                   </div>
                   
-                  <div className="p-6 flex-1 flex flex-col relative z-10 bg-background">
+                  <div className="p-5 flex-1 flex flex-col relative z-10 bg-background">
+                    {/* Course Creator Name */}
+                    <div className="text-orange-500 text-xs font-extrabold uppercase tracking-widest mb-2">
+                      {course.courseType === 'coaching' ? (course.coachingName || 'Coaching Center') : (course.instructorName || 'Instructor')}
+                    </div>
+
                     <h3 className="text-xl font-bold mb-2 line-clamp-2 leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-500 group-hover:to-rose-500 transition-all duration-300">{course.title}</h3>
+                    
+                    {/* Badge Below Title */}
+                    <div className="bg-foreground/5 border border-foreground/10 px-3 py-1 rounded-full text-xs font-extrabold text-foreground w-fit mb-3">
+                      {badgeText}
+                    </div>
+
                     <p className="text-foreground/60 mb-5 line-clamp-2 text-sm leading-relaxed">
                       {course.subtitle || 'এই কোর্সে আপনি গুরুত্বপূর্ণ সব টপিক শিখতে পারবেন।'}
                     </p>
                     
-                    <div className="flex items-center gap-4 text-xs font-bold text-foreground/70 mb-6 bg-foreground/5 py-2 px-4 rounded-xl w-fit">
-                      <span className="flex items-center gap-1.5"><Users className="w-4 h-4 text-orange-500" /> {course.coachingName || 'Instructor'}</span>
-                      <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-rose-500" /> Life-time</span>
+                    {/* Stats Row */}
+                    <div className="flex items-center gap-4 text-xs font-bold text-foreground/70 mb-6 w-full">
+                      {(course.enrolledStudents && course.enrolledStudents >= 20) ? (
+                        <span className="flex items-center gap-1.5" title="Enrolled Students"><Users className="w-4 h-4 text-orange-500" /> {course.enrolledStudents}</span>
+                      ) : null}
+                      
+                      <span className="flex items-center gap-1.5" title="Total Videos">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+                        {course.totalVideos || 0}
+                      </span>
+                      
+                      <span className="flex items-center gap-1.5" title="Total Exams">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                        {course.totalExams || 0}
+                      </span>
+                      
+                      <span className="flex items-center gap-1.5 ml-auto" title="Duration"><Clock className="w-4 h-4 text-rose-500" /> {course.duration || 'Life-time'}</span>
                     </div>
 
                     <div className="mt-auto pt-5 border-t border-foreground/10 flex items-center justify-between">

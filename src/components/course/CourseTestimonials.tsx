@@ -1,4 +1,4 @@
-import { Star, MessageSquareQuote } from 'lucide-react';
+import { Star, MessageSquareQuote, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
@@ -6,6 +6,15 @@ import gsap from 'gsap';
 export default function CourseTestimonials({ testimonials }: { testimonials?: any[] }) {
   const t = useTranslations('CourseDetails');
   const shapesRef = useRef<(HTMLDivElement | null)[]>([]);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, clientWidth } = scrollContainerRef.current;
+      const scrollTo = direction === 'left' ? scrollLeft - clientWidth : scrollLeft + clientWidth;
+      scrollContainerRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     shapesRef.current.forEach((shape, index) => {
@@ -35,12 +44,33 @@ export default function CourseTestimonials({ testimonials }: { testimonials?: an
 
   return (
     <section className="animate-in slide-in-from-bottom-4 duration-700 delay-500 mt-12">
-      <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-        <MessageSquareQuote className="w-8 h-8 text-primary" /> 
-        {t('testimonials')}
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {displayTestimonials.map((review, i) => {
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold flex items-center gap-3">
+          <MessageSquareQuote className="w-8 h-8 text-primary" /> 
+          {t('testimonials')}
+        </h2>
+        {displayTestimonials.length > 1 && (
+          <div className="flex gap-2">
+            <button onClick={() => scroll('left')} className="p-2.5 rounded-full border border-foreground/10 hover:bg-foreground/5 transition-colors">
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button onClick={() => scroll('right')} className="p-2.5 rounded-full border border-foreground/10 hover:bg-foreground/5 transition-colors">
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        )}
+      </div>
+      
+      <div className="relative group">
+        <div 
+          ref={scrollContainerRef}
+          className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 hide-scrollbar"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          <style dangerouslySetInnerHTML={{__html: `
+            .hide-scrollbar::-webkit-scrollbar { display: none; }
+          `}} />
+          {displayTestimonials.map((review, i) => {
           const colors = [
             'bg-orange-50/30 border-orange-100/50 dark:bg-orange-900/5 dark:border-orange-800/20',
             'bg-blue-50/30 border-blue-100/50 dark:bg-blue-900/5 dark:border-blue-800/20',
@@ -55,7 +85,7 @@ export default function CourseTestimonials({ testimonials }: { testimonials?: an
           const shapeColorClass = shapeColors[i % shapeColors.length];
 
           return (
-            <div key={i} className={`rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border ${colorClass} relative overflow-hidden group`}>
+            <div key={i} className={`flex-none w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] snap-start rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border ${colorClass} relative overflow-hidden group`}>
               {/* Animated Background Shape */}
               <div 
                 ref={el => { shapesRef.current[i] = el; }}
@@ -78,6 +108,7 @@ export default function CourseTestimonials({ testimonials }: { testimonials?: an
             </div>
           );
         })}
+        </div>
       </div>
     </section>
   );

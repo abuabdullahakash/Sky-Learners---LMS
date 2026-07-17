@@ -76,7 +76,7 @@ export default function CourseCurriculumPage() {
         if (docSnap.exists() && docSnap.data().teacherId === user.uid) {
           const data = docSnap.data();
           if (!data.modules) data.modules = [];
-          if (!data.subjects) data.subjects = [];
+          if (!data.curriculumSubjects) data.curriculumSubjects = [];
           if (!data.instructors) data.instructors = [];
           setCourse(data);
         }
@@ -129,17 +129,17 @@ export default function CourseCurriculumPage() {
   // --- Subject Management ---
   const handleAddSubject = async () => {
     if (!newSubject.trim()) return;
-    const updatedSubjects = [...(course.subjects || []), newSubject.trim()];
-    setCourse({ ...course, subjects: updatedSubjects });
-    await updateDoc(doc(db, 'courses', courseId), { subjects: updatedSubjects });
+    const updatedSubjects = [...(course.curriculumSubjects || []), newSubject.trim()];
+    setCourse({ ...course, curriculumSubjects: updatedSubjects });
+    await updateDoc(doc(db, 'courses', courseId), { curriculumSubjects: updatedSubjects });
     setNewSubject('');
   };
 
   const handleRemoveSubject = async (index: number) => {
-    const updatedSubjects = [...course.subjects];
+    const updatedSubjects = [...course.curriculumSubjects];
     updatedSubjects.splice(index, 1);
-    setCourse({ ...course, subjects: updatedSubjects });
-    await updateDoc(doc(db, 'courses', courseId), { subjects: updatedSubjects });
+    setCourse({ ...course, curriculumSubjects: updatedSubjects });
+    await updateDoc(doc(db, 'courses', courseId), { curriculumSubjects: updatedSubjects });
   };
 
   // --- Lesson Management ---
@@ -439,10 +439,10 @@ export default function CourseCurriculumPage() {
             </div>
 
             <div className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
-              {course.subjects?.length === 0 ? (
+              {course.curriculumSubjects?.length === 0 ? (
                 <div className="text-center py-6 text-foreground/40 text-sm">No subjects added yet.</div>
               ) : (
-                course.subjects?.map((subject: string, idx: number) => (
+                course.curriculumSubjects?.map((subject: string, idx: number) => (
                   <div key={idx} className="flex justify-between items-center bg-foreground/5 px-4 py-2.5 rounded-xl border border-foreground/10">
                     <span className="text-sm font-medium">{subject}</span>
                     <button onClick={() => handleRemoveSubject(idx)} className="text-red-500 hover:text-red-600">
@@ -584,7 +584,7 @@ export default function CourseCurriculumPage() {
                       className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 text-sm focus:outline-none focus:border-orange-500 appearance-none dark:bg-[#1f1f1f]"
                     >
                       <option value="" className="bg-background text-foreground">Select Subject...</option>
-                      {course.subjects?.map((sub: string, idx: number) => (
+                      {course.curriculumSubjects?.map((sub: string, idx: number) => (
                         <option key={idx} value={sub} className="bg-background text-foreground">{sub}</option>
                       ))}
                     </select>

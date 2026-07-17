@@ -231,48 +231,116 @@ export default function TeacherSettingsPage() {
 
             {/* SECURITY TAB */}
             {activeTab === 'security' && (
-              <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
-                <div className="border-b border-foreground/10 pb-4 mb-6">
+              <div className="space-y-8 animate-in fade-in zoom-in-95 duration-300">
+                <div className="border-b border-foreground/10 pb-4">
                   <h2 className="text-xl font-bold">Security & Password</h2>
                   <p className="text-sm text-foreground/60 mt-1">
-                    Keep your account secure by using a strong password.
+                    Keep your account secure by using a strong password and enabling extra security features.
                   </p>
                 </div>
                 
-                <div className="max-w-md space-y-5">
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-foreground/80">Current Password</label>
-                    <input 
-                      type="password" 
-                      placeholder="Enter current password"
-                      value={securityData.currentPassword}
-                      onChange={(e) => setSecurityData({...securityData, currentPassword: e.target.value})}
-                      className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-colors"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-foreground/80">New Password</label>
-                    <input 
-                      type="password" 
-                      placeholder="Enter new password"
-                      value={securityData.newPassword}
-                      onChange={(e) => setSecurityData({...securityData, newPassword: e.target.value})}
-                      className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-colors"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-foreground/80">Confirm New Password</label>
-                    <input 
-                      type="password" 
-                      placeholder="Confirm new password"
-                      value={securityData.confirmPassword}
-                      onChange={(e) => setSecurityData({...securityData, confirmPassword: e.target.value})}
-                      className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-colors"
-                    />
+                {/* Change Password Section */}
+                <div className="bg-background rounded-2xl p-6 border border-foreground/10 shadow-sm">
+                  <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                    <ShieldCheck className="w-5 h-5 text-orange-500" />
+                    Change Password
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-sm font-semibold text-foreground/80">Current Password</label>
+                      <input 
+                        type="password" 
+                        placeholder="Enter current password"
+                        value={securityData.currentPassword}
+                        onChange={(e) => setSecurityData({...securityData, currentPassword: e.target.value})}
+                        className="w-full bg-foreground/5 border border-foreground/10 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500 transition-colors"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-foreground/80">New Password</label>
+                      <input 
+                        type="password" 
+                        placeholder="Enter new password"
+                        value={securityData.newPassword}
+                        onChange={(e) => setSecurityData({...securityData, newPassword: e.target.value})}
+                        className="w-full bg-foreground/5 border border-foreground/10 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500 transition-colors"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-foreground/80">Confirm New Password</label>
+                      <input 
+                        type="password" 
+                        placeholder="Confirm new password"
+                        value={securityData.confirmPassword}
+                        onChange={(e) => setSecurityData({...securityData, confirmPassword: e.target.value})}
+                        className="w-full bg-foreground/5 border border-foreground/10 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500 transition-colors"
+                      />
+                    </div>
                   </div>
                 </div>
+
+                {/* Two-Factor Authentication (UI Only) */}
+                <div className="bg-background rounded-2xl p-6 border border-foreground/10 shadow-sm">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-bold text-lg mb-1 flex items-center gap-2">
+                        Two-Factor Authentication (2FA)
+                        <span className="bg-orange-500/10 text-orange-500 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Recommended</span>
+                      </h3>
+                      <p className="text-sm text-foreground/60 max-w-xl">
+                        Add an extra layer of security to your account. We will ask for a verification code when you sign in from a new device.
+                      </p>
+                    </div>
+                    <button type="button" className="shrink-0 px-6 py-2.5 bg-foreground/5 hover:bg-foreground/10 rounded-xl font-bold text-sm transition-colors border border-foreground/10">
+                      Enable 2FA
+                    </button>
+                  </div>
+                </div>
+
+                {/* Active Sessions (UI Only) */}
+                <div className="bg-background rounded-2xl p-6 border border-foreground/10 shadow-sm">
+                  <h3 className="font-bold text-lg mb-4">Active Login Sessions</h3>
+                  <p className="text-sm text-foreground/60 mb-6">
+                    Here are all the devices that are currently logged into your account. If you see an unfamiliar device, log out from it immediately.
+                  </p>
+                  
+                  <div className="space-y-4">
+                    {/* Current Device */}
+                    <div className="flex items-center justify-between p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 bg-emerald-500/10 text-emerald-600 rounded-full">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+                        </div>
+                        <div>
+                          <p className="font-bold text-sm flex items-center gap-2">
+                            MacBook Pro - Chrome 
+                            <span className="text-[10px] bg-emerald-500 text-white px-1.5 py-0.5 rounded font-medium">Active Now</span>
+                          </p>
+                          <p className="text-xs text-foreground/60">Dhaka, Bangladesh • IP: 192.168.1.1</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Other Device */}
+                    <div className="flex items-center justify-between p-4 bg-foreground/5 border border-foreground/10 rounded-xl">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 bg-foreground/10 text-foreground/60 rounded-full">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                        </div>
+                        <div>
+                          <p className="font-bold text-sm">Windows PC - Firefox</p>
+                          <p className="text-xs text-foreground/60">Chittagong, Bangladesh • Last active: 2 days ago</p>
+                        </div>
+                      </div>
+                      <button type="button" className="text-xs font-bold text-red-500 hover:text-white hover:bg-red-500 px-3 py-1.5 rounded-lg transition-colors">
+                        Log Out Device
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             )}
 

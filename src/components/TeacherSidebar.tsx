@@ -2,13 +2,33 @@
 
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
-import { LayoutDashboard, Video, Users, DollarSign, Settings, LogOut, UserCircle } from 'lucide-react';
+import { LayoutDashboard, Video, Users, DollarSign, Settings, UserCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useState, useEffect } from 'react';
+import { db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function TeacherSidebar() {
   const t = useTranslations('Dashboard.sidebar');
   const pathname = usePathname();
-  const { logout } = useAuth();
+  const { user, userData } = useAuth();
+  
+  const [profileName, setProfileName] = useState('');
+  const [profileImage, setProfileImage] = useState('');
+
+  useEffect(() => {
+    if (user?.uid) {
+      const fetchProfile = async () => {
+        const docRef = doc(db, 'teacherProfiles', user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setProfileName(docSnap.data().displayName || '');
+          setProfileImage(docSnap.data().photoUrl || '');
+        }
+      };
+      fetchProfile();
+    }
+  }, [user]);
 
   const menuItems = [
     { name: t('overview') || 'Overview', href: '/teacher-dashboard', icon: LayoutDashboard },
@@ -42,14 +62,27 @@ export default function TeacherSidebar() {
         })}
       </div>
 
-      <div className="p-4 mt-auto">
-        <button 
-          onClick={logout}
-          className="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-red-500/10 text-red-500 transition-colors font-medium"
+      <div className="p-4 mt-auto border-t border-foreground/5">
+        <Link 
+          href="/teacher-dashboard/settings"
+          className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-foreground/5 transition-all group"
         >
-          <LogOut className="w-5 h-5" />
-          {t('logout') || 'Logout'}
-        </button>
+          <div className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center overflow-hidden shrink-0">
+            {profileImage || user?.photoURL ? (
+              <img src={profileImage || user?.photoURL || ''} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <UserCircle className="w-6 h-6 text-foreground/50" />
+            )}
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <p className="text-sm font-bold text-foreground truncate">
+              {profileName || user?.displayName || userData?.name || 'Teacher'}
+            </p>
+            <p className="text-xs text-foreground/50 truncate">
+              {user?.email || 'No email'}
+            </p>
+          </div>
+        </Link>
       </div>
     </aside>
   );

@@ -95,10 +95,11 @@ export default function StudentsPage() {
           });
         }
 
-        // 4. Fetch last_accessed for "Active Students" logic
+        // 4. Fetch last_accessed for "Active Students" logic and users for real-time profile data
         const studentIdsArray = Array.from(studentIds);
         const studentChunks = chunkArray(studentIdsArray, 10);
         const activeStudentIds = new Set<string>();
+        const usersDataMap: Record<string, any> = {};
         
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -107,6 +108,7 @@ export default function StudentsPage() {
         for (const chunk of studentChunks) {
           await Promise.all(chunk.map(async (studentId) => {
             try {
+              // Fetch last_accessed
               const lastAccessedDoc = await getDoc(doc(db, 'last_accessed', studentId));
               if (lastAccessedDoc.exists()) {
                 const data = lastAccessedDoc.data();
@@ -114,8 +116,14 @@ export default function StudentsPage() {
                   activeStudentIds.add(studentId);
                 }
               }
+
+              // Fetch real-time user profile
+              const userDoc = await getDoc(doc(db, 'users', studentId));
+              if (userDoc.exists()) {
+                usersDataMap[studentId] = userDoc.data();
+              }
             } catch (e) {
-              console.error("Error fetching last_accessed for", studentId, e);
+              console.error("Error fetching user/accessed data for", studentId, e);
             }
           }));
         }
@@ -129,12 +137,19 @@ export default function StudentsPage() {
           const courseId = enrollment.courseId;
           const studentId = enrollment.studentId;
           const courseInfo = courseInfoMap[courseId] || { title: enrollment.courseTitle || 'Unknown', totalVideoLessons: 0 };
+          const userProfile = usersDataMap[studentId] || {};
           
           const completedCount = completedLessonsMap[`${studentId}_${courseId}`] || 0;
           const totalVideos = courseInfo.totalVideoLessons;
           const progress = totalVideos > 0 ? Math.round((completedCount / totalVideos) * 100) : 0;
           
-          const hasEmail = enrollment.studentEmail && enrollment.studentEmail.trim() !== '' && !enrollment.studentEmail.includes('no-email');
+          // Get profile data directly from users collection, fallback to checkout data
+          const finalName = userProfile.name || enrollment.studentName || 'Unknown Student';
+          const finalEmail = userProfile.email || enrollment.studentEmail || '';
+          const finalPhone = userProfile.phone || userProfile.phoneNumber || enrollment.offlinePhone || enrollment.senderNumber || '';
+          const finalAvatar = userProfile.photoURL || userProfile.imageUrl || enrollment.profileImageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(finalName)}&background=random`;
+
+          const hasEmail = finalEmail && finalEmail.trim() !== '' && !finalEmail.includes('no-email');
 
           let enrollDateStr = 'Unknown';
           let createdAtDate = new Date(0);
@@ -143,6 +158,7 @@ export default function StudentsPage() {
             createdAtDate = enrollment.createdAt.toDate ? enrollment.createdAt.toDate() : new Date(enrollment.createdAt);
             enrollDateStr = createdAtDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
             
+            // Count total enrollments this month
             if (createdAtDate.getMonth() === currentMonth && createdAtDate.getFullYear() === currentYear) {
               newThisMonthCount++;
             }
@@ -151,11 +167,11 @@ export default function StudentsPage() {
           return {
             id: enrollment.id,
             studentId: studentId,
-            name: enrollment.studentName || 'Unknown Student',
-            email: enrollment.studentEmail || '',
-            phone: enrollment.offlinePhone || enrollment.senderNumber || '',
+            name: finalName,
+            email: finalEmail,
+            phone: finalPhone,
             hasEmail: hasEmail,
-            avatar: enrollment.profileImageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(enrollment.studentName || 'Student')}&background=random`,
+            avatar: finalAvatar,
             courseTitle: courseInfo.title,
             courseId: courseId,
             enrollDate: enrollDateStr,
@@ -170,9 +186,9 @@ export default function StudentsPage() {
 
         setStudents(finalStudents);
         setStats({
-          totalStudents: studentIds.size,
-          activeStudents: activeStudentIds.size,
-          newThisMonth: newThisMonthCount
+          totalStudents: studentIds.size, // Unique students
+          activeStudents: activeStudentIds.size, // Unique active students
+          newThisMonth: newThisMonthCount // Total new enrollments
         });
 
       } catch (error) {
@@ -237,7 +253,7 @@ export default function StudentsPage() {
             <UserPlus className="w-7 h-7" />
           </div>
           <div>
-            <p className="text-foreground/60 text-sm font-medium">New This Month</p>
+            <p className="text-foreground/60 text-sm font-medium">New Enrollments</p>
             <h3 className="text-2xl font-bold">{stats.newThisMonth}</h3>
           </div>
         </div>

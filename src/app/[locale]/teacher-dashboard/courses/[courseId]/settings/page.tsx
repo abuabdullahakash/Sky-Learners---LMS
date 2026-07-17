@@ -193,8 +193,8 @@ export default function CourseSettingsPage() {
         <div className="space-y-4">
 
           {/* 1. Hero Section Information */}
-          <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
-            <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">1. Hero Section Information</h3>
+          <div className="space-y-6 pt-2">
+            <h2 className="text-2xl font-bold text-foreground">1. Hero Section Information</h2>
           <div>
             <label className="block text-sm font-medium mb-1">Course Title</label>
             <input 
@@ -218,7 +218,7 @@ export default function CourseSettingsPage() {
             />
           </div>
           {/* Cover & Slider Images */}
-          <div className="space-y-6 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+          <div className="space-y-6 pt-4">
             <div>
               <label className="block text-sm font-medium mb-2">Background Cover Image (Optional)</label>
               <div className="flex items-center gap-4">
@@ -280,9 +280,10 @@ export default function CourseSettingsPage() {
           </div>
 
 
+          <hr className="border-foreground/10 my-8" />
           {/* 2. Course Overview */}
-          <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
-            <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">2. Course Overview</h3>
+          <div className="space-y-6 pt-2">
+            <h2 className="text-2xl font-bold text-foreground">2. Course Overview</h2>
           <div>
             <label className="block text-sm font-medium mb-1">Detailed Description (HTML/Text)</label>
             <RichTextEditor 
@@ -294,12 +295,13 @@ export default function CourseSettingsPage() {
           </div>
 
 
+          <hr className="border-foreground/10 my-8" />
           {/* 3. Learning & Target Audience */}
-          <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
-            <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">3. Learning & Target Audience</h3>
+          <div className="space-y-6 pt-2">
+            <h2 className="text-2xl font-bold text-foreground">3. Learning & Target Audience</h2>
           {/* Learning Outcomes */}
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">Learning Outcomes (কী কী শিখবেন)</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-lg font-semibold text-foreground/80">Learning Outcomes (কী কী শিখবেন)</h3>
             <button 
               type="button" 
               onClick={() => setCourse({ ...course, learningOutcomes: [...(course.learningOutcomes || []), { text: '', icon: 'CheckCircle2' }] })}
@@ -361,9 +363,10 @@ export default function CourseSettingsPage() {
           </div>
 
 
+          <hr className="border-foreground/10 my-8" />
           {/* 4. Special Messages & Social Proof */}
-          <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
-            <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">4. Special Messages & Social Proof</h3>
+          <div className="space-y-6 pt-2">
+            <h2 className="text-2xl font-bold text-foreground">4. Special Messages & Social Proof</h2>
           {/* Category-Specific Dynamic Fields */}
           {(course.category === 'primary' || course.category === 'high_school') && (
             <div className="p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl">
@@ -399,8 +402,8 @@ export default function CourseSettingsPage() {
           )}
 
           {/* Testimonials */}
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">Student Testimonials (শিক্ষার্থীদের মতামত)</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-lg font-semibold text-foreground/80">Student Testimonials (শিক্ষার্থীদের মতামত)</h3>
             <button 
               type="button" 
               onClick={() => setCourse({ ...course, testimonials: [...(course.testimonials || []), { name: '', role: '', text: '', rating: 5 }] })}
@@ -469,13 +472,12 @@ export default function CourseSettingsPage() {
           </div>
 
 
+          <hr className="border-foreground/10 my-8" />
           {/* 5. Frequently Asked Questions */}
-          <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
-            <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">5. Frequently Asked Questions</h3>
-          <hr className="border-foreground/10 my-6" />
-          
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">Frequently Asked Questions (FAQs)</h2>
+          <div className="space-y-6 pt-2">
+            <h2 className="text-2xl font-bold text-foreground">5. Frequently Asked Questions</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-lg font-semibold text-foreground/80">Frequently Asked Questions (FAQs)</h3>
             <button 
               type="button" 
               onClick={() => setCourse({ ...course, faqs: [...(course.faqs || []), { question: '', answer: '' }] })}
@@ -542,9 +544,10 @@ export default function CourseSettingsPage() {
 
 
 
+          <hr className="border-foreground/10 my-8" />
           {/* 6. Study Materials */}
-          <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
-            <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">6. Study Materials</h3>
+          <div className="space-y-6 pt-2">
+            <h2 className="text-2xl font-bold text-foreground">6. Study Materials</h2>
           <div>
             <label className="block text-sm font-medium mb-2">Class Routine Image (Optional)</label>
             <p className="text-xs text-foreground/50 mb-3">Upload an image of the class routine to be displayed on the course details page.</p>

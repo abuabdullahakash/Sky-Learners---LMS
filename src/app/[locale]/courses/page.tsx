@@ -76,11 +76,11 @@ export default function CoursesPage() {
               
               if (course.isFullClassCourse !== false) {
                 badgeText += ' (Full Course)';
-              } else if (course.subjects && course.subjects.length > 0) {
-                if (course.subjects.length === 1) {
-                  badgeText += ` • ${course.subjects[0]}`;
+              } else if (course.specificSubjects && course.specificSubjects.length > 0) {
+                if (course.specificSubjects.length === 1) {
+                  badgeText += ` • ${course.specificSubjects[0]}`;
                 } else {
-                  badgeText += ` • ${course.subjects.length} Subjects`;
+                  badgeText += ` • ${course.specificSubjects.length} Subjects`;
                 }
               }
 

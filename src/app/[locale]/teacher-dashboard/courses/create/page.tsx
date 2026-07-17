@@ -40,22 +40,22 @@ export default function CreateCoursePage() {
 
   // Course Coverage
   const [isFullClassCourse, setIsFullClassCourse] = useState(true);
-  const [subjects, setSubjects] = useState<string[]>([]);
+  const [specificSubjects, setSpecificSubjects] = useState<string[]>([]);
   const [subjectInput, setSubjectInput] = useState('');
 
   const handleAddSubject = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       const val = subjectInput.trim();
-      if (val && !subjects.includes(val)) {
-        setSubjects([...subjects, val]);
+      if (val && !specificSubjects.includes(val)) {
+        setSpecificSubjects([...specificSubjects, val]);
       }
       setSubjectInput('');
     }
   };
 
   const removeSubject = (sub: string) => {
-    setSubjects(subjects.filter(s => s !== sub));
+    setSpecificSubjects(specificSubjects.filter(s => s !== sub));
   };
 
   const [thumbnail, setThumbnail] = useState<File | null>(null);
@@ -99,8 +99,8 @@ export default function CreateCoursePage() {
         year: (category === 'honours' || category === 'masters') ? year : '',
         coachingName: courseType === 'coaching' ? coachingName : '',
         isFullClassCourse,
-        subjects: !isFullClassCourse ? subjects : [],
-        totalLiveClasses: totalLiveClasses ? Number(totalLiveClasses) : 0,
+        specificSubjects: !isFullClassCourse ? specificSubjects : [],
+        totalLiveClasses: totalLiveClasses ? Number(totalLiveClasses) : null,
         totalVideoLessons: totalVideoLessons ? Number(totalVideoLessons) : 0,
         totalExams: totalExams ? Number(totalExams) : 0,
         totalPdfs: totalPdfs ? Number(totalPdfs) : 0,
@@ -199,7 +199,7 @@ export default function CreateCoursePage() {
                     setDepartment('');
                     setYear('');
                     setIsFullClassCourse(true);
-                    setSubjects([]);
+                    setSpecificSubjects([]);
                   }}
                   className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all appearance-none"
                   required
@@ -328,7 +328,7 @@ export default function CreateCoursePage() {
                   <div className="pt-2">
                     <label className="block text-sm font-medium mb-2 text-foreground/80">Add Subjects <span className="text-foreground/50 text-xs font-normal">(Type and press Enter)</span></label>
                     <div className="flex flex-wrap gap-2 mb-3">
-                      {subjects.map(sub => (
+                      {specificSubjects.map(sub => (
                         <span key={sub} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-medium border border-primary/20">
                           {sub}
                           <button type="button" onClick={() => removeSubject(sub)} className="hover:text-red-500 transition-colors">✖</button>

@@ -26,6 +26,25 @@ export default function CreateCoursePage() {
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string>('');
   
+  const [isFullClassCourse, setIsFullClassCourse] = useState(true);
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [subjectInput, setSubjectInput] = useState('');
+
+  const handleAddSubject = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const val = subjectInput.trim();
+      if (val && !subjects.includes(val)) {
+        setSubjects([...subjects, val]);
+      }
+      setSubjectInput('');
+    }
+  };
+
+  const removeSubject = (sub: string) => {
+    setSubjects(subjects.filter(s => s !== sub));
+  };
+  
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -62,6 +81,8 @@ export default function CreateCoursePage() {
         eduClass: (category === 'primary' || category === 'high_school' || category === 'intermediate') ? eduClass : '',
         department: (category === 'intermediate' || category === 'honours' || category === 'masters' || category === 'admission') ? department : '',
         year: (category === 'honours' || category === 'masters') ? year : '',
+        isFullClassCourse,
+        subjects: !isFullClassCourse ? subjects : [],
         coachingName: courseType === 'coaching' ? coachingName : '',
         price: Number(price),
         thumbnailUrl,
@@ -151,6 +172,8 @@ export default function CreateCoursePage() {
                     setEduClass('');
                     setDepartment('');
                     setYear('');
+                    setIsFullClassCourse(true);
+                    setSubjects([]);
                   }}
                   className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all appearance-none"
                   required
@@ -257,6 +280,44 @@ export default function CreateCoursePage() {
                     required
                   />
                 </div>
+              </div>
+            )}
+
+            {category && category !== 'skills' && (
+              <div className="bg-foreground/5 p-5 rounded-2xl border border-foreground/10 space-y-4">
+                <label className="block text-sm font-medium text-foreground/80">Course Coverage <span className="text-red-500">*</span></label>
+                <div className="flex gap-4 flex-col sm:flex-row">
+                  <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${isFullClassCourse ? 'border-primary bg-primary/5' : 'border-foreground/10 bg-background hover:border-primary/30'}`}>
+                    <input type="radio" checked={isFullClassCourse} onChange={() => setIsFullClassCourse(true)} className="accent-primary w-4 h-4" />
+                    <span className="text-sm font-medium">Full Course (All Subjects)</span>
+                  </label>
+                  <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${!isFullClassCourse ? 'border-primary bg-primary/5' : 'border-foreground/10 bg-background hover:border-primary/30'}`}>
+                    <input type="radio" checked={!isFullClassCourse} onChange={() => setIsFullClassCourse(false)} className="accent-primary w-4 h-4" />
+                    <span className="text-sm font-medium">Specific Subjects</span>
+                  </label>
+                </div>
+
+                {!isFullClassCourse && (
+                  <div className="pt-2">
+                    <label className="block text-sm font-medium mb-2 text-foreground/80">Add Subjects <span className="text-foreground/50 text-xs font-normal">(Type and press Enter)</span></label>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {subjects.map(sub => (
+                        <span key={sub} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-medium border border-primary/20">
+                          {sub}
+                          <button type="button" onClick={() => removeSubject(sub)} className="hover:text-red-500 transition-colors">✖</button>
+                        </span>
+                      ))}
+                    </div>
+                    <input 
+                      type="text" 
+                      value={subjectInput}
+                      onChange={(e) => setSubjectInput(e.target.value)}
+                      onKeyDown={handleAddSubject}
+                      placeholder="e.g. Physics, Math..."
+                      className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                    />
+                  </div>
+                )}
               </div>
             )}
 

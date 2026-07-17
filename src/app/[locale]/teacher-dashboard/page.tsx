@@ -14,6 +14,12 @@ export default function TeacherDashboard() {
   const [recentEnrollments, setRecentEnrollments] = useState<any[]>([]);
   const [isLoadingRequests, setIsLoadingRequests] = useState(true);
   const [activeTab, setActiveTab] = useState<'pending' | 'recent'>('pending');
+  const [dashboardStats, setDashboardStats] = useState({
+    totalStudents: 0,
+    activeCourses: 0,
+    totalEarnings: 0,
+    averageRating: 4.8
+  });
 
   const fetchDashboardData = async () => {
     if (!user) return;
@@ -21,31 +27,31 @@ export default function TeacherDashboard() {
     try {
       const enrollmentsRef = collection(db, 'enrollments');
       
-      // Fetch Pending Requests
-      const pendingQuery = query(
+      // Fetch All Enrollments to calculate stats & separate pending/recent
+      const allEnrollmentsQuery = query(
         enrollmentsRef,
-        where('teacherId', '==', user.uid),
-        where('status', '==', 'pending')
+        where('teacherId', '==', user.uid)
       );
-      const pendingSnap = await getDocs(pendingQuery);
+      const allSnap = await getDocs(allEnrollmentsQuery);
+      
       const pending: any[] = [];
-      pendingSnap.forEach(doc => {
-        pending.push({ id: doc.id, ...doc.data() });
-      });
-      setPendingRequests(pending);
-
-      // Fetch Recent Approved Enrollments
-      const recentQuery = query(
-        enrollmentsRef,
-        where('teacherId', '==', user.uid),
-        where('status', '==', 'approved')
-      );
-      const recentSnap = await getDocs(recentQuery);
       const recent: any[] = [];
-      recentSnap.forEach(doc => {
-        recent.push({ id: doc.id, ...doc.data() });
+      let totalEarnings = 0;
+      let totalStudents = 0;
+
+      allSnap.forEach(doc => {
+        const data = doc.data();
+        if (data.status === 'pending') {
+          pending.push({ id: doc.id, ...data });
+        } else if (data.status === 'approved' || data.status === 'completed') {
+          recent.push({ id: doc.id, ...data });
+          totalEarnings += Number(data.amount) || 0;
+          totalStudents += 1;
+        }
       });
       
+      setPendingRequests(pending);
+
       // Sort in memory by updatedAt descending and limit to 5
       recent.sort((a, b) => {
         const timeA = a.updatedAt?.toDate ? a.updatedAt.toDate().getTime() : 0;
@@ -53,6 +59,22 @@ export default function TeacherDashboard() {
         return timeB - timeA;
       });
       setRecentEnrollments(recent.slice(0, 5));
+
+      // Fetch Active Courses
+      const coursesRef = collection(db, 'courses');
+      const activeCoursesQuery = query(
+        coursesRef,
+        where('teacherId', '==', user.uid),
+        where('isPublished', '==', true)
+      );
+      const activeCoursesSnap = await getDocs(activeCoursesQuery);
+      
+      setDashboardStats({
+        totalStudents,
+        activeCourses: activeCoursesSnap.size,
+        totalEarnings,
+        averageRating: 4.8
+      });
 
     } catch (error) {
       console.error("Error fetching dashboard data", error);
@@ -79,10 +101,10 @@ export default function TeacherDashboard() {
   };
 
   const stats = [
-    { title: 'Total Students', value: '1,234', icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-    { title: 'Active Courses', value: '12', icon: Video, color: 'text-orange-500', bg: 'bg-orange-500/10' },
-    { title: 'Total Earnings', value: '$4,560', icon: DollarSign, color: 'text-green-500', bg: 'bg-green-500/10' },
-    { title: 'Average Rating', value: '4.8', icon: Star, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
+    { title: 'Total Students', value: dashboardStats.totalStudents.toString(), icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    { title: 'Active Courses', value: dashboardStats.activeCourses.toString(), icon: Video, color: 'text-orange-500', bg: 'bg-orange-500/10' },
+    { title: 'Total Earnings', value: `৳${dashboardStats.totalEarnings.toLocaleString()}`, icon: DollarSign, color: 'text-green-500', bg: 'bg-green-500/10' },
+    { title: 'Average Rating', value: dashboardStats.averageRating.toString(), icon: Star, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
   ];
 
   return (

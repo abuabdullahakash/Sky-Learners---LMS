@@ -1,8 +1,11 @@
 "use client";
 
 import { useState, useRef } from 'react';
-import { ShieldCheck, CreditCard, Bell, Save, AlertCircle, CheckCircle2, ChevronRight, ChevronLeft } from 'lucide-react';
+import { ShieldCheck, CreditCard, Bell, Save, AlertCircle, CheckCircle2, ChevronRight, ChevronLeft, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { useEffect } from 'react';
 
 export default function TeacherSettingsPage() {
   const { user } = useAuth();
@@ -14,10 +17,36 @@ export default function TeacherSettingsPage() {
 
   // Form States
   const [paymentData, setPaymentData] = useState({
-    bkash: '01711223344',
-    nagad: '01811223344',
+    bkash: '',
+    nagad: '',
     rocket: ''
   });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      if (!user) return;
+      try {
+        const docRef = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.paymentData) {
+            setPaymentData({
+              bkash: data.paymentData.bkash || '',
+              nagad: data.paymentData.nagad || '',
+              rocket: data.paymentData.rocket || ''
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching settings:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSettings();
+  }, [user]);
 
   const [securityData, setSecurityData] = useState({
     currentPassword: '',
@@ -31,17 +60,33 @@ export default function TeacherSettingsPage() {
     pushNotifications: true
   });
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
     setIsSaving(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsSaving(false);
+    try {
+      const docRef = doc(db, 'users', user.uid);
+      await updateDoc(docRef, {
+        paymentData: paymentData
+        // Add security and notifications saving logic here later
+      });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
-    }, 1500);
+    } catch (err) {
+      console.error("Error saving settings:", err);
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   const scrollTabs = (direction: 'left' | 'right') => {
     if (scrollRef.current) {

@@ -17,6 +17,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
   const { user, userData } = useAuth();
   
   const [course, setCourse] = useState<any>(null);
+  const [teacherPaymentData, setTeacherPaymentData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -70,7 +71,23 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
         const docRef = doc(db, 'courses', courseId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setCourse({ id: docSnap.id, ...docSnap.data() });
+          const courseData = { id: docSnap.id, ...docSnap.data() } as any;
+          setCourse(courseData);
+          
+          if (courseData.teacherId) {
+            const teacherRef = doc(db, 'users', courseData.teacherId);
+            const teacherSnap = await getDoc(teacherRef);
+            if (teacherSnap.exists() && teacherSnap.data().paymentData) {
+              const pData = teacherSnap.data().paymentData;
+              setTeacherPaymentData(pData);
+              
+              if (!pData.bkash && pData.nagad) {
+                setFormData(prev => ({...prev, paymentMethod: 'nagad'}));
+              } else if (!pData.bkash && !pData.nagad && pData.rocket) {
+                setFormData(prev => ({...prev, paymentMethod: 'rocket'}));
+              }
+            }
+          }
         } else {
           setError("Course not found!");
         }
@@ -204,7 +221,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
             </h2>
             
             <div className="space-y-4 text-foreground/80 font-medium">
-              <p>১. আপনার বিকাশ, নগদ বা রকেট অ্যাপ ওপেন করুন।</p>
+              <p>১. আপনার {teacherPaymentData?.bkash && 'বিকাশ'}{teacherPaymentData?.bkash && (teacherPaymentData?.nagad || teacherPaymentData?.rocket) ? ', ' : ''}{teacherPaymentData?.nagad && 'নগদ'}{teacherPaymentData?.nagad && teacherPaymentData?.rocket ? ' বা ' : (!teacherPaymentData?.nagad && teacherPaymentData?.bkash && teacherPaymentData?.rocket ? ' বা ' : '')}{teacherPaymentData?.rocket && 'রকেট'} অ্যাপ ওপেন করুন।</p>
               <p>২. <strong className="text-foreground">Send Money</strong> অপশনটি সিলেক্ট করুন।</p>
               <p>৩. নিচের যেকোনো একটি নাম্বারে ঠিক <strong className="text-xl text-primary bg-primary/10 px-2 py-0.5 rounded">
                 ৳{
@@ -215,14 +232,24 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
               </strong> সেন্ড মানি করুন:</p>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-                <div className="bg-pink-500/10 border border-pink-500/20 p-5 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">
-                  <span className="font-bold text-pink-500 uppercase tracking-wider text-xs">bKash (Personal)</span>
-                  <span className="text-2xl font-black text-foreground">017XX-XXXXXX</span>
-                </div>
-                <div className="bg-orange-500/10 border border-orange-500/20 p-5 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">
-                  <span className="font-bold text-orange-500 uppercase tracking-wider text-xs">Nagad (Personal)</span>
-                  <span className="text-2xl font-black text-foreground">018XX-XXXXXX</span>
-                </div>
+                {teacherPaymentData?.bkash && (
+                  <div className="bg-pink-500/10 border border-pink-500/20 p-5 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">
+                    <span className="font-bold text-pink-500 uppercase tracking-wider text-xs">bKash (Personal)</span>
+                    <span className="text-2xl font-black text-foreground">{teacherPaymentData.bkash}</span>
+                  </div>
+                )}
+                {teacherPaymentData?.nagad && (
+                  <div className="bg-orange-500/10 border border-orange-500/20 p-5 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">
+                    <span className="font-bold text-orange-500 uppercase tracking-wider text-xs">Nagad (Personal)</span>
+                    <span className="text-2xl font-black text-foreground">{teacherPaymentData.nagad}</span>
+                  </div>
+                )}
+                {teacherPaymentData?.rocket && (
+                  <div className="bg-purple-500/10 border border-purple-500/20 p-5 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">
+                    <span className="font-bold text-purple-500 uppercase tracking-wider text-xs">Rocket (Personal)</span>
+                    <span className="text-2xl font-black text-foreground">{teacherPaymentData.rocket}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -344,19 +371,45 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
               <div className="space-y-2">
                 <label className="text-sm font-bold text-foreground/80">পেমেন্ট মেথড <span className="text-red-500">*</span></label>
                 <div className="flex gap-4">
-                  {['bkash', 'nagad', 'rocket'].map(method => (
-                    <label key={method} className={`flex-1 border rounded-xl p-3 text-center cursor-pointer transition-colors ${formData.paymentMethod === method ? 'border-primary bg-primary/10 text-primary font-bold' : 'border-foreground/20 hover:border-foreground/40 font-semibold text-foreground/70'}`}>
+                  {teacherPaymentData?.bkash && (
+                    <label className={`flex-1 border rounded-xl p-3 text-center cursor-pointer transition-colors ${formData.paymentMethod === 'bkash' ? 'border-primary bg-primary/10 text-primary font-bold' : 'border-foreground/20 hover:border-foreground/40 font-semibold text-foreground/70'}`}>
                       <input 
                         type="radio" 
                         name="paymentMethod" 
-                        value={method} 
+                        value="bkash" 
                         className="hidden"
-                        checked={formData.paymentMethod === method}
+                        checked={formData.paymentMethod === 'bkash'}
                         onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})}
                       />
-                      <span className="capitalize">{method}</span>
+                      <span className="capitalize">bKash</span>
                     </label>
-                  ))}
+                  )}
+                  {teacherPaymentData?.nagad && (
+                    <label className={`flex-1 border rounded-xl p-3 text-center cursor-pointer transition-colors ${formData.paymentMethod === 'nagad' ? 'border-primary bg-primary/10 text-primary font-bold' : 'border-foreground/20 hover:border-foreground/40 font-semibold text-foreground/70'}`}>
+                      <input 
+                        type="radio" 
+                        name="paymentMethod" 
+                        value="nagad" 
+                        className="hidden"
+                        checked={formData.paymentMethod === 'nagad'}
+                        onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})}
+                      />
+                      <span className="capitalize">Nagad</span>
+                    </label>
+                  )}
+                  {teacherPaymentData?.rocket && (
+                    <label className={`flex-1 border rounded-xl p-3 text-center cursor-pointer transition-colors ${formData.paymentMethod === 'rocket' ? 'border-primary bg-primary/10 text-primary font-bold' : 'border-foreground/20 hover:border-foreground/40 font-semibold text-foreground/70'}`}>
+                      <input 
+                        type="radio" 
+                        name="paymentMethod" 
+                        value="rocket" 
+                        className="hidden"
+                        checked={formData.paymentMethod === 'rocket'}
+                        onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})}
+                      />
+                      <span className="capitalize">Rocket</span>
+                    </label>
+                  )}
                 </div>
               </div>
 

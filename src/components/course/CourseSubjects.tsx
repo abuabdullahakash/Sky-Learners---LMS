@@ -41,21 +41,21 @@ export default function CourseSubjects({ subjects, courseType }: { subjects: Sub
         </div>
       ) : (
         <div className="overflow-x-auto pb-4">
-          <div className="min-w-[700px] border border-foreground/10 rounded-2xl overflow-hidden bg-background shadow-sm">
+          <div className="min-w-[700px] border border-primary/20 rounded-[4px] overflow-hidden bg-background shadow-sm">
             <table className="w-full text-left border-collapse">
               {/* Table Header */}
               <thead>
-                <tr className="bg-primary/5 border-b-2 border-primary font-bold text-sm text-foreground/90 uppercase tracking-wider">
+                <tr className="bg-gradient-to-r from-orange-500 to-red-500 font-bold text-sm text-white uppercase tracking-wider shadow-sm">
                   <th className="p-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
-                      <Book className="w-4 h-4 text-primary shrink-0" /> 
+                      <Book className="w-4 h-4 text-white/90 shrink-0" /> 
                       {t('subjectName') || 'Subject / Topic'}
                     </div>
                   </th>
                   {hasInstructor && (
                     <th className="p-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-primary shrink-0" /> 
+                        <Users className="w-4 h-4 text-white/90 shrink-0" /> 
                         {t('instructor') || 'Instructor'}
                       </div>
                     </th>
@@ -63,7 +63,7 @@ export default function CourseSubjects({ subjects, courseType }: { subjects: Sub
                   {hasLiveClasses && (
                     <th className="p-4 whitespace-nowrap text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <MonitorPlay className="w-4 h-4 text-red-500 shrink-0" /> 
+                        <MonitorPlay className="w-4 h-4 text-white/90 shrink-0" /> 
                         {t('liveClasses') || 'Live Classes'}
                       </div>
                     </th>
@@ -71,7 +71,7 @@ export default function CourseSubjects({ subjects, courseType }: { subjects: Sub
                   {hasVideos && (
                     <th className="p-4 whitespace-nowrap text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <Video className="w-4 h-4 text-blue-500 shrink-0" /> 
+                        <Video className="w-4 h-4 text-white/90 shrink-0" /> 
                         {t('videoLessons') || 'Video Lessons'}
                       </div>
                     </th>
@@ -79,7 +79,7 @@ export default function CourseSubjects({ subjects, courseType }: { subjects: Sub
                   {hasExams && (
                     <th className="p-4 whitespace-nowrap text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <Edit3 className="w-4 h-4 text-green-500 shrink-0" /> 
+                        <Edit3 className="w-4 h-4 text-white/90 shrink-0" /> 
                         {t('exams') || 'Exams'}
                       </div>
                     </th>
@@ -88,7 +88,7 @@ export default function CourseSubjects({ subjects, courseType }: { subjects: Sub
               </thead>
 
               {/* Table Body */}
-              <tbody className="divide-y divide-foreground/5">
+              <tbody className="divide-y divide-primary/20">
                 {subjects.map((sub, idx) => (
                   <tr key={idx} className="hover:bg-foreground/[0.02] transition-colors">
                     <td className="p-4 font-semibold">

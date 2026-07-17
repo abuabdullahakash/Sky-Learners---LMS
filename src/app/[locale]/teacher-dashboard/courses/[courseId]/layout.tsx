@@ -14,7 +14,7 @@ export default function CourseDashboardLayout({
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 bg-foreground/5 rounded-3xl border border-foreground/10 p-6 md:p-8 min-h-[calc(100vh-140px)]">
+      <div className="flex-1 min-h-[calc(100vh-140px)]">
         {children}
       </div>
       

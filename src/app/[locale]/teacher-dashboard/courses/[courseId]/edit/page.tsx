@@ -180,17 +180,14 @@ export default function EditCoursePage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       
       <div className="mb-8">
-        <Link href="/teacher-dashboard/courses" className="inline-flex items-center gap-2 text-foreground/60 hover:text-foreground transition-colors mb-4">
-          <ArrowLeft className="w-4 h-4" /> Back to My Courses
-        </Link>
         <h1 className="text-3xl font-extrabold mb-2">Edit Basic Information</h1>
         <p className="text-foreground/70">Change the core identity of your course.</p>
       </div>
 
-      <div className="bg-background/40 backdrop-blur-md border border-foreground/10 rounded-3xl p-8 shadow-xl">
+      <div className="bg-background/40 backdrop-blur-md border border-foreground/10 rounded-3xl p-6 shadow-xl">
         {error && (
           <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl text-red-500 text-sm">
             {error}

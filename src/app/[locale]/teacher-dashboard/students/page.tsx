@@ -1,21 +1,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Search, Filter, Mail, Eye, Users, UserCheck, UserPlus, Loader2 } from 'lucide-react';
+import { Search, Filter, Mail, Eye, Users, UserCheck, UserPlus, Loader2, Phone } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-
-// Base mock names to generate dynamic students for real courses
-const MOCK_NAMES = [
-  { n: 'Rahim Uddin', e: 'rahim@example.com' },
-  { n: 'Jannatul Ferdous', e: 'jannatul@example.com' },
-  { n: 'Hasan Mahmud', e: 'hasan@example.com' },
-  { n: 'Sumaiya Akter', e: 'sumaiya@example.com' },
-  { n: 'Karimul Islam', e: 'karimul@example.com' },
-  { n: 'Ayesha Siddiqa', e: 'ayesha@example.com' },
-  { n: 'Tariqul Islam', e: 'tariqul@example.com' },
-];
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 
 export default function StudentsPage() {
   const { user } = useAuth();
@@ -26,48 +15,168 @@ export default function StudentsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCourseId, setFilterCourseId] = useState('All');
 
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    activeStudents: 0,
+    newThisMonth: 0
+  });
+
   useEffect(() => {
     const fetchCoursesAndStudents = async () => {
       if (!user) return;
       setIsLoading(true);
       try {
-        // Fetch real courses created by this teacher
+        // 1. Fetch real courses created by this teacher
         const q = query(
           collection(db, 'courses'),
           where('teacherId', '==', user.uid)
         );
         const querySnapshot = await getDocs(q);
         const fetchedCourses: any[] = [];
+        const courseInfoMap: Record<string, { title: string, totalVideoLessons: number }> = {};
+        const courseIds: string[] = [];
+
         querySnapshot.forEach((doc) => {
-          fetchedCourses.push({ id: doc.id, ...doc.data() });
+          const data = doc.data();
+          fetchedCourses.push({ id: doc.id, ...data });
+          courseIds.push(doc.id);
+          courseInfoMap[doc.id] = {
+            title: data.title || '',
+            totalVideoLessons: Number(data.totalVideoLessons) || 0
+          };
         });
         
         setCourses(fetchedCourses);
 
-        // Dynamically assign mock students to the teacher's real courses
-        if (fetchedCourses.length > 0) {
-          const generatedStudents = MOCK_NAMES.map((person, i) => {
-            const course = fetchedCourses[i % fetchedCourses.length];
-            const progress = Math.floor(Math.random() * 100);
-            return {
-              id: i,
-              name: person.n,
-              email: person.e,
-              avatar: `https://i.pravatar.cc/150?img=${(i % 50) + 10}`, // Randomize avatar slightly
-              courseTitle: course.title,
-              courseId: course.id,
-              enrollDate: new Date(Date.now() - Math.random() * 10000000000).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-              progress: progress,
-              status: progress === 100 ? 'Completed' : 'Active'
-            };
-          });
-          setStudents(generatedStudents);
-        } else {
+        if (courseIds.length === 0) {
           setStudents([]);
+          setIsLoading(false);
+          return;
         }
 
+        // 2. Fetch enrollments for the teacher
+        const enrollmentsQuery = query(
+          collection(db, 'enrollments'),
+          where('teacherId', '==', user.uid)
+        );
+        const enrollmentsSnapshot = await getDocs(enrollmentsQuery);
+        
+        const enrollmentsData: any[] = [];
+        const studentIds = new Set<string>();
+        
+        enrollmentsSnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (data.studentId) {
+            studentIds.add(data.studentId);
+            enrollmentsData.push({
+              id: docSnap.id,
+              ...data,
+            });
+          }
+        });
+
+        // 3. Fetch completed lessons to calculate progress
+        const completedLessonsMap: Record<string, number> = {}; // "studentId_courseId" -> count
+        const chunkArray = (arr: any[], size: number) => Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
+        const courseChunks = chunkArray(courseIds, 10);
+        
+        for (const chunk of courseChunks) {
+          const completedQuery = query(
+            collection(db, 'completed_lessons'),
+            where('courseId', 'in', chunk)
+          );
+          const completedSnapshot = await getDocs(completedQuery);
+          completedSnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.studentId && data.courseId) {
+              const key = `${data.studentId}_${data.courseId}`;
+              completedLessonsMap[key] = (completedLessonsMap[key] || 0) + 1;
+            }
+          });
+        }
+
+        // 4. Fetch last_accessed for "Active Students" logic
+        const studentIdsArray = Array.from(studentIds);
+        const studentChunks = chunkArray(studentIdsArray, 10);
+        const activeStudentIds = new Set<string>();
+        
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const sevenDaysAgoISO = sevenDaysAgo.toISOString();
+
+        for (const chunk of studentChunks) {
+          await Promise.all(chunk.map(async (studentId) => {
+            try {
+              const lastAccessedDoc = await getDoc(doc(db, 'last_accessed', studentId));
+              if (lastAccessedDoc.exists()) {
+                const data = lastAccessedDoc.data();
+                if (data.timestamp && data.timestamp >= sevenDaysAgoISO) {
+                  activeStudentIds.add(studentId);
+                }
+              }
+            } catch (e) {
+              console.error("Error fetching last_accessed for", studentId, e);
+            }
+          }));
+        }
+
+        // 5. Combine and calculate top stats
+        let newThisMonthCount = 0;
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+
+        const finalStudents = enrollmentsData.map(enrollment => {
+          const courseId = enrollment.courseId;
+          const studentId = enrollment.studentId;
+          const courseInfo = courseInfoMap[courseId] || { title: enrollment.courseTitle || 'Unknown', totalVideoLessons: 0 };
+          
+          const completedCount = completedLessonsMap[`${studentId}_${courseId}`] || 0;
+          const totalVideos = courseInfo.totalVideoLessons;
+          const progress = totalVideos > 0 ? Math.round((completedCount / totalVideos) * 100) : 0;
+          
+          const hasEmail = enrollment.studentEmail && enrollment.studentEmail.trim() !== '' && !enrollment.studentEmail.includes('no-email');
+
+          let enrollDateStr = 'Unknown';
+          let createdAtDate = new Date(0);
+          
+          if (enrollment.createdAt) {
+            createdAtDate = enrollment.createdAt.toDate ? enrollment.createdAt.toDate() : new Date(enrollment.createdAt);
+            enrollDateStr = createdAtDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            
+            if (createdAtDate.getMonth() === currentMonth && createdAtDate.getFullYear() === currentYear) {
+              newThisMonthCount++;
+            }
+          }
+
+          return {
+            id: enrollment.id,
+            studentId: studentId,
+            name: enrollment.studentName || 'Unknown Student',
+            email: enrollment.studentEmail || '',
+            phone: enrollment.offlinePhone || enrollment.senderNumber || '',
+            hasEmail: hasEmail,
+            avatar: enrollment.profileImageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(enrollment.studentName || 'Student')}&background=random`,
+            courseTitle: courseInfo.title,
+            courseId: courseId,
+            enrollDate: enrollDateStr,
+            createdAtDate: createdAtDate,
+            progress: Math.min(progress, 100),
+            isActive: activeStudentIds.has(studentId)
+          };
+        });
+
+        // Sort by newest enrollment first
+        finalStudents.sort((a, b) => b.createdAtDate.getTime() - a.createdAtDate.getTime());
+
+        setStudents(finalStudents);
+        setStats({
+          totalStudents: studentIds.size,
+          activeStudents: activeStudentIds.size,
+          newThisMonth: newThisMonthCount
+        });
+
       } catch (error) {
-        console.error("Error fetching courses:", error);
+        console.error("Error fetching courses and students:", error);
       } finally {
         setIsLoading(false);
       }
@@ -79,12 +188,11 @@ export default function StudentsPage() {
   // Filter logic
   const filteredStudents = students.filter(student => {
     const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          student.email.toLowerCase().includes(searchTerm.toLowerCase());
+                          student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          student.phone.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCourse = filterCourseId === 'All' || student.courseId === filterCourseId;
     return matchesSearch && matchesCourse;
   });
-
-  const activeStudentsCount = students.filter(s => s.status === 'Active').length;
 
   if (isLoading) {
     return (
@@ -110,7 +218,7 @@ export default function StudentsPage() {
           </div>
           <div>
             <p className="text-foreground/60 text-sm font-medium">Total Students</p>
-            <h3 className="text-2xl font-bold">{students.length}</h3>
+            <h3 className="text-2xl font-bold">{stats.totalStudents}</h3>
           </div>
         </div>
         
@@ -120,7 +228,7 @@ export default function StudentsPage() {
           </div>
           <div>
             <p className="text-foreground/60 text-sm font-medium">Active Students</p>
-            <h3 className="text-2xl font-bold">{activeStudentsCount}</h3>
+            <h3 className="text-2xl font-bold">{stats.activeStudents}</h3>
           </div>
         </div>
 
@@ -130,7 +238,7 @@ export default function StudentsPage() {
           </div>
           <div>
             <p className="text-foreground/60 text-sm font-medium">New This Month</p>
-            <h3 className="text-2xl font-bold">{Math.floor(students.length / 3)}</h3>
+            <h3 className="text-2xl font-bold">{stats.newThisMonth}</h3>
           </div>
         </div>
       </div>
@@ -143,7 +251,7 @@ export default function StudentsPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40" />
             <input 
               type="text" 
-              placeholder="Search by name or email..." 
+              placeholder="Search by name, email or phone..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-background border border-foreground/20 rounded-xl py-2.5 pl-10 pr-4 focus:outline-none focus:border-primary transition-colors"
@@ -200,7 +308,9 @@ export default function StudentsPage() {
                         />
                         <div>
                           <p className="font-semibold">{student.name}</p>
-                          <p className="text-xs text-foreground/60">{student.email}</p>
+                          <p className="text-xs text-foreground/60">
+                            {student.hasEmail ? student.email : student.phone}
+                          </p>
                         </div>
                       </div>
                     </td>
@@ -227,12 +337,26 @@ export default function StudentsPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors tooltip-trigger" title="Message Student">
-                          <Mail className="w-5 h-5" />
-                        </button>
-                        <button className="p-2 hover:bg-blue-500/10 hover:text-blue-500 rounded-lg transition-colors tooltip-trigger" title="View Profile">
+                        {student.hasEmail ? (
+                          <a 
+                            href={`mailto:${student.email}`}
+                            className="p-2 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors tooltip-trigger" 
+                            title="Email Student"
+                          >
+                            <Mail className="w-5 h-5" />
+                          </a>
+                        ) : (
+                          <a 
+                            href={`tel:${student.phone}`}
+                            className="p-2 hover:bg-green-500/10 hover:text-green-500 rounded-lg transition-colors tooltip-trigger" 
+                            title="Call Student"
+                          >
+                            <Phone className="w-5 h-5" />
+                          </a>
+                        )}
+                        {/* <button className="p-2 hover:bg-blue-500/10 hover:text-blue-500 rounded-lg transition-colors tooltip-trigger" title="View Profile">
                           <Eye className="w-5 h-5" />
-                        </button>
+                        </button> */}
                       </div>
                     </td>
                   </tr>
@@ -251,7 +375,7 @@ export default function StudentsPage() {
         {/* Pagination Dummy */}
         {students.length > 0 && (
           <div className="p-4 border-t border-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-foreground/60 bg-background/50">
-            <p>Showing {filteredStudents.length} of {students.length} students</p>
+            <p>Showing {filteredStudents.length} of {students.length} enrollments</p>
             <div className="flex gap-1">
               <button className="px-3 py-1 rounded bg-foreground/10 hover:bg-foreground/20 disabled:opacity-50" disabled>Prev</button>
               <button className="px-3 py-1 rounded bg-primary text-white">1</button>

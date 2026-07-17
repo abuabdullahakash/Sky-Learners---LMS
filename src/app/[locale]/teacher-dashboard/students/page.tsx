@@ -14,6 +14,12 @@ export default function StudentsPage() {
   
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCourseId, setFilterCourseId] = useState('All');
+  
+  const [visibleCount, setVisibleCount] = useState(5);
+
+  useEffect(() => {
+    setVisibleCount(5);
+  }, [searchTerm, filterCourseId]);
 
   const [stats, setStats] = useState({
     totalStudents: 0,
@@ -210,6 +216,8 @@ export default function StudentsPage() {
     return matchesSearch && matchesCourse;
   });
 
+  const displayedStudents = filteredStudents.slice(0, visibleCount);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
@@ -312,8 +320,8 @@ export default function StudentsPage() {
                     You haven't created any courses yet.
                   </td>
                 </tr>
-              ) : filteredStudents.length > 0 ? (
-                filteredStudents.map((student) => (
+              ) : displayedStudents.length > 0 ? (
+                displayedStudents.map((student) => (
                   <tr key={student.id} className="hover:bg-foreground/5 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -388,15 +396,20 @@ export default function StudentsPage() {
           </table>
         </div>
         
-        {/* Pagination Dummy */}
-        {students.length > 0 && (
-          <div className="p-4 border-t border-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-foreground/60 bg-background/50">
-            <p>Showing {filteredStudents.length} of {students.length} enrollments</p>
-            <div className="flex gap-1">
-              <button className="px-3 py-1 rounded bg-foreground/10 hover:bg-foreground/20 disabled:opacity-50" disabled>Prev</button>
-              <button className="px-3 py-1 rounded bg-primary text-white">1</button>
-              <button className="px-3 py-1 rounded bg-foreground/10 hover:bg-foreground/20 disabled:opacity-50" disabled={filteredStudents.length === 0}>Next</button>
-            </div>
+        {/* Load More Section */}
+        {filteredStudents.length > 0 && (
+          <div className="p-6 border-t border-foreground/10 flex flex-col items-center justify-center gap-4 bg-background/50">
+            <p className="text-sm text-foreground/60">
+              Showing {displayedStudents.length} of {filteredStudents.length} enrollments
+            </p>
+            {visibleCount < filteredStudents.length && (
+              <button 
+                onClick={() => setVisibleCount(prev => prev + 50)}
+                className="px-8 py-2.5 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-medium transition-all duration-300 hover:shadow-[0_0_15px_rgba(249,115,22,0.4)] hover:-translate-y-0.5 active:scale-95"
+              >
+                Load More
+              </button>
+            )}
           </div>
         )}
       </div>

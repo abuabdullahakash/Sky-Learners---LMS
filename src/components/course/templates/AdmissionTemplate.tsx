@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { ArrowLeft, Target, Trophy, Clock, Users, Download, PlayCircle, ChevronLeft, ChevronRight, User } from 'lucide-react';
+import RelatedCourses from '../RelatedCourses';
 import { PerspectiveCarousel, PerspectiveCarouselItem } from '@/components/ui/perspective-carousel';
 import { InstructorModal } from '@/components/course/InstructorModal';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -230,6 +231,8 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
                 </div>
               </section>
             )}
+          
+          <RelatedCourses currentCourseId={course.id} teacherId={course.teacherId} category={course.category} eduClass={course.eduClass} />
           </div>
           
           <StickyPricingCard course={course} />

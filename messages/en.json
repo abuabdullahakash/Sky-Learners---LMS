@@ -334,6 +334,8 @@
     "liveClasses": "Live Classes",
     "videoLessons": "Video Lessons",
     "exams": "Exams",
-    "na": "N/A"
+    "na": "N/A",
+    "relatedCourses": "Related Courses by this Instructor",
+    "noRelatedCourses": "No other courses available."
   }
 }

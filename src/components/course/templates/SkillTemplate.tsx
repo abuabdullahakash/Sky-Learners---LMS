@@ -4,6 +4,7 @@ import 'react-quill-new/dist/quill.snow.css';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { ArrowLeft, Briefcase, Award, Users, Image as ImageIcon, PlayCircle, ChevronLeft, ChevronRight, User } from 'lucide-react';
+import RelatedCourses from '../RelatedCourses';
 import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -261,6 +262,8 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
                 </div>
               </section>
             )}
+          
+          <RelatedCourses currentCourseId={course.id} teacherId={course.teacherId} category={course.category} eduClass={course.eduClass} />
           </div>
           
           <StickyPricingCard course={course} />

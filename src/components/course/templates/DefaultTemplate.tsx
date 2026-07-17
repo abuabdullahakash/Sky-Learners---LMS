@@ -5,6 +5,7 @@ import { useRef, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { Users, Clock, CheckCircle2, ArrowLeft, PlayCircle, Image as ImageIcon, User } from 'lucide-react';
+import RelatedCourses from '../RelatedCourses';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { PerspectiveCarousel, PerspectiveCarouselItem } from '@/components/ui/perspective-carousel';
@@ -258,6 +259,8 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
               </section>
             )}
 
+          
+          <RelatedCourses currentCourseId={course.id} teacherId={course.teacherId} category={course.category} eduClass={course.eduClass} />
           </div>
           
           <StickyPricingCard course={course} />

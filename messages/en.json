@@ -273,7 +273,7 @@
       "honours": "Honours",
       "skills": "Skills"
     },
-    "instructor": "Instructor/Institution",
+    "instructor": "Instructor",
     "viewProfile": "View Profile",
     "duration": "Duration",
     "lifetimeAccess": "Lifetime Access",
@@ -328,6 +328,12 @@
       "noFeatures": "No features added",
       "moreQuestions": "Have more questions?",
       "callUs": "Call"
-    }
+    },
+    "subjectBreakdown": "Course Breakdown & Distribution",
+    "subjectName": "Subject / Topic",
+    "liveClasses": "Live Classes",
+    "videoLessons": "Video Lessons",
+    "exams": "Exams",
+    "na": "N/A"
   }
 }

@@ -39,23 +39,32 @@ export default function CreateCoursePage() {
   const [contactNumber, setContactNumber] = useState('');
 
   // Course Coverage
-  const [isFullClassCourse, setIsFullClassCourse] = useState(true);
-  const [specificSubjects, setSpecificSubjects] = useState<string[]>([]);
-  const [subjectInput, setSubjectInput] = useState('');
+  const [specificSubjects, setSpecificSubjects] = useState<any[]>([]);
 
-  const handleAddSubject = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const val = subjectInput.trim();
-      if (val && !specificSubjects.includes(val)) {
-        setSpecificSubjects([...specificSubjects, val]);
-      }
-      setSubjectInput('');
-    }
+  const handleAddSubject = () => {
+    setSpecificSubjects([...specificSubjects, { name: '', instructor: '', liveClasses: '', videoLessons: '', exams: '' }]);
   };
 
-  const removeSubject = (sub: string) => {
-    setSpecificSubjects(specificSubjects.filter(s => s !== sub));
+  const removeSubject = (index: number) => {
+    setSpecificSubjects(specificSubjects.filter((_, i) => i !== index));
+  };
+
+  const updateSubject = (index: number, field: string, value: string) => {
+    const updated = [...specificSubjects];
+    updated[index][field] = value;
+    setSpecificSubjects(updated);
+    
+    if (field === 'liveClasses' || field === 'videoLessons' || field === 'exams') {
+       let tl = 0, tv = 0, te = 0;
+       updated.forEach(sub => {
+         tl += Number(sub.liveClasses || 0);
+         tv += Number(sub.videoLessons || 0);
+         te += Number(sub.exams || 0);
+       });
+       if (tl > 0) setTotalLiveClasses(String(tl));
+       if (tv > 0) setTotalVideoLessons(String(tv));
+       if (te > 0) setTotalExams(String(te));
+    }
   };
 
   const [thumbnail, setThumbnail] = useState<File | null>(null);
@@ -98,8 +107,7 @@ export default function CreateCoursePage() {
         department: (category === 'intermediate' || category === 'honours' || category === 'masters' || category === 'admission') ? department : '',
         year: (category === 'honours' || category === 'masters') ? year : '',
         coachingName: courseType === 'coaching' ? coachingName : '',
-        isFullClassCourse,
-        specificSubjects: !isFullClassCourse ? specificSubjects : [],
+        specificSubjects: specificSubjects,
         totalLiveClasses: totalLiveClasses ? Number(totalLiveClasses) : null,
         totalVideoLessons: totalVideoLessons ? Number(totalVideoLessons) : 0,
         totalExams: totalExams ? Number(totalExams) : 0,
@@ -198,7 +206,6 @@ export default function CreateCoursePage() {
                     setEduClass('');
                     setDepartment('');
                     setYear('');
-                    setIsFullClassCourse(true);
                     setSpecificSubjects([]);
                   }}
                   className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all appearance-none"
@@ -312,39 +319,43 @@ export default function CreateCoursePage() {
 
             {category && category !== 'skills' && (
               <div className="bg-foreground/5 p-5 rounded-2xl border border-foreground/10 space-y-4">
-                <label className="block text-sm font-medium text-foreground/80">Course Coverage <span className="text-red-500">*</span></label>
-                <div className="flex gap-4 flex-col sm:flex-row">
-                  <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${isFullClassCourse ? 'border-primary bg-primary/5' : 'border-foreground/10 bg-background hover:border-primary/30'}`}>
-                    <input type="radio" checked={isFullClassCourse} onChange={() => setIsFullClassCourse(true)} className="accent-primary w-4 h-4" />
-                    <span className="text-sm font-medium">Full Course (All Subjects)</span>
-                  </label>
-                  <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${!isFullClassCourse ? 'border-primary bg-primary/5' : 'border-foreground/10 bg-background hover:border-primary/30'}`}>
-                    <input type="radio" checked={!isFullClassCourse} onChange={() => setIsFullClassCourse(false)} className="accent-primary w-4 h-4" />
-                    <span className="text-sm font-medium">Specific Subjects</span>
-                  </label>
+                <div className="flex justify-between items-center">
+                  <label className="block text-sm font-medium text-foreground/80">Course Subjects & Class Distribution <span className="text-red-500">*</span></label>
+                  <button type="button" onClick={handleAddSubject} className="px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-lg hover:bg-primary/20 transition-colors">
+                    + Add Subject
+                  </button>
                 </div>
 
-                {!isFullClassCourse && (
-                  <div className="pt-2">
-                    <label className="block text-sm font-medium mb-2 text-foreground/80">Add Subjects <span className="text-foreground/50 text-xs font-normal">(Type and press Enter)</span></label>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {specificSubjects.map(sub => (
-                        <span key={sub} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-medium border border-primary/20">
-                          {sub}
-                          <button type="button" onClick={() => removeSubject(sub)} className="hover:text-red-500 transition-colors">✖</button>
-                        </span>
-                      ))}
+                <div className="space-y-3">
+                  {specificSubjects.map((sub, idx) => (
+                    <div key={idx} className="flex flex-wrap md:flex-nowrap gap-3 p-3 bg-background rounded-xl border border-foreground/10 relative pr-10">
+                      <button type="button" onClick={() => removeSubject(idx)} className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-red-500 transition-colors">✖</button>
+                      
+                      <div className="w-full md:w-1/3">
+                        <input type="text" value={sub.name} onChange={e => updateSubject(idx, 'name', e.target.value)} placeholder="Subject Name (e.g. Physics)" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" required />
+                      </div>
+                      
+                      {courseType === 'coaching' && (
+                        <div className="w-full md:w-1/4">
+                          <input type="text" value={sub.instructor || ''} onChange={e => updateSubject(idx, 'instructor', e.target.value)} placeholder="Instructor Name" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" />
+                        </div>
+                      )}
+                      
+                      <div className="w-full md:w-24">
+                        <input type="number" value={sub.liveClasses || ''} onChange={e => updateSubject(idx, 'liveClasses', e.target.value)} placeholder="Live" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" />
+                      </div>
+                      <div className="w-full md:w-24">
+                        <input type="number" value={sub.videoLessons || ''} onChange={e => updateSubject(idx, 'videoLessons', e.target.value)} placeholder="Videos" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" />
+                      </div>
+                      <div className="w-full md:w-24">
+                        <input type="number" value={sub.exams || ''} onChange={e => updateSubject(idx, 'exams', e.target.value)} placeholder="Exams" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" />
+                      </div>
                     </div>
-                    <input 
-                      type="text" 
-                      value={subjectInput}
-                      onChange={(e) => setSubjectInput(e.target.value)}
-                      onKeyDown={handleAddSubject}
-                      placeholder="e.g. Physics, Math..."
-                      className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-                    />
-                  </div>
-                )}
+                  ))}
+                  {specificSubjects.length === 0 && (
+                    <div className="text-center py-4 text-sm text-foreground/40">No subjects added. Click "+ Add Subject" to start.</div>
+                  )}
+                </div>
               </div>
             )}
 

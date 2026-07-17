@@ -273,7 +273,7 @@
       "honours": "Honours",
       "skills": "Skills"
     },
-    "instructor": "প্রশিক্ষক/প্রতিষ্ঠান",
+    "instructor": "প্রশিক্ষক",
     "viewProfile": "প্রোফাইল দেখুন",
     "duration": "মেয়াদ",
     "lifetimeAccess": "লাইফ-টাইম এক্সেস",
@@ -328,6 +328,12 @@
       "noFeatures": "ফিচার যুক্ত করা হয়নি",
       "moreQuestions": "আরও কোন জিজ্ঞাসা আছে?",
       "callUs": "কল করুন"
-    }
+    },
+    "subjectBreakdown": "বিষয়ভিত্তিক ক্লাস ডিস্ট্রিবিউশন",
+    "subjectName": "বিষয় / টপিক",
+    "liveClasses": "লাইভ ক্লাস",
+    "videoLessons": "ভিডিও লেসন",
+    "exams": "এক্সাম",
+    "na": "প্রযোজ্য নয়"
   }
 }

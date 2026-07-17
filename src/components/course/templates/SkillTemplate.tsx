@@ -13,6 +13,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import CourseCurriculum from '../CourseCurriculum';
 import LearningOutcomes from '../LearningOutcomes';
 import TargetAudience from '../TargetAudience';
+import CourseSubjects from '../CourseSubjects';
 import CourseTestimonials from '../CourseTestimonials';
 import StickyPricingCard from '../StickyPricingCard';
 import CourseFeatures from '../CourseFeatures';
@@ -182,6 +183,7 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
           
           <div className="lg:col-span-2 space-y-12">
             <TargetAudience audience={course.targetAudience} />
+            <CourseSubjects subjects={course.specificSubjects} courseType={course.courseType} />
             
             <CourseFeatures course={course} />
 

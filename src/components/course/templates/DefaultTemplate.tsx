@@ -14,6 +14,7 @@ import CourseFeatures from '../CourseFeatures';
 import CourseCurriculum from '../CourseCurriculum';
 import LearningOutcomes from '../LearningOutcomes';
 import TargetAudience from '../TargetAudience';
+import CourseSubjects from '../CourseSubjects';
 import CourseTestimonials from '../CourseTestimonials';
 import StickyPricingCard from '../StickyPricingCard';
 import { VideoModal } from '@/components/ui/VideoModal';
@@ -182,6 +183,7 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
           
           <div className="lg:col-span-2 space-y-12">
             <TargetAudience audience={course.targetAudience} />
+            <CourseSubjects subjects={course.specificSubjects} courseType={course.courseType} />
             <CourseFeatures course={course} />
             
             <LearningOutcomes outcomes={course.learningOutcomes} />

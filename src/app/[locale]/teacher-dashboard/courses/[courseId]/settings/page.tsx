@@ -181,20 +181,14 @@ export default function CourseSettingsPage() {
   if (!course) return null;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div>
-        <h1 className="text-2xl font-bold mb-2">Course Details</h1>
-        <p className="text-foreground/70">Manage basic information of your course.</p>
-      </div>
-
-      <form onSubmit={handleSaveBasicInfo} className="bg-background p-6 md:p-8 rounded-3xl border border-foreground/10 space-y-6 shadow-sm">
-        <h2 className="text-xl font-bold mb-2">Basic Information</h2>
+    <div className="animate-in fade-in duration-500">
+      <form onSubmit={handleSaveBasicInfo} className="space-y-6">
         
-        <div className="space-y-4">
+        <div className="space-y-6">
 
           {/* 1. Hero Section Information */}
-          <div className="space-y-6 pt-2">
-            <h2 className="text-2xl font-bold text-foreground">1. Hero Section Information</h2>
+          <div className="space-y-6 p-6 bg-background rounded-2xl border border-foreground/10 shadow-sm">
+            <h2 className="text-xl font-bold text-foreground border-b border-foreground/10 pb-4">1. Hero Section Information</h2>
           <div>
             <label className="block text-sm font-medium mb-1">Course Title</label>
             <input 
@@ -280,10 +274,9 @@ export default function CourseSettingsPage() {
           </div>
 
 
-          <hr className="border-foreground/10 my-8" />
           {/* 2. Course Overview */}
-          <div className="space-y-6 pt-2">
-            <h2 className="text-2xl font-bold text-foreground">2. Course Overview</h2>
+          <div className="space-y-6 p-6 bg-background rounded-2xl border border-foreground/10 shadow-sm">
+            <h2 className="text-xl font-bold text-foreground border-b border-foreground/10 pb-4">2. Course Overview</h2>
           <div>
             <label className="block text-sm font-medium mb-1">Detailed Description (HTML/Text)</label>
             <RichTextEditor 
@@ -295,10 +288,9 @@ export default function CourseSettingsPage() {
           </div>
 
 
-          <hr className="border-foreground/10 my-8" />
           {/* 3. Learning & Target Audience */}
-          <div className="space-y-6 pt-2">
-            <h2 className="text-2xl font-bold text-foreground">3. Learning & Target Audience</h2>
+          <div className="space-y-6 p-6 bg-background rounded-2xl border border-foreground/10 shadow-sm">
+            <h2 className="text-xl font-bold text-foreground border-b border-foreground/10 pb-4">3. Learning & Target Audience</h2>
           {/* Learning Outcomes */}
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-lg font-semibold text-foreground/80">Learning Outcomes (কী কী শিখবেন)</h3>
@@ -363,10 +355,9 @@ export default function CourseSettingsPage() {
           </div>
 
 
-          <hr className="border-foreground/10 my-8" />
           {/* 4. Special Messages & Social Proof */}
-          <div className="space-y-6 pt-2">
-            <h2 className="text-2xl font-bold text-foreground">4. Special Messages & Social Proof</h2>
+          <div className="space-y-6 p-6 bg-background rounded-2xl border border-foreground/10 shadow-sm">
+            <h2 className="text-xl font-bold text-foreground border-b border-foreground/10 pb-4">4. Special Messages & Social Proof</h2>
           {/* Category-Specific Dynamic Fields */}
           {(course.category === 'primary' || course.category === 'high_school') && (
             <div className="p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl">
@@ -472,10 +463,9 @@ export default function CourseSettingsPage() {
           </div>
 
 
-          <hr className="border-foreground/10 my-8" />
           {/* 5. Frequently Asked Questions */}
-          <div className="space-y-6 pt-2">
-            <h2 className="text-2xl font-bold text-foreground">5. Frequently Asked Questions</h2>
+          <div className="space-y-6 p-6 bg-background rounded-2xl border border-foreground/10 shadow-sm">
+            <h2 className="text-xl font-bold text-foreground border-b border-foreground/10 pb-4">5. Frequently Asked Questions</h2>
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-lg font-semibold text-foreground/80">Frequently Asked Questions (FAQs)</h3>
             <button 
@@ -544,10 +534,9 @@ export default function CourseSettingsPage() {
 
 
 
-          <hr className="border-foreground/10 my-8" />
           {/* 6. Study Materials */}
-          <div className="space-y-6 pt-2">
-            <h2 className="text-2xl font-bold text-foreground">6. Study Materials</h2>
+          <div className="space-y-6 p-6 bg-background rounded-2xl border border-foreground/10 shadow-sm">
+            <h2 className="text-xl font-bold text-foreground border-b border-foreground/10 pb-4">6. Study Materials</h2>
           <div>
             <label className="block text-sm font-medium mb-2">Class Routine Image (Optional)</label>
             <p className="text-xs text-foreground/50 mb-3">Upload an image of the class routine to be displayed on the course details page.</p>
@@ -578,7 +567,7 @@ export default function CourseSettingsPage() {
         </div>
         </div>
         
-        <div className="flex justify-end pt-4 border-t border-foreground/10 mt-6">
+        <div className="flex justify-end p-6 bg-background rounded-2xl border border-foreground/10 shadow-sm">
           <button type="submit" disabled={isSaving} className="px-8 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-all shadow-lg hover:shadow-orange-500/30 flex items-center gap-2">
             <Save className="w-5 h-5" /> {isSaving ? 'Saving...' : 'Save Settings'}
           </button>

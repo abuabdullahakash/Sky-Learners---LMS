@@ -23,6 +23,41 @@ export default function CreateCoursePage() {
   const [year, setYear] = useState('');
   const [coachingName, setCoachingName] = useState('');
   const [price, setPrice] = useState('');
+  
+  // Marketing Stats
+  const [totalLiveClasses, setTotalLiveClasses] = useState('');
+  const [totalVideoLessons, setTotalVideoLessons] = useState('');
+  const [totalExams, setTotalExams] = useState('');
+  const [totalPdfs, setTotalPdfs] = useState('');
+  const [hasDoubtSolving, setHasDoubtSolving] = useState(false);
+
+  // Pricing & Dates
+  const [discountPrice, setDiscountPrice] = useState('');
+  const [discountValidUntil, setDiscountValidUntil] = useState('');
+  const [classStartDate, setClassStartDate] = useState('');
+  const [courseValidity, setCourseValidity] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
+
+  // Course Coverage
+  const [isFullClassCourse, setIsFullClassCourse] = useState(true);
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [subjectInput, setSubjectInput] = useState('');
+
+  const handleAddSubject = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const val = subjectInput.trim();
+      if (val && !subjects.includes(val)) {
+        setSubjects([...subjects, val]);
+      }
+      setSubjectInput('');
+    }
+  };
+
+  const removeSubject = (sub: string) => {
+    setSubjects(subjects.filter(s => s !== sub));
+  };
+
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string>('');
   
@@ -62,10 +97,20 @@ export default function CreateCoursePage() {
         eduClass: (category === 'primary' || category === 'high_school' || category === 'intermediate') ? eduClass : '',
         department: (category === 'intermediate' || category === 'honours' || category === 'masters' || category === 'admission') ? department : '',
         year: (category === 'honours' || category === 'masters') ? year : '',
-        isFullClassCourse: true,
-        subjects: [],
         coachingName: courseType === 'coaching' ? coachingName : '',
+        isFullClassCourse,
+        subjects: !isFullClassCourse ? subjects : [],
+        totalLiveClasses: totalLiveClasses ? Number(totalLiveClasses) : 0,
+        totalVideoLessons: totalVideoLessons ? Number(totalVideoLessons) : 0,
+        totalExams: totalExams ? Number(totalExams) : 0,
+        totalPdfs: totalPdfs ? Number(totalPdfs) : 0,
+        hasDoubtSolving,
         price: Number(price),
+        discountPrice: discountPrice ? Number(discountPrice) : null,
+        discountValidUntil,
+        classStartDate,
+        courseValidity,
+        contactNumber,
         thumbnailUrl,
         isPublished: false, // Draft by default
         modules: [],
@@ -153,7 +198,8 @@ export default function CreateCoursePage() {
                     setEduClass('');
                     setDepartment('');
                     setYear('');
-                    setYear('');
+                    setIsFullClassCourse(true);
+                    setSubjects([]);
                   }}
                   className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all appearance-none"
                   required
@@ -264,22 +310,135 @@ export default function CreateCoursePage() {
             )}
 
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1 text-foreground/80">Price (BDT) <span className="text-red-500">*</span></label>
+            {category && category !== 'skills' && (
+              <div className="bg-foreground/5 p-5 rounded-2xl border border-foreground/10 space-y-4">
+                <label className="block text-sm font-medium text-foreground/80">Course Coverage <span className="text-red-500">*</span></label>
+                <div className="flex gap-4 flex-col sm:flex-row">
+                  <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${isFullClassCourse ? 'border-primary bg-primary/5' : 'border-foreground/10 bg-background hover:border-primary/30'}`}>
+                    <input type="radio" checked={isFullClassCourse} onChange={() => setIsFullClassCourse(true)} className="accent-primary w-4 h-4" />
+                    <span className="text-sm font-medium">Full Course (All Subjects)</span>
+                  </label>
+                  <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${!isFullClassCourse ? 'border-primary bg-primary/5' : 'border-foreground/10 bg-background hover:border-primary/30'}`}>
+                    <input type="radio" checked={!isFullClassCourse} onChange={() => setIsFullClassCourse(false)} className="accent-primary w-4 h-4" />
+                    <span className="text-sm font-medium">Specific Subjects</span>
+                  </label>
+                </div>
+
+                {!isFullClassCourse && (
+                  <div className="pt-2">
+                    <label className="block text-sm font-medium mb-2 text-foreground/80">Add Subjects <span className="text-foreground/50 text-xs font-normal">(Type and press Enter)</span></label>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {subjects.map(sub => (
+                        <span key={sub} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-medium border border-primary/20">
+                          {sub}
+                          <button type="button" onClick={() => removeSubject(sub)} className="hover:text-red-500 transition-colors">✖</button>
+                        </span>
+                      ))}
+                    </div>
+                    <input 
+                      type="text" 
+                      value={subjectInput}
+                      onChange={(e) => setSubjectInput(e.target.value)}
+                      onKeyDown={handleAddSubject}
+                      placeholder="e.g. Physics, Math..."
+                      className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+              <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">Marketing Stats & Features</h3>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Total Live Classes</label>
+                  <input type="number" value={totalLiveClasses} onChange={e => setTotalLiveClasses(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Total Videos</label>
+                  <input type="number" value={totalVideoLessons} onChange={e => setTotalVideoLessons(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Total Exams</label>
+                  <input type="number" value={totalExams} onChange={e => setTotalExams(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Total Notes/PDFs</label>
+                  <input type="number" value={totalPdfs} onChange={e => setTotalPdfs(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
+                </div>
+              </div>
+              
+              <div className="mt-4 flex items-center gap-3">
                 <input 
-                  type="number" 
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="e.g. 1500"
-                  min="0"
-                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all"
-                  required
+                  type="checkbox" 
+                  id="doubtSolving" 
+                  checked={hasDoubtSolving} 
+                  onChange={e => setHasDoubtSolving(e.target.checked)} 
+                  className="w-5 h-5 accent-orange-500"
+                />
+                <label htmlFor="doubtSolving" className="text-sm font-medium cursor-pointer">
+                  Includes 24/7 Doubt Solving Support / Group
+                </label>
+              </div>
+            </div>
+
+            <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+              <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">Pricing, Dates & Contact</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Regular Price (BDT) <span className="text-red-500">*</span></label>
+                  <input 
+                    type="number" value={price} onChange={e => setPrice(e.target.value)}
+                    className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Discount Price (Optional)</label>
+                  <input 
+                    type="number" value={discountPrice} onChange={e => setDiscountPrice(e.target.value)}
+                    className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Discount Valid Until</label>
+                  <input 
+                    type="date" value={discountValidUntil} onChange={e => setDiscountValidUntil(e.target.value)}
+                    className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Class Start Date</label>
+                  <input 
+                    type="date" value={classStartDate} onChange={e => setClassStartDate(e.target.value)}
+                    className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Course Validity</label>
+                  <input 
+                    type="text" value={courseValidity} onChange={e => setCourseValidity(e.target.value)} placeholder="e.g. 6 Months, Till Admission Test"
+                    className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Contact Number (For Inquiries)</label>
+                <input 
+                  type="text" value={contactNumber} onChange={e => setContactNumber(e.target.value)}
+                  placeholder="e.g. 16910 or 017XXXXXXX"
+                  className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
                 />
               </div>
             </div>
 
             <div>
+
               <label className="block text-sm font-medium mb-2 text-foreground/80">Course Thumbnail <span className="text-red-500">*</span></label>
               
               <div className="relative group w-full aspect-video md:aspect-[21/9] rounded-2xl border-2 border-dashed border-foreground/20 hover:border-orange-500/50 bg-foreground/5 flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-colors">

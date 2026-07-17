@@ -3,61 +3,8 @@
 import { useState, useEffect } from 'react';
 import { DollarSign, TrendingUp, Clock, CheckCircle2, AlertCircle, Filter } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-
-// --- MOCK DATA GENERATORS (Easy to replace with real API later) ---
-const fetchMockEarningsStats = async (month: string) => {
-  // Total Lifetime Earnings remains constant regardless of the filter
-  const lifetimeTotal = 12500;
-  
-  // Selected period total changes based on the filter
-  let selectedPeriodTotal = 0;
-  if (month === 'All Time') {
-    selectedPeriodTotal = 1250; // default to 'This Month' if All Time is selected
-  } else if (month === 'July 2026') {
-    selectedPeriodTotal = 1250;
-  } else if (month === 'June 2026') {
-    selectedPeriodTotal = 2400;
-  } else if (month === 'May 2026') {
-    selectedPeriodTotal = 1800;
-  }
-
-  return new Promise(resolve => setTimeout(() => resolve({
-    lifetimeTotal: lifetimeTotal,
-    selectedPeriodTotal: selectedPeriodTotal,
-    pending: 450, // pending might also be filtered or constant depending on business logic
-    growth: 12.5 // percentage
-  }), 500));
-};
-
-const fetchMockTransactions = async () => {
-  return new Promise(resolve => setTimeout(() => resolve([
-    { id: 'TRX-101', student: 'Rahim Uddin', course: 'Web Development Basics', amount: 1500, status: 'completed', date: '2026-07-06' },
-    { id: 'TRX-102', student: 'Jannatul Ferdous', course: 'Advanced Physics', amount: 2000, status: 'completed', date: '2026-07-05' },
-    { id: 'TRX-103', student: 'Hasan Mahmud', course: 'Web Development Basics', amount: 1500, status: 'pending', date: '2026-07-05' },
-    { id: 'TRX-104', student: 'Sumaiya Akter', course: 'Basic English Grammar', amount: 1000, status: 'completed', date: '2026-07-02' },
-    { id: 'TRX-105', student: 'Karimul Islam', course: 'Advanced Physics', amount: 2000, status: 'refunded', date: '2026-06-30' },
-  ]), 500));
-};
-
-const fetchMockChartData = async () => {
-  return new Promise(resolve => setTimeout(() => resolve([
-    { label: 'Mon', value: 450 },
-    { label: 'Tue', value: 800 },
-    { label: 'Wed', value: 300 },
-    { label: 'Thu', value: 1200 },
-    { label: 'Fri', value: 950 },
-    { label: 'Sat', value: 1500 },
-    { label: 'Sun', value: 600 },
-  ]), 500));
-};
-
-const fetchMockTopCourses = async () => {
-  return new Promise(resolve => setTimeout(() => resolve([
-    { id: 'C1', title: 'Web Development Basics', earnings: 5500, sales: 120 },
-    { id: 'C2', title: 'Advanced Physics', earnings: 4200, sales: 85 },
-    { id: 'C3', title: 'Basic English Grammar', earnings: 2800, sales: 65 },
-  ]), 500));
-};
+import { db } from '@/lib/firebase';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 
 export default function EarningsPage() {
   const { user } = useAuth();
@@ -68,23 +15,128 @@ export default function EarningsPage() {
   const [isLoading, setIsLoading] = useState(true);
   
   const [selectedMonth, setSelectedMonth] = useState('All Time');
+  const [monthOptions, setMonthOptions] = useState<{label: string, value: string}[]>([]);
 
   useEffect(() => {
-    // Load all mock data on mount and when month changes
+    // Generate last 6 months options dynamically
+    const generateMonthOptions = () => {
+      const options = [{ label: 'All Time', value: 'All Time' }];
+      for (let i = 0; i < 6; i++) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        const label = d.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+        options.push({ label, value: label });
+      }
+      return options;
+    };
+    setMonthOptions(generateMonthOptions());
+  }, []);
+
+  useEffect(() => {
     const loadData = async () => {
+      if (!user) return;
       setIsLoading(true);
       try {
-        const [statsData, trxData, chartRes, topCoursesRes] = await Promise.all([
-          fetchMockEarningsStats(selectedMonth),
-          fetchMockTransactions(),
-          fetchMockChartData(),
-          fetchMockTopCourses()
-        ]);
+        const enrollmentsQuery = query(
+          collection(db, 'enrollments'),
+          where('teacherId', '==', user.uid)
+        );
+        const snapshot = await getDocs(enrollmentsQuery);
         
-        setStats(statsData);
-        setTransactions(trxData as any[]);
-        setChartData(chartRes as any[]);
-        setTopCourses(topCoursesRes as any[]);
+        const allEnrollments: any[] = [];
+        snapshot.forEach(doc => {
+          allEnrollments.push({ id: doc.id, ...doc.data() });
+        });
+        
+        // Sort by createdAt descending
+        allEnrollments.sort((a, b) => {
+          const dateA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : new Date(a.createdAt).getTime();
+          const dateB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : new Date(b.createdAt).getTime();
+          return (dateB || 0) - (dateA || 0);
+        });
+
+        let lifetimeTotal = 0;
+        let selectedPeriodTotal = 0;
+        let pending = 0;
+        
+        const courseSales: Record<string, { title: string, earnings: number, sales: number }> = {};
+        const dailyEarnings: Record<string, number> = {};
+
+        allEnrollments.forEach(enrollment => {
+          const amount = Number(enrollment.amount) || 0;
+          const status = enrollment.status || 'pending';
+          const createdAtDate = enrollment.createdAt ? 
+             (enrollment.createdAt.toDate ? enrollment.createdAt.toDate() : new Date(enrollment.createdAt)) 
+             : new Date();
+             
+          const monthYearStr = createdAtDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+          const dayStr = createdAtDate.toLocaleDateString('en-US', { weekday: 'short' });
+          
+          if (status === 'pending') {
+            pending += amount;
+          } else if (status === 'approved' || status === 'completed') {
+            lifetimeTotal += amount;
+            
+            if (selectedMonth === 'All Time' || selectedMonth === monthYearStr) {
+               selectedPeriodTotal += amount;
+               
+               dailyEarnings[dayStr] = (dailyEarnings[dayStr] || 0) + amount;
+               
+               const cid = enrollment.courseId;
+               if (cid) {
+                 if (!courseSales[cid]) {
+                    courseSales[cid] = { title: enrollment.courseTitle || 'Unknown Course', earnings: 0, sales: 0 };
+                 }
+                 courseSales[cid].earnings += amount;
+                 courseSales[cid].sales += 1;
+               }
+            }
+          }
+        });
+        
+        const computedTopCourses = Object.entries(courseSales)
+           .map(([id, data]) => ({ id, ...data }))
+           .sort((a, b) => b.earnings - a.earnings)
+           .slice(0, 3);
+           
+        const computedChartData = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => ({
+           label: day,
+           value: dailyEarnings[day] || 0
+        }));
+
+        setStats({
+          lifetimeTotal,
+          selectedPeriodTotal,
+          pending,
+          growth: 0 // Optional: implement actual growth logic compared to previous month
+        });
+        
+        // Filter transactions for display (latest 5)
+        let filteredTx = allEnrollments;
+        if (selectedMonth !== 'All Time') {
+          filteredTx = allEnrollments.filter(e => {
+            const date = e.createdAt?.toDate ? e.createdAt.toDate() : new Date(e.createdAt);
+            const mStr = date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+            return mStr === selectedMonth;
+          });
+        }
+
+        const formattedTransactions = filteredTx.slice(0, 5).map(e => {
+          const date = e.createdAt?.toDate ? e.createdAt.toDate() : new Date(e.createdAt);
+          return {
+            id: e.id,
+            student: e.studentName || 'Unknown',
+            course: e.courseTitle || 'Unknown Course',
+            amount: Number(e.amount) || 0,
+            status: e.status || 'pending',
+            date: date.toLocaleDateString('en-CA') // YYYY-MM-DD
+          };
+        });
+
+        setTransactions(formattedTransactions);
+        setChartData(computedChartData);
+        setTopCourses(computedTopCourses);
+        
       } catch (error) {
         console.error("Failed to load earnings data", error);
       } finally {
@@ -93,7 +145,7 @@ export default function EarningsPage() {
     };
     
     loadData();
-  }, [selectedMonth]);
+  }, [selectedMonth, user]);
 
   if (isLoading && !stats) {
     return (
@@ -103,10 +155,7 @@ export default function EarningsPage() {
     );
   }
 
-  // Format currency helper
   const formatCurrency = (amount: number) => `৳${amount.toLocaleString()}`;
-  
-  // Calculate max value for chart scaling
   const maxChartValue = Math.max(...chartData.map(d => d.value), 1);
 
   return (
@@ -125,10 +174,9 @@ export default function EarningsPage() {
             onChange={(e) => setSelectedMonth(e.target.value)}
             className="w-full sm:w-48 bg-foreground/5 border border-foreground/10 rounded-xl py-2.5 pl-9 pr-4 appearance-none focus:outline-none focus:border-primary transition-colors cursor-pointer font-medium"
           >
-            <option value="All Time">All Time</option>
-            <option value="July 2026">July 2026</option>
-            <option value="June 2026">June 2026</option>
-            <option value="May 2026">May 2026</option>
+            {monthOptions.map((opt, idx) => (
+              <option key={idx} value={opt.value}>{opt.label}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -149,9 +197,6 @@ export default function EarningsPage() {
               <div className="p-3 bg-green-500/20 text-green-500 rounded-xl">
                 <DollarSign className="w-6 h-6" />
               </div>
-              <span className="flex items-center gap-1 text-sm font-medium text-green-500 bg-green-500/10 px-2 py-1 rounded-full">
-                <TrendingUp className="w-4 h-4" /> +{stats?.growth}%
-              </span>
             </div>
             <p className="text-foreground/60 text-sm font-medium mb-1">Total Lifetime Earnings</p>
             <h3 className="text-3xl font-bold">{formatCurrency(stats?.lifetimeTotal || 0)}</h3>
@@ -198,105 +243,98 @@ export default function EarningsPage() {
         {/* Custom CSS Bar Chart */}
         <div className="h-64 flex items-end gap-2 sm:gap-4 md:gap-8 mt-4 pt-10 border-b border-foreground/10 relative">
           {chartData.map((data, index) => (
-            <div key={index} className="flex-1 flex flex-col items-center justify-end h-full group relative">
+            <div key={index} className="flex-1 flex flex-col items-center gap-3 relative group h-full justify-end">
               {/* Tooltip */}
-              <div className="absolute -top-10 bg-foreground text-background text-xs font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+              <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-foreground text-background text-xs font-bold py-1 px-2 rounded pointer-events-none whitespace-nowrap z-10">
                 {formatCurrency(data.value)}
               </div>
               
               {/* Bar */}
-              <div 
-                className="w-full max-w-[40px] bg-primary/20 group-hover:bg-primary transition-all duration-500 rounded-t-lg relative"
-                style={{ height: `${(data.value / maxChartValue) * 100}%`, minHeight: '4px' }}
-              >
-                {/* Highlight line on top */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-primary rounded-t-lg"></div>
+              <div className="w-full flex justify-center h-full items-end">
+                <div 
+                  className="w-full max-w-[40px] bg-foreground/20 group-hover:bg-primary rounded-t-sm transition-all duration-500 ease-out"
+                  style={{ height: `${maxChartValue > 0 ? (data.value / maxChartValue) * 100 : 0}%` }}
+                ></div>
               </div>
               
               {/* Label */}
-              <span className="text-xs text-foreground/50 mt-3 absolute -bottom-8">{data.label}</span>
+              <span className="text-xs text-foreground/50 font-medium uppercase tracking-wider">{data.label}</span>
             </div>
           ))}
         </div>
-        <div className="h-8"></div> {/* Spacer for labels */}
       </div>
 
-      {/* Layout Grid for Tables and Sidebar */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        
-        {/* Left Col: Transactions */}
-        <div className="xl:col-span-2 space-y-8">
-          <div className="bg-foreground/5 border border-foreground/10 rounded-3xl overflow-hidden">
-            <div className="p-6 border-b border-foreground/10 flex items-center justify-between">
-              <h2 className="text-xl font-bold">Recent Transactions</h2>
-              <button className="text-primary text-sm font-medium hover:underline">View All</button>
-            </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[600px]">
-                <thead>
-                  <tr className="bg-foreground/5 text-foreground/60 text-sm uppercase tracking-wider">
-                    <th className="px-6 py-4 font-medium">Date</th>
-                    <th className="px-6 py-4 font-medium">Student / Course</th>
-                    <th className="px-6 py-4 font-medium">Amount</th>
-                    <th className="px-6 py-4 font-medium text-right">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-foreground/10">
-                  {transactions.map((trx) => (
-                    <tr key={trx.id} className="hover:bg-foreground/5 transition-colors">
-                      <td className="px-6 py-4 text-sm text-foreground/70 whitespace-nowrap">
-                        {trx.date}
-                      </td>
-                      <td className="px-6 py-4">
-                        <p className="font-semibold text-sm">{trx.student}</p>
-                        <p className="text-xs text-foreground/60">{trx.course}</p>
-                      </td>
-                      <td className="px-6 py-4 font-bold">
-                        {formatCurrency(trx.amount)}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${
-                          trx.status === 'completed' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Recent Transactions */}
+        <div className="lg:col-span-2 bg-foreground/5 border border-foreground/10 rounded-3xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold">Recent Transactions</h2>
+            {/* <button className="text-sm font-medium text-primary hover:underline">View All</button> */}
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[500px]">
+              <thead>
+                <tr className="text-foreground/50 text-xs uppercase tracking-wider border-b border-foreground/10">
+                  <th className="pb-4 font-medium">Date</th>
+                  <th className="pb-4 font-medium">Student / Course</th>
+                  <th className="pb-4 font-medium">Amount</th>
+                  <th className="pb-4 font-medium text-right">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-foreground/10">
+                {transactions.length > 0 ? transactions.map((trx) => (
+                  <tr key={trx.id} className="hover:bg-background/50 transition-colors">
+                    <td className="py-4 text-sm text-foreground/70">{trx.date}</td>
+                    <td className="py-4">
+                      <p className="font-semibold text-sm">{trx.student}</p>
+                      <p className="text-xs text-foreground/50">{trx.course.length > 25 ? trx.course.substring(0, 25) + '...' : trx.course}</p>
+                    </td>
+                    <td className="py-4 font-bold text-sm">{formatCurrency(trx.amount)}</td>
+                    <td className="py-4 text-right">
+                      <div className="flex justify-end">
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${
+                          trx.status === 'completed' || trx.status === 'approved' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
                           trx.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
                           'bg-red-500/10 text-red-500 border-red-500/20'
                         }`}>
-                          {trx.status === 'completed' && <CheckCircle2 className="w-3.5 h-3.5" />}
-                          {trx.status === 'pending' && <Clock className="w-3.5 h-3.5" />}
-                          {trx.status === 'refunded' && <AlertCircle className="w-3.5 h-3.5" />}
-                          {trx.status.charAt(0).toUpperCase() + trx.status.slice(1)}
+                          {trx.status === 'completed' || trx.status === 'approved' ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
+                          <span className="capitalize">{trx.status === 'approved' ? 'completed' : trx.status}</span>
                         </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      </div>
+                    </td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan={4} className="py-8 text-center text-foreground/50 text-sm">No recent transactions.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* Right Col: Top Courses */}
-        <div className="space-y-8">
-          {/* Top Courses */}
-          <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-6">
-            <h2 className="text-xl font-bold mb-6">Top Selling Courses</h2>
-            
-            <div className="space-y-4">
-              {topCourses.map((course, i) => (
-                <div key={course.id} className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg shrink-0">
-                    {i + 1}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-sm truncate" title={course.title}>{course.title}</h4>
-                    <p className="text-xs text-foreground/60">{course.sales} sales</p>
-                  </div>
-                  <div className="font-bold shrink-0">
-                    {formatCurrency(course.earnings)}
-                  </div>
+        {/* Top Selling Courses */}
+        <div className="bg-foreground/5 border border-foreground/10 rounded-3xl p-6">
+          <h2 className="text-xl font-bold mb-6">Top Selling Courses</h2>
+          
+          <div className="space-y-4">
+            {topCourses.length > 0 ? topCourses.map((course, index) => (
+              <div key={course.id} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-background/50 transition-colors">
+                <div className="w-8 h-8 rounded-full bg-foreground/10 flex items-center justify-center font-bold text-sm shrink-0">
+                  {index + 1}
                 </div>
-              ))}
-            </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm truncate" title={course.title}>{course.title}</p>
+                  <p className="text-xs text-foreground/50">{course.sales} sales</p>
+                </div>
+                <div className="font-bold text-sm shrink-0">
+                  {formatCurrency(course.earnings)}
+                </div>
+              </div>
+            )) : (
+              <div className="py-8 text-center text-foreground/50 text-sm">No sales data available.</div>
+            )}
           </div>
         </div>
       </div>

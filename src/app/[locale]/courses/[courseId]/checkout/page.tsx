@@ -102,6 +102,14 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
     setIsSubmitting(true);
     setError('');
 
+    let activePrice = Number(course?.price) || 0;
+    if (course?.discountPrice && course?.discountValidUntil) {
+      const validUntil = new Date(course.discountValidUntil);
+      if (new Date() <= validUntil) {
+        activePrice = Number(course.discountPrice);
+      }
+    }
+
     try {
       await addDoc(collection(db, 'enrollments'), {
         courseId: courseId,
@@ -113,7 +121,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
         senderNumber: formData.senderNumber,
         trxId: formData.trxId,
         paymentMethod: formData.paymentMethod,
-        amount: course?.price || 0,
+        amount: activePrice,
         status: 'pending',
         // New student info
         offlinePhone: studentInfo.phone,
@@ -198,7 +206,13 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
             <div className="space-y-4 text-foreground/80 font-medium">
               <p>১. আপনার বিকাশ, নগদ বা রকেট অ্যাপ ওপেন করুন।</p>
               <p>২. <strong className="text-foreground">Send Money</strong> অপশনটি সিলেক্ট করুন।</p>
-              <p>৩. নিচের যেকোনো একটি নাম্বারে ঠিক <strong className="text-xl text-primary bg-primary/10 px-2 py-0.5 rounded">৳{course?.price || 0}</strong> সেন্ড মানি করুন:</p>
+              <p>৩. নিচের যেকোনো একটি নাম্বারে ঠিক <strong className="text-xl text-primary bg-primary/10 px-2 py-0.5 rounded">
+                ৳{
+                  course?.discountPrice && course?.discountValidUntil && (new Date() <= new Date(course.discountValidUntil)) 
+                  ? course.discountPrice 
+                  : (course?.price || 0)
+                }
+              </strong> সেন্ড মানি করুন:</p>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
                 <div className="bg-pink-500/10 border border-pink-500/20 p-5 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">

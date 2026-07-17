@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { BookOpen, Clock, Users, Book } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
@@ -37,10 +37,19 @@ export default function RelatedCourses({
         );
         const snapshot = await getDocs(q);
         
+        const teacherDocRef = doc(db, 'teacherProfiles', teacherId);
+        const tDoc = await getDoc(teacherDocRef);
+        const fetchedInstructorName = tDoc.exists() ? tDoc.data().displayName : 'Instructor';
+
         let allCourses: any[] = [];
         snapshot.forEach(doc => {
           if (doc.id !== currentCourseId) {
-            allCourses.push({ id: doc.id, ...doc.data() });
+            const data = doc.data();
+            allCourses.push({ 
+              id: doc.id, 
+              ...data,
+              instructorName: data.coachingName ? data.coachingName : fetchedInstructorName
+            });
           }
         });
 
@@ -127,11 +136,15 @@ export default function RelatedCourses({
               
               <div className="p-5 flex-1 flex flex-col relative z-10 bg-background">
                 {/* Course Creator Name */}
-                <div className="text-orange-500 text-xs font-extrabold uppercase tracking-widest mb-2">
-                  {course.courseType === 'coaching' ? (course.coachingName || 'Coaching Center') : (course.instructorName || 'Instructor')}
+                <div className="text-orange-500 text-[13px] font-extrabold uppercase tracking-widest mb-2 flex items-center gap-2">
+                  {course.courseType === 'coaching' ? (
+                    <><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg> {course.coachingName || 'Coaching Center'}</>
+                  ) : (
+                    <><Users className="w-4 h-4" /> {course.instructorName || 'Instructor'}</>
+                  )}
                 </div>
 
-                <h3 className="text-xl font-bold mb-2 line-clamp-2 leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-500 group-hover:to-rose-500 transition-all duration-300">{course.title}</h3>
+                <h3 className="text-2xl font-bold mb-2 line-clamp-2 leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-500 group-hover:to-rose-500 transition-all duration-300">{course.title}</h3>
                 
                 {/* Badge Below Title */}
                 <div className="bg-foreground/5 border border-foreground/10 px-3 py-1 rounded-full text-xs font-extrabold text-foreground w-fit mb-3">
@@ -150,7 +163,7 @@ export default function RelatedCourses({
                   
                   <span className="flex items-center gap-1.5" title="Total Videos">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
-                    {course.totalVideos || 0}
+                    {course.totalVideoLessons || 0}
                   </span>
                   
                   <span className="flex items-center gap-1.5" title="Total Exams">

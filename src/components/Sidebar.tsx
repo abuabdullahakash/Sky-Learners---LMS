@@ -66,7 +66,7 @@ export default function Sidebar() {
           <div className="flex-1 overflow-hidden">
             <div className="flex items-center gap-2">
               <p className="text-sm font-bold text-foreground truncate">
-                {user?.displayName || userData?.name || t('student')}
+                {user?.displayName || userData?.name || 'Student'}
               </p>
             </div>
             <p className="text-[11px] text-foreground/50 truncate">

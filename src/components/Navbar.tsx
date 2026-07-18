@@ -18,6 +18,8 @@ export default function Navbar() {
   
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
 
+  const isDashboard = pathname.startsWith('/dashboard') || pathname.startsWith('/teacher-dashboard');
+
   const handleRoleSelect = (role: 'student' | 'teacher') => {
     setIsRoleModalOpen(false);
     router.push(`/onboarding?role=${role}`);
@@ -26,7 +28,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="fixed w-full top-0 z-50 bg-background/80 backdrop-blur-md border-b border-foreground/10">
-        <div className="max-w-[1280px] mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px]">
+        <div className={`${isDashboard ? 'w-full' : 'max-w-[1280px]'} mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px]`}>
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">

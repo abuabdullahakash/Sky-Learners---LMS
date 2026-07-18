@@ -14,6 +14,7 @@ export type Question = {
   options: string[];
   correctOptionIndex: number;
   marks: number;
+  explanation?: string;
 };
 
 export type Exam = {
@@ -24,6 +25,8 @@ export type Exam = {
   link?: string;
   questions?: Question[];
   isBuiltIn?: boolean;
+  endTime?: string;
+  allowLateSubmission?: boolean;
 };
 
 export default function CourseExamsPage() {
@@ -45,6 +48,8 @@ export default function CourseExamsPage() {
   const [newLink, setNewLink] = useState('');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [newTotalMarks, setNewTotalMarks] = useState<number | ''>(''); // Only used for link type
+  const [newEndTime, setNewEndTime] = useState<string>('');
+  const [allowLateSubmission, setAllowLateSubmission] = useState<boolean>(false);
   const [error, setError] = useState('');
 
   // Expanded state for questions
@@ -79,7 +84,8 @@ export default function CourseExamsPage() {
       text: '',
       options: ['', '', '', ''],
       correctOptionIndex: 0,
-      marks: 1
+      marks: 1,
+      explanation: ''
     }]);
     setExpandedQuestion(newId);
   };
@@ -149,6 +155,8 @@ export default function CourseExamsPage() {
       totalMarks: finalTotalMarks,
       durationMinutes: Number(newDuration),
       isBuiltIn: examType === 'builtin',
+      endTime: newEndTime || undefined,
+      allowLateSubmission,
       ...(examType === 'builtin' ? { questions } : { link: newLink })
     };
 
@@ -174,6 +182,8 @@ export default function CourseExamsPage() {
     setNewTotalMarks('');
     setQuestions([]);
     setExamType('builtin');
+    setNewEndTime('');
+    setAllowLateSubmission(false);
   };
 
   const handleDelete = async (id: string) => {
@@ -241,6 +251,18 @@ export default function CourseExamsPage() {
             <div>
               <label className="block text-sm font-medium mb-1">Duration (Minutes) <span className="text-red-500">*</span></label>
               <input type="number" min="1" value={newDuration} onChange={e => setNewDuration(Number(e.target.value) || '')} placeholder="e.g. 45" className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" required />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">End Time (Deadline) <span className="text-foreground/50 text-xs font-normal">(Optional)</span></label>
+              <input type="datetime-local" value={newEndTime} onChange={e => setNewEndTime(e.target.value)} className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
+            </div>
+
+            <div className="flex items-center gap-3">
+              <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
+                <input type="checkbox" checked={allowLateSubmission} onChange={e => setAllowLateSubmission(e.target.checked)} className="w-4 h-4 text-orange-500 rounded focus:ring-orange-500" />
+                Allow students to take the exam after the deadline
+              </label>
             </div>
 
             {examType === 'link' && (
@@ -315,6 +337,16 @@ export default function CourseExamsPage() {
                                 />
                               </div>
                             ))}
+                          </div>
+
+                          <div className="pt-2">
+                            <label className="block text-sm font-medium mb-1 text-foreground/70">Answer Explanation <span className="font-normal text-xs">(Optional - Shows after exam)</span></label>
+                            <textarea 
+                              value={q.explanation || ''} 
+                              onChange={e => handleUpdateQuestion(q.id, 'explanation', e.target.value)} 
+                              placeholder="Explain why the answer is correct..." 
+                              className="w-full px-4 py-2 bg-background border border-foreground/10 rounded-lg focus:border-primary focus:outline-none min-h-[80px]"
+                            />
                           </div>
 
                           <div className="flex justify-between items-center pt-2">

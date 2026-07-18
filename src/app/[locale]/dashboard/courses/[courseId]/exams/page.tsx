@@ -129,6 +129,11 @@ export default function StudentExams() {
           const isCompleted = !!completionData;
           const isBuiltIn = exam.isBuiltIn || exam.questions;
           
+          const now = new Date();
+          const hasEnded = exam.endTime ? now > new Date(exam.endTime) : false;
+          const canShowResult = isCompleted && (!exam.endTime || hasEnded);
+          const canTakeExam = !isCompleted && (!hasEnded || exam.allowLateSubmission);
+          
           return (
             <div 
               key={exam.id} 
@@ -154,23 +159,41 @@ export default function StudentExams() {
 
               <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 {isBuiltIn ? (
-                  isCompleted ? (
-                    <div className="flex items-center gap-3 px-5 py-2.5 bg-green-500/10 border border-green-500/20 text-green-600 rounded-xl">
-                      <div className="flex flex-col items-end">
-                        <span className="text-xs uppercase font-bold opacity-70">Your Score</span>
-                        <span className="font-black text-lg leading-none">{completionData.score} <span className="text-sm opacity-50">/ {completionData.totalMarks}</span></span>
+                  <>
+                    {isCompleted && (
+                      <div className="flex items-center gap-3 px-5 py-2.5 bg-green-500/10 border border-green-500/20 text-green-600 rounded-xl">
+                        <div className="flex flex-col items-end">
+                          <span className="text-xs uppercase font-bold opacity-70">Your Score</span>
+                          <span className="font-black text-lg leading-none">{completionData.score} <span className="text-sm opacity-50">/ {completionData.totalMarks}</span></span>
+                        </div>
+                        <CheckCircle2 className="w-8 h-8 opacity-50" />
                       </div>
-                      <CheckCircle2 className="w-8 h-8 opacity-50" />
-                    </div>
-                  ) : (
-                    <Link 
-                      href={`/dashboard/courses/${courseId}/exams/${exam.id}`}
-                      className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-md hover:shadow-primary/30"
-                    >
-                      <PlayCircle className="w-5 h-5" />
-                      Start Quiz
-                    </Link>
-                  )
+                    )}
+                    {canShowResult && (
+                      <Link 
+                        href={`/dashboard/courses/${courseId}/exams/${exam.id}/result`}
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-500/10 border border-blue-500/20 text-blue-600 hover:bg-blue-500/20 transition-colors font-bold rounded-xl"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        See Result
+                      </Link>
+                    )}
+                    {canTakeExam && (
+                      <Link 
+                        href={`/dashboard/courses/${courseId}/exams/${exam.id}`}
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-md hover:shadow-primary/30"
+                      >
+                        <PlayCircle className="w-5 h-5" />
+                        Start Quiz
+                      </Link>
+                    )}
+                    {!canTakeExam && !isCompleted && (
+                      <div className="px-5 py-2.5 bg-foreground/5 text-foreground/50 font-bold rounded-xl flex items-center gap-2 border border-foreground/10">
+                        <Clock className="w-4 h-4" />
+                        Exam Ended
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <>
                     <a 

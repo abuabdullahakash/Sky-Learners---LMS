@@ -56,6 +56,14 @@ export default function TakeExamPage() {
           const courseData = docSnap.data();
           const targetExam = courseData.exams?.find((e: Exam) => e.id === examId);
           if (targetExam && (targetExam.isBuiltIn || targetExam.questions)) {
+            if (targetExam.endTime && !targetExam.allowLateSubmission) {
+              const now = new Date();
+              const end = new Date(targetExam.endTime);
+              if (now > end) {
+                router.push(`/dashboard/courses/${courseId}/exams`);
+                return;
+              }
+            }
             setExam(targetExam);
             setTimeLeft(targetExam.durationMinutes * 60);
           } else {
@@ -117,6 +125,7 @@ export default function TakeExamPage() {
         examId,
         score,
         totalMarks: exam.totalMarks,
+        answers: answersRef.current,
         completedAt: Timestamp.now()
       });
 

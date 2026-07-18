@@ -40,7 +40,11 @@
       "courses": "My Courses",
       "exams": "Daily Exams",
       "settings": "Settings",
-      "logout": "Logout"
+      "logout": "Logout",
+      "confirmLogoutTitle": "Confirm Logout",
+      "confirmLogoutMessage": "Are you sure you want to log out of your account?",
+      "cancel": "Cancel",
+      "confirm": "Yes, Log Out"
     },
     "myCourses": {
       "title": "My Courses",

@@ -40,7 +40,11 @@
       "courses": "আমার কোর্স",
       "exams": "ডেইলি এক্সাম",
       "settings": "সেটিংস",
-      "logout": "লগআউট"
+      "logout": "লগআউট",
+      "confirmLogoutTitle": "লগআউট নিশ্চিত করুন",
+      "confirmLogoutMessage": "আপনি কি নিশ্চিত যে আপনি আপনার অ্যাকাউন্ট থেকে লগআউট করতে চান?",
+      "cancel": "বাতিল করুন",
+      "confirm": "হ্যাঁ, লগআউট করুন"
     },
     "myCourses": {
       "title": "আমার কোর্স",

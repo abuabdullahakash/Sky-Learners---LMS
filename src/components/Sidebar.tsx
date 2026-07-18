@@ -1,14 +1,16 @@
 "use client";
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
-import { LayoutDashboard, BookOpen, GraduationCap, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, BookOpen, GraduationCap, Settings, LogOut, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Sidebar() {
   const t = useTranslations('Dashboard.sidebar');
   const pathname = usePathname();
   const { user, userData, logout } = useAuth();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const menuItems = [
     { name: t('overview'), href: '/dashboard', icon: LayoutDashboard },
@@ -48,8 +50,8 @@ export default function Sidebar() {
               <Settings className="w-4 h-4 text-foreground/70" /> Account Settings
             </Link>
             <div className="h-px bg-foreground/10 my-1 mx-2"></div>
-            <button onClick={logout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-500/10 text-red-500 text-sm font-medium transition-colors">
-              <LogOut className="w-4 h-4" /> Log Out
+            <button onClick={() => setShowLogoutConfirm(true)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-500/10 text-red-500 text-sm font-medium transition-colors">
+              <LogOut className="w-4 h-4" /> {t('logout') || 'Log Out'}
             </button>
           </div>
         </div>
@@ -76,6 +78,41 @@ export default function Sidebar() {
           <svg className="w-4 h-4 text-foreground/40 group-hover:text-foreground transition-colors" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
         </div>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-background border border-foreground/10 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">{t('confirmLogoutTitle') || 'Confirm Logout'}</h3>
+              <p className="text-foreground/60 text-sm">
+                {t('confirmLogoutMessage') || 'Are you sure you want to log out of your account?'}
+              </p>
+            </div>
+            <div className="flex border-t border-foreground/10">
+              <button 
+                onClick={() => setShowLogoutConfirm(false)} 
+                className="flex-1 py-4 font-medium hover:bg-foreground/5 transition-colors"
+              >
+                {t('cancel') || 'Cancel'}
+              </button>
+              <div className="w-px bg-foreground/10"></div>
+              <button 
+                onClick={() => {
+                  setShowLogoutConfirm(false);
+                  logout();
+                }} 
+                className="flex-1 py-4 font-bold text-red-500 hover:bg-red-500/10 transition-colors"
+              >
+                {t('confirm') || 'Yes, Log Out'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   );
 }

@@ -6,15 +6,15 @@ export default function CourseDashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col md:flex-row gap-6 h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       
-      {/* Dynamic Course Sidebar */}
-      <div className="hidden md:block flex-shrink-0">
+      {/* Dynamic Course Sidebar - Replaces Main Sidebar */}
+      <div className="hidden md:block w-64 lg:w-[280px] flex-shrink-0 bg-background border-r border-foreground/10 fixed left-0 top-[80px] h-[calc(100vh-80px)] z-40 overflow-y-auto custom-scrollbar">
         <CourseSidebar />
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 min-h-[calc(100vh-140px)]">
+      <div className="w-full min-h-[calc(100vh-140px)]">
         {children}
       </div>
       

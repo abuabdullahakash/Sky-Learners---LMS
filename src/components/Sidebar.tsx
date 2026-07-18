@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 export default function Sidebar() {
   const t = useTranslations('Dashboard.sidebar');
   const pathname = usePathname();
-  const { logout } = useAuth();
+  const { user, userData, logout } = useAuth();
 
   const menuItems = [
     { name: t('overview'), href: '/dashboard', icon: LayoutDashboard },
@@ -57,16 +57,20 @@ export default function Sidebar() {
         {/* Profile Button */}
         <div className="flex items-center gap-3 w-full p-3 rounded-2xl hover:bg-foreground/5 transition-all cursor-pointer bg-foreground/[0.02] border border-transparent hover:border-foreground/10">
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden shrink-0 ring-2 ring-transparent group-hover:ring-primary/30 transition-all">
-            <svg className="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+            {user?.photoURL ? (
+              <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <svg className="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+            )}
           </div>
           <div className="flex-1 overflow-hidden">
             <div className="flex items-center gap-2">
               <p className="text-sm font-bold text-foreground truncate">
-                {t('student')}
+                {user?.displayName || userData?.name || t('student')}
               </p>
             </div>
             <p className="text-[11px] text-foreground/50 truncate">
-              {t('settings')}
+              {user?.email || 'No email'}
             </p>
           </div>
           <svg className="w-4 h-4 text-foreground/40 group-hover:text-foreground transition-colors" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>

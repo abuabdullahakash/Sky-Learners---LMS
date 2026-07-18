@@ -5,15 +5,22 @@ import { db } from '@/lib/firebase';
 import { doc, onSnapshot, collection, query, where, getDocs, addDoc, deleteDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Trophy, Clock, CheckCircle2, Circle, ExternalLink } from 'lucide-react';
+import { Trophy, Clock, CheckCircle2, Circle, ExternalLink, PlayCircle } from 'lucide-react';
+import Link from 'next/link';
+import { Exam } from '@/app/[locale]/teacher-dashboard/courses/[courseId]/exams/page';
+
+type CompletedExamData = {
+  score?: number;
+  totalMarks?: number;
+};
 
 export default function StudentExams() {
   const params = useParams();
   const courseId = params.courseId as string;
   const { user } = useAuth();
   
-  const [exams, setExams] = useState<any[]>([]);
-  const [completedExams, setCompletedExams] = useState<string[]>([]);
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [completedExams, setCompletedExams] = useState<Record<string, CompletedExamData>>({});
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -39,9 +46,20 @@ export default function StudentExams() {
         where('studentId', '==', user.uid),
         where('courseId', '==', courseId)
       );
-      const snap = await getDocs(q);
-      const completed = snap.docs.map(d => d.data().examId);
-      setCompletedExams(completed);
+      
+      const unsubscribe = onSnapshot(q, (snap) => {
+        const completed: Record<string, CompletedExamData> = {};
+        snap.docs.forEach(d => {
+          const data = d.data();
+          completed[data.examId] = {
+            score: data.score,
+            totalMarks: data.totalMarks
+          };
+        });
+        setCompletedExams(completed);
+      });
+
+      return () => unsubscribe();
     };
     fetchCompletedExams();
   }, [user, courseId]);
@@ -49,12 +67,11 @@ export default function StudentExams() {
   const toggleExamCompletion = async (examId: string) => {
     if (!user) return;
     
-    const isCompleted = completedExams.includes(examId);
+    const isCompleted = !!completedExams[examId];
     
     try {
       if (isCompleted) {
-        // Remove completion
-        setCompletedExams(prev => prev.filter(id => id !== examId));
+        // Remove completion (only for external links)
         const q = query(
           collection(db, 'completed_exams'),
           where('studentId', '==', user.uid),
@@ -66,8 +83,7 @@ export default function StudentExams() {
           await deleteDoc(doc(db, 'completed_exams', d.id));
         });
       } else {
-        // Add completion
-        setCompletedExams(prev => [...prev, examId]);
+        // Add completion (only for external links)
         await addDoc(collection(db, 'completed_exams'), {
           studentId: user.uid,
           courseId: courseId,
@@ -103,13 +119,15 @@ export default function StudentExams() {
       <div>
         <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Exams & Quizzes</h2>
         <p className="text-gray-600 dark:text-foreground/70">
-          Take your exams and track your progress. Don't forget to mark them as completed after you finish!
+          Take your exams and track your progress.
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
         {exams.map((exam, idx) => {
-          const isCompleted = completedExams.includes(exam.id);
+          const completionData = completedExams[exam.id];
+          const isCompleted = !!completionData;
+          const isBuiltIn = exam.isBuiltIn || exam.questions;
           
           return (
             <div 
@@ -135,36 +153,58 @@ export default function StudentExams() {
               </div>
 
               <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                <a 
-                  href={exam.link} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-primary/10 text-primary font-medium rounded-xl hover:bg-primary/20 transition-colors"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  Take Exam
-                </a>
-                
-                <button 
-                  onClick={() => toggleExamCompletion(exam.id)}
-                  className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 font-medium rounded-xl border transition-all ${
-                    isCompleted 
-                      ? 'bg-green-500/10 border-green-500/20 text-green-600 hover:bg-green-500/20 hover:border-green-500/30' 
-                      : 'bg-background border-foreground/20 text-foreground/70 hover:border-foreground/40 hover:bg-foreground/5'
-                  }`}
-                >
-                  {isCompleted ? (
-                    <>
-                      <CheckCircle2 className="w-5 h-5" />
-                      Completed
-                    </>
+                {isBuiltIn ? (
+                  isCompleted ? (
+                    <div className="flex items-center gap-3 px-5 py-2.5 bg-green-500/10 border border-green-500/20 text-green-600 rounded-xl">
+                      <div className="flex flex-col items-end">
+                        <span className="text-xs uppercase font-bold opacity-70">Your Score</span>
+                        <span className="font-black text-lg leading-none">{completionData.score} <span className="text-sm opacity-50">/ {completionData.totalMarks}</span></span>
+                      </div>
+                      <CheckCircle2 className="w-8 h-8 opacity-50" />
+                    </div>
                   ) : (
-                    <>
-                      <Circle className="w-5 h-5" />
-                      Mark as Done
-                    </>
-                  )}
-                </button>
+                    <Link 
+                      href={`/dashboard/courses/${courseId}/exams/${exam.id}`}
+                      className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-md hover:shadow-primary/30"
+                    >
+                      <PlayCircle className="w-5 h-5" />
+                      Start Quiz
+                    </Link>
+                  )
+                ) : (
+                  <>
+                    <a 
+                      href={exam.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-primary/10 text-primary font-medium rounded-xl hover:bg-primary/20 transition-colors"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Take Exam
+                    </a>
+                    
+                    <button 
+                      onClick={() => toggleExamCompletion(exam.id)}
+                      className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 font-medium rounded-xl border transition-all ${
+                        isCompleted 
+                          ? 'bg-green-500/10 border-green-500/20 text-green-600 hover:bg-green-500/20 hover:border-green-500/30' 
+                          : 'bg-background border-foreground/20 text-foreground/70 hover:border-foreground/40 hover:bg-foreground/5'
+                      }`}
+                    >
+                      {isCompleted ? (
+                        <>
+                          <CheckCircle2 className="w-5 h-5" />
+                          Completed
+                        </>
+                      ) : (
+                        <>
+                          <Circle className="w-5 h-5" />
+                          Mark as Done
+                        </>
+                      )}
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           );

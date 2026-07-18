@@ -42,9 +42,9 @@ export default function StudentCourseSidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-white dark:bg-foreground/5 rounded-3xl border border-gray-200 dark:border-foreground/10 shadow-md dark:shadow-none flex flex-col h-[calc(100vh-140px)] lg:h-[calc(100vh-180px)] sticky top-[120px] lg:top-[160px] overflow-hidden">
+    <aside className="w-full flex flex-col justify-between min-h-full overflow-x-hidden pr-2">
       
-      <div className="p-4 border-b border-gray-100 dark:border-foreground/10">
+      <div className="p-4 space-y-4 border-b border-gray-100 dark:border-foreground/10">
         <Link href="/dashboard/courses" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:text-foreground/60 dark:hover:text-foreground transition-colors mb-4 font-medium">
           <ArrowLeft className="w-4 h-4" /> {t('back')}
         </Link>

@@ -64,9 +64,9 @@ export default function CourseSidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-foreground/5 rounded-3xl border border-foreground/10 flex flex-col h-[calc(100vh-140px)] lg:h-[calc(100vh-180px)] sticky top-[120px] lg:top-[160px] overflow-hidden">
+    <aside className="w-full flex flex-col justify-between min-h-full overflow-x-hidden pr-2">
       
-      <div className="p-4 border-b border-foreground/10">
+      <div className="p-4 space-y-4 border-b border-foreground/10">
         <Link href="/teacher-dashboard/courses" className="inline-flex items-center gap-2 text-sm text-foreground/60 hover:text-foreground transition-colors mb-3">
           <ArrowLeft className="w-4 h-4" /> Back to All Courses
         </Link>

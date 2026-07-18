@@ -9,7 +9,7 @@ export default function CourseDashboardLayout({
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       
       {/* Dynamic Course Sidebar - Replaces Main Sidebar */}
-      <div className="hidden md:block w-64 lg:w-[280px] flex-shrink-0 bg-background border-r border-foreground/10 fixed left-0 top-[80px] h-[calc(100vh-80px)] z-40 overflow-y-auto custom-scrollbar">
+      <div className="hidden md:block w-64 lg:w-[280px] flex-shrink-0 bg-background/50 border-r border-foreground/10 fixed left-0 top-[80px] h-[calc(100vh-80px)] z-40 overflow-y-auto custom-scrollbar">
         <CourseSidebar />
       </div>
 

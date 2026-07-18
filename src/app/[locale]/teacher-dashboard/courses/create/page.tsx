@@ -347,9 +347,6 @@ export default function CreateCoursePage() {
                         <input type="number" value={sub.liveClasses || ''} onChange={e => updateSubject(idx, 'liveClasses', e.target.value)} placeholder="Live" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" />
                       </div>
                       <div className="w-full md:w-24">
-                        <input type="number" value={sub.videoLessons || ''} onChange={e => updateSubject(idx, 'videoLessons', e.target.value)} placeholder="Videos" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" />
-                      </div>
-                      <div className="w-full md:w-24">
                         <input type="number" value={sub.exams || ''} onChange={e => updateSubject(idx, 'exams', e.target.value)} placeholder="Exams" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" />
                       </div>
                     </div>
@@ -364,14 +361,10 @@ export default function CreateCoursePage() {
             <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
               <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">Marketing Stats & Features</h3>
               
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Total Live Classes</label>
                   <input type="number" value={totalLiveClasses} onChange={e => setTotalLiveClasses(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Total Videos</label>
-                  <input type="number" value={totalVideoLessons} onChange={e => setTotalVideoLessons(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Total Exams</label>

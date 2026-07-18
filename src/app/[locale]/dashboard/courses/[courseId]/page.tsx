@@ -17,6 +17,7 @@ export default function StudentCourseOverview() {
   const { user } = useAuth();
   
   const [completedCount, setCompletedCount] = useState<number>(0);
+  const [completedExamsCount, setCompletedExamsCount] = useState<number>(0);
   const [totalLessons, setTotalLessons] = useState<number>(0);
   const [teacherProfile, setTeacherProfile] = useState<any>(null);
 
@@ -38,26 +39,24 @@ export default function StudentCourseOverview() {
             }
           }
 
-          // Calculate total lessons
-          let total = 0;
-          if (courseData.modules) {
-            courseData.modules.forEach((module: any) => {
-              if (module.lessons) {
-                total += module.lessons.length;
-              }
-            });
-          }
-          setTotalLessons(total);
-
           // Fetch completed lessons
           if (user) {
-            const completedQuery = query(
+            const completedLessonsQuery = query(
               collection(db, 'completed_lessons'),
               where('studentId', '==', user.uid),
               where('courseId', '==', courseId)
             );
-            const completedSnap = await getDocs(completedQuery);
-            setCompletedCount(completedSnap.size);
+            const completedLessonsSnap = await getDocs(completedLessonsQuery);
+            setCompletedCount(completedLessonsSnap.size);
+
+            const completedExamsQuery = query(
+              collection(db, 'completed_exams'),
+              where('studentId', '==', user.uid),
+              where('courseId', '==', courseId)
+            );
+            const completedExamsSnap = await getDocs(completedExamsQuery);
+            // We can save this in a new state
+            setCompletedExamsCount(completedExamsSnap.size);
           }
         }
       } catch (error) {
@@ -65,13 +64,21 @@ export default function StudentCourseOverview() {
       }
     };
     if (courseId) fetchCourse();
-  }, [courseId]);
+  }, [courseId, user]);
 
   if (!course) {
     return <div className="text-center py-20 text-gray-500">Loading course overview...</div>;
   }
 
-  const progressPercentage = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+  // Calculate Progress using Marketing Stats
+  const promisedLiveClasses = Number(course.totalLiveClasses) || 0;
+  const promisedExams = Number(course.totalExams) || 0;
+  const totalPromisedItems = promisedLiveClasses + promisedExams;
+  const totalCompletedItems = completedCount + completedExamsCount;
+  
+  const progressPercentage = totalPromisedItems > 0 
+    ? Math.min(100, Math.round((totalCompletedItems / totalPromisedItems) * 100))
+    : 0;
   
   const upcomingClasses = (course.liveClasses || [])
     .filter((lc: any) => new Date(lc.date) >= new Date(new Date().setHours(0,0,0,0)))

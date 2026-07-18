@@ -123,7 +123,7 @@ export default function ExamResultPage() {
         <Link href={`/dashboard/courses/${courseId}/exams`} className="inline-flex items-center gap-2 text-primary hover:underline font-medium mb-4">
           <ArrowLeft className="w-4 h-4" /> {t('backToExams')}
         </Link>
-        <h1 className="text-3xl font-extrabold text-foreground mb-2">Exam Result</h1>
+        <h1 className="text-3xl font-extrabold text-foreground mb-2">{t('examResult')}</h1>
         <p className="text-foreground/70">{exam.title}</p>
       </div>
 
@@ -135,12 +135,12 @@ export default function ExamResultPage() {
           
           <div className="flex flex-col items-center">
             <Trophy className="w-10 h-10 text-orange-500 mb-3" />
-            <p className="text-sm font-bold text-foreground/60 uppercase tracking-widest mb-1">Final Score</p>
+            <p className="text-sm font-bold text-foreground/60 uppercase tracking-widest mb-1">{t('finalScore')}</p>
             <div className="text-5xl md:text-6xl font-black text-primary drop-shadow-sm">
               {score} <span className="text-3xl text-primary/50">/ {exam.totalMarks}</span>
             </div>
             <p className="text-foreground/60 font-bold mt-2 bg-background/50 px-3 py-1 rounded-full text-sm backdrop-blur-sm border border-foreground/5">
-              Percentage: {Math.round((score / exam.totalMarks) * 100)}%
+              {t('percentage')}: {Math.round((score / exam.totalMarks) * 100)}%
             </p>
           </div>
 
@@ -176,7 +176,7 @@ export default function ExamResultPage() {
       </div>
 
       <div className="space-y-8">
-        <h2 className="text-xl font-bold border-b border-foreground/10 pb-2">Review Answers</h2>
+        <h2 className="text-xl font-bold border-b border-foreground/10 pb-2">{t('reviewAnswers')}</h2>
         
         {exam.questions?.map((q, idx) => {
           const studentAnswer = answers[q.id];
@@ -197,9 +197,9 @@ export default function ExamResultPage() {
                   </h3>
                   <div className="text-right shrink-0">
                     <span className={`px-3 py-1 rounded-lg text-sm font-bold ${isCorrect ? 'bg-green-500/10 text-green-600' : 'bg-red-500/10 text-red-600'}`}>
-                      {isCorrect ? `${q.marks} / ${q.marks} Marks` : `0 / ${q.marks} Marks`}
+                      {isCorrect ? `${q.marks} / ${q.marks} ${t('marks')}` : `0 / ${q.marks} ${t('marks')}`}
                     </span>
-                    {skipped && <p className="text-xs text-red-500 mt-1 font-medium text-center">Skipped</p>}
+                    {skipped && <p className="text-xs text-red-500 mt-1 font-medium text-center">{t('skipped')}</p>}
                   </div>
                 </div>
 
@@ -225,7 +225,7 @@ export default function ExamResultPage() {
                       <div key={optIdx} className={`flex items-center gap-3 p-4 rounded-xl transition-all ${bgClass}`}>
                         <div className="shrink-0">{icon}</div>
                         <span className={`font-medium ${isActualCorrect ? 'text-green-700 dark:text-green-400' : isSelected ? 'text-red-700 dark:text-red-400' : 'text-foreground/70'}`}>{opt}</span>
-                        {isSelected && <span className="ml-auto text-xs font-bold uppercase tracking-wider opacity-50">Your Answer</span>}
+                        {isSelected && <span className="ml-auto text-xs font-bold uppercase tracking-wider opacity-50">{t('yourAnswer')}</span>}
                       </div>
                     );
                   })}
@@ -235,7 +235,7 @@ export default function ExamResultPage() {
               {q.explanation && (
                 <div className="bg-blue-500/5 border-t border-blue-500/10 p-5">
                   <h4 className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold mb-2">
-                    <Info className="w-5 h-5" /> Explanation
+                    <Info className="w-5 h-5" /> {t('explanation')}
                   </h4>
                   <p className="text-foreground/80 text-sm leading-relaxed whitespace-pre-wrap pl-7">{q.explanation}</p>
                 </div>

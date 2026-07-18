@@ -32,7 +32,13 @@
     "rank": "Rank",
     "outOf": "out of",
     "unrankedLate": "N/A (Late)",
-    "deadlineOver": "Deadline Over"
+    "deadlineOver": "Deadline Over",
+    "examResult": "Exam Result",
+    "finalScore": "Final Score",
+    "reviewAnswers": "Review Answers",
+    "yourAnswer": "Your Answer",
+    "skipped": "Skipped",
+    "explanation": "Explanation"
   },
   "Index": {
     "title": "Welcome to SkyLearners",

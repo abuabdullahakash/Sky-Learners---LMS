@@ -32,7 +32,13 @@
     "rank": "র‍্যাংক",
     "outOf": "এর মধ্যে",
     "unrankedLate": "প্রযোজ্য নয় (লেইট)",
-    "deadlineOver": "নির্ধারিত সময় শেষ"
+    "deadlineOver": "নির্ধারিত সময় শেষ",
+    "examResult": "এক্সাম রেজাল্ট",
+    "finalScore": "ফাইনাল স্কোর",
+    "reviewAnswers": "উত্তরমালা পর্যালোচনা",
+    "yourAnswer": "আপনার উত্তর",
+    "skipped": "স্কিপ করা হয়েছে",
+    "explanation": "ব্যাখ্যা"
   },
   "Index": {
     "title": "SkyLearners এ আপনাকে স্বাগতম",

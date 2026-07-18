@@ -171,7 +171,7 @@ export default function RelatedCourses({
                     {course.totalExams || 0}
                   </span>
                   
-                  <span className="flex items-center gap-1.5 ml-auto" title="Duration"><Clock className="w-4 h-4 text-rose-500" /> {course.duration || 'Life-time'}</span>
+                  <span className="flex items-center gap-1.5 ml-auto" title="Duration"><Clock className="w-4 h-4 text-rose-500" /> {course.courseValidity || course.duration || 'Life-time'}</span>
                 </div>
 
                 <div className="mt-auto pt-5 border-t border-foreground/10 flex items-center justify-between">

@@ -1,4 +1,26 @@
 {
+  "Exam": {
+    "examsAndQuizzes": "Exams & Quizzes",
+    "takeYourExams": "Take your exams and track your progress.",
+    "completed": "Completed",
+    "marks": "Marks",
+    "minutes": "Minutes",
+    "deadline": "Deadline",
+    "yourScore": "Your Score",
+    "submitted": "Submitted",
+    "seeResult": "See Result",
+    "startQuiz": "Start Quiz",
+    "builtInQuiz": "Built-in Quiz",
+    "externalLink": "External Link",
+    "questions": "Questions",
+    "timeTaken": "Time Taken",
+    "examCompleted": "Exam Completed!",
+    "percentage": "Percentage",
+    "backToExams": "Back to Exams",
+    "submittedSuccess": "Your exam has been submitted successfully.",
+    "resultHidden": "Your score and detailed results will be revealed after the exam deadline passes",
+    "noExams": "No exams available."
+  },
   "Index": {
     "title": "Welcome to SkyLearners",
     "subtitle": "Get all your academic content here. The ultimate learning platform for your success.",

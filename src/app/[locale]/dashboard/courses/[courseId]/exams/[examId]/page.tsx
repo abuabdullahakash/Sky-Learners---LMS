@@ -9,6 +9,7 @@ import { useRouter } from '@/i18n/routing';
 import { Clock, Trophy, CheckCircle, ArrowLeft, AlertCircle, CheckSquare } from 'lucide-react';
 import { Exam, Question } from '@/app/[locale]/teacher-dashboard/courses/[courseId]/exams/page';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export default function TakeExamPage() {
   const { user } = useAuth();
@@ -16,12 +17,13 @@ export default function TakeExamPage() {
   const params = useParams();
   const courseId = params.courseId as string;
   const examId = params.examId as string;
+  const t = useTranslations('Exam');
 
   const [exam, setExam] = useState<Exam | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasCompleted, setHasCompleted] = useState(false);
-  const [result, setResult] = useState<{ score: number, totalMarks: number } | null>(null);
+  const [result, setResult] = useState<{ score: number, totalMarks: number, timeTakenSeconds?: number } | null>(null);
 
   // Exam State
   const [hasStarted, setHasStarted] = useState(false);
@@ -45,7 +47,11 @@ export default function TakeExamPage() {
           setHasCompleted(true);
           const data = snap.docs[0].data();
           if (data.score !== undefined) {
-            setResult({ score: data.score, totalMarks: data.totalMarks });
+            setResult({ 
+              score: data.score, 
+              totalMarks: data.totalMarks,
+              timeTakenSeconds: data.timeTakenSeconds 
+            });
           }
         }
 
@@ -118,6 +124,8 @@ export default function TakeExamPage() {
       }
     });
 
+    const timeTakenSeconds = (exam.durationMinutes * 60) - timeLeft;
+
     try {
       await addDoc(collection(db, 'completed_exams'), {
         studentId: user.uid,
@@ -126,10 +134,11 @@ export default function TakeExamPage() {
         score,
         totalMarks: exam.totalMarks,
         answers: answersRef.current,
+        timeTakenSeconds,
         completedAt: Timestamp.now()
       });
 
-      setResult({ score, totalMarks: exam.totalMarks });
+      setResult({ score, totalMarks: exam.totalMarks, timeTakenSeconds });
       setHasCompleted(true);
     } catch (err) {
       console.error("Failed to submit exam", err);
@@ -149,6 +158,13 @@ export default function TakeExamPage() {
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
+  const formatTimeTaken = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    if (m === 0) return `${s}s`;
+    return `${m}m ${s}s`;
+  };
+
   if (isLoading) return <div className="flex justify-center items-center h-64">Loading...</div>;
 
   if (!exam) return null;
@@ -160,40 +176,52 @@ export default function TakeExamPage() {
 
     return (
       <div className="max-w-3xl mx-auto py-12 px-4 animate-in fade-in zoom-in-95 duration-500">
-        <div className="bg-background border border-foreground/10 rounded-3xl p-8 text-center shadow-xl">
-          <div className="w-24 h-24 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-12 h-12" />
-          </div>
-          <h1 className="text-3xl font-extrabold mb-2">Exam Completed!</h1>
-          <p className="text-foreground/60 mb-8">{exam.title}</p>
-          
+        <div className="bg-background border border-foreground/10 rounded-3xl p-8 md:p-12 text-center animate-in zoom-in-95 duration-500 shadow-xl max-w-2xl mx-auto mt-10">
+        <div className="w-24 h-24 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <CheckCircle className="w-12 h-12" />
+        </div>
+        <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-2">{t('examCompleted')}</h2>
+        <p className="text-xl text-foreground/60 mb-8">{exam.title}</p>
+
+        <div className="flex justify-center mb-8">
           {result && canShowResult ? (
-            <div className="inline-block bg-primary/5 border border-primary/20 rounded-2xl p-6 mb-8">
-              <p className="text-sm font-bold text-primary uppercase tracking-wider mb-2">Your Score</p>
+            <div className="inline-block bg-primary/5 border border-primary/20 rounded-2xl px-12 py-8">
+              <p className="text-sm font-bold text-primary uppercase tracking-wider mb-2">{t('yourScore')}</p>
               <div className="text-5xl font-black text-primary">
                 {result.score} <span className="text-2xl text-primary/50">/ {result.totalMarks}</span>
               </div>
-              <p className="mt-4 text-sm font-medium text-foreground/70">
-                Percentage: {Math.round((result.score / result.totalMarks) * 100)}%
-              </p>
+              <div className="mt-4 flex items-center justify-center gap-4 text-sm font-medium text-foreground/70">
+                <span>{t('percentage')}: {Math.round((result.score / result.totalMarks) * 100)}%</span>
+                {result.timeTakenSeconds !== undefined && (
+                  <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> {t('timeTaken')}: {formatTimeTaken(result.timeTakenSeconds)}</span>
+                )}
+              </div>
             </div>
           ) : (
             <div className="inline-block bg-orange-500/5 border border-orange-500/20 rounded-2xl p-6 mb-8 max-w-md">
               <AlertCircle className="w-8 h-8 text-orange-500 mx-auto mb-3" />
-              <p className="text-foreground/80 font-medium">Your exam has been submitted successfully.</p>
+              <p className="text-foreground/80 font-medium">{t('submittedSuccess')}</p>
+              {result?.timeTakenSeconds !== undefined && (
+                <p className="text-sm text-foreground/60 mt-1 font-bold">
+                  {t('timeTaken')}: {formatTimeTaken(result.timeTakenSeconds)}
+                </p>
+              )}
               <p className="text-sm text-foreground/60 mt-2">
-                Your score and detailed results will be revealed after the exam deadline passes
+                {t('resultHidden')}
                 {exam.endTime && <span className="block mt-1 font-bold text-orange-500">({new Date(exam.endTime).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })})</span>}.
               </p>
             </div>
           )}
-
-          <div>
-            <Link href={`/dashboard/courses/${courseId}/exams`} className="inline-flex items-center gap-2 px-6 py-3 bg-foreground/5 hover:bg-foreground/10 text-foreground font-bold rounded-xl transition-colors">
-              <ArrowLeft className="w-4 h-4" /> Back to Exams
-            </Link>
-          </div>
         </div>
+
+        <Link 
+          href={`/dashboard/courses/${courseId}/exams`}
+          className="inline-flex items-center gap-2 px-6 py-3 bg-foreground/5 hover:bg-foreground/10 text-foreground font-bold rounded-xl transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          {t('backToExams')}
+        </Link>
+      </div>
       </div>
     );
   }

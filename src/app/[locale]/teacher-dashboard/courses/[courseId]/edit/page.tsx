@@ -259,8 +259,9 @@ export default function EditCoursePage() {
                     setCategory(e.target.value);
                     setEduClass('');
                     setDepartment('');
-                    setCourseType('coaching');
-                    setCategory('');}}
+                    setYear('');
+                    setSpecificSubjects([]);
+                  }}
                   className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all appearance-none"
                   required
                 >

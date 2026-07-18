@@ -113,7 +113,7 @@ export default function SettingsPage() {
   ] as const;
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       
       {/* Header */}
       <div className="bg-background/40 backdrop-blur-md border border-foreground/10 rounded-3xl p-8 relative overflow-hidden shadow-lg">

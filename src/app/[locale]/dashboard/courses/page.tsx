@@ -84,7 +84,7 @@ export default function StudentCoursesPage() {
   const approvedCourses = courses.filter(c => c.status === 'approved');
 
   return (
-    <div className="max-w-6xl mx-auto space-y-10 animate-in fade-in duration-500">
+    <div className="w-full space-y-10 animate-in fade-in duration-500">
       
       {/* Header */}
       <div>

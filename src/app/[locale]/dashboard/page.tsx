@@ -133,7 +133,7 @@ export default function DashboardOverview() {
   ];
 
   return (
-    <div ref={containerRef} className="max-w-6xl mx-auto space-y-10">
+    <div ref={containerRef} className="w-full space-y-10">
       
       {/* Welcome Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 p-8 md:p-12">

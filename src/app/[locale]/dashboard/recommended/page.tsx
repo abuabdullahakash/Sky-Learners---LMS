@@ -73,7 +73,7 @@ export default function RecommendedCourses() {
   }, [loading, courses]);
 
   return (
-    <div ref={containerRef} className="max-w-6xl mx-auto space-y-10">
+    <div ref={containerRef} className="w-full space-y-10">
       {/* Header */}
       <div className="flex items-center gap-4 border-b border-foreground/10 pb-6">
         <Link href="/dashboard/settings" className="p-3 bg-foreground/5 hover:bg-foreground/10 rounded-xl transition-colors">

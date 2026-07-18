@@ -181,7 +181,10 @@ export default function TakeExamPage() {
             <div className="inline-block bg-orange-500/5 border border-orange-500/20 rounded-2xl p-6 mb-8 max-w-md">
               <AlertCircle className="w-8 h-8 text-orange-500 mx-auto mb-3" />
               <p className="text-foreground/80 font-medium">Your exam has been submitted successfully.</p>
-              <p className="text-sm text-foreground/60 mt-2">Your score and detailed results will be revealed after the exam deadline passes.</p>
+              <p className="text-sm text-foreground/60 mt-2">
+                Your score and detailed results will be revealed after the exam deadline passes
+                {exam.endTime && <span className="block mt-1 font-bold text-orange-500">({new Date(exam.endTime).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })})</span>}.
+              </p>
             </div>
           )}
 

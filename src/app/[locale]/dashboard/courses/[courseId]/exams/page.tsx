@@ -154,6 +154,12 @@ export default function StudentExams() {
                     <Clock className="w-4 h-4 text-blue-500" />
                     <span>{exam.durationMinutes} Minutes</span>
                   </div>
+                  {exam.endTime && (
+                    <div className="flex items-center gap-1.5 bg-red-500/10 px-2 py-1 rounded-md text-red-600 font-bold dark:text-red-400">
+                      <Clock className="w-4 h-4" />
+                      <span>Deadline: {new Date(exam.endTime).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 

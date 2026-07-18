@@ -19,7 +19,19 @@
     "backToExams": "Back to Exams",
     "submittedSuccess": "Your exam has been submitted successfully.",
     "resultHidden": "Your score and detailed results will be revealed after the exam deadline passes",
-    "noExams": "No exams available."
+    "noExams": "No exams available.",
+    "totalMarks": "Total Marks",
+    "instructions": "Instructions",
+    "instruction1": "Once you start, the timer cannot be paused.",
+    "instruction2": "Do not refresh or close the page, or your progress will be lost.",
+    "instruction3": "The exam will submit automatically when the time runs out.",
+    "cancel": "Cancel",
+    "startExamNow": "Start Exam Now",
+    "motivationalMsg": "Congratulations! Your exam has been submitted. Please wait for the result. Keep studying hard, otherwise others will get ahead of you!",
+    "lateBadge": "Late",
+    "rank": "Rank",
+    "outOf": "out of",
+    "unrankedLate": "N/A (Late)"
   },
   "Index": {
     "title": "Welcome to SkyLearners",

@@ -14,6 +14,7 @@ type CompletedExamData = {
   score?: number;
   totalMarks?: number;
   timeTakenSeconds?: number;
+  isLate?: boolean;
 };
 
 export default function StudentExams() {
@@ -57,7 +58,8 @@ export default function StudentExams() {
           completed[data.examId] = {
             score: data.score,
             totalMarks: data.totalMarks,
-            timeTakenSeconds: data.timeTakenSeconds
+            timeTakenSeconds: data.timeTakenSeconds,
+            isLate: !!data.isLate
           };
         });
         setCompletedExams(completed);
@@ -148,6 +150,7 @@ export default function StudentExams() {
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
                   {exam.title}
                   {isCompleted && <span className="text-[10px] uppercase tracking-wider font-bold bg-green-500/10 text-green-500 px-2 py-0.5 rounded-full">{t('completed')}</span>}
+                  {completionData?.isLate && <span className="text-[10px] uppercase tracking-wider font-bold bg-red-500/10 text-red-500 px-2 py-0.5 rounded-full">{t('lateBadge')}</span>}
                 </h3>
                 <div className="flex flex-wrap items-center gap-4 text-sm text-foreground/60">
                   <div className="flex items-center gap-1.5 bg-foreground/5 px-2 py-1 rounded-md">
@@ -171,15 +174,15 @@ export default function StudentExams() {
                 {isBuiltIn ? (
                   <>
                     {isCompleted && canShowResult && (
-                      <div className="flex items-center gap-3 px-5 py-2.5 bg-green-500/10 border border-green-500/20 text-green-600 rounded-xl">
-                        <div className="flex flex-col items-end">
+                      <div className="flex items-center justify-between gap-3 px-5 py-2.5 bg-green-500/10 border border-green-500/20 text-green-600 rounded-xl min-w-[160px]">
+                        <div className="flex flex-col items-start">
                           <span className="text-xs uppercase font-bold opacity-70">{t('yourScore')}</span>
                           <span className="font-black text-lg leading-none">{completionData.score} <span className="text-sm opacity-50">/ {completionData.totalMarks}</span></span>
                           {completionData.timeTakenSeconds !== undefined && (
                             <span className="text-[10px] font-bold mt-1 opacity-70 flex items-center gap-1"><Clock className="w-3 h-3" /> {formatTimeTaken(completionData.timeTakenSeconds)}</span>
                           )}
                         </div>
-                        <CheckCircle2 className="w-8 h-8 opacity-50" />
+                        <CheckCircle2 className="w-6 h-6 opacity-70 shrink-0" />
                       </div>
                     )}
                     {isCompleted && !canShowResult && (

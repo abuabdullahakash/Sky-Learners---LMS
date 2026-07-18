@@ -92,7 +92,6 @@ export default function TakeExamPage() {
         setTimeLeft((prev) => {
           if (prev <= 1) {
             clearInterval(timerRef.current!);
-            handleSubmit();
             return 0;
           }
           return prev - 1;
@@ -125,6 +124,8 @@ export default function TakeExamPage() {
     });
 
     const timeTakenSeconds = (exam.durationMinutes * 60) - timeLeft;
+    const now = new Date();
+    const isLate = !!(exam.endTime && exam.allowLateSubmission && now > new Date(exam.endTime));
 
     try {
       await addDoc(collection(db, 'completed_exams'), {
@@ -135,6 +136,7 @@ export default function TakeExamPage() {
         totalMarks: exam.totalMarks,
         answers: answersRef.current,
         timeTakenSeconds,
+        isLate,
         completedAt: Timestamp.now()
       });
 
@@ -149,6 +151,10 @@ export default function TakeExamPage() {
   };
 
   const handleSelectAnswer = (questionId: string, optionIndex: number) => {
+    if (timeLeft === 0 && exam?.strictTimeLimit) {
+      alert("Time is up! Please submit your exam.");
+      return;
+    }
     setAnswers(prev => ({ ...prev, [questionId]: optionIndex }));
   };
 
@@ -200,16 +206,12 @@ export default function TakeExamPage() {
           ) : (
             <div className="inline-block bg-orange-500/5 border border-orange-500/20 rounded-2xl p-6 mb-8 max-w-md">
               <AlertCircle className="w-8 h-8 text-orange-500 mx-auto mb-3" />
-              <p className="text-foreground/80 font-medium">{t('submittedSuccess')}</p>
+              <p className="text-foreground/80 font-medium">{t('motivationalMsg')}</p>
               {result?.timeTakenSeconds !== undefined && (
-                <p className="text-sm text-foreground/60 mt-1 font-bold">
+                <p className="text-sm text-foreground/60 mt-4 font-bold">
                   {t('timeTaken')}: {formatTimeTaken(result.timeTakenSeconds)}
                 </p>
               )}
-              <p className="text-sm text-foreground/60 mt-2">
-                {t('resultHidden')}
-                {exam.endTime && <span className="block mt-1 font-bold text-orange-500">({new Date(exam.endTime).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })})</span>}.
-              </p>
             </div>
           )}
         </div>
@@ -236,35 +238,35 @@ export default function TakeExamPage() {
             <div className="flex flex-col items-center p-4 bg-foreground/5 rounded-2xl min-w-[120px]">
               <Trophy className="w-6 h-6 text-orange-500 mb-2" />
               <span className="font-bold text-lg">{exam.totalMarks}</span>
-              <span className="text-xs text-foreground/50 uppercase tracking-wider font-bold">Total Marks</span>
+              <span className="text-xs text-foreground/50 uppercase tracking-wider font-bold">{t('totalMarks')}</span>
             </div>
             <div className="flex flex-col items-center p-4 bg-foreground/5 rounded-2xl min-w-[120px]">
               <Clock className="w-6 h-6 text-blue-500 mb-2" />
               <span className="font-bold text-lg">{exam.durationMinutes}</span>
-              <span className="text-xs text-foreground/50 uppercase tracking-wider font-bold">Minutes</span>
+              <span className="text-xs text-foreground/50 uppercase tracking-wider font-bold">{t('minutes')}</span>
             </div>
             <div className="flex flex-col items-center p-4 bg-foreground/5 rounded-2xl min-w-[120px]">
               <CheckSquare className="w-6 h-6 text-green-500 mb-2" />
               <span className="font-bold text-lg">{exam.questions?.length || 0}</span>
-              <span className="text-xs text-foreground/50 uppercase tracking-wider font-bold">Questions</span>
+              <span className="text-xs text-foreground/50 uppercase tracking-wider font-bold">{t('questions')}</span>
             </div>
           </div>
 
           <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-6 text-left mb-8 text-orange-600 dark:text-orange-400">
-            <h3 className="font-bold flex items-center gap-2 mb-2"><AlertCircle className="w-5 h-5" /> Instructions</h3>
+            <h3 className="font-bold flex items-center gap-2 mb-2"><AlertCircle className="w-5 h-5" /> {t('instructions')}</h3>
             <ul className="list-disc list-inside space-y-1 text-sm">
-              <li>Once you start, the timer cannot be paused.</li>
-              <li>Do not refresh or close the page, or your progress will be lost.</li>
-              <li>The exam will submit automatically when the time runs out.</li>
+              <li>{t('instruction1')}</li>
+              <li>{t('instruction2')}</li>
+              {exam.strictTimeLimit === false ? null : <li>{t('instruction3')}</li>}
             </ul>
           </div>
 
           <div className="flex justify-center gap-4">
             <Link href={`/dashboard/courses/${courseId}/exams`} className="px-6 py-3 bg-foreground/5 hover:bg-foreground/10 font-bold rounded-xl transition-colors">
-              Cancel
+              {t('cancel')}
             </Link>
             <button onClick={() => setHasStarted(true)} className="px-8 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-lg hover:shadow-primary/30">
-              Start Exam Now
+              {t('startExamNow')}
             </button>
           </div>
         </div>

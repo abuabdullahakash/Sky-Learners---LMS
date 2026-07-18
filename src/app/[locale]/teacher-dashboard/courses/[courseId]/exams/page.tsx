@@ -27,6 +27,7 @@ export type Exam = {
   isBuiltIn?: boolean;
   endTime?: string | null;
   allowLateSubmission?: boolean;
+  strictTimeLimit?: boolean;
   isPublished?: boolean;
 };
 
@@ -50,8 +51,9 @@ export default function CourseExamsPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [newTotalMarks, setNewTotalMarks] = useState<number | ''>(''); // Only used for link type
   const [newEndTime, setNewEndTime] = useState<string>('');
-  const [allowLateSubmission, setAllowLateSubmission] = useState<boolean>(false);
-  const [isPublishedState, setIsPublishedState] = useState<boolean>(true);
+  const [allowLateSubmission, setAllowLateSubmission] = useState(false);
+  const [strictTimeLimit, setStrictTimeLimit] = useState(true);
+  const [isPublishedState, setIsPublishedState] = useState(true);
   const [editingExamId, setEditingExamId] = useState<string | null>(null);
   const [error, setError] = useState('');
 
@@ -189,6 +191,7 @@ export default function CourseExamsPage() {
       isBuiltIn: examType === 'builtin',
       endTime: newEndTime || null,
       allowLateSubmission,
+      strictTimeLimit,
       isPublished: isPublishedState,
       ...(examType === 'builtin' ? { questions: cleanedQuestions } : { link: newLink })
     };
@@ -219,6 +222,7 @@ export default function CourseExamsPage() {
     setExamType('builtin');
     setNewEndTime('');
     setAllowLateSubmission(false);
+    setStrictTimeLimit(true);
     setIsPublishedState(true);
     setEditingExamId(null);
   };
@@ -233,6 +237,7 @@ export default function CourseExamsPage() {
     setQuestions(exam.questions || []);
     setNewEndTime(exam.endTime || '');
     setAllowLateSubmission(exam.allowLateSubmission || false);
+    setStrictTimeLimit(exam.strictTimeLimit ?? true);
     setIsPublishedState(exam.isPublished !== false);
     setIsAdding(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -310,10 +315,25 @@ export default function CourseExamsPage() {
               <input type="datetime-local" value={newEndTime} onChange={e => setNewEndTime(e.target.value)} className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
             </div>
 
-            <div className="flex items-center gap-3">
-              <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
-                <input type="checkbox" checked={allowLateSubmission} onChange={e => setAllowLateSubmission(e.target.checked)} className="w-4 h-4 text-orange-500 rounded focus:ring-orange-500" />
-                Allow students to take the exam after the deadline
+            <div className="md:col-span-2 flex flex-col gap-3">
+              <label className="flex items-center gap-2 cursor-pointer bg-foreground/5 p-3 rounded-xl hover:bg-foreground/10 transition-colors w-fit">
+                <input 
+                  type="checkbox" 
+                  checked={allowLateSubmission} 
+                  onChange={e => setAllowLateSubmission(e.target.checked)}
+                  className="w-4 h-4 text-orange-500 rounded border-gray-300 focus:ring-orange-500"
+                />
+                <span className="text-sm font-medium">Allow students to take the exam after the deadline</span>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer bg-foreground/5 p-3 rounded-xl hover:bg-foreground/10 transition-colors w-fit">
+                <input 
+                  type="checkbox" 
+                  checked={strictTimeLimit} 
+                  onChange={e => setStrictTimeLimit(e.target.checked)}
+                  className="w-4 h-4 text-orange-500 rounded border-gray-300 focus:ring-orange-500"
+                />
+                <span className="text-sm font-medium">Strict Time Limit: Prevent option selection when time is up</span>
               </label>
             </div>
 

@@ -6,7 +6,8 @@ import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/i18n/routing';
-import { ArrowLeft, CheckCircle2, XCircle, Info, HelpCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { ArrowLeft, CheckCircle2, XCircle, Info, HelpCircle, Trophy, Clock, Medal } from 'lucide-react';
 import { Exam } from '@/app/[locale]/teacher-dashboard/courses/[courseId]/exams/page';
 import Link from 'next/link';
 
@@ -20,7 +21,13 @@ export default function ExamResultPage() {
   const [exam, setExam] = useState<Exam | null>(null);
   const [answers, setAnswers] = useState<Record<string, number> | null>(null);
   const [score, setScore] = useState<number>(0);
+  const [timeTakenSeconds, setTimeTakenSeconds] = useState<number | undefined>(undefined);
+  const [isLate, setIsLate] = useState<boolean>(false);
+  const [rank, setRank] = useState<number | null>(null);
+  const [totalParticipants, setTotalParticipants] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
+  
+  const t = useTranslations('Exam');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,19 +51,37 @@ export default function ExamResultPage() {
           return;
         }
 
-        // Fetch Completed Exam for answers
+        // Fetch ALL Completed Exams for ranking
         const q = query(
           collection(db, 'completed_exams'),
-          where('studentId', '==', user.uid),
           where('courseId', '==', courseId),
           where('examId', '==', examId)
         );
         const snap = await getDocs(q);
         
-        if (!snap.empty) {
-          const data = snap.docs[0].data();
+        const myExamDoc = snap.docs.find(d => d.data().studentId === user.uid);
+
+        if (myExamDoc) {
+          const data = myExamDoc.data();
           setAnswers(data.answers || {});
           setScore(data.score || 0);
+          setTimeTakenSeconds(data.timeTakenSeconds);
+          setIsLate(!!data.isLate);
+
+          if (!data.isLate) {
+            const validExams = snap.docs
+              .map(d => d.data())
+              .filter(d => !d.isLate);
+
+            validExams.sort((a, b) => {
+              if (b.score !== a.score) return b.score - a.score;
+              return (a.timeTakenSeconds || 0) - (b.timeTakenSeconds || 0);
+            });
+
+            const rankIndex = validExams.findIndex(d => d.studentId === user.uid);
+            setRank(rankIndex + 1);
+            setTotalParticipants(validExams.length);
+          }
 
           // Additional security: Only show result if End Time has passed (or doesn't exist)
           if (targetExam.endTime) {
@@ -85,22 +110,69 @@ export default function ExamResultPage() {
   if (isLoading) return <div className="flex justify-center items-center h-64">Loading Result...</div>;
   if (!exam || !answers) return null;
 
+  const formatTimeTaken = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    if (m === 0) return `${s}s`;
+    return `${m}m ${s}s`;
+  };
+
   return (
-    <div className="max-w-4xl mx-auto pb-24 animate-in fade-in duration-500">
+    <div className="w-full pb-24 animate-in fade-in duration-500">
       <div className="mb-8">
         <Link href={`/dashboard/courses/${courseId}/exams`} className="inline-flex items-center gap-2 text-primary hover:underline font-medium mb-4">
-          <ArrowLeft className="w-4 h-4" /> Back to Exams
+          <ArrowLeft className="w-4 h-4" /> {t('backToExams')}
         </Link>
         <h1 className="text-3xl font-extrabold text-foreground mb-2">Exam Result</h1>
         <p className="text-foreground/70">{exam.title}</p>
       </div>
 
-      <div className="bg-primary/5 border border-primary/20 rounded-3xl p-8 mb-8 text-center shadow-sm">
-        <p className="text-sm font-bold text-primary uppercase tracking-wider mb-2">Final Score</p>
-        <div className="text-6xl font-black text-primary mb-2">
-          {score} <span className="text-3xl text-primary/50">/ {exam.totalMarks}</span>
+      <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-background border border-primary/20 rounded-3xl p-8 md:p-12 mb-12 shadow-lg relative overflow-hidden">
+        {/* Background Decoration */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-around gap-8 text-center">
+          
+          <div className="flex flex-col items-center">
+            <Trophy className="w-10 h-10 text-orange-500 mb-3" />
+            <p className="text-sm font-bold text-foreground/60 uppercase tracking-widest mb-1">Final Score</p>
+            <div className="text-5xl md:text-6xl font-black text-primary drop-shadow-sm">
+              {score} <span className="text-3xl text-primary/50">/ {exam.totalMarks}</span>
+            </div>
+            <p className="text-foreground/60 font-bold mt-2 bg-background/50 px-3 py-1 rounded-full text-sm backdrop-blur-sm border border-foreground/5">
+              Percentage: {Math.round((score / exam.totalMarks) * 100)}%
+            </p>
+          </div>
+
+          <div className="hidden md:block w-px h-32 bg-gradient-to-b from-transparent via-primary/20 to-transparent" />
+          <div className="block md:hidden w-32 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent my-4" />
+
+          <div className="flex flex-col items-center">
+            <Clock className="w-10 h-10 text-blue-500 mb-3" />
+            <p className="text-sm font-bold text-foreground/60 uppercase tracking-widest mb-1">{t('timeTaken')}</p>
+            <div className="text-4xl md:text-5xl font-black text-foreground drop-shadow-sm">
+              {timeTakenSeconds !== undefined ? formatTimeTaken(timeTakenSeconds) : 'N/A'}
+            </div>
+          </div>
+
+          <div className="hidden md:block w-px h-32 bg-gradient-to-b from-transparent via-primary/20 to-transparent" />
+          <div className="block md:hidden w-32 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent my-4" />
+
+          <div className="flex flex-col items-center">
+            <Medal className={`w-10 h-10 mb-3 ${rank === 1 ? 'text-yellow-500' : rank === 2 ? 'text-gray-400' : rank === 3 ? 'text-amber-600' : 'text-purple-500'}`} />
+            <p className="text-sm font-bold text-foreground/60 uppercase tracking-widest mb-1">{t('rank')}</p>
+            <div className="text-4xl md:text-5xl font-black text-foreground drop-shadow-sm flex items-baseline gap-2">
+              {isLate ? (
+                <span className="text-xl md:text-2xl text-red-500">{t('unrankedLate')}</span>
+              ) : (
+                <>
+                  #{rank} <span className="text-lg text-foreground/40 font-bold tracking-normal">{t('outOf')} {totalParticipants}</span>
+                </>
+              )}
+            </div>
+          </div>
+
         </div>
-        <p className="text-foreground/60 font-medium">Percentage: {Math.round((score / exam.totalMarks) * 100)}%</p>
       </div>
 
       <div className="space-y-8">

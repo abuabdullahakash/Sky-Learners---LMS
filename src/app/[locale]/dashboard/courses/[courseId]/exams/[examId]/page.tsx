@@ -154,6 +154,10 @@ export default function TakeExamPage() {
   if (!exam) return null;
 
   if (hasCompleted) {
+    const now = new Date();
+    const hasEnded = exam.endTime ? now > new Date(exam.endTime) : true;
+    const canShowResult = !exam.endTime || hasEnded;
+
     return (
       <div className="max-w-3xl mx-auto py-12 px-4 animate-in fade-in zoom-in-95 duration-500">
         <div className="bg-background border border-foreground/10 rounded-3xl p-8 text-center shadow-xl">
@@ -163,7 +167,7 @@ export default function TakeExamPage() {
           <h1 className="text-3xl font-extrabold mb-2">Exam Completed!</h1>
           <p className="text-foreground/60 mb-8">{exam.title}</p>
           
-          {result && (
+          {result && canShowResult ? (
             <div className="inline-block bg-primary/5 border border-primary/20 rounded-2xl p-6 mb-8">
               <p className="text-sm font-bold text-primary uppercase tracking-wider mb-2">Your Score</p>
               <div className="text-5xl font-black text-primary">
@@ -172,6 +176,12 @@ export default function TakeExamPage() {
               <p className="mt-4 text-sm font-medium text-foreground/70">
                 Percentage: {Math.round((result.score / result.totalMarks) * 100)}%
               </p>
+            </div>
+          ) : (
+            <div className="inline-block bg-orange-500/5 border border-orange-500/20 rounded-2xl p-6 mb-8 max-w-md">
+              <AlertCircle className="w-8 h-8 text-orange-500 mx-auto mb-3" />
+              <p className="text-foreground/80 font-medium">Your exam has been submitted successfully.</p>
+              <p className="text-sm text-foreground/60 mt-2">Your score and detailed results will be revealed after the exam deadline passes.</p>
             </div>
           )}
 

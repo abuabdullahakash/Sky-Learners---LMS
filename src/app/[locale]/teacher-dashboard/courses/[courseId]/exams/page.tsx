@@ -25,8 +25,9 @@ export type Exam = {
   link?: string;
   questions?: Question[];
   isBuiltIn?: boolean;
-  endTime?: string;
+  endTime?: string | null;
   allowLateSubmission?: boolean;
+  isPublished?: boolean;
 };
 
 export default function CourseExamsPage() {
@@ -50,6 +51,8 @@ export default function CourseExamsPage() {
   const [newTotalMarks, setNewTotalMarks] = useState<number | ''>(''); // Only used for link type
   const [newEndTime, setNewEndTime] = useState<string>('');
   const [allowLateSubmission, setAllowLateSubmission] = useState<boolean>(false);
+  const [isPublishedState, setIsPublishedState] = useState<boolean>(true);
+  const [editingExamId, setEditingExamId] = useState<string | null>(null);
   const [error, setError] = useState('');
 
   // Expanded state for questions
@@ -179,17 +182,20 @@ export default function CourseExamsPage() {
     }
 
     const newExam: Exam = {
-      id: Date.now().toString(),
+      id: editingExamId || Date.now().toString(),
       title: newTitle,
       totalMarks: finalTotalMarks,
       durationMinutes: Number(newDuration),
       isBuiltIn: examType === 'builtin',
-      endTime: newEndTime || undefined,
+      endTime: newEndTime || null,
       allowLateSubmission,
+      isPublished: isPublishedState,
       ...(examType === 'builtin' ? { questions: cleanedQuestions } : { link: newLink })
     };
 
-    const updatedExams = [...exams, newExam];
+    const updatedExams = editingExamId 
+      ? exams.map(e => e.id === editingExamId ? newExam : e)
+      : [...exams, newExam];
     
     try {
       await updateDoc(doc(db, 'courses', courseId), { exams: updatedExams });
@@ -213,6 +219,23 @@ export default function CourseExamsPage() {
     setExamType('builtin');
     setNewEndTime('');
     setAllowLateSubmission(false);
+    setIsPublishedState(true);
+    setEditingExamId(null);
+  };
+
+  const handleEditExam = (exam: Exam) => {
+    setEditingExamId(exam.id);
+    setExamType(exam.isBuiltIn || exam.questions ? 'builtin' : 'link');
+    setNewTitle(exam.title);
+    setNewDuration(exam.durationMinutes);
+    setNewLink(exam.link || '');
+    setNewTotalMarks(exam.totalMarks);
+    setQuestions(exam.questions || []);
+    setNewEndTime(exam.endTime || '');
+    setAllowLateSubmission(exam.allowLateSubmission || false);
+    setIsPublishedState(exam.isPublished !== false);
+    setIsAdding(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id: string) => {
@@ -247,7 +270,7 @@ export default function CourseExamsPage() {
       {isAdding && (
         <form onSubmit={handleAddExam} className="bg-background border border-foreground/10 p-6 rounded-3xl shadow-sm space-y-6">
           <div className="flex justify-between items-center mb-2 pb-4 border-b border-foreground/10">
-            <h2 className="text-xl font-bold">Add New Exam</h2>
+            <h2 className="text-xl font-bold">{editingExamId ? 'Edit Exam' : 'Add New Exam'}</h2>
             <button type="button" onClick={() => { setIsAdding(false); resetForm(); }} className="text-sm text-foreground/50 hover:text-foreground">Cancel</button>
           </div>
           
@@ -396,9 +419,13 @@ export default function CourseExamsPage() {
             </div>
           )}
 
-          <div className="flex justify-end pt-4 border-t border-foreground/10">
+          <div className="flex justify-between items-center pt-4 border-t border-foreground/10">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={isPublishedState} onChange={e => setIsPublishedState(e.target.checked)} className="w-5 h-5 text-green-500 rounded focus:ring-green-500" />
+              <span className="font-bold text-sm">Publish this exam immediately</span>
+            </label>
             <button type="submit" disabled={isSaving} className="px-8 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-colors flex items-center gap-2 shadow-lg hover:shadow-primary/30">
-              <Save className="w-5 h-5" /> {isSaving ? 'Saving Exam...' : 'Publish Exam'}
+              <Save className="w-5 h-5" /> {isSaving ? 'Saving...' : editingExamId ? 'Save Changes' : 'Save Exam'}
             </button>
           </div>
         </form>
@@ -416,6 +443,9 @@ export default function CourseExamsPage() {
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h3 className="font-bold text-lg">{exam.title}</h3>
+                  {exam.isPublished === false && (
+                    <span className="px-2.5 py-0.5 bg-gray-500/10 text-gray-500 text-xs font-bold rounded-full uppercase tracking-wider">Draft</span>
+                  )}
                   {exam.isBuiltIn || exam.questions ? (
                     <span className="px-2.5 py-0.5 bg-blue-500/10 text-blue-500 text-xs font-bold rounded-full uppercase tracking-wider">Built-in Quiz</span>
                   ) : (
@@ -425,6 +455,9 @@ export default function CourseExamsPage() {
                 <div className="flex flex-wrap gap-4 text-sm text-foreground/70 font-medium">
                   <span className="flex items-center gap-1.5"><Trophy className="w-4 h-4 text-orange-500" /> {exam.totalMarks} Marks</span>
                   <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-orange-500" /> {exam.durationMinutes} Minutes</span>
+                  {exam.endTime && (
+                    <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-red-500" /> Deadline: {new Date(exam.endTime).toLocaleString()}</span>
+                  )}
                   {(!exam.isBuiltIn && !exam.questions) && (
                     <span className="flex items-center gap-1.5"><LinkIcon className="w-4 h-4 text-orange-500" /> <a href={exam.link} target="_blank" rel="noopener noreferrer" className="hover:text-orange-500 underline underline-offset-2">External Link</a></span>
                   )}
@@ -433,9 +466,14 @@ export default function CourseExamsPage() {
                   )}
                 </div>
               </div>
-              <button onClick={() => handleDelete(exam.id)} className="p-2 text-foreground/40 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-colors shrink-0">
-                <Trash2 className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <button onClick={() => handleEditExam(exam)} className="px-4 py-2 text-sm font-bold bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 rounded-xl transition-colors">
+                  Edit
+                </button>
+                <button onClick={() => handleDelete(exam.id)} className="p-2 text-foreground/40 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-colors">
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           ))
         )}

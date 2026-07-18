@@ -124,7 +124,7 @@ export default function StudentExams() {
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        {exams.map((exam, idx) => {
+        {exams.filter(e => e.isPublished !== false).map((exam, idx) => {
           const completionData = completedExams[exam.id];
           const isCompleted = !!completionData;
           const isBuiltIn = exam.isBuiltIn || exam.questions;
@@ -160,13 +160,19 @@ export default function StudentExams() {
               <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 {isBuiltIn ? (
                   <>
-                    {isCompleted && (
+                    {isCompleted && canShowResult && (
                       <div className="flex items-center gap-3 px-5 py-2.5 bg-green-500/10 border border-green-500/20 text-green-600 rounded-xl">
                         <div className="flex flex-col items-end">
                           <span className="text-xs uppercase font-bold opacity-70">Your Score</span>
                           <span className="font-black text-lg leading-none">{completionData.score} <span className="text-sm opacity-50">/ {completionData.totalMarks}</span></span>
                         </div>
                         <CheckCircle2 className="w-8 h-8 opacity-50" />
+                      </div>
+                    )}
+                    {isCompleted && !canShowResult && (
+                      <div className="flex items-center gap-2 px-5 py-2.5 bg-green-500/10 border border-green-500/20 text-green-600 rounded-xl font-bold">
+                        <CheckCircle2 className="w-5 h-5" />
+                        Submitted
                       </div>
                     )}
                     {canShowResult && (

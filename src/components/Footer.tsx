@@ -22,6 +22,12 @@ export default function Footer() {
   const t = useTranslations('Footer');
   const pathname = usePathname();
 
+  const isDashboard = pathname.startsWith('/dashboard') || pathname.startsWith('/teacher-dashboard');
+
+  if (isDashboard) {
+    return null;
+  }
+
   return (
     <footer className="bg-background/80 backdrop-blur-md border-t border-foreground/10 pt-16 pb-8 mt-20 relative overflow-hidden">
       {/* Decorative glows */}

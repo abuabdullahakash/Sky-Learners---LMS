@@ -139,7 +139,7 @@ export default function CreateCoursePage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
       
       <div className="mb-8">
         <Link href="/teacher-dashboard" className="inline-flex items-center gap-2 text-foreground/60 hover:text-foreground transition-colors mb-4">
@@ -159,16 +159,32 @@ export default function CreateCoursePage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1 text-foreground/80">Course Title <span className="text-red-500">*</span></label>
-              <input 
-                type="text" 
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Master React in 30 Days"
-                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all"
-                required
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1 text-foreground/80">Course Title <span className="text-red-500">*</span></label>
+                <input 
+                  type="text" 
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g. Master React in 30 Days"
+                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1 text-foreground/80">Course Type <span className="text-red-500">*</span></label>
+                <div className="flex gap-4 flex-col sm:flex-row">
+                  <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${courseType === 'individual' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
+                    <input type="radio" name="courseType" value="individual" checked={courseType === 'individual'} onChange={() => setCourseType('individual')} className="accent-orange-500 w-4 h-4" />
+                    <span className="text-sm font-medium">Individual Teacher</span>
+                  </label>
+                  <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${courseType === 'coaching' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
+                    <input type="radio" name="courseType" value="coaching" checked={courseType === 'coaching'} onChange={() => setCourseType('coaching')} className="accent-orange-500 w-4 h-4" />
+                    <span className="text-sm font-medium">Coaching Center</span>
+                  </label>
+                </div>
+              </div>
             </div>
 
             <div>
@@ -177,23 +193,9 @@ export default function CreateCoursePage() {
                 value={subtitle}
                 onChange={(e) => setSubtitle(e.target.value)}
                 placeholder="A brief catchy description of what students will learn..."
-                rows={3}
+                rows={2}
                 className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all resize-none custom-scrollbar"
               ></textarea>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2 text-foreground/80">Course Type <span className="text-red-500">*</span></label>
-              <div className="flex gap-4 flex-col sm:flex-row">
-                <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${courseType === 'individual' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
-                  <input type="radio" name="courseType" value="individual" checked={courseType === 'individual'} onChange={() => setCourseType('individual')} className="accent-orange-500 w-4 h-4" />
-                  <span className="text-sm font-medium">Individual Teacher</span>
-                </label>
-                <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${courseType === 'coaching' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
-                  <input type="radio" name="courseType" value="coaching" checked={courseType === 'coaching'} onChange={() => setCourseType('coaching')} className="accent-orange-500 w-4 h-4" />
-                  <span className="text-sm font-medium">Coaching Center</span>
-                </label>
-              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

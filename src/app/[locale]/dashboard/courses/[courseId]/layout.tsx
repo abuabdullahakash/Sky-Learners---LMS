@@ -14,7 +14,7 @@ export default function StudentCourseDashboardLayout({
       </div>
 
       {/* Main Content Area */}
-      <div className="w-full bg-white dark:bg-foreground/5 rounded-3xl border border-gray-200 dark:border-foreground/10 p-6 md:p-8 min-h-[calc(100vh-140px)] shadow-md dark:shadow-none">
+      <div className="w-full min-h-[calc(100vh-140px)] p-6 md:p-8">
         {children}
       </div>
       

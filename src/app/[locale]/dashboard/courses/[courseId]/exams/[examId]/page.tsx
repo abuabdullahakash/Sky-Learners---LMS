@@ -275,7 +275,7 @@ export default function TakeExamPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto pb-24 animate-in fade-in duration-500">
+    <div className="w-full max-w-7xl mx-auto pb-24 animate-in fade-in duration-500">
       {/* Sticky Header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-foreground/10 p-4 mb-8 flex justify-between items-center rounded-b-2xl shadow-sm">
         <h1 className="font-bold text-lg truncate max-w-[50%]">{exam.title}</h1>

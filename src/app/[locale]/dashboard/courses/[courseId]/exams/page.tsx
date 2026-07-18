@@ -25,6 +25,7 @@ export default function StudentExams() {
   
   const [exams, setExams] = useState<Exam[]>([]);
   const [completedExams, setCompletedExams] = useState<Record<string, CompletedExamData>>({});
+  const [totalExamsSet, setTotalExamsSet] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -33,7 +34,9 @@ export default function StudentExams() {
     // Real-time listener for exams
     const unsubscribe = onSnapshot(doc(db, 'courses', courseId), (docSnap) => {
       if (docSnap.exists()) {
-        setExams(docSnap.data().exams || []);
+        const data = docSnap.data();
+        setExams(data.exams || []);
+        setTotalExamsSet(data.totalExams || 0);
       }
       setIsLoading(false);
     });
@@ -116,11 +119,20 @@ export default function StudentExams() {
 
   return (
     <div className="w-full max-w-7xl space-y-8 animate-in fade-in duration-500">
-      <div>
-        <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('examsAndQuizzes')}</h2>
-        <p className="text-gray-600 dark:text-foreground/70">
-          {t('takeYourExams')}
-        </p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('examsAndQuizzes')}</h2>
+          <p className="text-gray-600 dark:text-foreground/70">
+            {t('takeYourExams')}
+          </p>
+        </div>
+        
+        {totalExamsSet > 0 && (
+          <div className="flex items-center gap-2 px-4 py-2 bg-foreground/5 rounded-xl border border-foreground/10 text-sm font-bold shadow-sm">
+            <span className="text-foreground/60">Total Exams:</span>
+            <span className="text-primary">{exams.length} / {totalExamsSet}</span>
+          </div>
+        )}
       </div>
 
       {exams.length === 0 && (

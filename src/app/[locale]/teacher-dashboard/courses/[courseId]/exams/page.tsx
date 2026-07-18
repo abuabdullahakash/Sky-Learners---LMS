@@ -265,11 +265,20 @@ export default function CourseExamsPage() {
           <h1 className="text-2xl font-bold mb-2">Exams & Quizzes</h1>
           <p className="text-foreground/70">Create built-in quizzes or add external links for your students.</p>
         </div>
-        {!isAdding && (
-          <button onClick={() => setIsAdding(true)} className="px-5 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2 whitespace-nowrap">
-            <Plus className="w-5 h-5" /> Add Exam
-          </button>
-        )}
+        
+        <div className="flex items-center gap-4">
+          {course?.totalExams > 0 && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-foreground/5 rounded-xl border border-foreground/10 text-sm font-bold shadow-sm">
+              <span className="text-foreground/60">Total Exams:</span>
+              <span className="text-primary">{exams.length} / {course.totalExams}</span>
+            </div>
+          )}
+          {!isAdding && (
+            <button onClick={() => setIsAdding(true)} className="px-5 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2 whitespace-nowrap">
+              <Plus className="w-5 h-5" /> Add Exam
+            </button>
+          )}
+        </div>
       </div>
 
       {isAdding && (

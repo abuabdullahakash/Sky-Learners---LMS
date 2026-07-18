@@ -31,7 +31,8 @@
     "lateBadge": "লেইট",
     "rank": "র‍্যাংক",
     "outOf": "এর মধ্যে",
-    "unrankedLate": "প্রযোজ্য নয় (লেইট)"
+    "unrankedLate": "প্রযোজ্য নয় (লেইট)",
+    "deadlineOver": "নির্ধারিত সময় শেষ"
   },
   "Index": {
     "title": "SkyLearners এ আপনাকে স্বাগতম",

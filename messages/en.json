@@ -31,7 +31,8 @@
     "lateBadge": "Late",
     "rank": "Rank",
     "outOf": "out of",
-    "unrankedLate": "N/A (Late)"
+    "unrankedLate": "N/A (Late)",
+    "deadlineOver": "Deadline Over"
   },
   "Index": {
     "title": "Welcome to SkyLearners",

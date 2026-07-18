@@ -163,6 +163,11 @@ export default function StudentExams() {
                   {exam.title}
                   {isCompleted && <span className="text-[10px] uppercase tracking-wider font-bold bg-green-500/10 text-green-500 px-2 py-0.5 rounded-full">{t('completed')}</span>}
                   {completionData?.isLate && <span className="text-[10px] uppercase tracking-wider font-bold bg-red-500/10 text-red-500 px-2 py-0.5 rounded-full">{t('lateBadge')}</span>}
+                  {isCompleted && completionData?.timeTakenSeconds !== undefined && (
+                    <span className="text-[10px] uppercase tracking-wider font-bold bg-blue-500/10 text-blue-500 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> {formatTimeTaken(completionData.timeTakenSeconds)}
+                    </span>
+                  )}
                 </h3>
                 <div className="flex flex-wrap items-center gap-4 text-sm text-foreground/60">
                   <div className="flex items-center gap-1.5 bg-foreground/5 px-2 py-1 rounded-md">
@@ -176,7 +181,7 @@ export default function StudentExams() {
                   {exam.endTime && (
                     <div className="flex items-center gap-1.5 bg-red-500/10 px-2 py-1 rounded-md text-red-600 font-bold dark:text-red-400">
                       <Clock className="w-4 h-4" />
-                      <span>{t('deadline')}: {new Date(exam.endTime).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</span>
+                      <span>{hasEnded ? t('deadlineOver') : `${t('deadline')}: ${new Date(exam.endTime).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}`}</span>
                     </div>
                   )}
                 </div>
@@ -186,32 +191,24 @@ export default function StudentExams() {
                 {isBuiltIn ? (
                   <>
                     {isCompleted && canShowResult && (
-                      <div className="flex items-center justify-between gap-3 px-5 py-2.5 bg-green-500/10 border border-green-500/20 text-green-600 rounded-xl min-w-[160px]">
-                        <div className="flex flex-col items-start">
-                          <span className="text-xs uppercase font-bold opacity-70">{t('yourScore')}</span>
-                          <span className="font-black text-lg leading-none">{completionData.score} <span className="text-sm opacity-50">/ {completionData.totalMarks}</span></span>
-                          {completionData.timeTakenSeconds !== undefined && (
-                            <span className="text-[10px] font-bold mt-1 opacity-70 flex items-center gap-1"><Clock className="w-3 h-3" /> {formatTimeTaken(completionData.timeTakenSeconds)}</span>
-                          )}
+                      <div className="flex items-center justify-between gap-3 px-5 h-12 bg-green-500/10 border border-green-500/20 text-green-600 rounded-xl min-w-[140px]">
+                        <div className="flex flex-col items-start justify-center">
+                          <span className="text-[10px] uppercase font-bold opacity-70 leading-none mb-1">{t('yourScore')}</span>
+                          <span className="font-black text-xl leading-none">{completionData.score} <span className="text-sm opacity-50">/ {completionData.totalMarks}</span></span>
                         </div>
                         <CheckCircle2 className="w-6 h-6 opacity-70 shrink-0" />
                       </div>
                     )}
                     {isCompleted && !canShowResult && (
-                      <div className="flex items-center gap-3 px-5 py-2 bg-green-500/10 border border-green-500/20 text-green-600 rounded-xl font-bold">
+                      <div className="flex items-center gap-3 px-5 h-12 bg-green-500/10 border border-green-500/20 text-green-600 rounded-xl font-bold">
                         <CheckCircle2 className="w-5 h-5" />
-                        <div className="flex flex-col">
-                          <span>{t('submitted')}</span>
-                          {completionData.timeTakenSeconds !== undefined && (
-                            <span className="text-[10px] font-bold opacity-70 flex items-center gap-1 mt-0.5"><Clock className="w-3 h-3" /> {formatTimeTaken(completionData.timeTakenSeconds)}</span>
-                          )}
-                        </div>
+                        <span>{t('submitted')}</span>
                       </div>
                     )}
                     {canShowResult && (
                       <Link 
                         href={`/dashboard/courses/${courseId}/exams/${exam.id}/result`}
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-500/10 border border-blue-500/20 text-blue-600 hover:bg-blue-500/20 transition-colors font-bold rounded-xl"
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 h-12 bg-blue-500/10 border border-blue-500/20 text-blue-600 hover:bg-blue-500/20 transition-colors font-bold rounded-xl"
                       >
                         <ExternalLink className="w-4 h-4" />
                         {t('seeResult')}
@@ -220,14 +217,14 @@ export default function StudentExams() {
                     {canTakeExam && (
                       <Link 
                         href={`/dashboard/courses/${courseId}/exams/${exam.id}`}
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-md hover:shadow-primary/30"
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 h-12 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-md hover:shadow-primary/30"
                       >
                         <PlayCircle className="w-5 h-5" />
                         {t('startQuiz')}
                       </Link>
                     )}
                     {!canTakeExam && !isCompleted && (
-                      <div className="px-5 py-2.5 bg-foreground/5 text-foreground/50 font-bold rounded-xl flex items-center gap-2 border border-foreground/10">
+                      <div className="px-5 h-12 bg-foreground/5 text-foreground/50 font-bold rounded-xl flex items-center gap-2 border border-foreground/10">
                         <Clock className="w-4 h-4" />
                         {t('examEnded')}
                       </div>
@@ -240,7 +237,7 @@ export default function StudentExams() {
                         href={exam.link} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-md hover:shadow-primary/30"
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 h-12 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-md hover:shadow-primary/30"
                       >
                         <ExternalLink className="w-5 h-5" />
                         {t('startQuiz')}

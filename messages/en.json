@@ -41,7 +41,16 @@
     "explanation": "Explanation",
     "multipleStatementTitle": "Multiple Statement MCQ (Board style)",
     "statementsTitle": "Statements",
-    "statementPlaceholder": "Statement"
+    "statementPlaceholder": "Statement",
+    "participants": "Participants",
+    "leaderboard": "Leaderboard",
+    "rank": "Rank",
+    "student": "Student",
+    "score": "Score",
+    "time": "Time Taken",
+    "late": "Late",
+    "noParticipants": "No participants yet",
+    "backToExams": "Back to Exams"
   },
   "Index": {
     "title": "Welcome to SkyLearners",

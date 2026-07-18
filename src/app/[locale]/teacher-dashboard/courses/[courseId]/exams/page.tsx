@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Plus, Trash2, Link as LinkIcon, Save, CheckSquare, Clock, Trophy, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Trash2, Link as LinkIcon, Save, CheckSquare, Clock, Trophy, ChevronDown, ChevronUp, Users } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
+import Link from 'next/link';
 
 export type Question = {
   id: string;
@@ -43,6 +44,7 @@ export default function CourseExamsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [course, setCourse] = useState<any>(null);
   const [exams, setExams] = useState<Exam[]>([]);
+  const [participantCounts, setParticipantCounts] = useState<Record<string, number>>({});
 
   // New Exam Form State
   const [isAdding, setIsAdding] = useState(false);
@@ -81,7 +83,27 @@ export default function CourseExamsPage() {
         setIsLoading(false);
       }
     };
+
+    const fetchParticipants = async () => {
+      if (!courseId) return;
+      try {
+        const q = query(collection(db, 'completed_exams'), where('courseId', '==', courseId));
+        const querySnapshot = await getDocs(q);
+        const counts: Record<string, number> = {};
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.examId) {
+            counts[data.examId] = (counts[data.examId] || 0) + 1;
+          }
+        });
+        setParticipantCounts(counts);
+      } catch (err) {
+        console.error("Error fetching participants", err);
+      }
+    };
+
     fetchCourse();
+    fetchParticipants();
   }, [user, courseId, router]);
 
   const handleAddQuestion = () => {
@@ -502,21 +524,31 @@ export default function CourseExamsPage() {
             <p className="text-foreground/50 font-medium text-lg">No exams added yet.</p>
           </div>
         ) : (
-          exams.map((exam) => (
+          exams.map((exam, index) => (
             <div key={exam.id} className="bg-background border border-foreground/10 p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-primary/30 transition-colors shadow-sm">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="font-bold text-lg">{exam.title}</h3>
-                  {exam.isPublished === false && (
-                    <span className="px-2.5 py-0.5 bg-gray-500/10 text-gray-500 text-xs font-bold rounded-full uppercase tracking-wider">Draft</span>
-                  )}
-                  {exam.isBuiltIn || exam.questions ? (
-                    <span className="px-2.5 py-0.5 bg-blue-500/10 text-blue-500 text-xs font-bold rounded-full uppercase tracking-wider">Built-in Quiz</span>
-                  ) : (
-                    <span className="px-2.5 py-0.5 bg-purple-500/10 text-purple-500 text-xs font-bold rounded-full uppercase tracking-wider">External Link</span>
-                  )}
+              <div className="flex-1 flex gap-4">
+                <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-sm mt-0.5">
+                  {index + 1}
                 </div>
-                <div className="flex flex-wrap gap-4 text-sm text-foreground/70 font-medium">
+                <div>
+                  <div className="flex flex-wrap items-center gap-3 mb-2">
+                    <h3 className="font-bold text-lg">{exam.title}</h3>
+                    {exam.isPublished === false && (
+                      <span className="px-2.5 py-0.5 bg-gray-500/10 text-gray-500 text-xs font-bold rounded-full uppercase tracking-wider">Draft</span>
+                    )}
+                    {exam.isBuiltIn || exam.questions ? (
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 bg-blue-500/10 text-blue-500 text-xs font-bold rounded-full uppercase tracking-wider">Built-in Quiz</span>
+                        <Link href={`/teacher-dashboard/courses/${courseId}/exams/${exam.id}/leaderboard`} className="flex items-center gap-1.5 px-2.5 py-0.5 bg-green-500/10 text-green-600 hover:bg-green-500/20 text-xs font-bold rounded-full uppercase tracking-wider transition-colors cursor-pointer group animate-in fade-in duration-500">
+                          <Users className="w-3.5 h-3.5" />
+                          <span>{participantCounts[exam.id] || 0} Participants</span>
+                        </Link>
+                      </div>
+                    ) : (
+                      <span className="px-2.5 py-0.5 bg-purple-500/10 text-purple-500 text-xs font-bold rounded-full uppercase tracking-wider">External Link</span>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-4 text-sm text-foreground/70 font-medium">
                   <span className="flex items-center gap-1.5"><Trophy className="w-4 h-4 text-orange-500" /> {exam.totalMarks} Marks</span>
                   <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-orange-500" /> {exam.durationMinutes} Minutes</span>
                   {exam.endTime && (
@@ -529,7 +561,8 @@ export default function CourseExamsPage() {
                     <span className="flex items-center gap-1.5"><CheckSquare className="w-4 h-4 text-orange-500" /> {exam.questions?.length || 0} Questions</span>
                   )}
                 </div>
-              </div>
+                  </div>
+                </div>
               <div className="flex items-center gap-2 shrink-0">
                 <button onClick={() => handleEditExam(exam)} className="px-4 py-2 text-sm font-bold bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 rounded-xl transition-colors">
                   Edit

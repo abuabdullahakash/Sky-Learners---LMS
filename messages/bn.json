@@ -41,7 +41,16 @@
     "explanation": "ব্যাখ্যা",
     "multipleStatementTitle": "বহুপদী প্রশ্ন (বোর্ড স্টাইল)",
     "statementsTitle": "বিবৃতি বা অপশন",
-    "statementPlaceholder": "পয়েন্ট"
+    "statementPlaceholder": "পয়েন্ট",
+    "participants": "জন অংশগ্রহণ করেছে",
+    "leaderboard": "লিডারবোর্ড",
+    "rank": "র‍্যাংক",
+    "student": "শিক্ষার্থী",
+    "score": "মার্কস",
+    "time": "সময় লেগেছে",
+    "late": "লেইট",
+    "noParticipants": "এখনো কেউ পরীক্ষায় অংশ নেয়নি",
+    "backToExams": "পরীক্ষার তালিকায় ফিরে যান"
   },
   "Index": {
     "title": "SkyLearners এ আপনাকে স্বাগতম",

@@ -126,16 +126,45 @@ export default function CourseExamsPage() {
         setError('Please add at least one question.');
         return;
       }
-      // Validate questions
-      for (const q of questions) {
+      // Validate and clean questions
+      const cleanedQuestions: Question[] = [];
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
         if (!q.text.trim()) {
-          setError('All questions must have text.');
+          setExpandedQuestion(q.id);
+          setError(`Question ${i + 1} is missing the question text.`);
           return;
         }
-        if (q.options.some(opt => !opt.trim())) {
-          setError('All options must be filled.');
+        
+        const filledOptions: string[] = [];
+        let newCorrectIndex = -1;
+        
+        for (let j = 0; j < q.options.length; j++) {
+          if (q.options[j].trim() !== '') {
+            filledOptions.push(q.options[j]);
+            if (q.correctOptionIndex === j) {
+              newCorrectIndex = filledOptions.length - 1;
+            }
+          }
+        }
+
+        if (filledOptions.length < 2) {
+          setExpandedQuestion(q.id);
+          setError(`Question ${i + 1} must have at least 2 options filled.`);
           return;
         }
+
+        if (newCorrectIndex === -1) {
+          setExpandedQuestion(q.id);
+          setError(`Question ${i + 1}: The correct answer cannot be an empty option.`);
+          return;
+        }
+
+        cleanedQuestions.push({
+          ...q,
+          options: filledOptions,
+          correctOptionIndex: newCorrectIndex
+        });
       }
     }
 
@@ -157,7 +186,7 @@ export default function CourseExamsPage() {
       isBuiltIn: examType === 'builtin',
       endTime: newEndTime || undefined,
       allowLateSubmission,
-      ...(examType === 'builtin' ? { questions } : { link: newLink })
+      ...(examType === 'builtin' ? { questions: cleanedQuestions } : { link: newLink })
     };
 
     const updatedExams = [...exams, newExam];

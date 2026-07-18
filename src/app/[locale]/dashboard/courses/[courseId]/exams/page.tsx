@@ -99,7 +99,7 @@ export default function StudentExams() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="w-full max-w-7xl space-y-8 animate-in fade-in duration-500">
       <div>
         <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Exams & Quizzes</h2>
         <p className="text-gray-600 dark:text-foreground/70">

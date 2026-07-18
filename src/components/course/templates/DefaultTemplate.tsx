@@ -81,7 +81,7 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
           </div>
         ) : null}
 
-        <div className="w-full max-w-7xl mx-auto relative z-20 h-full flex items-center">
+        <div className="w-full max-w-[1280px] px-[15px] md:px-[20px] lg:px-[30px] mx-auto relative z-20 h-full flex items-center">
           <div className="hidden lg:flex absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 flex-col items-center gap-6 w-16">
             {hasSlider && course.sliderImages.length > 1 && (
               <>
@@ -179,7 +179,7 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
         )}
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-16">
+      <div className="max-w-[1280px] mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px] py-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
           <div className="lg:col-span-2 space-y-12">

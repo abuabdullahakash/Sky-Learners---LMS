@@ -43,7 +43,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen px-4 overflow-hidden" ref={heroRef}>
+    <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden" ref={heroRef}>
       
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
@@ -59,29 +59,31 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background dark:from-background/90 dark:via-background/70 dark:to-background z-10" />
       </div>
 
-      {/* Hero Content */}
-      <div className="relative z-20 text-center max-w-4xl mx-auto mt-20">
-        <h1 ref={titleRef} className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent drop-shadow-sm">
-          {t('title')}
-        </h1>
-        <p ref={subRef} className="text-lg md:text-2xl text-foreground/90 mb-10 max-w-2xl mx-auto font-medium drop-shadow-md">
-          {t('subtitle')}
-        </p>
-      </div>
+      <div className="max-w-[1280px] mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px]">
+        {/* Hero Content */}
+        <div className="relative z-20 text-center mx-auto mt-20">
+          <h1 ref={titleRef} className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent drop-shadow-sm">
+            {t('title')}
+          </h1>
+          <p ref={subRef} className="text-lg md:text-2xl text-foreground/90 mb-10 max-w-3xl mx-auto font-medium drop-shadow-md">
+            {t('subtitle')}
+          </p>
+        </div>
 
-      {/* Feature Cards */}
-      <div ref={cardsRef} className="relative z-20 grid grid-cols-1 md:grid-cols-3 gap-6 mt-32 w-full max-w-6xl pb-20">
-        {[
-          { icon: <BookOpen className="w-8 h-8 mb-4 text-primary" />, title: "Premium Content", desc: "High quality video lectures & notes" },
-          { icon: <GraduationCap className="w-8 h-8 mb-4 text-secondary" />, title: "Daily Exams", desc: "Test your skills every day" },
-          { icon: <Users className="w-8 h-8 mb-4 text-accent" />, title: "Live Support", desc: "Doubt solving sessions" }
-        ].map((feat, i) => (
-          <div key={i} className="p-8 rounded-2xl bg-background/60 backdrop-blur-md border border-foreground/10 hover:border-primary/50 transition-colors shadow-xl">
-            {feat.icon}
-            <h3 className="text-xl font-bold mb-2">{feat.title}</h3>
-            <p className="text-foreground/80">{feat.desc}</p>
-          </div>
-        ))}
+        {/* Feature Cards */}
+        <div ref={cardsRef} className="relative z-20 grid grid-cols-1 md:grid-cols-3 gap-6 mt-32 w-full pb-20">
+          {[
+            { icon: <BookOpen className="w-8 h-8 mb-4 text-primary" />, title: "Premium Content", desc: "High quality video lectures & notes" },
+            { icon: <GraduationCap className="w-8 h-8 mb-4 text-secondary" />, title: "Daily Exams", desc: "Test your skills every day" },
+            { icon: <Users className="w-8 h-8 mb-4 text-accent" />, title: "Live Support", desc: "Doubt solving sessions" }
+          ].map((feat, i) => (
+            <div key={i} className="p-8 rounded-2xl bg-background/60 backdrop-blur-md border border-foreground/10 hover:border-primary/50 transition-colors shadow-xl">
+              {feat.icon}
+              <h3 className="text-xl font-bold mb-2">{feat.title}</h3>
+              <p className="text-foreground/80">{feat.desc}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

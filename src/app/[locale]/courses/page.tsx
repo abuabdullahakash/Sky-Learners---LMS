@@ -72,8 +72,8 @@ export default function CoursesPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-80px)] px-4 pt-28 pb-10 bg-background text-foreground">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-[calc(100vh-80px)] pt-28 pb-10 bg-background text-foreground">
+      <div className="max-w-[1280px] mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px]">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold mb-4 text-primary">আমাদের সকল কোর্সসমূহ</h1>
           <p className="text-foreground/70 max-w-2xl mx-auto text-lg">

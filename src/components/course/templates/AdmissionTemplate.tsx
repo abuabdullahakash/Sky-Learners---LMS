@@ -54,7 +54,7 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
 
 
 
-        <div className={`w-full max-w-7xl mx-auto px-4 relative z-20 h-full flex flex-col justify-center ${textColor}`}>
+        <div className={`w-full max-w-[1280px] px-[15px] md:px-[20px] lg:px-[30px] mx-auto relative z-20 h-full flex flex-col justify-center ${textColor}`}>
           <Link href="/courses" className={`inline-flex items-center gap-2 font-semibold mb-8 transition-colors ${hasCover ? 'text-white/70 hover:text-white' : 'text-foreground/60 hover:text-foreground'}`}>
             <ArrowLeft className="w-4 h-4" /> {t('goBack')}
           </Link>
@@ -95,7 +95,7 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
 
         {/* Video Button (Right Sidebar) */}
         <div className="absolute inset-0 z-20 pointer-events-none">
-          <div className="w-full max-w-7xl mx-auto px-4 relative h-full flex items-center justify-end">
+          <div className="w-full max-w-[1280px] px-[15px] md:px-[20px] lg:px-[30px] mx-auto relative h-full flex items-center justify-end">
             <div className="hidden lg:flex flex-col items-center gap-10 w-20 pointer-events-auto">
               {course.introVideoUrl && (
                 <button onClick={() => setIsVideoModalOpen(true)} className="flex flex-col items-center gap-3 group cursor-pointer">
@@ -115,7 +115,7 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
         {/* Slider Controls */}
         {hasSlider && course.sliderImages.length > 1 && (
           <div className="absolute bottom-10 left-0 right-0 z-20 pointer-events-none">
-            <div className="w-full max-w-7xl mx-auto px-4 relative flex justify-between items-center pointer-events-auto">
+            <div className="w-full max-w-[1280px] px-[15px] md:px-[20px] lg:px-[30px] mx-auto relative flex justify-between items-center pointer-events-auto">
               {/* Pagination Dots */}
               <div className="flex items-center gap-4">
                 <span className="text-white/80 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
@@ -151,7 +151,7 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
         )}
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-16">
+      <div className="max-w-[1280px] mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px] py-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
           <div className="lg:col-span-2 space-y-12">

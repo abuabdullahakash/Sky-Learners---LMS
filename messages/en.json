@@ -38,7 +38,10 @@
     "reviewAnswers": "Review Answers",
     "yourAnswer": "Your Answer",
     "skipped": "Skipped",
-    "explanation": "Explanation"
+    "explanation": "Explanation",
+    "multipleStatementTitle": "Multiple Statement MCQ (Board style)",
+    "statementsTitle": "Statements",
+    "statementPlaceholder": "Statement"
   },
   "Index": {
     "title": "Welcome to SkyLearners",

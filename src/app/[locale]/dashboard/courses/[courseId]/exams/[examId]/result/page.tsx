@@ -203,6 +203,17 @@ export default function ExamResultPage() {
                   </div>
                 </div>
 
+                {q.isMultipleStatement && q.statements && (
+                  <div className="mb-6 pl-10 space-y-2">
+                    {q.statements.map((stmt, sIdx) => (
+                      <div key={sIdx} className="flex items-start gap-3 text-foreground/80">
+                        <span className="font-semibold text-foreground/60 min-w-[24px]">{['i.', 'ii.', 'iii.'][sIdx]}</span>
+                        <span className="font-medium">{stmt}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 gap-3">
                   {q.options.map((opt, optIdx) => {
                     const isSelected = studentAnswer === optIdx;

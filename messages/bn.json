@@ -38,7 +38,10 @@
     "reviewAnswers": "উত্তরমালা পর্যালোচনা",
     "yourAnswer": "আপনার উত্তর",
     "skipped": "স্কিপ করা হয়েছে",
-    "explanation": "ব্যাখ্যা"
+    "explanation": "ব্যাখ্যা",
+    "multipleStatementTitle": "বহুপদী প্রশ্ন (বোর্ড স্টাইল)",
+    "statementsTitle": "বিবৃতি বা অপশন",
+    "statementPlaceholder": "পয়েন্ট"
   },
   "Index": {
     "title": "SkyLearners এ আপনাকে স্বাগতম",

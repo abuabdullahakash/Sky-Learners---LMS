@@ -11,6 +11,8 @@ import { useRouter } from '@/i18n/routing';
 export type Question = {
   id: string;
   text: string;
+  isMultipleStatement?: boolean;
+  statements?: string[];
   options: string[];
   correctOptionIndex: number;
   marks: number;
@@ -395,9 +397,42 @@ export default function CourseExamsPage() {
                       {expandedQuestion === q.id && (
                         <div className="p-4 border-t border-foreground/10 bg-foreground/[0.02] space-y-4">
                           <div>
-                            <label className="block text-sm font-medium mb-1">Question Text</label>
+                            <div className="flex items-center justify-between mb-1">
+                              <label className="block text-sm font-medium">Question Text</label>
+                              <label className="flex items-center gap-2 cursor-pointer bg-primary/5 px-3 py-1 rounded-lg border border-primary/10 hover:bg-primary/10 transition-colors">
+                                <input
+                                  type="checkbox"
+                                  checked={q.isMultipleStatement || false}
+                                  onChange={(e) => handleUpdateQuestion(q.id, 'isMultipleStatement', e.target.checked)}
+                                  className="w-3.5 h-3.5 text-primary rounded border-gray-300 focus:ring-primary"
+                                />
+                                <span className="text-xs font-bold text-primary">Multiple Statement MCQ (Board style)</span>
+                              </label>
+                            </div>
                             <input type="text" value={q.text} onChange={e => handleUpdateQuestion(q.id, 'text', e.target.value)} placeholder="Type your question here..." className="w-full px-4 py-2 bg-background border border-foreground/10 rounded-lg focus:border-primary focus:outline-none" />
                           </div>
+
+                          {q.isMultipleStatement && (
+                            <div className="mt-4 space-y-3 p-4 bg-background border border-foreground/10 rounded-xl">
+                              <p className="text-xs font-bold text-foreground/50 uppercase tracking-widest mb-2">Statements</p>
+                              {[0, 1, 2].map(idx => (
+                                <div key={idx} className="flex items-center gap-3">
+                                  <span className="w-8 text-right font-bold text-foreground/40">{['i.', 'ii.', 'iii.'][idx]}</span>
+                                  <input
+                                    type="text"
+                                    value={(q.statements || ['', '', ''])[idx] || ''}
+                                    onChange={(e) => {
+                                      const newStatements = [...(q.statements || ['', '', ''])];
+                                      newStatements[idx] = e.target.value;
+                                      handleUpdateQuestion(q.id, 'statements', newStatements);
+                                    }}
+                                    placeholder={`Statement ${['i', 'ii', 'iii'][idx]}`}
+                                    className="w-full px-3 py-2 bg-background border border-foreground/10 rounded-lg focus:border-primary focus:outline-none"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
                           
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {q.options.map((opt, optIdx) => (

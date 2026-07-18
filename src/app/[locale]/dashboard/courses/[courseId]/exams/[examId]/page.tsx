@@ -290,9 +290,20 @@ export default function TakeExamPage() {
           <div key={q.id} className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm">
             <div className="flex justify-between items-start gap-4 mb-6">
               <h3 className="font-bold text-lg leading-relaxed"><span className="text-primary mr-2">{idx + 1}.</span> {q.text}</h3>
-              <span className="shrink-0 bg-foreground/5 px-2 py-1 rounded text-xs font-bold text-foreground/50">{q.marks} Marks</span>
+              <span className="shrink-0 bg-foreground/5 px-2 py-1 rounded text-xs font-bold text-foreground/50">{q.marks} {t('marks')}</span>
             </div>
             
+            {q.isMultipleStatement && q.statements && (
+              <div className="mb-6 pl-6 space-y-2">
+                {q.statements.map((stmt, sIdx) => (
+                  <div key={sIdx} className="flex items-start gap-3 text-foreground/80">
+                    <span className="font-semibold text-foreground/60 min-w-[24px]">{['i.', 'ii.', 'iii.'][sIdx]}</span>
+                    <span className="font-medium">{stmt}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {q.options.map((opt, optIdx) => (
                 <label 

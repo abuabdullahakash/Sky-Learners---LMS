@@ -35,8 +35,6 @@ export default function TeacherSidebar() {
     { name: 'My Courses', href: '/teacher-dashboard/courses', icon: Video },
     { name: 'Students', href: '/teacher-dashboard/students', icon: Users },
     { name: 'Earnings', href: '/teacher-dashboard/earnings', icon: DollarSign },
-    { name: 'My Profile', href: '/teacher-dashboard/profile', icon: UserCircle },
-    { name: t('settings') || 'Settings', href: '/teacher-dashboard/settings', icon: Settings },
   ];
 
   return (

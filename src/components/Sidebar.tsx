@@ -14,7 +14,6 @@ export default function Sidebar() {
     { name: t('overview'), href: '/dashboard', icon: LayoutDashboard },
     { name: t('courses'), href: '/dashboard/courses', icon: BookOpen },
     { name: t('exams'), href: '/dashboard/exams', icon: GraduationCap },
-    { name: t('settings'), href: '/dashboard/settings', icon: Settings },
   ];
 
   return (

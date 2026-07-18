@@ -71,9 +71,9 @@ export default function StudentCourseOverview() {
   }
 
   // Calculate Progress using Marketing Stats
-  const promisedLiveClasses = Number(course.totalLiveClasses) || 0;
+  const promisedVideos = Number(course.totalVideoLessons) || 0;
   const promisedExams = Number(course.totalExams) || 0;
-  const totalPromisedItems = promisedLiveClasses + promisedExams;
+  const totalPromisedItems = promisedVideos + promisedExams;
   const totalCompletedItems = completedCount + completedExamsCount;
   
   const progressPercentage = totalPromisedItems > 0 

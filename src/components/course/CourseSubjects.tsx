@@ -17,6 +17,7 @@ export default function CourseSubjects({ subjects, courseType }: { subjects: Sub
   // Check which columns have at least one value across all subjects
   const hasInstructor = courseType === 'coaching' && subjects.some(s => s.instructor && s.instructor.trim() !== '');
   const hasLiveClasses = subjects.some(s => s.liveClasses && Number(s.liveClasses) > 0);
+  const hasVideos = subjects.some(s => s.videoLessons && Number(s.videoLessons) > 0);
   const hasExams = subjects.some(s => s.exams && Number(s.exams) > 0);
 
   // If there are no stats at all, just render as beautiful badges
@@ -67,6 +68,13 @@ export default function CourseSubjects({ subjects, courseType }: { subjects: Sub
                       </div>
                     </th>
                   )}
+                  {hasVideos && (
+                    <th className="p-4 whitespace-nowrap text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <Video className="w-4 h-4 text-white/90 shrink-0" /> 
+                        {t('videoLessons') || 'Video Lessons'}
+                      </div>
+                    </th>
                   )}
                   {hasExams && (
                     <th className="p-4 whitespace-nowrap text-center">
@@ -106,6 +114,13 @@ export default function CourseSubjects({ subjects, courseType }: { subjects: Sub
                       </td>
                     )}
 
+                    {hasVideos && (
+                      <td className="p-4 text-center text-sm font-medium">
+                        {(sub.videoLessons && Number(sub.videoLessons) > 0) ? (
+                          <span className="inline-flex px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full">{sub.videoLessons}</span>
+                        ) : (
+                          <span className="text-foreground/30">{t('na') || '-'}</span>
+                        )}
                       </td>
                     )}
 

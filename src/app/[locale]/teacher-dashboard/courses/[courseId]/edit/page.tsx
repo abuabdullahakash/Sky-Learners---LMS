@@ -399,6 +399,9 @@ export default function EditCoursePage() {
                         <input type="number" value={sub.liveClasses || ''} onChange={e => updateSubject(idx, 'liveClasses', e.target.value)} placeholder="Live" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" />
                       </div>
                       <div className="w-full md:w-24">
+                        <input type="number" value={sub.videoLessons || ''} onChange={e => updateSubject(idx, 'videoLessons', e.target.value)} placeholder="Videos" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" />
+                      </div>
+                      <div className="w-full md:w-24">
                         <input type="number" value={sub.exams || ''} onChange={e => updateSubject(idx, 'exams', e.target.value)} placeholder="Exams" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" />
                       </div>
                     </div>
@@ -417,6 +420,10 @@ export default function EditCoursePage() {
                 <div>
                   <label className="block text-sm font-medium mb-1">Total Live Classes</label>
                   <input type="number" value={totalLiveClasses} onChange={e => setTotalLiveClasses(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Total Videos</label>
+                  <input type="number" value={totalVideoLessons} onChange={e => setTotalVideoLessons(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Total Exams</label>

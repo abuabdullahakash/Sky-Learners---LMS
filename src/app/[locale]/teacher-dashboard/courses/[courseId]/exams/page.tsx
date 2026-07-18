@@ -121,13 +121,13 @@ export default function CourseExamsPage() {
       return;
     }
 
+    let cleanedQuestions: Question[] = [];
     if (examType === 'builtin') {
       if (questions.length === 0) {
         setError('Please add at least one question.');
         return;
       }
       // Validate and clean questions
-      const cleanedQuestions: Question[] = [];
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
         if (!q.text.trim()) {

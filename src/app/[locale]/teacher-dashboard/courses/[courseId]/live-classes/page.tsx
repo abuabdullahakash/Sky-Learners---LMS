@@ -335,11 +335,13 @@ export default function CourseLiveClassesPage() {
           className={`px-4 py-2 flex items-center gap-2 font-bold rounded transition-colors ${
             cls.isLive 
               ? 'bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white' 
-              : 'bg-green-500/10 text-green-600 dark:text-green-400 hover:bg-green-500 hover:text-white'
+              : cls.liveEndedAt
+                ? 'bg-foreground/5 text-foreground/50 border border-foreground/10 hover:bg-orange-500/10 hover:text-orange-500 hover:border-orange-500/30'
+                : 'bg-green-500/10 text-green-600 dark:text-green-400 hover:bg-green-500 hover:text-white'
           }`}
         >
           {cls.isLive ? <StopCircle className="w-5 h-5" /> : <PlayCircle className="w-5 h-5" />}
-          {cls.isLive ? 'End Live' : 'Go Live Now'}
+          {cls.isLive ? 'End Live' : cls.liveEndedAt ? 'Go Live Again' : 'Go Live Now'}
         </button>
         <button onClick={() => handleOpenForm(cls, cls.moduleId)} className="p-2 text-foreground/40 hover:text-blue-500 hover:bg-blue-500/10 rounded transition-colors" title="Edit">
           <Edit className="w-5 h-5" />
@@ -443,24 +445,24 @@ export default function CourseLiveClassesPage() {
           const isExpanded = expandedModules.includes(module.id);
           return (
             <div key={module.id} className="bg-background rounded-none border border-foreground/10 overflow-hidden shadow-sm transition-all duration-300">
-              <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-2 flex items-center gap-3 border-b border-transparent transition-colors">
+              <div className="bg-orange-500/15 dark:bg-orange-500/10 border-l-4 border-orange-500 p-2 flex items-center gap-3 transition-colors">
                 <button 
                   onClick={() => toggleModule(module.id)}
-                  className="p-2 hover:bg-white/20 rounded-lg transition-colors flex items-center justify-center text-white"
+                  className="p-2 hover:bg-orange-500/20 rounded-lg transition-colors flex items-center justify-center text-foreground/70"
                 >
                   {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                 </button>
-                <GripVertical className="text-white/70 cursor-move hidden sm:block" />
-                <span className="font-bold text-white whitespace-nowrap hidden sm:block">Module {mIndex + 1}:</span>
+                <GripVertical className="text-foreground/30 cursor-move hidden sm:block" />
+                <span className="font-bold text-orange-500 whitespace-nowrap hidden sm:block">Module {mIndex + 1}:</span>
                 <input 
                   type="text" value={module.title}
                   onChange={(e) => handleUpdateModule(module.id, e.target.value)}
-                  className="flex-1 bg-transparent font-bold focus:outline-none border-b border-transparent focus:border-white/50 py-1 text-white placeholder-white/70"
+                  className="flex-1 bg-transparent font-bold focus:outline-none border-b border-transparent focus:border-orange-500/50 py-1 text-foreground"
                 />
-                <button onClick={() => handleOpenForm(undefined, module.id)} className="text-sm px-3 py-1.5 bg-white text-orange-500 rounded-lg hover:bg-white/90 font-bold transition-colors shadow-sm ml-2 whitespace-nowrap flex items-center gap-1">
+                <button onClick={() => handleOpenForm(undefined, module.id)} className="text-sm px-3 py-1.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-bold transition-colors shadow-sm ml-2 whitespace-nowrap flex items-center gap-1">
                   <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Add Class</span>
                 </button>
-                <button onClick={() => handleDeleteModule(module.id)} className="p-2 text-white hover:bg-white/20 rounded-lg transition-colors ml-1" title="Delete Module">
+                <button onClick={() => handleDeleteModule(module.id)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors ml-1" title="Delete Module">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -480,10 +482,10 @@ export default function CourseLiveClassesPage() {
 
         {generalClasses.length > 0 && (
           <div className="bg-background rounded-none border border-foreground/10 overflow-hidden shadow-sm transition-all duration-300">
-            <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-4 flex items-center gap-3 border-b border-transparent">
-              <div className="p-1"><Video className="w-5 h-5 text-white/80" /></div>
-              <h3 className="font-bold text-lg text-white">General Classes</h3>
-              <span className="text-sm font-semibold text-orange-500 bg-white px-2 py-0.5 rounded-full ml-auto">
+            <div className="bg-orange-500/15 dark:bg-orange-500/10 border-l-4 border-orange-500 text-foreground p-4 flex items-center gap-3 border-b border-foreground/10">
+              <div className="p-1"><Video className="w-5 h-5 text-orange-500" /></div>
+              <h3 className="font-bold text-lg">General Classes</h3>
+              <span className="text-sm font-semibold text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-full ml-auto">
                 {generalClasses.length}
               </span>
             </div>

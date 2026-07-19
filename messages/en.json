@@ -264,7 +264,9 @@
       "autoStartNote": "Button will activate automatically when class starts.",
       "manualStartNote": "Wait for the teacher to start the live session.",
       "loading": "Loading live schedule...",
-      "generalClasses": "General Classes"
+      "generalClasses": "General Classes",
+      "watchRecording": "Watch Recording",
+      "goLiveAgain": "Go Live Again"
     }
   },
   "Footer": {

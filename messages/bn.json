@@ -264,7 +264,9 @@
       "autoStartNote": "নির্ধারিত সময়ে বাটনটি অটোমেটিকভাবে চালু হবে",
       "manualStartNote": "শিক্ষক নিজে থেকে লাইভটি শুরু করবেন",
       "loading": "লাইভ ক্লাস লোড হচ্ছে...",
-      "generalClasses": "সাধারণ ক্লাসসমূহ"
+      "generalClasses": "সাধারণ ক্লাসসমূহ",
+      "watchRecording": "রেকর্ডিং দেখুন",
+      "goLiveAgain": "আবার লাইভ করুন"
     }
   },
   "Footer": {

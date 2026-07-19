@@ -120,6 +120,18 @@ export default function StudentLiveClasses() {
     window.open(cls.meetLink, '_blank');
   };
 
+  // Detect if link is from a platform that keeps public recordings
+  const getRecordingPlatform = (url: string): 'facebook' | 'youtube' | null => {
+    if (!url) return null;
+    try {
+      const parsed = new URL(url);
+      const host = parsed.hostname.replace('www.', '');
+      if (host === 'facebook.com' || host === 'fb.watch' || host === 'fb.com') return 'facebook';
+      if (host === 'youtube.com' || host === 'youtu.be') return 'youtube';
+    } catch { /* invalid url */ }
+    return null;
+  };
+
   const toggleModule = (moduleId: string) => {
     setExpandedModules(prev => 
       prev.includes(moduleId) 
@@ -200,21 +212,47 @@ export default function StudentLiveClasses() {
         
         <div className="shrink-0 flex flex-col items-center gap-2">
           {isEnded ? (
-            <div className="flex flex-col items-center bg-gradient-to-r from-orange-500 to-red-500 px-6 py-3 rounded-none shadow-sm">
-              <span className="text-sm text-white/90 font-bold mb-1">{t('classDuration')}</span>
-              <span className="text-xl font-extrabold text-white font-mono">
-                {cls.liveStartedAt && cls.liveEndedAt ? (
-                  (() => {
-                    const diff = Math.floor((cls.liveEndedAt - cls.liveStartedAt) / 1000);
-                    const h = Math.floor(diff / 3600);
-                    const m = Math.floor((diff % 3600) / 60);
-                    const s = diff % 60;
-                      if (h > 0) return `${h}h ${m}m ${s}s`;
-                      return `${m}m ${s}s`;
-                    })()
-                  ) : t('ended')}
-              </span>
-            </div>
+            (() => {
+              const platform = getRecordingPlatform(cls.meetLink);
+              return (
+                <>
+                  <div className="flex flex-col items-center bg-gradient-to-r from-orange-500/80 to-red-500/80 px-6 py-3 rounded-none shadow-sm">
+                    <span className="text-sm text-white/90 font-bold mb-1">{t('classDuration')}</span>
+                    <span className="text-xl font-extrabold text-white font-mono">
+                      {cls.liveStartedAt && cls.liveEndedAt ? (
+                        (() => {
+                          const diff = Math.floor((cls.liveEndedAt - cls.liveStartedAt) / 1000);
+                          const h = Math.floor(diff / 3600);
+                          const m = Math.floor((diff % 3600) / 60);
+                          const s = diff % 60;
+                            if (h > 0) return `${h}h ${m}m ${s}s`;
+                            return `${m}m ${s}s`;
+                          })()
+                        ) : t('ended')}
+                    </span>
+                  </div>
+                  {platform && (
+                    <a
+                      href={cls.meetLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`mt-1 px-5 py-2 flex items-center gap-2 font-bold text-sm rounded transition-all hover:-translate-y-0.5 ${
+                        platform === 'facebook'
+                          ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm shadow-blue-500/30'
+                          : 'bg-red-600 text-white hover:bg-red-700 shadow-sm shadow-red-500/30'
+                      }`}
+                    >
+                      {platform === 'facebook' ? (
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                      )}
+                      {t('watchRecording')}
+                    </a>
+                  )}
+                </>
+              );
+            })()
           ) : canJoin ? (
             <button 
               onClick={() => handleJoinLive(cls)}
@@ -299,13 +337,13 @@ export default function StudentLiveClasses() {
               <div key={module.id} className="bg-white dark:bg-background rounded-none border border-gray-200 dark:border-foreground/10 overflow-hidden shadow-sm transition-all duration-300">
                 <button 
                   onClick={() => toggleModule(module.id)}
-                  className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white p-4 flex items-center gap-4 hover:from-orange-600 hover:to-red-600 transition-colors text-left"
+                  className="w-full bg-orange-500/10 dark:bg-orange-500/10 border-l-4 border-orange-500 p-4 flex items-center gap-4 hover:bg-orange-500/15 dark:hover:bg-orange-500/15 transition-colors text-left"
                 >
-                  <div className="p-1 bg-white/20 rounded shadow-sm text-white">
+                  <div className="p-1 bg-orange-500/20 rounded text-orange-600 dark:text-orange-400">
                     {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                   </div>
-                  <h3 className="font-bold text-lg text-white flex-1">{module.title}</h3>
-                  <span className="text-sm font-semibold text-orange-500 bg-white px-3 py-1 rounded-full">
+                  <h3 className="font-bold text-lg text-gray-900 dark:text-white flex-1">{module.title}</h3>
+                  <span className="text-sm font-semibold text-orange-500 bg-orange-500/10 px-3 py-1 rounded-full">
                     {moduleClasses.length} {t('liveSessions')}
                   </span>
                 </button>
@@ -321,12 +359,12 @@ export default function StudentLiveClasses() {
 
           {generalClasses.length > 0 && (
             <div className="bg-white dark:bg-background rounded-none border border-gray-200 dark:border-foreground/10 overflow-hidden shadow-sm transition-all duration-300">
-              <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-4 flex items-center gap-4 border-b border-transparent">
-                <div className="p-1 bg-white/20 rounded shadow-sm text-white">
+              <div className="bg-orange-500/10 dark:bg-orange-500/10 border-l-4 border-orange-500 text-foreground p-4 flex items-center gap-4 border-b border-gray-200 dark:border-foreground/10">
+                <div className="p-1 bg-orange-500/20 rounded text-orange-600 dark:text-orange-400">
                   <Video className="w-5 h-5" />
                 </div>
-                <h3 className="font-bold text-lg text-white flex-1">{t('generalClasses')}</h3>
-                <span className="text-sm font-semibold text-orange-500 bg-white px-3 py-1 rounded-full">
+                <h3 className="font-bold text-lg text-gray-900 dark:text-white flex-1">{t('generalClasses')}</h3>
+                <span className="text-sm font-semibold text-orange-500 bg-orange-500/10 px-3 py-1 rounded-full">
                   {generalClasses.length} {t('liveSessions')}
                 </span>
               </div>

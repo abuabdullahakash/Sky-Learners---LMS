@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Video, Plus, Trash2, Calendar, Clock, Link as LinkIcon, Save, Edit, PlayCircle, StopCircle, ChevronDown, ChevronRight, GripVertical } from 'lucide-react';
+import { Video, Plus, Trash2, Calendar, Clock, Link as LinkIcon, Save, Edit, PlayCircle, StopCircle, ChevronDown, ChevronRight, GripVertical, Filter } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 
 type LiveClass = {
@@ -33,6 +33,7 @@ export default function CourseLiveClassesPage() {
   const [liveClasses, setLiveClasses] = useState<LiveClass[]>([]);
   const [liveModules, setLiveModules] = useState<{id: string, title: string}[]>([]);
   const [expandedModules, setExpandedModules] = useState<string[]>([]);
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
 
   // Form State
   const [isAdding, setIsAdding] = useState(false);
@@ -365,6 +366,38 @@ export default function CourseLiveClassesPage() {
         <div className="flex gap-3">
           {!isAdding && (
             <>
+              {liveModules.length > 0 && (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowFilterMenu(p => !p)}
+                    className="px-4 py-2.5 bg-background border border-foreground/10 text-foreground rounded font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap"
+                    title="Jump to module"
+                  >
+                    <Filter className="w-4 h-4 text-orange-500" />
+                    <span className="hidden md:inline text-sm">Jump to Module</span>
+                  </button>
+                  {showFilterMenu && (
+                    <div className="absolute right-0 top-full mt-2 bg-background border border-foreground/10 rounded shadow-lg z-50 min-w-[200px] py-1 animate-in fade-in slide-in-from-top-2 duration-150">
+                      {liveModules.map((m, i) => (
+                        <button
+                          key={m.id}
+                          onClick={() => {
+                            setShowFilterMenu(false);
+                            setExpandedModules(prev => prev.includes(m.id) ? prev : [...prev, m.id]);
+                            setTimeout(() => {
+                              document.getElementById(`module-${m.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 100);
+                          }}
+                          className="w-full text-left px-4 py-2.5 text-sm hover:bg-orange-500/10 hover:text-orange-500 transition-colors flex items-center gap-2"
+                        >
+                          <span className="text-xs font-bold text-orange-400 w-16 shrink-0">Module {i + 1}</span>
+                          <span className="font-medium truncate">{m.title}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
               <button onClick={handleAddModule} className="px-5 py-2.5 bg-background border border-foreground/10 text-foreground rounded font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap">
                 <Plus className="w-5 h-5" /> Add Module
               </button>
@@ -444,7 +477,7 @@ export default function CourseLiveClassesPage() {
           const moduleClasses = liveClasses.filter(c => c.moduleId === module.id);
           const isExpanded = expandedModules.includes(module.id);
           return (
-            <div key={module.id} className="bg-background rounded-none border border-foreground/10 overflow-hidden shadow-sm transition-all duration-300">
+            <div id={`module-${module.id}`} key={module.id} className="bg-background rounded-none border-2 border-orange-500/30 hover:border-orange-500/50 overflow-hidden shadow-sm transition-all duration-300">
               <div className="bg-orange-500/15 dark:bg-orange-500/10 border-l-4 border-orange-500 p-2 flex items-center gap-3 transition-colors">
                 <button 
                   onClick={() => toggleModule(module.id)}

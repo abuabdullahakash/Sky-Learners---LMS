@@ -161,7 +161,7 @@ export default function StudentLiveClasses() {
     return (
       <div 
         key={cls.id} 
-        className={`bg-white dark:bg-foreground/5 border border-gray-100 dark:border-foreground/10 p-6 rounded-xl shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-6 group animate-in fade-in slide-in-from-bottom-4 ${canJoin ? 'hover:border-orange-500/50 hover:shadow-md ring-1 ring-transparent hover:ring-orange-500/20' : 'opacity-90'} ${isEnded ? 'opacity-70 grayscale-[0.2]' : ''}`}
+        className={`bg-white dark:bg-foreground/5 border border-gray-200 dark:border-foreground/10 p-6 rounded-none shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-6 group animate-in fade-in slide-in-from-bottom-4 ${canJoin ? 'hover:border-orange-500/50 hover:shadow-md' : 'opacity-90'} ${isEnded ? 'opacity-80' : ''}`}
         style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
       >
         <div className="flex-1">
@@ -210,15 +210,15 @@ export default function StudentLiveClasses() {
           </div>
         </div>
         
-        <div className="shrink-0 flex flex-col items-center gap-2">
+        <div className="shrink-0 flex flex-col items-center gap-0">
           {isEnded ? (
             (() => {
               const platform = getRecordingPlatform(cls.meetLink);
               return (
-                <>
-                  <div className="flex flex-col items-center bg-gradient-to-r from-orange-500/80 to-red-500/80 px-6 py-3 rounded-none shadow-sm">
-                    <span className="text-sm text-white/90 font-bold mb-1">{t('classDuration')}</span>
-                    <span className="text-xl font-extrabold text-white font-mono">
+                <div className="flex flex-col items-stretch overflow-hidden rounded-none shadow-sm">
+                  <div className="flex flex-col items-center bg-gradient-to-r from-orange-500/80 to-red-500/80 px-5 py-2">
+                    <span className="text-xs text-white/80 font-bold">{t('classDuration')}</span>
+                    <span className="text-lg font-extrabold text-white font-mono leading-tight">
                       {cls.liveStartedAt && cls.liveEndedAt ? (
                         (() => {
                           const diff = Math.floor((cls.liveEndedAt - cls.liveStartedAt) / 1000);
@@ -236,21 +236,21 @@ export default function StudentLiveClasses() {
                       href={cls.meetLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`mt-1 px-5 py-2 flex items-center gap-2 font-bold text-sm rounded transition-all hover:-translate-y-0.5 ${
+                      className={`flex items-center justify-center gap-1.5 px-4 py-1.5 font-bold text-xs transition-all ${
                         platform === 'facebook'
-                          ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm shadow-blue-500/30'
-                          : 'bg-red-600 text-white hover:bg-red-700 shadow-sm shadow-red-500/30'
+                          ? 'bg-blue-600 text-white hover:bg-blue-700'
+                          : 'bg-[#FF0000] text-white hover:bg-red-700'
                       }`}
                     >
                       {platform === 'facebook' ? (
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                       ) : (
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                       )}
                       {t('watchRecording')}
                     </a>
                   )}
-                </>
+                </div>
               );
             })()
           ) : canJoin ? (
@@ -334,7 +334,7 @@ export default function StudentLiveClasses() {
             if (moduleClasses.length === 0) return null; // Don't show empty modules for students
             
             return (
-              <div key={module.id} className="bg-white dark:bg-background rounded-none border border-gray-200 dark:border-foreground/10 overflow-hidden shadow-sm transition-all duration-300">
+              <div key={module.id} className="bg-white dark:bg-background rounded-none border-2 border-orange-500/30 hover:border-orange-500/50 overflow-hidden shadow-sm transition-all duration-300">
                 <button 
                   onClick={() => toggleModule(module.id)}
                   className="w-full bg-orange-500/10 dark:bg-orange-500/10 border-l-4 border-orange-500 p-4 flex items-center gap-4 hover:bg-orange-500/15 dark:hover:bg-orange-500/15 transition-colors text-left"

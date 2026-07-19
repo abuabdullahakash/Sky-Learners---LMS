@@ -34,6 +34,7 @@ export default function CourseLiveClassesPage() {
   const [liveModules, setLiveModules] = useState<{id: string, title: string}[]>([]);
   const [expandedModules, setExpandedModules] = useState<string[]>([]);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [moduleOrder, setModuleOrder] = useState<string[]>([]);
 
   // Form State
   const [isAdding, setIsAdding] = useState(false);
@@ -59,7 +60,9 @@ export default function CourseLiveClassesPage() {
           const data = docSnap.data();
           setCourse(data);
           setLiveClasses(data.liveClasses || []);
-          setLiveModules(data.liveModules || []);
+          const modules = data.liveModules || [];
+          setLiveModules(modules);
+          setModuleOrder(modules.map((m: {id: string}) => m.id));
         } else {
           router.push('/teacher-dashboard/courses');
         }
@@ -358,54 +361,78 @@ export default function CourseLiveClassesPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="flex justify-between items-start md:items-center flex-col md:flex-row gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">Live Classes</h1>
-          <p className="text-foreground/70">Schedule and manage live sessions via Google Meet, Zoom, or YouTube.</p>
-        </div>
-        <div className="flex gap-3">
-          {!isAdding && (
-            <>
-              {liveModules.length > 0 && (
-                <div className="relative">
-                  <button
-                    onClick={() => setShowFilterMenu(p => !p)}
-                    className="px-4 py-2.5 bg-background border border-foreground/10 text-foreground rounded font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap"
-                    title="Jump to module"
-                  >
-                    <Filter className="w-4 h-4 text-orange-500" />
-                    <span className="hidden md:inline text-sm">Jump to Module</span>
-                  </button>
-                  {showFilterMenu && (
-                    <div className="absolute right-0 top-full mt-2 bg-background border border-foreground/10 rounded shadow-lg z-50 min-w-[200px] py-1 animate-in fade-in slide-in-from-top-2 duration-150">
-                      {liveModules.map((m, i) => (
-                        <button
-                          key={m.id}
-                          onClick={() => {
-                            setShowFilterMenu(false);
-                            setExpandedModules(prev => prev.includes(m.id) ? prev : [...prev, m.id]);
-                            setTimeout(() => {
-                              document.getElementById(`module-${m.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }, 100);
-                          }}
-                          className="w-full text-left px-4 py-2.5 text-sm hover:bg-orange-500/10 hover:text-orange-500 transition-colors flex items-center gap-2"
-                        >
-                          <span className="text-xs font-bold text-orange-400 w-16 shrink-0">Module {i + 1}</span>
-                          <span className="font-medium truncate">{m.title}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+
+      {/* Hero Section */}
+      <div className="relative w-full rounded-none overflow-hidden mb-2 shadow-lg">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-orange-950/40 to-gray-900" />
+        <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(circle at 20% 50%, #f97316 0%, transparent 50%), radial-gradient(circle at 80% 20%, #ef4444 0%, transparent 50%)'}} />
+        <div className="absolute top-0 right-0 w-64 h-64 opacity-5" style={{background: 'repeating-linear-gradient(45deg, #f97316 0px, #f97316 1px, transparent 1px, transparent 12px)'}} />
+        <div className="relative z-10 px-8 py-7 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-2 py-0.5 bg-orange-500/20 border border-orange-500/30 text-orange-400 text-xs font-bold rounded uppercase tracking-widest">
+                Teacher Dashboard
+              </span>
+            </div>
+            <h1 className="text-2xl md:text-3xl font-extrabold text-white mb-1">Live Classes</h1>
+            <p className="text-gray-400 text-sm">Schedule and manage live sessions via Google Meet, Zoom, or YouTube.</p>
+            <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
+              <span className="flex items-center gap-1.5"><Video className="w-3.5 h-3.5 text-orange-500" /> {liveClasses.length} Classes</span>
+              <span className="flex items-center gap-1.5"><Plus className="w-3.5 h-3.5 text-orange-500" /> {liveModules.length} Modules</span>
+              {liveClasses.filter(c => c.isLive).length > 0 && (
+                <span className="flex items-center gap-1.5 text-red-400 animate-pulse">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                  {liveClasses.filter(c => c.isLive).length} Live Now
+                </span>
               )}
-              <button onClick={handleAddModule} className="px-5 py-2.5 bg-background border border-foreground/10 text-foreground rounded font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap">
-                <Plus className="w-5 h-5" /> Add Module
-              </button>
-              <button onClick={() => handleOpenForm()} className="px-5 py-2.5 bg-orange-500 text-white rounded font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2 whitespace-nowrap">
-                <Plus className="w-5 h-5" /> Schedule Class
-              </button>
-            </>
-          )}
+            </div>
+          </div>
+          <div className="flex gap-3 shrink-0">
+            {!isAdding && (
+              <>
+                {liveModules.length > 0 && (
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowFilterMenu(p => !p)}
+                      className="p-2.5 bg-white/10 border border-white/20 text-white rounded hover:bg-white/20 transition-colors shadow-sm"
+                      title="Jump to Module"
+                    >
+                      <Filter className="w-5 h-5 text-orange-400" />
+                    </button>
+                    {showFilterMenu && (
+                      <div className="absolute right-0 top-full mt-2 bg-background border border-foreground/10 rounded shadow-xl z-50 min-w-[220px] py-1 animate-in fade-in slide-in-from-top-2 duration-150">
+                        <div className="px-3 py-2 text-xs font-bold text-foreground/40 uppercase tracking-widest border-b border-foreground/10">Jump to Module</div>
+                        {liveModules.map((m, i) => (
+                          <button
+                            key={m.id}
+                            onClick={() => {
+                              setShowFilterMenu(false);
+                              // Move selected module to top of display order
+                              setModuleOrder(prev => [m.id, ...prev.filter(id => id !== m.id)]);
+                              setExpandedModules(prev => [m.id, ...prev.filter(id => id !== m.id)]);
+                              setTimeout(() => {
+                                document.getElementById(`module-${m.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                              }, 150);
+                            }}
+                            className="w-full text-left px-4 py-2.5 text-sm hover:bg-orange-500/10 hover:text-orange-500 transition-colors flex items-center gap-2"
+                          >
+                            <span className="text-xs font-bold text-orange-400 w-16 shrink-0">Module {i + 1}</span>
+                            <span className="font-medium truncate">{m.title}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+                <button onClick={handleAddModule} className="px-4 py-2.5 bg-white/10 border border-white/20 text-white rounded font-bold hover:bg-white/20 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap text-sm">
+                  <Plus className="w-4 h-4" /> Add Module
+                </button>
+                <button onClick={() => handleOpenForm()} className="px-4 py-2.5 bg-orange-500 text-white rounded font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2 whitespace-nowrap text-sm">
+                  <Plus className="w-4 h-4" /> Schedule Class
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -473,12 +500,18 @@ export default function CourseLiveClassesPage() {
       )}
 
       <div className="space-y-4">
-        {liveModules.map((module, mIndex) => {
+        {(moduleOrder.length > 0 ? moduleOrder.map(id => liveModules.find(m => m.id === id)).filter(Boolean) : liveModules).map((module, mIndex) => {
+          if (!module) return null;
           const moduleClasses = liveClasses.filter(c => c.moduleId === module.id);
           const isExpanded = expandedModules.includes(module.id);
+          const hasLiveClass = moduleClasses.some(c => c.isLive);
           return (
-            <div id={`module-${module.id}`} key={module.id} className="bg-background rounded-none border-2 border-orange-500/30 hover:border-orange-500/50 overflow-hidden shadow-sm transition-all duration-300">
-              <div className="bg-orange-500/15 dark:bg-orange-500/10 border-l-4 border-orange-500 p-2 flex items-center gap-3 transition-colors">
+            <div id={`module-${module.id}`} key={module.id} className={`bg-background rounded-none overflow-hidden shadow-sm transition-all duration-300 border-2 ${
+              hasLiveClass ? 'border-red-500/50' : 'border-orange-500/30 hover:border-orange-500/50'
+            }`}>
+              <div className={`border-l-4 p-2 flex items-center gap-3 transition-colors ${
+                hasLiveClass ? 'bg-red-500/10 border-red-500' : 'bg-orange-500/15 dark:bg-orange-500/10 border-orange-500'
+              }`}>
                 <button 
                   onClick={() => toggleModule(module.id)}
                   className="p-2 hover:bg-orange-500/20 rounded-lg transition-colors flex items-center justify-center text-foreground/70"
@@ -492,6 +525,19 @@ export default function CourseLiveClassesPage() {
                   onChange={(e) => handleUpdateModule(module.id, e.target.value)}
                   className="flex-1 bg-transparent font-bold focus:outline-none border-b border-transparent focus:border-orange-500/50 py-1 text-foreground"
                 />
+                {/* Live indicator */}
+                {hasLiveClass && (
+                  <span className="flex items-center gap-1 text-xs font-bold text-red-500 animate-pulse mr-1">
+                    <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span>
+                    LIVE
+                  </span>
+                )}
+                {/* Class count badge */}
+                {moduleClasses.length > 0 && (
+                  <span className="text-xs font-bold bg-orange-500/10 text-orange-500 px-2 py-0.5 rounded-full border border-orange-500/20">
+                    {moduleClasses.length} class{moduleClasses.length > 1 ? 'es' : ''}
+                  </span>
+                )}
                 <button onClick={() => handleOpenForm(undefined, module.id)} className="text-sm px-3 py-1.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-bold transition-colors shadow-sm ml-2 whitespace-nowrap flex items-center gap-1">
                   <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Add Class</span>
                 </button>
@@ -500,7 +546,11 @@ export default function CourseLiveClassesPage() {
                 </button>
               </div>
               
-              {isExpanded && (
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+                }`}
+              >
                 <div className="p-4 space-y-3">
                   {moduleClasses.length === 0 ? (
                     <div className="text-center p-4 text-foreground/40 text-sm">No classes added to this module yet.</div>
@@ -508,7 +558,7 @@ export default function CourseLiveClassesPage() {
                     moduleClasses.map(cls => renderClassCard(cls))
                   )}
                 </div>
-              )}
+              </div>
             </div>
           );
         })}

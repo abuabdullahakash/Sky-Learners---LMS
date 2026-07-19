@@ -383,11 +383,15 @@ export default function StudentLiveClasses() {
                   </span>
                 </button>
                 
-                {isExpanded && (
+                <div
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                    isExpanded ? 'max-h-[3000px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
+                  }`}
+                >
                   <div className="p-4 md:p-6 space-y-4 bg-gray-50/50 dark:bg-background/50 border-t border-gray-200 dark:border-foreground/10">
                     {moduleClasses.map((cls, index) => renderClassCard(cls, index))}
                   </div>
-                )}
+                </div>
               </div>
             );
           })}

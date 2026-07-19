@@ -58,6 +58,15 @@ export default function StudentLiveClasses() {
     return currentTime >= classDateTime;
   };
 
+  const formatTime12Hour = (timeStr: string) => {
+    if (!timeStr) return '';
+    const [h, m] = timeStr.split(':');
+    const hour = parseInt(h, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12;
+    return `${formattedHour}:${m} ${ampm}`;
+  };
+
   const formatLiveDuration = (startedAt: number) => {
     const diff = Math.floor((currentTime.getTime() - startedAt) / 1000);
     if (diff < 0) return "00:00";
@@ -172,7 +181,11 @@ export default function StudentLiveClasses() {
                     </div>
                     <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-foreground/5 px-3 py-1.5 rounded">
                       <Clock className="w-4 h-4 text-orange-500" /> 
-                      <span>{cls.time}</span>
+                      <span>{formatTime12Hour(cls.time)}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-foreground/5 px-3 py-1.5 rounded">
+                      <Users className="w-4 h-4 text-orange-500" /> 
+                      <span>Interactive Session</span>
                     </div>
                   </div>
                 </div>

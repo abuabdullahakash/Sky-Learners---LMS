@@ -97,6 +97,15 @@ export default function StudentCourseOverview() {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
+  const formatTime12Hour = (timeStr: string) => {
+    if (!timeStr) return '';
+    const [h, m] = timeStr.split(':');
+    const hour = parseInt(h, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12;
+    return `${formattedHour}:${m} ${ampm}`;
+  };
+
   if (!course) {
     return <div className="text-center py-20 text-gray-500">Loading course overview...</div>;
   }
@@ -258,9 +267,8 @@ export default function StudentCourseOverview() {
                     <Calendar className="w-4 h-4 text-orange-500" />
                     <span>{nextClass.date}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-orange-500" />
-                    <span>{nextClass.time}</span>
+                  <div className="flex items-center gap-2 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 px-3 py-1.5 rounded text-sm font-bold">
+                    <Clock className="w-4 h-4" /> {formatTime12Hour(nextClass.time)}
                   </div>
                 </div>
               </div>

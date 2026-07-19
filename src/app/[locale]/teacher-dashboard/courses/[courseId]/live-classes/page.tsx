@@ -148,14 +148,31 @@ export default function CourseLiveClassesPage() {
     const updatedStatus = !cls.isLive;
     const updatedClasses = liveClasses.map(c => {
       if (c.id === cls.id) {
-        return { 
-          ...c, 
-          isLive: updatedStatus,
-          liveStartedAt: updatedStatus ? Date.now() : c.liveStartedAt,
-          liveEndedAt: !updatedStatus ? Date.now() : undefined
-        };
+        const newClass = { ...c, isLive: updatedStatus };
+        if (updatedStatus) {
+          newClass.liveStartedAt = Date.now();
+          delete newClass.liveEndedAt;
+        } else {
+          newClass.liveEndedAt = Date.now();
+        }
+        
+        // Firebase does not allow undefined values, so we clean the object
+        Object.keys(newClass).forEach(key => {
+          if (newClass[key as keyof LiveClass] === undefined) {
+            delete newClass[key as keyof LiveClass];
+          }
+        });
+        
+        return newClass;
       }
-      return c;
+      // Clean other objects too just in case
+      const cleanC = { ...c };
+      Object.keys(cleanC).forEach(key => {
+        if (cleanC[key as keyof LiveClass] === undefined) {
+          delete cleanC[key as keyof LiveClass];
+        }
+      });
+      return cleanC;
     });
     
     try {
@@ -174,6 +191,15 @@ export default function CourseLiveClassesPage() {
     const m = Math.floor(diff / 60);
     const s = diff % 60;
     return `${m}m ${s}s`;
+  };
+
+  const formatTime12Hour = (timeStr: string) => {
+    if (!timeStr) return '';
+    const [h, m] = timeStr.split(':');
+    const hour = parseInt(h, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12;
+    return `${formattedHour}:${m} ${ampm}`;
   };
 
   return (
@@ -260,7 +286,7 @@ export default function CourseLiveClassesPage() {
                 </div>
                 <div className="flex flex-wrap gap-4 text-sm text-foreground/70 font-medium">
                   <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4 text-orange-500" /> {cls.date}</span>
-                  <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-orange-500" /> {cls.time}</span>
+                  <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-orange-500" /> {formatTime12Hour(cls.time)}</span>
                   {cls.isAutoStart ? (
                     <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
                       <span className="w-2 h-2 rounded-full bg-green-500"></span> Auto-Start ON

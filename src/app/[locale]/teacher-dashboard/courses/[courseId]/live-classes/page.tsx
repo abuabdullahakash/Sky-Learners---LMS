@@ -199,8 +199,8 @@ export default function CourseLiveClassesPage() {
           
           {error && <div className="p-3 bg-red-500/10 text-red-500 rounded text-sm font-medium">{error}</div>}
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
               <label className="block text-sm font-medium mb-1">Topic / Title <span className="text-red-500">*</span></label>
               <input type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="e.g. Chapter 1 Problem Solving" className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded focus:border-orange-500" required />
             </div>
@@ -209,23 +209,25 @@ export default function CourseLiveClassesPage() {
               <input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded focus:border-orange-500" required />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Time <span className="text-red-500">*</span></label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium">Time <span className="text-red-500">*</span></label>
+                
+                <label className="flex items-center gap-1.5 cursor-pointer group">
+                  <span className="text-[11px] font-medium text-foreground/60 group-hover:text-foreground transition-colors">
+                    Auto-start?
+                  </span>
+                  <div className={`w-7 h-4 rounded-full transition-colors relative flex-shrink-0 ${isAutoStart ? 'bg-orange-500' : 'bg-foreground/20'}`}>
+                    <div className={`w-3 h-3 rounded-full bg-white absolute top-0.5 transition-transform ${isAutoStart ? 'translate-x-3.5' : 'translate-x-0.5'}`}></div>
+                  </div>
+                  <span className={`text-[11px] font-bold transition-colors w-20 text-left ${isAutoStart ? 'text-orange-500' : 'text-foreground/50'}`}>
+                    {isAutoStart ? 'Yes (Auto)' : 'No (Manual)'}
+                  </span>
+                  <input type="checkbox" checked={isAutoStart} onChange={e => setIsAutoStart(e.target.checked)} className="sr-only" />
+                </label>
+              </div>
               <input type="time" value={newTime} onChange={e => setNewTime(e.target.value)} className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded focus:border-orange-500" required />
             </div>
-            <div className="flex flex-col justify-center">
-              <label className="block text-sm font-medium mb-1">Auto-start at time?</label>
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <div className={`w-12 h-6 rounded-full transition-colors relative ${isAutoStart ? 'bg-orange-500' : 'bg-foreground/20'}`}>
-                  <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-transform ${isAutoStart ? 'translate-x-7' : 'translate-x-1'}`}></div>
-                </div>
-                <span className="text-sm font-medium text-foreground/70 group-hover:text-foreground transition-colors">
-                  {isAutoStart ? 'Yes (Auto-activate Join)' : 'No (Manual Start)'}
-                </span>
-              </label>
-              {/* Invisible checkbox for accessibility */}
-              <input type="checkbox" checked={isAutoStart} onChange={e => setIsAutoStart(e.target.checked)} className="sr-only" />
-            </div>
-            <div className="md:col-span-3">
+            <div className="md:col-span-2">
               <label className="block text-sm font-medium mb-1">Meeting/Live Link (Zoom / Meet / YouTube / FB) <span className="text-red-500">*</span></label>
               <input type="url" value={newLink} onChange={e => setNewLink(e.target.value)} placeholder="https://..." className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded focus:border-orange-500" required />
             </div>

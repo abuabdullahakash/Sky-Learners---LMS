@@ -32,17 +32,17 @@ export default function StudentsPage() {
       if (!user) return;
       setIsLoading(true);
       try {
-        // 1. Fetch real courses created by this teacher
-        const q = query(
-          collection(db, 'courses'),
-          where('teacherId', '==', user.uid)
-        );
-        const querySnapshot = await getDocs(q);
+        // 1 & 2. Fetch courses and enrollments concurrently
+        const [coursesSnapshot, enrollmentsSnapshot] = await Promise.all([
+          getDocs(query(collection(db, 'courses'), where('teacherId', '==', user.uid))),
+          getDocs(query(collection(db, 'enrollments'), where('teacherId', '==', user.uid)))
+        ]);
+
         const fetchedCourses: any[] = [];
         const courseInfoMap: Record<string, { title: string, totalVideoLessons: number }> = {};
         const courseIds: string[] = [];
 
-        querySnapshot.forEach((doc) => {
+        coursesSnapshot.forEach((doc) => {
           const data = doc.data();
           fetchedCourses.push({ id: doc.id, ...data });
           courseIds.push(doc.id);
@@ -60,13 +60,6 @@ export default function StudentsPage() {
           return;
         }
 
-        // 2. Fetch enrollments for the teacher
-        const enrollmentsQuery = query(
-          collection(db, 'enrollments'),
-          where('teacherId', '==', user.uid)
-        );
-        const enrollmentsSnapshot = await getDocs(enrollmentsQuery);
-        
         const enrollmentsData: any[] = [];
         const studentIds = new Set<string>();
         
@@ -81,29 +74,17 @@ export default function StudentsPage() {
           }
         });
 
-        // 3. Fetch completed lessons to calculate progress
         const completedLessonsMap: Record<string, number> = {}; // "studentId_courseId" -> count
         const chunkArray = (arr: any[], size: number) => Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
-        const courseChunks = chunkArray(courseIds, 10);
         
-        for (const chunk of courseChunks) {
-          const completedQuery = query(
-            collection(db, 'completed_lessons'),
-            where('courseId', 'in', chunk)
-          );
-          const completedSnapshot = await getDocs(completedQuery);
-          completedSnapshot.forEach((doc) => {
-            const data = doc.data();
-            if (data.studentId && data.courseId) {
-              const key = `${data.studentId}_${data.courseId}`;
-              completedLessonsMap[key] = (completedLessonsMap[key] || 0) + 1;
-            }
-          });
-        }
+        // 3. Prepare promises for completed lessons (chunked but executed concurrently)
+        const courseChunks = chunkArray(courseIds, 10);
+        const completedLessonsPromises = courseChunks.map(chunk => 
+          getDocs(query(collection(db, 'completed_lessons'), where('courseId', 'in', chunk)))
+        );
 
-        // 4. Fetch last_accessed for "Active Students" logic and users for real-time profile data
+        // 4. Prepare promises for users and last_accessed (executed concurrently)
         const studentIdsArray = Array.from(studentIds);
-        const studentChunks = chunkArray(studentIdsArray, 10);
         const activeStudentIds = new Set<string>();
         const usersDataMap: Record<string, any> = {};
         
@@ -111,28 +92,44 @@ export default function StudentsPage() {
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
         const sevenDaysAgoISO = sevenDaysAgo.toISOString();
 
-        for (const chunk of studentChunks) {
-          await Promise.all(chunk.map(async (studentId) => {
-            try {
-              // Fetch last_accessed
-              const lastAccessedDoc = await getDoc(doc(db, 'last_accessed', studentId));
-              if (lastAccessedDoc.exists()) {
-                const data = lastAccessedDoc.data();
-                if (data.timestamp && data.timestamp >= sevenDaysAgoISO) {
-                  activeStudentIds.add(studentId);
-                }
+        const userAndAccessPromises = studentIdsArray.map(async (studentId) => {
+          try {
+            const [lastAccessedDoc, userDoc] = await Promise.all([
+              getDoc(doc(db, 'last_accessed', studentId)),
+              getDoc(doc(db, 'users', studentId))
+            ]);
+            
+            if (lastAccessedDoc.exists()) {
+              const data = lastAccessedDoc.data();
+              if (data.timestamp && data.timestamp >= sevenDaysAgoISO) {
+                activeStudentIds.add(studentId);
               }
-
-              // Fetch real-time user profile
-              const userDoc = await getDoc(doc(db, 'users', studentId));
-              if (userDoc.exists()) {
-                usersDataMap[studentId] = userDoc.data();
-              }
-            } catch (e) {
-              console.error("Error fetching user/accessed data for", studentId, e);
             }
-          }));
-        }
+
+            if (userDoc.exists()) {
+              usersDataMap[studentId] = userDoc.data();
+            }
+          } catch (e) {
+            console.error("Error fetching user/accessed data for", studentId, e);
+          }
+        });
+
+        // Await all background data simultaneously
+        const [completedLessonsSnapshots] = await Promise.all([
+          Promise.all(completedLessonsPromises),
+          Promise.all(userAndAccessPromises)
+        ]);
+
+        // Process completed lessons
+        completedLessonsSnapshots.forEach(snapshot => {
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.studentId && data.courseId) {
+              const key = `${data.studentId}_${data.courseId}`;
+              completedLessonsMap[key] = (completedLessonsMap[key] || 0) + 1;
+            }
+          });
+        });
 
         // 5. Combine and calculate top stats
         let newThisMonthCount = 0;

@@ -90,16 +90,26 @@ export default function StudentLiveClasses() {
     if (user && !cls.attendedStudents?.includes(user.uid)) {
       try {
         const classRef = doc(db, 'courses', courseId);
-        const updatedClasses = liveClasses.map(c => {
-          if (c.id === cls.id) {
-            return {
-              ...c,
-              attendedStudents: [...(c.attendedStudents || []), user.uid]
-            };
-          }
-          return c;
-        });
-        await updateDoc(classRef, { liveClasses: updatedClasses });
+        
+        // Fetch latest data to prevent race conditions
+        const { getDoc } = await import('firebase/firestore');
+        const docSnap = await getDoc(classRef);
+        
+        if (docSnap.exists()) {
+          const latestClasses = docSnap.data().liveClasses || [];
+          const updatedClasses = latestClasses.map((c: LiveClass) => {
+            if (c.id === cls.id) {
+              const currentAttended = c.attendedStudents || [];
+              return {
+                ...c,
+                attendedStudents: Array.from(new Set([...currentAttended, user.uid]))
+              };
+            }
+            return c;
+          });
+          
+          await updateDoc(classRef, { liveClasses: updatedClasses });
+        }
       } catch (error) {
         console.error("Error updating attendance:", error);
       }

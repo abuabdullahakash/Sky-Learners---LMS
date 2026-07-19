@@ -148,38 +148,46 @@ export default function CourseLiveClassesPage() {
   };
 
   const toggleGoLive = async (cls: LiveClass) => {
-    const updatedStatus = !cls.isLive;
-    const updatedClasses = liveClasses.map(c => {
-      if (c.id === cls.id) {
-        const newClass = { ...c, isLive: updatedStatus };
-        if (updatedStatus) {
-          newClass.liveStartedAt = Date.now();
-          delete newClass.liveEndedAt;
-        } else {
-          newClass.liveEndedAt = Date.now();
+    try {
+      const docRef = doc(db, 'courses', courseId);
+      const docSnap = await getDoc(docRef);
+      
+      if (!docSnap.exists()) return;
+      
+      const latestData = docSnap.data();
+      const currentLiveClasses = latestData.liveClasses || [];
+
+      const updatedStatus = !cls.isLive;
+      const updatedClasses = currentLiveClasses.map((c: LiveClass) => {
+        if (c.id === cls.id) {
+          const newClass = { ...c, isLive: updatedStatus };
+          if (updatedStatus) {
+            newClass.liveStartedAt = Date.now();
+            delete newClass.liveEndedAt;
+          } else {
+            newClass.liveEndedAt = Date.now();
+          }
+          
+          // Firebase does not allow undefined values, so we clean the object
+          Object.keys(newClass).forEach(key => {
+            if (newClass[key as keyof LiveClass] === undefined) {
+              delete newClass[key as keyof LiveClass];
+            }
+          });
+          
+          return newClass;
         }
-        
-        // Firebase does not allow undefined values, so we clean the object
-        Object.keys(newClass).forEach(key => {
-          if (newClass[key as keyof LiveClass] === undefined) {
-            delete newClass[key as keyof LiveClass];
+        // Clean other objects too just in case
+        const cleanC = { ...c };
+        Object.keys(cleanC).forEach(key => {
+          if (cleanC[key as keyof LiveClass] === undefined) {
+            delete cleanC[key as keyof LiveClass];
           }
         });
-        
-        return newClass;
-      }
-      // Clean other objects too just in case
-      const cleanC = { ...c };
-      Object.keys(cleanC).forEach(key => {
-        if (cleanC[key as keyof LiveClass] === undefined) {
-          delete cleanC[key as keyof LiveClass];
-        }
+        return cleanC;
       });
-      return cleanC;
-    });
-    
-    try {
-      await updateDoc(doc(db, 'courses', courseId), { liveClasses: updatedClasses });
+      
+      await updateDoc(docRef, { liveClasses: updatedClasses });
       setLiveClasses(updatedClasses);
     } catch (err) {
       console.error(err);

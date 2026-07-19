@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { useParams } from 'next/navigation';
 import { Clock, CheckCircle2, PlayCircle, Trophy, BookOpen, AlertCircle, Calendar, Video, UserCircle, ExternalLink } from 'lucide-react';
@@ -21,49 +21,67 @@ export default function StudentCourseOverview() {
   const [totalLessons, setTotalLessons] = useState<number>(0);
   const [teacherProfile, setTeacherProfile] = useState<any>(null);
 
+  // Time state for live classes
+  const [currentTime, setCurrentTime] = useState(new Date());
+
   useEffect(() => {
-    const fetchCourse = async () => {
-      try {
-        const docRef = doc(db, 'courses', courseId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const courseData = docSnap.data();
-          setCourse(courseData);
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000); // Check every second
+    return () => clearInterval(timer);
+  }, []);
 
-          // Fetch teacher profile
-          if (courseData.teacherId) {
-            const teacherRef = doc(db, 'teacherProfiles', courseData.teacherId);
-            const teacherSnap = await getDoc(teacherRef);
-            if (teacherSnap.exists()) {
-              setTeacherProfile(teacherSnap.data());
-            }
-          }
+  useEffect(() => {
+    if (!courseId) return;
 
-          // Fetch completed lessons
-          if (user) {
-            const completedLessonsQuery = query(
-              collection(db, 'completed_lessons'),
-              where('studentId', '==', user.uid),
-              where('courseId', '==', courseId)
-            );
-            const completedLessonsSnap = await getDocs(completedLessonsQuery);
-            setCompletedCount(completedLessonsSnap.size);
+    // Real-time listener for the course to get immediate live class updates
+    const docRef = doc(db, 'courses', courseId);
+    const unsubscribeCourse = onSnapshot(docRef, async (docSnap) => {
+      if (docSnap.exists()) {
+        const courseData = docSnap.data();
+        setCourse(courseData);
 
-            const completedExamsQuery = query(
-              collection(db, 'completed_exams'),
-              where('studentId', '==', user.uid),
-              where('courseId', '==', courseId)
-            );
-            const completedExamsSnap = await getDocs(completedExamsQuery);
-            // We can save this in a new state
-            setCompletedExamsCount(completedExamsSnap.size);
+        // Fetch teacher profile (only fetch if we haven't already or if it changed)
+        if (courseData.teacherId && !teacherProfile) {
+          const teacherRef = doc(db, 'teacherProfiles', courseData.teacherId);
+          const teacherSnap = await getDoc(teacherRef);
+          if (teacherSnap.exists()) {
+            setTeacherProfile(teacherSnap.data());
           }
         }
-      } catch (error) {
-        console.error("Error fetching course", error);
+      }
+    });
+
+    // Fetch static completion data once
+    const fetchCompletionData = async () => {
+      if (user && courseId) {
+        try {
+          const completedLessonsQuery = query(
+            collection(db, 'completed_lessons'),
+            where('studentId', '==', user.uid),
+            where('courseId', '==', courseId)
+          );
+          const completedLessonsSnap = await getDocs(completedLessonsQuery);
+          setCompletedCount(completedLessonsSnap.size);
+
+          const completedExamsQuery = query(
+            collection(db, 'completed_exams'),
+            where('studentId', '==', user.uid),
+            where('courseId', '==', courseId)
+          );
+          const completedExamsSnap = await getDocs(completedExamsQuery);
+          setCompletedExamsCount(completedExamsSnap.size);
+        } catch (error) {
+          console.error("Error fetching completion data", error);
+        }
       }
     };
-    if (courseId) fetchCourse();
+    
+    fetchCompletionData();
+
+    return () => {
+      unsubscribeCourse();
+    };
   }, [courseId, user]);
 
   if (!course) {
@@ -80,10 +98,18 @@ export default function StudentCourseOverview() {
     ? Math.min(100, Math.round((totalCompletedItems / totalPromisedItems) * 100))
     : 0;
   
+  // Find next upcoming live class
   const upcomingClasses = (course.liveClasses || [])
-    .filter((lc: any) => new Date(lc.date) >= new Date(new Date().setHours(0,0,0,0)))
+    .filter((lc: any) => new Date(lc.date).setHours(0,0,0,0) >= new Date().setHours(0,0,0,0))
     .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  
   const nextClass = upcomingClasses.length > 0 ? upcomingClasses[0] : null;
+  
+  let canJoinLive = false;
+  if (nextClass) {
+    const classDateTime = new Date(`${nextClass.date}T${nextClass.time}`);
+    canJoinLive = nextClass.isLive || currentTime >= classDateTime;
+  }
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 max-w-7xl">
@@ -194,34 +220,49 @@ export default function StudentCourseOverview() {
         </div>
 
         {/* Widget 2: Upcoming Live Class */}
-        <div className="bg-white dark:bg-foreground/5 rounded-3xl p-6 border border-gray-200 dark:border-foreground/10 shadow-sm">
+        <div className="bg-white dark:bg-foreground/5 rounded p-6 border border-gray-200 dark:border-foreground/10 shadow-sm transition-all">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-lg text-gray-900 dark:text-white">Upcoming Live</h3>
-            <span className="bg-red-500/10 text-red-500 px-2 py-1 rounded-md text-xs font-bold animate-pulse">LIVE</span>
+            {nextClass?.isLive && (
+              <span className="bg-red-500/10 text-red-500 px-2 py-1 rounded text-xs font-bold animate-pulse flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping"></span> LIVE
+              </span>
+            )}
           </div>
+          
           {nextClass ? (
-            <div className="space-y-4">
-              <div className="p-4 bg-gray-50 dark:bg-foreground/5 rounded-2xl border border-gray-100 dark:border-foreground/10">
+            <div className={`space-y-4 ${canJoinLive ? 'ring-1 ring-orange-500/30 bg-orange-500/5 p-4 rounded' : ''} transition-all`}>
+              <div className={`p-4 rounded border ${canJoinLive ? 'bg-white dark:bg-foreground/5 border-orange-200 dark:border-orange-500/20' : 'bg-gray-50 dark:bg-foreground/5 border-gray-100 dark:border-foreground/10'}`}>
                 <h4 className="font-bold text-gray-900 dark:text-white mb-2">{nextClass.title}</h4>
                 <div className="flex flex-col gap-2 text-sm text-gray-600 dark:text-foreground/70">
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-primary" />
+                    <Calendar className="w-4 h-4 text-orange-500" />
                     <span>{nextClass.date}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-primary" />
+                    <Clock className="w-4 h-4 text-orange-500" />
                     <span>{nextClass.time}</span>
                   </div>
                 </div>
               </div>
-              <a 
-                href={nextClass.meetLink}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
-              >
-                <Video className="w-4 h-4" /> Join Class
-              </a>
+              
+              {canJoinLive ? (
+                <a 
+                  href={nextClass.meetLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-orange-500 text-white font-bold rounded hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/30 animate-in zoom-in"
+                >
+                  <Video className="w-5 h-5" /> Join Class
+                </a>
+              ) : (
+                <button 
+                  disabled
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-200 dark:bg-foreground/10 text-gray-400 dark:text-foreground/40 font-bold rounded cursor-not-allowed transition-colors"
+                >
+                  <Clock className="w-5 h-5" /> Starting Soon...
+                </button>
+              )}
             </div>
           ) : (
             <div className="py-6 flex flex-col items-center justify-center text-center">

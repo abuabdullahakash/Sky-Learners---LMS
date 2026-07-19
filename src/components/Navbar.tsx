@@ -32,8 +32,8 @@ export default function Navbar() {
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
-              <div className="relative w-[180px] h-[48px] md:w-[220px] md:h-[56px] lg:w-[260px] lg:h-[64px] overflow-hidden flex items-center justify-center">
-                <Image src="/Skylearnars Academy logo.png" alt="Sky Learners Logo" fill className="object-contain scale-[1.7] origin-center" priority />
+              <div className="relative w-[180px] h-[48px] md:w-[220px] md:h-[56px] lg:w-[260px] lg:h-[64px] flex items-center justify-center">
+                <Image src="/Skylearnars Academy logo.png" alt="Sky Learners Logo" fill className="object-contain" priority />
               </div>
             </Link>
 

@@ -40,8 +40,8 @@ export default function Footer() {
           {/* Brand & About */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2 mb-2">
-              <div className="relative w-[180px] h-[50px] md:w-[240px] md:h-[60px] overflow-hidden flex items-center justify-center">
-                <Image src="/Skylearnars Academy logo.png" alt="Sky Learners Logo" fill className="object-contain scale-[1.7] origin-center" />
+              <div className="relative w-[180px] h-[50px] md:w-[240px] md:h-[60px] flex items-center justify-center">
+                <Image src="/Skylearnars Academy logo.png" alt="Sky Learners Logo" fill className="object-contain" />
               </div>
             </Link>
             <p className="text-foreground/70 leading-relaxed">

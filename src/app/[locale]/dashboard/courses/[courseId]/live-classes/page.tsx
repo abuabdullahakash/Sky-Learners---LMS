@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Video, Calendar, Clock, ExternalLink, PlayCircle, Users } from 'lucide-react';
+import { Video, Calendar, Clock, ExternalLink, PlayCircle, Users, CheckCircle, XCircle } from 'lucide-react';
 import Image from 'next/image';
+import { useAuth } from '@/context/AuthContext';
+import { useTranslations } from 'next-intl';
 
 type LiveClass = {
   id: string;
@@ -17,11 +19,15 @@ type LiveClass = {
   liveStartedAt?: number;
   liveEndedAt?: number;
   isAutoStart?: boolean;
+  attendedStudents?: string[];
 };
 
 export default function StudentLiveClasses() {
   const params = useParams();
   const courseId = params.courseId as string;
+  const { user } = useAuth();
+  const t = useTranslations('Dashboard.liveClasses');
+  
   const [liveClasses, setLiveClasses] = useState<LiveClass[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -80,11 +86,33 @@ export default function StudentLiveClasses() {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
+  const handleJoinLive = async (cls: LiveClass) => {
+    if (user && !cls.attendedStudents?.includes(user.uid)) {
+      try {
+        const classRef = doc(db, 'courses', courseId);
+        const updatedClasses = liveClasses.map(c => {
+          if (c.id === cls.id) {
+            return {
+              ...c,
+              attendedStudents: [...(c.attendedStudents || []), user.uid]
+            };
+          }
+          return c;
+        });
+        await updateDoc(classRef, { liveClasses: updatedClasses });
+      } catch (error) {
+        console.error("Error updating attendance:", error);
+      }
+    }
+    // Open meet link
+    window.open(cls.meetLink, '_blank');
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-32 gap-4">
         <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-        <div className="text-gray-500 font-medium animate-pulse">Loading Live Classes...</div>
+        <div className="text-gray-500 font-medium animate-pulse">{t('loading')}</div>
       </div>
     );
   }
@@ -116,12 +144,12 @@ export default function StudentLiveClasses() {
           <div className="max-w-2xl">
             <div className="flex items-center gap-3 mb-3">
               <span className="px-3 py-1 bg-orange-500 text-white text-xs font-bold rounded uppercase tracking-wider animate-pulse flex items-center gap-2">
-                <span className="w-2 h-2 bg-white rounded-full animate-ping"></span> Live Sessions
+                <span className="w-2 h-2 bg-white rounded-full animate-ping"></span> {t('liveSessions')}
               </span>
             </div>
-            <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-4">Course Live Classes</h1>
+            <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-4">{t('title')}</h1>
             <p className="text-gray-300 md:text-lg">
-              Join upcoming live sessions scheduled by your instructor. Interactive learning right at your fingertips.
+              {t('subtitle')}
             </p>
           </div>
         </div>
@@ -132,9 +160,9 @@ export default function StudentLiveClasses() {
           <div className="w-20 h-20 bg-gray-200 dark:bg-foreground/5 text-gray-400 dark:text-foreground/30 rounded-full flex items-center justify-center mx-auto mb-6">
             <Video className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">No Live Classes</h2>
+          <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">{t('noLiveClasses')}</h2>
           <p className="text-gray-500 dark:text-foreground/60 max-w-md mx-auto">
-            There are currently no scheduled live classes for this course. Your instructor will notify you when a new session is added.
+            {t('noLiveClassesDesc')}
           </p>
         </div>
       ) : (
@@ -143,6 +171,7 @@ export default function StudentLiveClasses() {
             const classTimeReached = cls.isAutoStart && isTimeReached(cls.date, cls.time);
             const canJoin = cls.isLive || classTimeReached;
             const isEnded = !!cls.liveEndedAt && !cls.isLive;
+            const hasAttended = user && cls.attendedStudents?.includes(user.uid);
 
             return (
               <div 
@@ -155,7 +184,8 @@ export default function StudentLiveClasses() {
                     {cls.isLive ? (
                       <span className="px-2.5 py-1 bg-red-500 text-white text-xs font-bold rounded uppercase tracking-wider animate-pulse flex items-center gap-1.5 shadow-sm shadow-red-500/20">
                         <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span> 
-                        LIVE NOW
+                        <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span> 
+                        {t('liveNow')}
                         {cls.liveStartedAt && (
                           <span className="ml-1 border-l border-white/30 pl-2 text-white/90 font-mono tracking-tighter">
                             {formatLiveDuration(cls.liveStartedAt)}
@@ -164,11 +194,11 @@ export default function StudentLiveClasses() {
                       </span>
                     ) : isEnded ? (
                       <span className="px-2.5 py-1 bg-gray-500 text-white text-xs font-bold rounded uppercase tracking-wider">
-                        Completed
+                        {t('completed')}
                       </span>
                     ) : (
                       <span className="px-2.5 py-1 bg-gray-100 dark:bg-foreground/10 text-gray-600 dark:text-foreground/70 text-xs font-bold rounded uppercase tracking-wider">
-                        Upcoming
+                        {t('upcoming')}
                       </span>
                     )}
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white line-clamp-1">{cls.title}</h3>
@@ -184,8 +214,13 @@ export default function StudentLiveClasses() {
                       <span>{formatTime12Hour(cls.time)}</span>
                     </div>
                     <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-foreground/5 px-3 py-1.5 rounded">
-                      <Users className="w-4 h-4 text-orange-500" /> 
-                      <span>Interactive Session</span>
+                      {hasAttended ? (
+                        <span className="flex items-center gap-1.5 text-green-600 dark:text-green-500"><CheckCircle className="w-4 h-4" /> {t('present')}</span>
+                      ) : isEnded ? (
+                        <span className="flex items-center gap-1.5 text-red-500 dark:text-red-400"><XCircle className="w-4 h-4" /> {t('missed')}</span>
+                      ) : (
+                        <span className="flex items-center gap-1.5 text-orange-600 dark:text-orange-500"><Users className="w-4 h-4" /> {t('interactiveSession')}</span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -193,7 +228,7 @@ export default function StudentLiveClasses() {
                 <div className="shrink-0 flex flex-col items-center gap-2">
                   {isEnded ? (
                     <div className="flex flex-col items-center bg-gray-50 dark:bg-foreground/5 px-6 py-3 rounded border border-gray-100 dark:border-foreground/10">
-                      <span className="text-sm text-gray-500 font-bold mb-1">Class Duration</span>
+                      <span className="text-sm text-gray-500 font-bold mb-1">{t('classDuration')}</span>
                       <span className="text-xl font-extrabold text-gray-900 dark:text-white font-mono">
                         {cls.liveStartedAt && cls.liveEndedAt ? (
                           (() => {
@@ -201,33 +236,31 @@ export default function StudentLiveClasses() {
                             const h = Math.floor(diff / 3600);
                             const m = Math.floor((diff % 3600) / 60);
                             const s = diff % 60;
-                            if (h > 0) return `${h}h ${m}m ${s}s`;
-                            return `${m}m ${s}s`;
-                          })()
-                        ) : 'Ended'}
+                              if (h > 0) return `${h}h ${m}m ${s}s`;
+                              return `${m}m ${s}s`;
+                            })()
+                          ) : t('ended')}
                       </span>
                     </div>
                   ) : canJoin ? (
-                    <a 
-                      href={cls.meetLink}
-                      target="_blank"
-                      rel="noreferrer"
+                    <button 
+                      onClick={() => handleJoinLive(cls)}
                       className="px-8 py-3.5 bg-orange-500 text-white font-bold rounded hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/30 hover:-translate-y-1 animate-in zoom-in duration-300"
                     >
-                      <PlayCircle className="w-5 h-5" /> Join Live
-                    </a>
+                      <PlayCircle className="w-5 h-5" /> {t('joinLive')}
+                    </button>
                   ) : (
                     <button 
                       disabled
                       className="px-8 py-3.5 bg-gray-200 dark:bg-foreground/10 text-gray-400 dark:text-foreground/40 font-bold rounded cursor-not-allowed flex items-center justify-center gap-2 transition-all"
                     >
-                      <Clock className="w-5 h-5" /> Starting Soon...
+                      <Clock className="w-5 h-5" /> {t('startingSoon')}
                     </button>
                   )}
                   
                   {!canJoin && !isEnded && (
                     <span className="text-xs text-gray-500 dark:text-foreground/50 font-medium">
-                      {cls.isAutoStart ? 'Button activates at scheduled time' : 'Teacher will start this live manually'}
+                      {cls.isAutoStart ? t('autoStartNote') : t('manualStartNote')}
                     </span>
                   )}
                 </div>

@@ -244,6 +244,26 @@
         "history": "Payment History",
         "noHistory": "No previous transactions found."
       }
+    },
+    "liveClasses": {
+      "title": "Course Live Classes",
+      "subtitle": "Join upcoming live sessions scheduled by your instructor. Interactive learning right at your fingertips.",
+      "liveSessions": "Live Sessions",
+      "noLiveClasses": "No Live Classes",
+      "noLiveClassesDesc": "There are currently no scheduled live classes for this course. Your instructor will notify you when a new session is added.",
+      "liveNow": "LIVE NOW",
+      "completed": "Completed",
+      "upcoming": "Upcoming",
+      "interactiveSession": "Interactive Session",
+      "present": "Attended",
+      "missed": "Missed Class",
+      "classDuration": "Class Duration",
+      "ended": "Ended",
+      "joinLive": "Join Live",
+      "startingSoon": "Starting Soon...",
+      "autoStartNote": "Button activates at scheduled time",
+      "manualStartNote": "Teacher will start this live manually",
+      "loading": "Loading Live Classes..."
     }
   },
   "Footer": {

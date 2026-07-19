@@ -74,15 +74,6 @@ export default function StudentsPage() {
           }
         });
 
-        const completedLessonsMap: Record<string, number> = {}; // "studentId_courseId" -> count
-        const chunkArray = (arr: any[], size: number) => Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
-        
-        // 3. Prepare promises for completed lessons (chunked but executed concurrently)
-        const courseChunks = chunkArray(courseIds, 10);
-        const completedLessonsPromises = courseChunks.map(chunk => 
-          getDocs(query(collection(db, 'completed_lessons'), where('courseId', 'in', chunk)))
-        );
-
         // 4. Prepare promises for users and last_accessed (executed concurrently)
         const studentIdsArray = Array.from(studentIds);
         const activeStudentIds = new Set<string>();
@@ -115,21 +106,8 @@ export default function StudentsPage() {
         });
 
         // Await all background data simultaneously
-        const [completedLessonsSnapshots] = await Promise.all([
-          Promise.all(completedLessonsPromises),
-          Promise.all(userAndAccessPromises)
-        ]);
+        await Promise.all(userAndAccessPromises);
 
-        // Process completed lessons
-        completedLessonsSnapshots.forEach(snapshot => {
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            if (data.studentId && data.courseId) {
-              const key = `${data.studentId}_${data.courseId}`;
-              completedLessonsMap[key] = (completedLessonsMap[key] || 0) + 1;
-            }
-          });
-        });
 
         // 5. Combine and calculate top stats
         let newThisMonthCount = 0;
@@ -142,10 +120,7 @@ export default function StudentsPage() {
           const courseInfo = courseInfoMap[courseId] || { title: enrollment.courseTitle || 'Unknown', totalVideoLessons: 0 };
           const userProfile = usersDataMap[studentId] || {};
           
-          const completedCount = completedLessonsMap[`${studentId}_${courseId}`] || 0;
-          const totalVideos = courseInfo.totalVideoLessons;
-          const progress = totalVideos > 0 ? Math.round((completedCount / totalVideos) * 100) : 0;
-          
+
           // Get profile data directly from users collection, fallback to checkout data
           const finalName = userProfile.name || enrollment.studentName || 'Unknown Student';
           const finalEmail = userProfile.email || enrollment.studentEmail || '';
@@ -179,7 +154,6 @@ export default function StudentsPage() {
             courseId: courseId,
             enrollDate: enrollDateStr,
             createdAtDate: createdAtDate,
-            progress: Math.min(progress, 100),
             isActive: activeStudentIds.has(studentId)
           };
         });
@@ -306,14 +280,13 @@ export default function StudentsPage() {
                 <th className="px-6 py-4 font-medium">Student</th>
                 <th className="px-6 py-4 font-medium">Course Enrolled</th>
                 <th className="px-6 py-4 font-medium">Enroll Date</th>
-                <th className="px-6 py-4 font-medium text-center">Progress</th>
                 <th className="px-6 py-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-foreground/10">
               {courses.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-foreground/50">
+                  <td colSpan={4} className="px-6 py-12 text-center text-foreground/50">
                     You haven't created any courses yet.
                   </td>
                 </tr>
@@ -343,19 +316,6 @@ export default function StudentsPage() {
                     <td className="px-6 py-4 text-sm text-foreground/70">
                       {student.enrollDate}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col items-center gap-1">
-                        <span className="text-xs font-bold">{student.progress}%</span>
-                        <div className="w-24 h-2 bg-foreground/10 rounded-full overflow-hidden">
-                          <div 
-                            className={`h-full rounded-full transition-all duration-1000 ${
-                              student.progress === 100 ? 'bg-green-500' : 'bg-orange-500'
-                            }`}
-                            style={{ width: `${student.progress}%` }}
-                          />
-                        </div>
-                      </div>
-                    </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         {student.hasEmail ? (
@@ -384,7 +344,7 @@ export default function StudentsPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-foreground/50">
+                  <td colSpan={4} className="px-6 py-12 text-center text-foreground/50">
                     No students found matching your criteria.
                   </td>
                 </tr>

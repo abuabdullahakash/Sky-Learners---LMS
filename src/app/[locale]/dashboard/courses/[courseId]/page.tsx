@@ -84,6 +84,19 @@ export default function StudentCourseOverview() {
     };
   }, [courseId, user]);
 
+  const formatLiveDuration = (startedAt: number) => {
+    const diff = Math.floor((currentTime.getTime() - startedAt) / 1000);
+    if (diff < 0) return "00:00";
+    const h = Math.floor(diff / 3600);
+    const m = Math.floor((diff % 3600) / 60);
+    const s = diff % 60;
+    
+    if (h > 0) {
+      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
   if (!course) {
     return <div className="text-center py-20 text-gray-500">Loading course overview...</div>;
   }
@@ -224,8 +237,14 @@ export default function StudentCourseOverview() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-lg text-gray-900 dark:text-white">Upcoming Live</h3>
             {nextClass?.isLive && (
-              <span className="bg-red-500/10 text-red-500 px-2 py-1 rounded text-xs font-bold animate-pulse flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping"></span> LIVE
+              <span className="bg-red-500 text-white px-2.5 py-1 rounded text-xs font-bold animate-pulse flex items-center gap-1.5 shadow-sm shadow-red-500/20">
+                <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span> 
+                LIVE NOW
+                {nextClass.liveStartedAt && (
+                  <span className="ml-1 border-l border-white/30 pl-2 text-white/90 font-mono tracking-tighter">
+                    {formatLiveDuration(nextClass.liveStartedAt)}
+                  </span>
+                )}
               </span>
             )}
           </div>

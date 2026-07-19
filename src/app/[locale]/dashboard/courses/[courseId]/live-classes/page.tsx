@@ -14,6 +14,7 @@ type LiveClass = {
   time: string;
   meetLink: string;
   isLive?: boolean;
+  liveStartedAt?: number;
 };
 
 export default function StudentLiveClasses() {
@@ -53,6 +54,19 @@ export default function StudentLiveClasses() {
   const isTimeReached = (date: string, time: string) => {
     const classDateTime = new Date(`${date}T${time}`);
     return currentTime >= classDateTime;
+  };
+
+  const formatLiveDuration = (startedAt: number) => {
+    const diff = Math.floor((currentTime.getTime() - startedAt) / 1000);
+    if (diff < 0) return "00:00";
+    const h = Math.floor(diff / 3600);
+    const m = Math.floor((diff % 3600) / 60);
+    const s = diff % 60;
+    
+    if (h > 0) {
+      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
   if (isLoading) {
@@ -127,8 +141,14 @@ export default function StudentLiveClasses() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     {cls.isLive ? (
-                      <span className="px-2.5 py-1 bg-red-500 text-white text-xs font-bold rounded uppercase tracking-wider animate-pulse flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span> Live Now
+                      <span className="px-2.5 py-1 bg-red-500 text-white text-xs font-bold rounded uppercase tracking-wider animate-pulse flex items-center gap-1.5 shadow-sm shadow-red-500/20">
+                        <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span> 
+                        LIVE NOW
+                        {cls.liveStartedAt && (
+                          <span className="ml-1 border-l border-white/30 pl-2 text-white/90 font-mono tracking-tighter">
+                            {formatLiveDuration(cls.liveStartedAt)}
+                          </span>
+                        )}
                       </span>
                     ) : (
                       <span className="px-2.5 py-1 bg-gray-100 dark:bg-foreground/10 text-gray-600 dark:text-foreground/70 text-xs font-bold rounded uppercase tracking-wider">

@@ -15,6 +15,7 @@ type LiveClass = {
   time: string;
   meetLink: string;
   isLive?: boolean;
+  liveStartedAt?: number;
 };
 
 export default function CourseLiveClassesPage() {
@@ -139,9 +140,16 @@ export default function CourseLiveClassesPage() {
 
   const toggleGoLive = async (cls: LiveClass) => {
     const updatedStatus = !cls.isLive;
-    const updatedClasses = liveClasses.map(c => 
-      c.id === cls.id ? { ...c, isLive: updatedStatus } : c
-    );
+    const updatedClasses = liveClasses.map(c => {
+      if (c.id === cls.id) {
+        return { 
+          ...c, 
+          isLive: updatedStatus,
+          liveStartedAt: updatedStatus ? Date.now() : undefined
+        };
+      }
+      return c;
+    });
     
     try {
       await updateDoc(doc(db, 'courses', courseId), { liveClasses: updatedClasses });

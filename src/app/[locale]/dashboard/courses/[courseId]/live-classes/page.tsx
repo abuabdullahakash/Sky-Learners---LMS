@@ -166,7 +166,7 @@ export default function StudentLiveClasses() {
                 )}
               </span>
             ) : isEnded ? (
-              <span className="px-2.5 py-1 bg-gray-500 text-white text-xs font-bold rounded uppercase tracking-wider">
+              <span className="px-2.5 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded uppercase tracking-wider shadow-sm">
                 {t('completed')}
               </span>
             ) : (
@@ -200,9 +200,9 @@ export default function StudentLiveClasses() {
         
         <div className="shrink-0 flex flex-col items-center gap-2">
           {isEnded ? (
-            <div className="flex flex-col items-center bg-gray-50 dark:bg-foreground/5 px-6 py-3 rounded border border-gray-100 dark:border-foreground/10">
-              <span className="text-sm text-gray-500 font-bold mb-1">{t('classDuration')}</span>
-              <span className="text-xl font-extrabold text-gray-900 dark:text-white font-mono">
+            <div className="flex flex-col items-center bg-gradient-to-r from-orange-500 to-red-500 px-6 py-3 rounded-none shadow-sm">
+              <span className="text-sm text-white/90 font-bold mb-1">{t('classDuration')}</span>
+              <span className="text-xl font-extrabold text-white font-mono">
                 {cls.liveStartedAt && cls.liveEndedAt ? (
                   (() => {
                     const diff = Math.floor((cls.liveEndedAt - cls.liveStartedAt) / 1000);
@@ -296,16 +296,16 @@ export default function StudentLiveClasses() {
             if (moduleClasses.length === 0) return null; // Don't show empty modules for students
             
             return (
-              <div key={module.id} className="bg-white dark:bg-background rounded-2xl border border-gray-200 dark:border-foreground/10 overflow-hidden shadow-sm transition-all duration-300">
+              <div key={module.id} className="bg-white dark:bg-background rounded-none border border-gray-200 dark:border-foreground/10 overflow-hidden shadow-sm transition-all duration-300">
                 <button 
                   onClick={() => toggleModule(module.id)}
-                  className="w-full bg-gray-50 dark:bg-foreground/5 p-4 flex items-center gap-4 hover:bg-gray-100 dark:hover:bg-foreground/10 transition-colors text-left"
+                  className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white p-4 flex items-center gap-4 hover:from-orange-600 hover:to-red-600 transition-colors text-left"
                 >
-                  <div className="p-1 bg-white dark:bg-background rounded shadow-sm border border-gray-200 dark:border-foreground/10 text-gray-500 dark:text-foreground/50">
+                  <div className="p-1 bg-white/20 rounded shadow-sm text-white">
                     {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                   </div>
-                  <h3 className="font-bold text-lg text-gray-900 dark:text-white flex-1">{module.title}</h3>
-                  <span className="text-sm font-semibold text-gray-500 dark:text-foreground/50 bg-gray-200 dark:bg-foreground/10 px-3 py-1 rounded-full">
+                  <h3 className="font-bold text-lg text-white flex-1">{module.title}</h3>
+                  <span className="text-sm font-semibold text-orange-500 bg-white px-3 py-1 rounded-full">
                     {moduleClasses.length} {t('liveSessions')}
                   </span>
                 </button>
@@ -320,13 +320,13 @@ export default function StudentLiveClasses() {
           })}
 
           {generalClasses.length > 0 && (
-            <div className="bg-white dark:bg-background rounded-2xl border border-gray-200 dark:border-foreground/10 overflow-hidden shadow-sm transition-all duration-300">
-              <div className="bg-gray-50 dark:bg-foreground/5 p-4 flex items-center gap-4 border-b border-gray-200 dark:border-foreground/10">
-                <div className="p-1 bg-white dark:bg-background rounded shadow-sm border border-gray-200 dark:border-foreground/10 text-gray-500 dark:text-foreground/50">
+            <div className="bg-white dark:bg-background rounded-none border border-gray-200 dark:border-foreground/10 overflow-hidden shadow-sm transition-all duration-300">
+              <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-4 flex items-center gap-4 border-b border-transparent">
+                <div className="p-1 bg-white/20 rounded shadow-sm text-white">
                   <Video className="w-5 h-5" />
                 </div>
-                <h3 className="font-bold text-lg text-gray-900 dark:text-white flex-1">{t('generalClasses')}</h3>
-                <span className="text-sm font-semibold text-gray-500 dark:text-foreground/50 bg-gray-200 dark:bg-foreground/10 px-3 py-1 rounded-full">
+                <h3 className="font-bold text-lg text-white flex-1">{t('generalClasses')}</h3>
+                <span className="text-sm font-semibold text-orange-500 bg-white px-3 py-1 rounded-full">
                   {generalClasses.length} {t('liveSessions')}
                 </span>
               </div>

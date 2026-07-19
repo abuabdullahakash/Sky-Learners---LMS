@@ -362,52 +362,62 @@ export default function CourseLiveClassesPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
 
-      {/* Hero Section */}
-      <div className="relative w-full rounded-none overflow-hidden mb-2 shadow-lg">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-orange-950/40 to-gray-900" />
-        <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(circle at 20% 50%, #f97316 0%, transparent 50%), radial-gradient(circle at 80% 20%, #ef4444 0%, transparent 50%)'}} />
-        <div className="absolute top-0 right-0 w-64 h-64 opacity-5" style={{background: 'repeating-linear-gradient(45deg, #f97316 0px, #f97316 1px, transparent 1px, transparent 12px)'}} />
-        <div className="relative z-10 px-8 py-7 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      {/* Hero Section - background layer with overflow-hidden, buttons layer outside */}
+      <div className="relative w-full rounded-none mb-4 shadow-lg">
+        {/* Background with overflow-hidden just for the visual decorations */}
+        <div className="absolute inset-0 overflow-hidden rounded-none">
+          <div className="absolute inset-0 bg-[#111827]"/>
+          <div className="absolute inset-0" style={{background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 30%, #111827 60%, #0f172a 100%)'}} />
+          <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 15% 60%, rgba(249,115,22,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 20%, rgba(239,68,68,0.2) 0%, transparent 40%)'}} />
+          <div className="absolute top-0 right-0 w-80 h-80 opacity-[0.04]" style={{background: 'repeating-linear-gradient(45deg, #f97316 0px, #f97316 1px, transparent 1px, transparent 14px)'}} />
+          <div className="absolute bottom-0 left-0 w-40 h-40 opacity-[0.06]" style={{background: 'radial-gradient(circle, #f97316 0%, transparent 70%)'}} />
+        </div>
+
+        {/* Content — NOT overflow-hidden so dropdown can escape */}
+        <div className="relative z-10 px-8 py-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2 py-0.5 bg-orange-500/20 border border-orange-500/30 text-orange-400 text-xs font-bold rounded uppercase tracking-widest">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">
                 Teacher Dashboard
               </span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-white mb-1">Live Classes</h1>
-            <p className="text-gray-400 text-sm">Schedule and manage live sessions via Google Meet, Zoom, or YouTube.</p>
-            <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
-              <span className="flex items-center gap-1.5"><Video className="w-3.5 h-3.5 text-orange-500" /> {liveClasses.length} Classes</span>
-              <span className="flex items-center gap-1.5"><Plus className="w-3.5 h-3.5 text-orange-500" /> {liveModules.length} Modules</span>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">Live Classes</h1>
+            <p className="text-gray-300 text-sm font-medium">Schedule and manage live sessions via Google Meet, Zoom, or YouTube.</p>
+            <div className="flex items-center gap-5 mt-4 text-xs">
+              <span className="flex items-center gap-1.5 text-gray-300"><Video className="w-3.5 h-3.5 text-orange-400" /> {liveClasses.length} Classes</span>
+              <span className="flex items-center gap-1.5 text-gray-300"><Plus className="w-3.5 h-3.5 text-orange-400" /> {liveModules.length} Modules</span>
               {liveClasses.filter(c => c.isLive).length > 0 && (
-                <span className="flex items-center gap-1.5 text-red-400 animate-pulse">
-                  <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                <span className="flex items-center gap-1.5 text-red-300 font-bold animate-pulse">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                  </span>
                   {liveClasses.filter(c => c.isLive).length} Live Now
                 </span>
               )}
             </div>
           </div>
-          <div className="flex gap-3 shrink-0">
+          {/* Buttons are OUTSIDE overflow-hidden so dropdown is not clipped */}
+          <div className="flex gap-3 shrink-0 z-[60]">
             {!isAdding && (
               <>
                 {liveModules.length > 0 && (
                   <div className="relative">
                     <button
                       onClick={() => setShowFilterMenu(p => !p)}
-                      className="p-2.5 bg-white/10 border border-white/20 text-white rounded hover:bg-white/20 transition-colors shadow-sm"
+                      className="p-2.5 bg-white/15 border border-white/30 text-white rounded hover:bg-white/25 transition-colors shadow-sm"
                       title="Jump to Module"
                     >
-                      <Filter className="w-5 h-5 text-orange-400" />
+                      <Filter className="w-5 h-5 text-orange-300" />
                     </button>
                     {showFilterMenu && (
-                      <div className="absolute right-0 top-full mt-2 bg-background border border-foreground/10 rounded shadow-xl z-50 min-w-[220px] py-1 animate-in fade-in slide-in-from-top-2 duration-150">
+                      <div className="absolute right-0 top-[calc(100%+8px)] bg-background border border-foreground/10 rounded-lg shadow-2xl z-[100] min-w-[230px] py-1 animate-in fade-in slide-in-from-top-2 duration-150">
                         <div className="px-3 py-2 text-xs font-bold text-foreground/40 uppercase tracking-widest border-b border-foreground/10">Jump to Module</div>
                         {liveModules.map((m, i) => (
                           <button
                             key={m.id}
                             onClick={() => {
                               setShowFilterMenu(false);
-                              // Move selected module to top of display order
                               setModuleOrder(prev => [m.id, ...prev.filter(id => id !== m.id)]);
                               setExpandedModules(prev => [m.id, ...prev.filter(id => id !== m.id)]);
                               setTimeout(() => {
@@ -424,7 +434,7 @@ export default function CourseLiveClassesPage() {
                     )}
                   </div>
                 )}
-                <button onClick={handleAddModule} className="px-4 py-2.5 bg-white/10 border border-white/20 text-white rounded font-bold hover:bg-white/20 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap text-sm">
+                <button onClick={handleAddModule} className="px-4 py-2.5 bg-white/15 border border-white/30 text-white rounded font-bold hover:bg-white/25 transition-colors flex items-center gap-2 whitespace-nowrap text-sm">
                   <Plus className="w-4 h-4" /> Add Module
                 </button>
                 <button onClick={() => handleOpenForm()} className="px-4 py-2.5 bg-orange-500 text-white rounded font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2 whitespace-nowrap text-sm">

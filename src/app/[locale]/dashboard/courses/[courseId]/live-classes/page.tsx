@@ -15,6 +15,8 @@ type LiveClass = {
   meetLink: string;
   isLive?: boolean;
   liveStartedAt?: number;
+  liveEndedAt?: number;
+  isAutoStart?: boolean;
 };
 
 export default function StudentLiveClasses() {
@@ -129,13 +131,14 @@ export default function StudentLiveClasses() {
       ) : (
         <div className="grid gap-6 max-w-5xl mx-auto">
           {sortedClasses.map((cls, index) => {
-            const classTimeReached = isTimeReached(cls.date, cls.time);
+            const classTimeReached = cls.isAutoStart && isTimeReached(cls.date, cls.time);
             const canJoin = cls.isLive || classTimeReached;
+            const isEnded = !!cls.liveEndedAt && !cls.isLive;
 
             return (
               <div 
                 key={cls.id} 
-                className={`bg-white dark:bg-foreground/5 border border-gray-100 dark:border-foreground/10 p-6 rounded shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-6 group animate-in fade-in slide-in-from-bottom-4 ${canJoin ? 'hover:border-orange-500/50 hover:shadow-md ring-1 ring-transparent hover:ring-orange-500/20' : 'opacity-90'}`}
+                className={`bg-white dark:bg-foreground/5 border border-gray-100 dark:border-foreground/10 p-6 rounded shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-6 group animate-in fade-in slide-in-from-bottom-4 ${canJoin ? 'hover:border-orange-500/50 hover:shadow-md ring-1 ring-transparent hover:ring-orange-500/20' : 'opacity-90'} ${isEnded ? 'opacity-70 grayscale-[0.2]' : ''}`}
                 style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
               >
                 <div className="flex-1">
@@ -149,6 +152,10 @@ export default function StudentLiveClasses() {
                             {formatLiveDuration(cls.liveStartedAt)}
                           </span>
                         )}
+                      </span>
+                    ) : isEnded ? (
+                      <span className="px-2.5 py-1 bg-gray-500 text-white text-xs font-bold rounded uppercase tracking-wider">
+                        Completed
                       </span>
                     ) : (
                       <span className="px-2.5 py-1 bg-gray-100 dark:bg-foreground/10 text-gray-600 dark:text-foreground/70 text-xs font-bold rounded uppercase tracking-wider">
@@ -171,7 +178,23 @@ export default function StudentLiveClasses() {
                 </div>
                 
                 <div className="shrink-0 flex flex-col items-center gap-2">
-                  {canJoin ? (
+                  {isEnded ? (
+                    <div className="flex flex-col items-center bg-gray-50 dark:bg-foreground/5 px-6 py-3 rounded border border-gray-100 dark:border-foreground/10">
+                      <span className="text-sm text-gray-500 font-bold mb-1">Class Duration</span>
+                      <span className="text-xl font-extrabold text-gray-900 dark:text-white font-mono">
+                        {cls.liveStartedAt && cls.liveEndedAt ? (
+                          (() => {
+                            const diff = Math.floor((cls.liveEndedAt - cls.liveStartedAt) / 1000);
+                            const h = Math.floor(diff / 3600);
+                            const m = Math.floor((diff % 3600) / 60);
+                            const s = diff % 60;
+                            if (h > 0) return `${h}h ${m}m ${s}s`;
+                            return `${m}m ${s}s`;
+                          })()
+                        ) : 'Ended'}
+                      </span>
+                    </div>
+                  ) : canJoin ? (
                     <a 
                       href={cls.meetLink}
                       target="_blank"
@@ -189,8 +212,10 @@ export default function StudentLiveClasses() {
                     </button>
                   )}
                   
-                  {!canJoin && (
-                    <span className="text-xs text-gray-500 dark:text-foreground/50 font-medium">Button activates at class time</span>
+                  {!canJoin && !isEnded && (
+                    <span className="text-xs text-gray-500 dark:text-foreground/50 font-medium">
+                      {cls.isAutoStart ? 'Button activates at scheduled time' : 'Teacher will start this live manually'}
+                    </span>
                   )}
                 </div>
               </div>

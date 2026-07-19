@@ -113,7 +113,7 @@ export default function StudentCourseOverview() {
   
   // Find next upcoming live class
   const upcomingClasses = (course.liveClasses || [])
-    .filter((lc: any) => new Date(lc.date).setHours(0,0,0,0) >= new Date().setHours(0,0,0,0))
+    .filter((lc: any) => !lc.liveEndedAt && new Date(lc.date).setHours(0,0,0,0) >= new Date().setHours(0,0,0,0))
     .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
   
   const nextClass = upcomingClasses.length > 0 ? upcomingClasses[0] : null;
@@ -121,7 +121,7 @@ export default function StudentCourseOverview() {
   let canJoinLive = false;
   if (nextClass) {
     const classDateTime = new Date(`${nextClass.date}T${nextClass.time}`);
-    canJoinLive = nextClass.isLive || currentTime >= classDateTime;
+    canJoinLive = nextClass.isLive || (nextClass.isAutoStart && currentTime >= classDateTime);
   }
 
   return (
@@ -275,12 +275,17 @@ export default function StudentCourseOverview() {
                   <Video className="w-5 h-5" /> Join Class
                 </a>
               ) : (
-                <button 
-                  disabled
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-200 dark:bg-foreground/10 text-gray-400 dark:text-foreground/40 font-bold rounded cursor-not-allowed transition-colors"
-                >
-                  <Clock className="w-5 h-5" /> Starting Soon...
-                </button>
+                <div className="flex flex-col gap-2">
+                  <button 
+                    disabled
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-200 dark:bg-foreground/10 text-gray-400 dark:text-foreground/40 font-bold rounded cursor-not-allowed transition-colors"
+                  >
+                    <Clock className="w-5 h-5" /> Starting Soon...
+                  </button>
+                  <span className="text-[10px] text-center text-gray-400 font-medium">
+                    {nextClass.isAutoStart ? 'Activates at scheduled time' : 'Teacher will start this manually'}
+                  </span>
+                </div>
               )}
             </div>
           ) : (

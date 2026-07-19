@@ -16,6 +16,8 @@ type LiveClass = {
   meetLink: string;
   isLive?: boolean;
   liveStartedAt?: number;
+  liveEndedAt?: number;
+  isAutoStart?: boolean;
 };
 
 export default function CourseLiveClassesPage() {
@@ -36,6 +38,7 @@ export default function CourseLiveClassesPage() {
   const [newDate, setNewDate] = useState('');
   const [newTime, setNewTime] = useState('');
   const [newLink, setNewLink] = useState('');
+  const [isAutoStart, setIsAutoStart] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -67,12 +70,14 @@ export default function CourseLiveClassesPage() {
       setNewDate(cls.date);
       setNewTime(cls.time);
       setNewLink(cls.meetLink);
+      setIsAutoStart(cls.isAutoStart ?? false);
     } else {
       setEditingId(null);
       setNewTitle('');
       setNewDate('');
       setNewTime('');
       setNewLink('');
+      setIsAutoStart(false);
     }
     setIsAdding(true);
     setError('');
@@ -98,7 +103,7 @@ export default function CourseLiveClassesPage() {
     if (editingId) {
       updatedClasses = updatedClasses.map(cls => 
         cls.id === editingId 
-          ? { ...cls, title: newTitle, date: newDate, time: newTime, meetLink: newLink }
+          ? { ...cls, title: newTitle, date: newDate, time: newTime, meetLink: newLink, isAutoStart }
           : cls
       );
     } else {
@@ -108,6 +113,7 @@ export default function CourseLiveClassesPage() {
         date: newDate,
         time: newTime,
         meetLink: newLink,
+        isAutoStart,
         isLive: false
       };
       updatedClasses.push(newClass);
@@ -145,7 +151,8 @@ export default function CourseLiveClassesPage() {
         return { 
           ...c, 
           isLive: updatedStatus,
-          liveStartedAt: updatedStatus ? Date.now() : undefined
+          liveStartedAt: updatedStatus ? Date.now() : c.liveStartedAt,
+          liveEndedAt: !updatedStatus ? Date.now() : undefined
         };
       }
       return c;
@@ -161,6 +168,13 @@ export default function CourseLiveClassesPage() {
   };
 
   if (isLoading) return <div className="flex justify-center items-center h-64">Loading...</div>;
+
+  const formatDuration = (start: number, end: number) => {
+    const diff = Math.floor((end - start) / 1000);
+    const m = Math.floor(diff / 60);
+    const s = diff % 60;
+    return `${m}m ${s}s`;
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -185,8 +199,8 @@ export default function CourseLiveClassesPage() {
           
           {error && <div className="p-3 bg-red-500/10 text-red-500 rounded text-sm font-medium">{error}</div>}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="md:col-span-3">
               <label className="block text-sm font-medium mb-1">Topic / Title <span className="text-red-500">*</span></label>
               <input type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="e.g. Chapter 1 Problem Solving" className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded focus:border-orange-500" required />
             </div>
@@ -198,7 +212,20 @@ export default function CourseLiveClassesPage() {
               <label className="block text-sm font-medium mb-1">Time <span className="text-red-500">*</span></label>
               <input type="time" value={newTime} onChange={e => setNewTime(e.target.value)} className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded focus:border-orange-500" required />
             </div>
-            <div className="md:col-span-2">
+            <div className="flex flex-col justify-center">
+              <label className="block text-sm font-medium mb-1">Auto-start at time?</label>
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className={`w-12 h-6 rounded-full transition-colors relative ${isAutoStart ? 'bg-orange-500' : 'bg-foreground/20'}`}>
+                  <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-transform ${isAutoStart ? 'translate-x-7' : 'translate-x-1'}`}></div>
+                </div>
+                <span className="text-sm font-medium text-foreground/70 group-hover:text-foreground transition-colors">
+                  {isAutoStart ? 'Yes (Auto-activate Join)' : 'No (Manual Start)'}
+                </span>
+              </label>
+              {/* Invisible checkbox for accessibility */}
+              <input type="checkbox" checked={isAutoStart} onChange={e => setIsAutoStart(e.target.checked)} className="sr-only" />
+            </div>
+            <div className="md:col-span-3">
               <label className="block text-sm font-medium mb-1">Meeting/Live Link (Zoom / Meet / YouTube / FB) <span className="text-red-500">*</span></label>
               <input type="url" value={newLink} onChange={e => setNewLink(e.target.value)} placeholder="https://..." className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded focus:border-orange-500" required />
             </div>
@@ -222,14 +249,30 @@ export default function CourseLiveClassesPage() {
             <div key={cls.id} className="bg-background border border-foreground/10 p-5 rounded flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-orange-500/30 transition-colors shadow-sm">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  {cls.isLive && (
+                  {cls.isLive ? (
                     <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded uppercase tracking-wider animate-pulse">Live Now</span>
-                  )}
+                  ) : cls.liveEndedAt ? (
+                    <span className="px-2 py-1 bg-gray-500 text-white text-xs font-bold rounded uppercase tracking-wider">Ended</span>
+                  ) : null}
                   <h3 className="font-bold text-lg">{cls.title}</h3>
                 </div>
                 <div className="flex flex-wrap gap-4 text-sm text-foreground/70 font-medium">
                   <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4 text-orange-500" /> {cls.date}</span>
                   <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-orange-500" /> {cls.time}</span>
+                  {cls.isAutoStart ? (
+                    <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
+                      <span className="w-2 h-2 rounded-full bg-green-500"></span> Auto-Start ON
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5 text-gray-500">
+                      <span className="w-2 h-2 rounded-full bg-gray-400"></span> Manual Start
+                    </span>
+                  )}
+                  {cls.liveEndedAt && cls.liveStartedAt && (
+                    <span className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">
+                      Duration: {formatDuration(cls.liveStartedAt, cls.liveEndedAt)}
+                    </span>
+                  )}
                   <span className="flex items-center gap-1.5"><LinkIcon className="w-4 h-4 text-orange-500" /> <a href={cls.meetLink} target="_blank" rel="noopener noreferrer" className="hover:text-orange-500 underline underline-offset-2">Join Link</a></span>
                 </div>
               </div>

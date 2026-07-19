@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Video, Calendar, Clock, ExternalLink, PlayCircle } from 'lucide-react';
+import { Video, Calendar, Clock, ExternalLink, PlayCircle, Users } from 'lucide-react';
 import Image from 'next/image';
 
 type LiveClass = {

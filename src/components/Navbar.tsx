@@ -33,7 +33,7 @@ export default function Navbar() {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
               <div className="relative w-[180px] h-[48px] md:w-[220px] md:h-[56px] lg:w-[260px] lg:h-[64px] overflow-hidden flex items-center justify-center">
-                <Image src="/Sky learners academy.png" alt="Sky Learners Logo" fill className="object-contain scale-[1.7] origin-center" priority />
+                <Image src="/Skylearnars Academy logo.png" alt="Sky Learners Logo" fill className="object-contain scale-[1.7] origin-center" priority />
               </div>
             </Link>
 

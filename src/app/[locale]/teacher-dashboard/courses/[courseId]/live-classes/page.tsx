@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -40,6 +40,9 @@ export default function CourseLiveClassesPage() {
   const [newLink, setNewLink] = useState('');
   const [isAutoStart, setIsAutoStart] = useState(false);
   const [error, setError] = useState('');
+  
+  // Prevent duplicate auto-starts
+  const autoStartingRefs = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -181,8 +184,28 @@ export default function CourseLiveClassesPage() {
     } catch (err) {
       console.error(err);
       alert('Failed to update live status.');
+      throw err; // Re-throw to allow catch in auto-trigger
     }
   };
+
+  // Auto-start logic checking every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      liveClasses.forEach(cls => {
+        if (cls.isAutoStart && !cls.isLive && !cls.liveEndedAt && !autoStartingRefs.current.has(cls.id)) {
+          const scheduledTime = new Date(`${cls.date}T${cls.time}`);
+          if (now >= scheduledTime) {
+            autoStartingRefs.current.add(cls.id);
+            toggleGoLive(cls).catch(() => {
+              autoStartingRefs.current.delete(cls.id); // allow retry if it failed
+            });
+          }
+        }
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [liveClasses]);
 
   if (isLoading) return <div className="flex justify-center items-center h-64">Loading...</div>;
 

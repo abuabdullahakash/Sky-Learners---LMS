@@ -154,9 +154,13 @@ export default function StudentLiveClasses() {
 
   const renderClassCard = (cls: LiveClass, index: number) => {
     const classTimeReached = cls.isAutoStart && isTimeReached(cls.date, cls.time);
+    const isAutoStarting = cls.isAutoStart && classTimeReached && !cls.isLive && !cls.liveEndedAt;
     const canJoin = cls.isLive || classTimeReached;
     const isEnded = !!cls.liveEndedAt && !cls.isLive;
     const hasAttended = user && cls.attendedStudents?.includes(user.uid);
+    // Fallback: use scheduled time if isLive but liveStartedAt not yet written
+    const effectiveLiveStart = cls.liveStartedAt || 
+      (cls.isLive && cls.date && cls.time ? new Date(`${cls.date}T${cls.time}`).getTime() : undefined);
 
     return (
       <div 
@@ -171,11 +175,16 @@ export default function StudentLiveClasses() {
                 <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span> 
                 <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span> 
                 {t('liveNow')}
-                {cls.liveStartedAt && (
+                {effectiveLiveStart && (
                   <span className="ml-1 border-l border-white/30 pl-2 text-white/90 font-mono tracking-tighter">
-                    {formatLiveDuration(cls.liveStartedAt)}
+                    {formatLiveDuration(effectiveLiveStart)}
                   </span>
                 )}
+              </span>
+            ) : isAutoStarting ? (
+              <span className="px-2.5 py-1 bg-orange-500 text-white text-xs font-bold rounded uppercase tracking-wider animate-pulse flex items-center gap-1.5 shadow-sm">
+                <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span>
+                Auto-starting...
               </span>
             ) : isEnded ? (
               <span className="px-2.5 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded uppercase tracking-wider shadow-sm">
@@ -331,20 +340,46 @@ export default function StudentLiveClasses() {
           {liveModules.map((module, mIndex) => {
             const moduleClasses = sortedClasses.filter(c => c.moduleId === module.id);
             const isExpanded = expandedModules.includes(module.id);
+            const hasLiveClass = moduleClasses.some(c => c.isLive);
             if (moduleClasses.length === 0) return null; // Don't show empty modules for students
             
             return (
-              <div key={module.id} className="bg-white dark:bg-background rounded-none border-2 border-orange-500/30 hover:border-orange-500/50 overflow-hidden shadow-sm transition-all duration-300">
+              <div key={module.id} className={`bg-white dark:bg-background rounded-none overflow-hidden shadow-sm transition-all duration-300 border-2 ${
+                hasLiveClass 
+                  ? 'border-red-500/60 hover:border-red-500 shadow-red-500/10' 
+                  : 'border-orange-500/30 hover:border-orange-500/50'
+              }`}>
                 <button 
                   onClick={() => toggleModule(module.id)}
-                  className="w-full bg-orange-500/10 dark:bg-orange-500/10 border-l-4 border-orange-500 p-4 flex items-center gap-4 hover:bg-orange-500/15 dark:hover:bg-orange-500/15 transition-colors text-left"
+                  className={`w-full border-l-4 p-4 flex items-center gap-4 transition-colors text-left ${
+                    hasLiveClass
+                      ? 'bg-red-500/10 dark:bg-red-500/10 border-red-500 hover:bg-red-500/15'
+                      : 'bg-orange-500/10 dark:bg-orange-500/10 border-orange-500 hover:bg-orange-500/15 dark:hover:bg-orange-500/15'
+                  }`}
                 >
-                  <div className="p-1 bg-orange-500/20 rounded text-orange-600 dark:text-orange-400">
+                  <div className={`p-1 rounded ${
+                    hasLiveClass 
+                      ? 'bg-red-500/20 text-red-600 dark:text-red-400' 
+                      : 'bg-orange-500/20 text-orange-600 dark:text-orange-400'
+                  }`}>
                     {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                   </div>
                   <h3 className="font-bold text-lg text-gray-900 dark:text-white flex-1">{module.title}</h3>
-                  <span className="text-sm font-semibold text-orange-500 bg-orange-500/10 px-3 py-1 rounded-full">
-                    {moduleClasses.length} {t('liveSessions')}
+                  {hasLiveClass && (
+                    <span className="flex items-center gap-1.5 mr-2">
+                      <span className="relative flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                      </span>
+                      <span className="text-xs font-bold text-red-500 animate-pulse">LIVE</span>
+                    </span>
+                  )}
+                  <span className={`text-sm font-semibold px-3 py-1 rounded-full ${
+                    hasLiveClass
+                      ? 'text-white bg-red-500 animate-pulse'
+                      : 'text-orange-500 bg-orange-500/10'
+                  }`}>
+                    {hasLiveClass ? '🔴 ' : ''}{moduleClasses.length} {t('liveSessions')}
                   </span>
                 </button>
                 
@@ -358,7 +393,7 @@ export default function StudentLiveClasses() {
           })}
 
           {generalClasses.length > 0 && (
-            <div className="bg-white dark:bg-background rounded-none border border-gray-200 dark:border-foreground/10 overflow-hidden shadow-sm transition-all duration-300">
+            <div className="bg-white dark:bg-background rounded-none border-2 border-orange-500/30 hover:border-orange-500/50 overflow-hidden shadow-sm transition-all duration-300">
               <div className="bg-orange-500/10 dark:bg-orange-500/10 border-l-4 border-orange-500 text-foreground p-4 flex items-center gap-4 border-b border-gray-200 dark:border-foreground/10">
                 <div className="p-1 bg-orange-500/20 rounded text-orange-600 dark:text-orange-400">
                   <Video className="w-5 h-5" />

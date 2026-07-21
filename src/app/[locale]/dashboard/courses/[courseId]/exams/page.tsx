@@ -120,7 +120,7 @@ export default function StudentExams() {
   return (
     <div className="w-full max-w-7xl space-y-8 animate-in fade-in duration-500">
       {/* Hero Section */}
-      <div className="relative w-full mb-6 shadow-lg rounded-2xl overflow-hidden">
+      <div className="relative w-full mb-6 shadow-lg rounded-none overflow-hidden">
         <div className="absolute inset-0 bg-[#111827]"/>
         <div className="absolute inset-0" style={{background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 30%, #111827 60%, #0f172a 100%)'}} />
         <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 15% 60%, rgba(249,115,22,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 20%, rgba(239,68,68,0.2) 0%, transparent 40%)'}} />
@@ -169,7 +169,7 @@ export default function StudentExams() {
           return (
             <div 
               key={exam.id} 
-              className="bg-background border border-foreground/10 rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all hover:border-primary/30 hover:shadow-md animate-in slide-in-from-bottom-4 duration-500"
+              className="bg-background border border-foreground/10 rounded p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all hover:border-primary/30 hover:shadow-md animate-in slide-in-from-bottom-4 duration-500"
               style={{ animationDelay: `${idx * 100}ms` }}
             >
               <div className="flex-1">

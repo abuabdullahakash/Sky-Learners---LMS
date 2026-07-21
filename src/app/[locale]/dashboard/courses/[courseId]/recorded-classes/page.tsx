@@ -19,6 +19,11 @@ export default function StudentRecordedClasses() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedModule, setSelectedModule] = useState('All');
   const [selectedSubject, setSelectedSubject] = useState('All');
+  
+  // Popups States
+  const [showSearch, setShowSearch] = useState(false);
+  const [showModuleFilter, setShowModuleFilter] = useState(false);
+  const [showSubjectFilter, setShowSubjectFilter] = useState(false);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -121,7 +126,7 @@ export default function StudentRecordedClasses() {
     <div className="w-full space-y-6 animate-in fade-in duration-500 relative">
       
       {/* Hero Section */}
-      <div className="relative w-full mb-6 shadow-lg rounded-2xl overflow-hidden">
+      <div className="relative w-full mb-6 shadow-lg rounded-none overflow-hidden">
         <div className="absolute inset-0 bg-[#111827]"/>
         <div className="absolute inset-0" style={{background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 30%, #111827 60%, #0f172a 100%)'}} />
         <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 15% 60%, rgba(249,115,22,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 20%, rgba(239,68,68,0.2) 0%, transparent 40%)'}} />
@@ -133,83 +138,79 @@ export default function StudentRecordedClasses() {
           <PlayCircle className="w-32 h-32 text-orange-500 animate-pulse" />
         </div>
 
-        <div className="relative z-10 px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
+        <div className="relative z-10 px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex-1">
             <div className="flex items-center gap-2 mb-3">
               <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">Student Dashboard</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">Recorded Classes</h1>
             <p className="text-gray-300 text-sm font-medium">Watch your class recordings and download notes.</p>
           </div>
-        </div>
-      </div>
-      
-      {/* View Toggles */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4">
-        <div className="flex items-center gap-2 bg-foreground/5 p-1 rounded-xl border border-foreground/10">
-          <button 
-            onClick={() => setViewMode('list')}
-            className={`p-2.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-background shadow-sm text-orange-500' : 'text-foreground/60 hover:text-foreground'}`}
-            title="List View"
-          >
-            <ListIcon className="w-5 h-5" />
-          </button>
-          <button 
-            onClick={() => setViewMode('grid')}
-            className={`p-2.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-background shadow-sm text-orange-500' : 'text-foreground/60 hover:text-foreground'}`}
-            title="Grid View"
-          >
-            <LayoutGrid className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
+          
+          <div className="flex flex-wrap items-center gap-3 relative z-20">
+            {/* Search Popup */}
+            <div className="relative">
+              <button onClick={() => setShowSearch(!showSearch)} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50" title="Search">
+                <Search className="w-5 h-5" />
+              </button>
+              {showSearch && (
+                <div className="absolute right-0 top-[calc(100%+8px)] w-64 bg-background border border-foreground/10 p-2 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 z-50">
+                   <div className="relative">
+                     <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40" />
+                     <input 
+                        type="text" 
+                        placeholder="Search by lesson title or no..." 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        autoFocus
+                        className="w-full bg-foreground/5 border border-transparent pl-9 pr-3 py-2 rounded-lg text-sm focus:outline-none focus:border-orange-500/50 transition-colors text-foreground"
+                      />
+                   </div>
+                </div>
+              )}
+            </div>
 
-      {/* Advanced Filters */}
-      <div className="bg-background border border-foreground/10 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row gap-4 relative z-10">
-        
-        {/* Search */}
-        <div className="flex-1 relative">
-          <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-foreground/40" />
-          <input 
-            type="text" 
-            placeholder="Search by lesson title or no..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-foreground/5 border border-transparent pl-11 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-orange-500/50 transition-colors"
-          />
-        </div>
-        
-        {/* Module Filter */}
-        <div className="w-full md:w-48 relative">
-          <Filter className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-foreground/40 z-10 pointer-events-none" />
-          <select
-            value={selectedModule}
-            onChange={(e) => setSelectedModule(e.target.value)}
-            className="w-full bg-foreground/5 border border-transparent pl-10 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-orange-500/50 transition-colors appearance-none text-foreground dark:bg-[#1f1f1f] cursor-pointer"
-          >
-            <option value="All" className="bg-background text-foreground">All Modules</option>
-            {availableModules.map((mod: any, idx: number) => (
-              <option key={mod.id} value={mod.id} className="bg-background text-foreground">Module {idx + 1}: {mod.title}</option>
-            ))}
-          </select>
-        </div>
+            {/* Module Filter */}
+            <div className="relative">
+              <button onClick={() => setShowModuleFilter(!showModuleFilter)} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 flex items-center gap-2" title="Filter by Module">
+                <Filter className="w-5 h-5" />
+                {selectedModule !== 'All' && <span className="w-2 h-2 rounded-full bg-orange-500"></span>}
+              </button>
+              {showModuleFilter && (
+                <div className="absolute right-0 top-[calc(100%+8px)] w-56 bg-background border border-foreground/10 p-2 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 flex flex-col gap-1 max-h-60 overflow-y-auto z-50">
+                   <button onClick={() => {setSelectedModule('All'); setShowModuleFilter(false);}} className={`text-left px-3 py-2 text-sm rounded-lg hover:bg-orange-500/10 transition-colors ${selectedModule === 'All' ? 'text-orange-500 bg-orange-500/10 font-bold' : 'text-foreground'}`}>All Modules</button>
+                   {availableModules.map((mod: any, idx: number) => (
+                     <button key={mod.id} onClick={() => {setSelectedModule(mod.id); setShowModuleFilter(false);}} className={`text-left px-3 py-2 text-sm rounded-lg hover:bg-orange-500/10 transition-colors ${selectedModule === mod.id ? 'text-orange-500 bg-orange-500/10 font-bold' : 'text-foreground'}`}>Module {idx + 1}: {mod.title}</button>
+                   ))}
+                </div>
+              )}
+            </div>
 
-        {/* Subject Filter */}
-        {availableSubjects.length > 0 && (
-          <div className="w-full md:w-48 relative">
-            <BookOpen className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-foreground/40 z-10 pointer-events-none" />
-            <select
-              value={selectedSubject}
-              onChange={(e) => setSelectedSubject(e.target.value)}
-              className="w-full bg-foreground/5 border border-transparent pl-10 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-orange-500/50 transition-colors appearance-none text-foreground dark:bg-[#1f1f1f] cursor-pointer"
-            >
-              <option value="All" className="bg-background text-foreground">All Subjects</option>
-              {availableSubjects.map((sub: string) => (
-                <option key={sub} value={sub} className="bg-background text-foreground">{sub}</option>
-              ))}
-            </select>
+            {/* Subject Filter */}
+            {availableSubjects.length > 0 && (
+              <div className="relative">
+                <button onClick={() => setShowSubjectFilter(!showSubjectFilter)} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 flex items-center gap-2" title="Filter by Subject">
+                  <BookOpen className="w-5 h-5" />
+                  {selectedSubject !== 'All' && <span className="w-2 h-2 rounded-full bg-orange-500"></span>}
+                </button>
+                {showSubjectFilter && (
+                  <div className="absolute right-0 top-[calc(100%+8px)] w-48 bg-background border border-foreground/10 p-2 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 flex flex-col gap-1 max-h-60 overflow-y-auto z-50">
+                     <button onClick={() => {setSelectedSubject('All'); setShowSubjectFilter(false);}} className={`text-left px-3 py-2 text-sm rounded-lg hover:bg-orange-500/10 transition-colors ${selectedSubject === 'All' ? 'text-orange-500 bg-orange-500/10 font-bold' : 'text-foreground'}`}>All Subjects</button>
+                     {availableSubjects.map((sub: string) => (
+                       <button key={sub} onClick={() => {setSelectedSubject(sub); setShowSubjectFilter(false);}} className={`text-left px-3 py-2 text-sm rounded-lg hover:bg-orange-500/10 transition-colors ${selectedSubject === sub ? 'text-orange-500 bg-orange-500/10 font-bold' : 'text-foreground'}`}>{sub}</button>
+                     ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* View Mode Toggle inside hero */}
+            <div className="flex bg-white/10 border border-white/20 rounded-xl overflow-hidden shadow-sm">
+               <button onClick={() => setViewMode('list')} className={`p-2.5 transition-colors focus:outline-none ${viewMode === 'list' ? 'bg-white/20 text-white' : 'text-white/60 hover:text-white'}`} title="List View"><ListIcon className="w-5 h-5" /></button>
+               <button onClick={() => setViewMode('grid')} className={`p-2.5 transition-colors focus:outline-none ${viewMode === 'grid' ? 'bg-white/20 text-white' : 'text-white/60 hover:text-white'}`} title="Grid View"><LayoutGrid className="w-5 h-5" /></button>
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Results */}

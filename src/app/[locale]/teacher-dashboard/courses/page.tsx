@@ -152,14 +152,32 @@ export default function CoursesListPage() {
 
                 <div className="flex items-center justify-between mt-auto pt-4 border-t border-foreground/10">
                   <div className="flex flex-col">
-                    {course.discountPrice && course.discountValidUntil && new Date() <= (course.discountValidUntil?.toDate ? course.discountValidUntil.toDate() : new Date(course.discountValidUntil)) ? (
-                      <>
-                        <span className="text-[10px] text-foreground/50 line-through">৳{course.price}</span>
-                        <span className="text-lg font-extrabold text-orange-500">৳{course.discountPrice}</span>
-                      </>
-                    ) : (
-                      <span className="text-lg font-extrabold">৳{course.price}</span>
-                    )}
+                    {(() => {
+                      const hasDiscount = course.discountPrice !== undefined && course.discountPrice !== null && (course.discountPrice as any) !== '';
+                      const isDiscountValid = hasDiscount && course.discountValidUntil && new Date() <= (course.discountValidUntil?.toDate ? course.discountValidUntil.toDate() : new Date(course.discountValidUntil));
+                      const activeP = isDiscountValid ? Number(course.discountPrice) : Number(course.price || 0);
+                      const isFree = activeP === 0;
+
+                      if (isFree) {
+                        return isDiscountValid ? (
+                          <>
+                            <span className="text-[10px] text-foreground/50 line-through">৳{course.price}</span>
+                            <span className="text-lg font-extrabold text-emerald-500">ফ্রি</span>
+                          </>
+                        ) : (
+                          <span className="text-lg font-extrabold text-emerald-500">ফ্রি</span>
+                        );
+                      }
+
+                      return isDiscountValid ? (
+                        <>
+                          <span className="text-[10px] text-foreground/50 line-through">৳{course.price}</span>
+                          <span className="text-lg font-extrabold text-orange-500">৳{course.discountPrice}</span>
+                        </>
+                      ) : (
+                        <span className="text-lg font-extrabold">৳{course.price}</span>
+                      );
+                    })()}
                   </div>
                   <button 
                     onClick={(e) => {

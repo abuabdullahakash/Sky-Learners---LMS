@@ -24,13 +24,17 @@ export default function StickyPricingCard({ course }: { course: any }) {
     }
   }, []);
 
+  const hasDiscountPrice = course?.discountPrice !== undefined && course?.discountPrice !== null && course?.discountPrice !== '';
   let isDiscountValid = false;
-  if (course?.discountPrice && course?.discountValidUntil) {
+  if (hasDiscountPrice && course?.discountValidUntil) {
     const validUntil = new Date(course.discountValidUntil);
     if (validUntil >= new Date()) {
       isDiscountValid = true;
     }
   }
+
+  const activePrice = isDiscountValid ? Number(course?.discountPrice) : Number(course?.price || 0);
+  const isFree = activePrice === 0;
 
   return (
     <div className="lg:col-span-1 space-y-6 sticky top-24 h-fit pb-12">
@@ -39,9 +43,28 @@ export default function StickyPricingCard({ course }: { course: any }) {
           ref={shapeRef}
           className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/10 dark:bg-blue-500/20 rounded-full pointer-events-none opacity-50 dark:opacity-30" 
         />
-        <div className="text-center mb-6 relative z-10">
+        <div className="text-center mb-6 relative z-10 flex flex-col items-center">
           <p className="text-foreground/50 font-bold uppercase tracking-wider mb-2">{t('pricingCard.courseFee')}</p>
-          {isDiscountValid ? (
+          
+          {isFree && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-extrabold text-xs rounded-full uppercase tracking-wider mb-3 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              🎁 ফ্রি কোর্স
+            </div>
+          )}
+
+          {isFree ? (
+            isDiscountValid ? (
+              <div className="flex flex-col items-center justify-center">
+                <div className="text-xl font-bold text-foreground/40 line-through">৳{course.price}</div>
+                <div className="text-5xl font-extrabold text-emerald-500 dark:text-emerald-400">ফ্রি</div>
+              </div>
+            ) : (
+              <div className="text-5xl font-extrabold text-emerald-500 dark:text-emerald-400">
+                ফ্রি
+              </div>
+            )
+          ) : isDiscountValid ? (
             <div className="flex flex-col items-center justify-center">
               <div className="text-xl font-bold text-foreground/40 line-through">৳{course.price}</div>
               <div className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-rose-500">৳{course.discountPrice}</div>

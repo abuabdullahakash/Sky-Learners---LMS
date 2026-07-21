@@ -120,7 +120,8 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
     setError('');
 
     let activePrice = Number(course?.price) || 0;
-    if (course?.discountPrice && course?.discountValidUntil) {
+    const hasDiscountPrice = course?.discountPrice !== undefined && course?.discountPrice !== null && (course?.discountPrice as any) !== '';
+    if (hasDiscountPrice && course?.discountValidUntil) {
       const validUntil = new Date(course.discountValidUntil);
       if (new Date() <= validUntil) {
         activePrice = Number(course.discountPrice);
@@ -472,20 +473,20 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
                 <span>কোর্স ফি</span>
                 <span>৳{course?.price || 0}</span>
               </div>
-              {course?.discountPrice && course?.discountValidUntil && new Date() <= new Date(course.discountValidUntil) && (
+              {course?.discountPrice !== undefined && course?.discountPrice !== null && (course?.discountPrice as any) !== '' && course?.discountValidUntil && new Date() <= new Date(course.discountValidUntil) && (
                 <div className="flex justify-between text-green-600 font-medium">
                   <span>ডিসকাউন্ট</span>
-                  <span>-৳{(course?.price || 0) - course.discountPrice}</span>
+                  <span>-৳{(course?.price || 0) - Number(course.discountPrice)}</span>
                 </div>
               )}
               <div className="flex justify-between font-extrabold text-xl pt-2 border-t border-foreground/10">
                 <span>সর্বমোট</span>
                 <span className="text-primary">
-                  ৳{
-                    course?.discountPrice && course?.discountValidUntil && new Date() <= new Date(course.discountValidUntil) 
-                    ? course.discountPrice 
-                    : (course?.price || 0)
-                  }
+                  {(() => {
+                    const hasDisc = course?.discountPrice !== undefined && course?.discountPrice !== null && (course?.discountPrice as any) !== '' && course?.discountValidUntil && new Date() <= new Date(course.discountValidUntil);
+                    const finalP = hasDisc ? Number(course.discountPrice) : Number(course?.price || 0);
+                    return finalP === 0 ? 'ফ্রি (৳০)' : `৳${finalP}`;
+                  })()}
                 </span>
               </div>
             </div>

@@ -84,7 +84,7 @@ export default function CreateCoursePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    if (!title || !category || !price || !thumbnail) {
+    if (!title || !category || price === '' || price === undefined || price === null || !thumbnail) {
       setError('Please fill in all required fields and upload a thumbnail.');
       return;
     }
@@ -98,9 +98,9 @@ export default function CreateCoursePage() {
 
       // 2. Save Course to Firestore
       const courseData = {
-        teacherId: user.uid,
         title,
         subtitle,
+        teacherId: user.uid,
         courseType,
         category, // Used as Education Level
         eduClass: (category === 'primary' || category === 'high_school' || category === 'intermediate') ? eduClass : '',
@@ -114,7 +114,7 @@ export default function CreateCoursePage() {
         totalPdfs: totalPdfs ? Number(totalPdfs) : 0,
         hasDoubtSolving,
         price: Number(price),
-        discountPrice: discountPrice ? Number(discountPrice) : null,
+        discountPrice: (discountPrice !== '' && discountPrice !== null && discountPrice !== undefined) ? Number(discountPrice) : null,
         discountValidUntil,
         classStartDate,
         courseValidity,

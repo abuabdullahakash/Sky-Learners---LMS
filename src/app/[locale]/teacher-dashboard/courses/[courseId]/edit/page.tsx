@@ -92,7 +92,7 @@ export default function EditCoursePage() {
           setDepartment(data.department || '');
           setYear(data.year || '');
           setCoachingName(data.coachingName || '');
-          setPrice(data.price ? data.price.toString() : '');
+          setPrice(data.price !== undefined && data.price !== null ? data.price.toString() : '');
           setThumbnailPreview(data.thumbnailUrl || '');
           
           setTotalLiveClasses(data.totalLiveClasses ? data.totalLiveClasses.toString() : '');
@@ -101,7 +101,7 @@ export default function EditCoursePage() {
           setTotalPdfs(data.totalPdfs ? data.totalPdfs.toString() : '');
           setHasDoubtSolving(data.hasDoubtSolving || false);
           
-          setDiscountPrice(data.discountPrice ? data.discountPrice.toString() : '');
+          setDiscountPrice(data.discountPrice !== undefined && data.discountPrice !== null ? data.discountPrice.toString() : '');
           setDiscountValidUntil(data.discountValidUntil || '');
           setClassStartDate(data.classStartDate || '');
           setCourseValidity(data.courseValidity || '');
@@ -139,7 +139,7 @@ export default function EditCoursePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !courseId) return;
-    if (!title || !category || !price || (!thumbnail && !thumbnailPreview)) {
+    if (!title || !category || price === '' || price === undefined || price === null || (!thumbnail && !thumbnailPreview)) {
       setError('Please fill in all required fields and upload a thumbnail.');
       return;
     }
@@ -171,7 +171,7 @@ export default function EditCoursePage() {
         totalPdfs: totalPdfs ? Number(totalPdfs) : 0,
         hasDoubtSolving,
         price: Number(price),
-        discountPrice: discountPrice ? Number(discountPrice) : null,
+        discountPrice: (discountPrice !== '' && discountPrice !== null && discountPrice !== undefined) ? Number(discountPrice) : null,
         discountValidUntil,
         classStartDate,
         courseValidity,

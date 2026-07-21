@@ -57,7 +57,7 @@ export default function RelatedCourses({
         const primaryMatches = allCourses.filter(c => c.category === category && c.eduClass === eduClass);
         const others = allCourses.filter(c => !(c.category === category && c.eduClass === eduClass));
 
-        const sorted = [...primaryMatches, ...others].slice(0, 3); // Limit to 3 for related courses
+        const sorted = [...primaryMatches, ...others];
         setCourses(sorted);
       } catch (err) {
         console.error("Error fetching related courses", err);
@@ -69,18 +69,32 @@ export default function RelatedCourses({
     fetchRelatedCourses();
   }, [currentCourseId, teacherId, category, eduClass]);
 
+  const [showAll, setShowAll] = useState(false);
+
   if (loading) return null;
   if (courses.length === 0) return null;
 
+  const visibleCourses = showAll ? courses : courses.slice(0, 2);
+
   return (
     <section className="animate-in slide-in-from-bottom-4 duration-700 delay-300 mt-16 pt-16 border-t border-foreground/10 relative z-10">
-      <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-        <Book className="w-8 h-8 text-primary" /> 
-        {t('relatedCourses') || 'Related Courses by this Instructor'}
-      </h2>
+      <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
+        <h2 className="text-3xl font-bold flex items-center gap-3">
+          <Book className="w-8 h-8 text-primary" /> 
+          {t('relatedCourses') || 'Related Courses by this Instructor'}
+        </h2>
+        {courses.length > 2 && (
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="px-5 py-2.5 bg-orange-500/10 hover:bg-orange-500 text-orange-600 dark:text-orange-400 hover:text-white font-bold text-sm rounded-xl transition-all duration-300 flex items-center gap-2 border border-orange-500/20"
+          >
+            {showAll ? 'কম দেখুন' : `আরও দেখুন (${courses.length - 2}টি)`}
+          </button>
+        )}
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses.map(course => {
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {visibleCourses.map(course => {
           // Badge Logic
           let badgeText = course.category === 'primary' ? 'Primary' :
                           course.category === 'high_school' ? 'High School' :
@@ -105,15 +119,19 @@ export default function RelatedCourses({
             }
           }
 
-          // Discount Logic
+          // Discount & Pricing Logic
+          const hasDiscountPrice = course.discountPrice !== undefined && course.discountPrice !== null && course.discountPrice !== '';
           let isDiscountValid = false;
           let expiryDate = null;
-          if (course.discountPrice && course.discountValidUntil) {
+          if (hasDiscountPrice && course.discountValidUntil) {
             expiryDate = course.discountValidUntil?.toDate ? course.discountValidUntil.toDate() : new Date(course.discountValidUntil);
             if (expiryDate && expiryDate > new Date()) {
               isDiscountValid = true;
             }
           }
+
+          const activePrice = isDiscountValid ? Number(course.discountPrice) : Number(course.price || 0);
+          const isFree = activePrice === 0;
 
           return (
             <div key={course.id} className="bg-background rounded-[14px] border border-foreground/10 hover:border-orange-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-orange-500/10 hover:-translate-y-2 overflow-hidden group flex flex-col relative">
@@ -132,6 +150,11 @@ export default function RelatedCourses({
                   </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                {isFree && (
+                  <div className="absolute top-3 right-3 bg-emerald-500 text-white font-extrabold text-xs px-3 py-1 rounded-full shadow-lg z-20 flex items-center gap-1">
+                    🎁 ফ্রি কোর্স
+                  </div>
+                )}
               </div>
               
               <div className="p-5 flex-1 flex flex-col relative z-10 bg-background">
@@ -147,8 +170,15 @@ export default function RelatedCourses({
                 <h3 className="text-2xl font-bold mb-2 line-clamp-2 leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-500 group-hover:to-rose-500 transition-all duration-300">{course.title}</h3>
                 
                 {/* Badge Below Title */}
-                <div className="bg-foreground/5 border border-foreground/10 px-3 py-1 rounded-full text-xs font-extrabold text-foreground w-fit mb-3">
-                  {badgeText}
+                <div className="flex flex-wrap gap-2 mb-3">
+                  <div className="bg-foreground/5 border border-foreground/10 px-3 py-1 rounded-full text-xs font-extrabold text-foreground w-fit">
+                    {badgeText}
+                  </div>
+                  {isFree && (
+                    <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full text-xs font-extrabold w-fit">
+                      🎁 ফ্রি
+                    </div>
+                  )}
                 </div>
 
                 <p className="text-foreground/60 mb-5 line-clamp-2 text-sm leading-relaxed">
@@ -176,7 +206,16 @@ export default function RelatedCourses({
 
                 <div className="mt-auto pt-5 border-t border-foreground/10 flex items-center justify-between">
                   <div className="flex flex-col">
-                    {isDiscountValid ? (
+                    {isFree ? (
+                      isDiscountValid ? (
+                        <>
+                          <span className="text-xs text-foreground/50 line-through font-medium">৳{course.price}</span>
+                          <span className="font-extrabold text-3xl text-emerald-500">ফ্রি</span>
+                        </>
+                      ) : (
+                        <span className="font-extrabold text-3xl text-emerald-500">ফ্রি</span>
+                      )
+                    ) : isDiscountValid ? (
                       <>
                         <span className="text-xs text-foreground/50 line-through font-medium">৳{course.price}</span>
                         <span className="font-extrabold text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-rose-500">
@@ -201,6 +240,17 @@ export default function RelatedCourses({
           );
         })}
       </div>
+
+      {courses.length > 2 && (
+        <div className="mt-8 text-center">
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="px-8 py-3 bg-gradient-to-r from-orange-500 to-rose-500 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 active:scale-95 inline-flex items-center gap-2"
+          >
+            {showAll ? 'কম দেখুন' : `আরও ${courses.length - 2}টি কোর্স দেখুন`}
+          </button>
+        </div>
+      )}
     </section>
   );
 }

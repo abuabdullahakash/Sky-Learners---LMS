@@ -22,14 +22,14 @@ interface CommunityLink {
   url: string;
 }
 
-const PLATFORM_INFO: Record<string, { icon: React.FC<any>; color: string }> = {
-  facebook_public: { icon: FacebookIcon, color: 'text-blue-600 bg-blue-500/10 hover:bg-blue-500/20 border-blue-500/20 dark:text-blue-400 dark:border-blue-500/30' },
-  facebook_private: { icon: FacebookIcon, color: 'text-blue-700 bg-blue-600/10 hover:bg-blue-600/20 border-blue-600/20 dark:text-blue-500 dark:border-blue-600/30' },
-  whatsapp: { icon: MessageCircle, color: 'text-green-600 bg-green-500/10 hover:bg-green-500/20 border-green-500/20 dark:text-green-400 dark:border-green-500/30' },
-  telegram: { icon: Send, color: 'text-sky-500 bg-sky-500/10 hover:bg-sky-500/20 border-sky-500/20 dark:text-sky-400 dark:border-sky-500/30' },
-  discord: { icon: MessageSquare, color: 'text-indigo-500 bg-indigo-500/10 hover:bg-indigo-500/20 border-indigo-500/20 dark:text-indigo-400 dark:border-indigo-500/30' },
-  youtube: { icon: YoutubeIcon, color: 'text-red-500 bg-red-500/10 hover:bg-red-500/20 border-red-500/20 dark:text-red-400 dark:border-red-500/30' },
-  other: { icon: LinkIcon, color: 'text-primary bg-primary/10 hover:bg-primary/20 border-primary/20 dark:border-primary/30' },
+const PLATFORM_INFO: Record<string, { icon: React.FC<any>; colorClass: string; iconBg: string }> = {
+  facebook_public: { icon: FacebookIcon, colorClass: 'border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20', iconBg: 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400' },
+  facebook_private: { icon: FacebookIcon, colorClass: 'border-blue-600/30 bg-blue-50 dark:bg-blue-600/10 hover:bg-blue-100 dark:hover:bg-blue-600/20', iconBg: 'bg-blue-100 dark:bg-blue-600/20 text-blue-700 dark:text-blue-500' },
+  whatsapp: { icon: MessageCircle, colorClass: 'border-green-500/30 bg-green-50 dark:bg-green-500/10 hover:bg-green-100 dark:hover:bg-green-500/20', iconBg: 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' },
+  telegram: { icon: Send, colorClass: 'border-sky-500/30 bg-sky-50 dark:bg-sky-500/10 hover:bg-sky-100 dark:hover:bg-sky-500/20', iconBg: 'bg-sky-100 dark:bg-sky-500/20 text-sky-500 dark:text-sky-400' },
+  discord: { icon: MessageSquare, colorClass: 'border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20', iconBg: 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' },
+  youtube: { icon: YoutubeIcon, colorClass: 'border-red-500/30 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20', iconBg: 'bg-red-100 dark:bg-red-500/20 text-red-500 dark:text-red-400' },
+  other: { icon: LinkIcon, colorClass: 'border-orange-500/30 bg-orange-50 dark:bg-orange-500/10 hover:bg-orange-100 dark:hover:bg-orange-500/20', iconBg: 'bg-orange-100 dark:bg-orange-500/20 text-orange-500 dark:text-orange-400' },
 };
 
 export default function StudentCommunity() {
@@ -98,7 +98,8 @@ export default function StudentCommunity() {
     <div className="w-full space-y-6">
       
       {/* Colorful Hero Section */}
-      <div className="relative overflow-hidden rounded bg-gradient-to-r from-orange-500 to-red-600 p-8 text-white shadow-md">
+      <div className="relative overflow-hidden rounded p-8 text-white shadow-md" style={{background: 'linear-gradient(135deg, #f97316 0%, #ef4444 60%, #dc2626 100%)'}}>
+        <div className="absolute inset-0 opacity-20" style={{backgroundImage: 'radial-gradient(circle at 80% 20%, #fff 0%, transparent 50%)'}}></div>
         <div className="relative z-10 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
@@ -127,10 +128,10 @@ export default function StudentCommunity() {
               href={link.url} 
               target="_blank" 
               rel="noopener noreferrer"
-              className={`flex items-center justify-between p-6 rounded border transition-all duration-300 group ${info.color}`}
+            className={`flex items-center justify-between p-5 rounded border transition-all duration-300 group ${info.colorClass}`}
             >
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-white dark:bg-background rounded shadow-sm">
+                <div className={`p-3 rounded shadow-sm ${info.iconBg}`}>
                   <Icon className="w-6 h-6" />
                 </div>
                 <div>

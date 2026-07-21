@@ -113,7 +113,8 @@ export default function CourseCommunityPage() {
     <div className="space-y-6 animate-in fade-in duration-500">
       
       {/* Colorful Hero Section */}
-      <div className="relative overflow-hidden rounded bg-gradient-to-r from-orange-500 to-red-600 p-8 text-white shadow-md">
+      <div className="relative overflow-hidden rounded p-8 text-white shadow-md" style={{background: 'linear-gradient(135deg, #f97316 0%, #ef4444 60%, #dc2626 100%)'}}>
+        <div className="absolute inset-0 opacity-20" style={{backgroundImage: 'radial-gradient(circle at 80% 20%, #fff 0%, transparent 50%)'}}></div>
         <div className="relative z-10 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
@@ -202,7 +203,7 @@ export default function CourseCommunityPage() {
           )}
           
           <div className="flex justify-end pt-6 border-t border-foreground/10">
-            <button type="submit" disabled={isSaving} className="px-6 py-2.5 bg-primary text-white font-bold rounded hover:bg-primary/90 transition-all shadow-sm flex items-center gap-2">
+            <button type="submit" disabled={isSaving} className="px-6 py-2.5 font-bold rounded flex items-center gap-2 text-white transition-all shadow-md hover:shadow-lg hover:opacity-90 disabled:opacity-60" style={{background: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)'}}>
               <Save className="w-4 h-4" /> {isSaving ? 'Saving...' : 'Save Changes'}
             </button>
           </div>

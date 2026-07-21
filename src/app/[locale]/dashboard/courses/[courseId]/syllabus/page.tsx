@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 
 export default function SyllabusPage() {
   const tHero = useTranslations('Dashboard.studentHero');
+  const tSyllabus = useTranslations('Dashboard.syllabus');
   const params = useParams();
   const courseId = params.courseId as string;
   
@@ -23,8 +24,8 @@ export default function SyllabusPage() {
         if (docSnap.exists()) {
           setCourse(docSnap.data());
           // Expand the first module by default
-          if (docSnap.data().modules && docSnap.data().modules.length > 0) {
-            setExpandedModules([docSnap.data().modules[0].id]);
+          if (docSnap.data().syllabus?.modules && docSnap.data().syllabus.modules.length > 0) {
+            setExpandedModules([docSnap.data().syllabus.modules[0].id]);
           }
         }
       } catch (error) {
@@ -86,13 +87,13 @@ export default function SyllabusPage() {
                 <BookOpen className="w-5 h-5 text-orange-500" /> Course Curriculum
               </h2>
               
-              {(!course?.modules || course.modules.length === 0) ? (
+              {(!course?.syllabus?.modules || course.syllabus.modules.length === 0) ? (
                 <div className="text-center py-10 bg-foreground/5 rounded-xl border-2 border-dashed border-foreground/10">
                   <p className="text-foreground/50 font-medium">Curriculum is being prepared.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {course.modules.map((module: any, mIndex: number) => {
+                  {course.syllabus.modules.map((module: any, mIndex: number) => {
                     const isExpanded = expandedModules.includes(module.id);
                     return (
                       <div key={module.id} className="border border-foreground/10 rounded-xl overflow-hidden shadow-sm transition-all duration-300">
@@ -101,17 +102,26 @@ export default function SyllabusPage() {
                           onClick={() => toggleModule(module.id)}
                           className="w-full bg-foreground/5 hover:bg-foreground/10 p-4 flex items-center justify-between transition-colors text-left"
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="bg-orange-500/10 text-orange-500 p-2 rounded-lg">
-                              {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
-                            </div>
+                          <div className="flex items-center gap-4">
+                            {module.imageUrl ? (
+                              <img src={module.imageUrl} alt={module.title} className="w-10 h-10 object-cover rounded-lg bg-white" />
+                            ) : (
+                              <div className="w-10 h-10 bg-orange-500/10 text-orange-500 rounded-lg flex items-center justify-center">
+                                <BookOpen className="w-5 h-5" />
+                              </div>
+                            )}
                             <div>
                               <span className="text-xs font-bold text-orange-500 uppercase tracking-wider block mb-0.5">Module {mIndex + 1}</span>
-                              <span className="font-bold text-foreground">{module.title}</span>
+                              <span className="font-bold text-foreground text-lg">{module.title}</span>
                             </div>
                           </div>
-                          <div className="hidden sm:flex items-center gap-2 text-xs font-medium text-foreground/50 bg-background px-3 py-1.5 rounded-full border border-foreground/10">
-                            <span>{module.lessons?.length || 0} Lessons</span>
+                          <div className="flex items-center gap-3">
+                            <div className="hidden sm:flex items-center gap-2 text-xs font-medium text-foreground/50 bg-background px-3 py-1.5 rounded-full border border-foreground/10">
+                              <span>{module.lessons?.length || 0} Lessons</span>
+                            </div>
+                            <div className="text-foreground/50 bg-background p-1.5 rounded-lg border border-foreground/10">
+                              {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                            </div>
                           </div>
                         </button>
                         
@@ -119,26 +129,39 @@ export default function SyllabusPage() {
                         {isExpanded && (
                           <div className="bg-background divide-y divide-foreground/5">
                             {(!module.lessons || module.lessons.length === 0) ? (
-                              <div className="p-4 text-sm text-foreground/40 text-center">No lessons added yet.</div>
+                              <div className="p-4 text-sm text-foreground/40 text-center">No topics added yet.</div>
                             ) : (
-                              module.lessons.map((lesson: any, lIndex: number) => (
-                                <div key={lesson.id} className="p-4 flex items-start sm:items-center gap-4 hover:bg-foreground/[0.02] transition-colors">
-                                  <div className="mt-1 sm:mt-0 text-foreground/30">
-                                    {lesson.type === 'video' || lesson.videoUrl ? <PlayCircle className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
+                              module.lessons.map((lesson: any, lIndex: number) => {
+                                const vCount = lesson.videoCount || 0;
+                                const eCount = lesson.examCount || 0;
+                                const nCount = lesson.noteCount || 0;
+                                const metaData = [];
+                                if (vCount > 0) metaData.push(tSyllabus('videoCount', { count: vCount }));
+                                if (eCount > 0) metaData.push(tSyllabus('examCount', { count: eCount }));
+                                if (nCount > 0) metaData.push(tSyllabus('noteCount', { count: nCount }));
+                                
+                                return (
+                                  <div key={lesson.id} className="p-4 flex items-start sm:items-center gap-4 hover:bg-foreground/[0.02] transition-colors">
+                                    <div className="mt-1 sm:mt-0 text-foreground/30 bg-foreground/5 p-2 rounded-lg">
+                                      <FileText className="w-5 h-5" />
+                                    </div>
+                                    <div className="flex-1">
+                                      <h4 className="text-sm font-bold text-foreground mb-1">
+                                        {lesson.title}
+                                      </h4>
+                                      <div className="text-xs text-foreground/50 font-medium flex items-center flex-wrap gap-2">
+                                        {metaData.length > 0 ? metaData.map((meta, i) => (
+                                          <span key={i} className="flex items-center gap-2">
+                                            {meta} {i < metaData.length - 1 && <span className="text-foreground/20">•</span>}
+                                          </span>
+                                        )) : (
+                                          <span>No items</span>
+                                        )}
+                                      </div>
+                                    </div>
                                   </div>
-                                  <div className="flex-1">
-                                    <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                                      {lesson.title}
-                                      {lesson.isFreePreview && (
-                                        <span className="text-[10px] bg-green-500/10 text-green-500 px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">Preview</span>
-                                      )}
-                                    </h4>
-                                  </div>
-                                  <div className="text-xs text-foreground/50 font-medium">
-                                    Lesson {lIndex + 1}
-                                  </div>
-                                </div>
-                              ))
+                                );
+                              })
                             )}
                           </div>
                         )}

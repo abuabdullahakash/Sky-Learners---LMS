@@ -55,6 +55,7 @@ export default function CourseCurriculumPage() {
   const [syllabusObjectives, setSyllabusObjectives] = useState('');
   const [syllabusPrerequisites, setSyllabusPrerequisites] = useState('');
   const [syllabusGrading, setSyllabusGrading] = useState('');
+  const [syllabusModules, setSyllabusModules] = useState<any[]>([]);
   
   // Lesson form state
   const [editingModuleId, setEditingModuleId] = useState<string | null>(null);
@@ -91,6 +92,7 @@ export default function CourseCurriculumPage() {
           setSyllabusObjectives(data.syllabus.objectives || '');
           setSyllabusPrerequisites(data.syllabus.prerequisites || '');
           setSyllabusGrading(data.syllabus.grading || '');
+          setSyllabusModules(data.syllabus.modules || []);
         }
       } catch (error) {
         console.error("Error fetching course", error);
@@ -161,6 +163,7 @@ export default function CourseCurriculumPage() {
           objectives: syllabusObjectives,
           prerequisites: syllabusPrerequisites,
           grading: syllabusGrading,
+          modules: syllabusModules,
         }
       });
       alert('Syllabus details saved successfully!');
@@ -168,6 +171,68 @@ export default function CourseCurriculumPage() {
       console.error(error);
       alert('Failed to save syllabus');
     }
+  };
+
+  // --- Syllabus Module Management ---
+  const handleAddSyllabusModule = () => {
+    setSyllabusModules([...syllabusModules, {
+      id: Date.now().toString(),
+      title: '',
+      imageUrl: '',
+      lessons: []
+    }]);
+  };
+
+  const handleUpdateSyllabusModule = (moduleId: string, field: string, value: any) => {
+    setSyllabusModules(prev => prev.map(m => m.id === moduleId ? { ...m, [field]: value } : m));
+  };
+
+  const handleRemoveSyllabusModule = (moduleId: string) => {
+    if (confirm('Are you sure you want to delete this syllabus module?')) {
+      setSyllabusModules(prev => prev.filter(m => m.id !== moduleId));
+    }
+  };
+
+  const handleAddSyllabusLesson = (moduleId: string) => {
+    setSyllabusModules(prev => prev.map(m => {
+      if (m.id === moduleId) {
+        return {
+          ...m,
+          lessons: [...(m.lessons || []), {
+            id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+            title: '',
+            videoCount: 1,
+            examCount: 0,
+            noteCount: 0
+          }]
+        };
+      }
+      return m;
+    }));
+  };
+
+  const handleUpdateSyllabusLesson = (moduleId: string, lessonId: string, field: string, value: any) => {
+    setSyllabusModules(prev => prev.map(m => {
+      if (m.id === moduleId) {
+        return {
+          ...m,
+          lessons: m.lessons.map((l: any) => l.id === lessonId ? { ...l, [field]: value } : l)
+        };
+      }
+      return m;
+    }));
+  };
+
+  const handleRemoveSyllabusLesson = (moduleId: string, lessonId: string) => {
+    setSyllabusModules(prev => prev.map(m => {
+      if (m.id === moduleId) {
+        return {
+          ...m,
+          lessons: m.lessons.filter((l: any) => l.id !== lessonId)
+        };
+      }
+      return m;
+    }));
   };
 
   // --- Lesson Management ---
@@ -516,6 +581,110 @@ export default function CourseCurriculumPage() {
                 className="w-full bg-foreground/5 border border-foreground/10 px-4 py-3 rounded focus:outline-none focus:border-orange-500 min-h-[100px]"
               />
             </div>
+          </div>
+
+          <div className="pt-6 border-t border-foreground/10 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-orange-500" /> Syllabus Outline
+              </h3>
+              <button onClick={handleAddSyllabusModule} className="px-3 py-1.5 bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-foreground text-sm font-bold rounded-lg transition-colors flex items-center gap-1">
+                <Plus className="w-4 h-4" /> Add Module
+              </button>
+            </div>
+
+            {syllabusModules.length === 0 ? (
+              <div className="text-center p-8 border-2 border-dashed border-foreground/10 rounded-xl bg-foreground/5 text-foreground/50 text-sm">
+                No syllabus modules added. Click "Add Module" to start building your course outline.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {syllabusModules.map((module: any, mIndex: number) => (
+                  <div key={module.id} className="border border-foreground/10 rounded-xl overflow-hidden shadow-sm bg-background">
+                    <div className="bg-foreground/5 p-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 border-b border-foreground/10">
+                      <div className="font-bold text-orange-500 whitespace-nowrap">Module {mIndex + 1}:</div>
+                      <div className="flex-1 flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
+                        <input 
+                          type="text" 
+                          value={module.title}
+                          onChange={(e) => handleUpdateSyllabusModule(module.id, 'title', e.target.value)}
+                          placeholder="Module Title (e.g. English, Math)"
+                          className="flex-1 w-full bg-background border border-foreground/10 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-orange-500"
+                        />
+                        <input 
+                          type="text" 
+                          value={module.imageUrl || ''}
+                          onChange={(e) => handleUpdateSyllabusModule(module.id, 'imageUrl', e.target.value)}
+                          placeholder="Image URL (optional)"
+                          className="w-full sm:w-48 bg-background border border-foreground/10 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-orange-500"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2 self-end sm:self-auto w-full sm:w-auto mt-2 sm:mt-0 justify-end">
+                        <button onClick={() => handleAddSyllabusLesson(module.id)} className="text-sm px-3 py-1.5 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded hover:bg-orange-500/20 font-bold transition-colors whitespace-nowrap flex items-center gap-1">
+                          <Plus className="w-4 h-4" /> Add Topic
+                        </button>
+                        <button onClick={() => handleRemoveSyllabusModule(module.id)} className="p-1.5 text-red-500 hover:bg-red-500/10 rounded transition-colors" title="Delete Module">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="p-3 space-y-2 bg-background">
+                      {(!module.lessons || module.lessons.length === 0) ? (
+                        <div className="text-center p-3 text-foreground/40 text-xs">No topics added to this module yet.</div>
+                      ) : (
+                        module.lessons.map((lesson: any, lIndex: number) => (
+                          <div key={lesson.id} className="flex flex-col md:flex-row items-start md:items-center gap-3 p-3 bg-foreground/5 rounded border border-foreground/10 group">
+                            <span className="text-xs font-bold text-foreground/50 hidden sm:block w-6">{lIndex + 1}.</span>
+                            <div className="flex-1 w-full">
+                              <input 
+                                type="text" 
+                                value={lesson.title}
+                                onChange={(e) => handleUpdateSyllabusLesson(module.id, lesson.id, 'title', e.target.value)}
+                                placeholder="Topic Title (e.g. Lesson 18: Make Your Snacks)"
+                                className="w-full bg-background border border-foreground/10 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-orange-500"
+                              />
+                            </div>
+                            <div className="flex items-center gap-3 w-full md:w-auto">
+                              <div className="flex items-center gap-1">
+                                <VideoIcon className="w-4 h-4 text-blue-500" />
+                                <input 
+                                  type="number" min="0"
+                                  value={lesson.videoCount}
+                                  onChange={(e) => handleUpdateSyllabusLesson(module.id, lesson.id, 'videoCount', parseInt(e.target.value) || 0)}
+                                  className="w-12 bg-background border border-foreground/10 rounded px-2 py-1 text-xs text-center focus:outline-none focus:border-orange-500"
+                                />
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <FileText className="w-4 h-4 text-purple-500" />
+                                <input 
+                                  type="number" min="0"
+                                  value={lesson.examCount}
+                                  onChange={(e) => handleUpdateSyllabusLesson(module.id, lesson.id, 'examCount', parseInt(e.target.value) || 0)}
+                                  className="w-12 bg-background border border-foreground/10 rounded px-2 py-1 text-xs text-center focus:outline-none focus:border-orange-500"
+                                />
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <BookOpen className="w-4 h-4 text-green-500" />
+                                <input 
+                                  type="number" min="0"
+                                  value={lesson.noteCount}
+                                  onChange={(e) => handleUpdateSyllabusLesson(module.id, lesson.id, 'noteCount', parseInt(e.target.value) || 0)}
+                                  className="w-12 bg-background border border-foreground/10 rounded px-2 py-1 text-xs text-center focus:outline-none focus:border-orange-500"
+                                />
+                              </div>
+                              <button onClick={() => handleRemoveSyllabusLesson(module.id, lesson.id)} className="p-1.5 text-red-500 hover:bg-red-500/10 rounded transition-colors ml-auto md:ml-0" title="Delete Topic">
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -280,6 +280,11 @@
       "resourcesSubtitle": "শিক্ষকের দেওয়া সমস্ত নোটস, পিডিএফ এবং স্লাইডস অ্যাক্সেস করুন।",
       "syllabusTitle": "কোর্স সিলেবাস",
       "syllabusSubtitle": "বিস্তারিত কারিকুলাম এবং লার্নিং পাথ দেখুন।"
+    },
+    "syllabus": {
+      "videoCount": "{count} টি ভিডিও",
+      "examCount": "{count} টি এক্সাম",
+      "noteCount": "{count} টি নোট"
     }
   },
   "Footer": {

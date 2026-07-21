@@ -280,6 +280,11 @@
       "resourcesSubtitle": "Access all course notes, PDFs, slides, and materials shared by your instructor.",
       "syllabusTitle": "Course Syllabus",
       "syllabusSubtitle": "Explore the detailed curriculum and learning path."
+    },
+    "syllabus": {
+      "videoCount": "{count} Video",
+      "examCount": "{count} Exam",
+      "noteCount": "{count} Note"
     }
   },
   "Footer": {

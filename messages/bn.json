@@ -265,6 +265,21 @@
       "generalClasses": "সাধারণ ক্লাসসমূহ",
       "watchRecording": "রেকর্ডিং দেখুন",
       "goLiveAgain": "আবার লাইভ করুন"
+    },
+    "studentHero": {
+      "badge": "স্টুডেন্ট ড্যাশবোর্ড",
+      "communityTitle": "কমিউনিটি",
+      "communitySubtitle": "আপনার সহপাঠী এবং শিক্ষকদের সাথে যুক্ত হোন।",
+      "examsTitle": "কুইজ ও এক্সাম",
+      "examsSubtitle": "আপনার এক্সামগুলো দিন এবং প্রোগ্রেস ট্র্যাক করুন।",
+      "liveClassesTitle": "লাইভ ক্লাস",
+      "liveClassesSubtitle": "শিক্ষকদের সাথে সরাসরি লাইভ সেশনে যুক্ত হোন।",
+      "recordedClassesTitle": "রেকর্ডেড ক্লাস",
+      "recordedClassesSubtitle": "ক্লাসের রেকর্ডিং দেখুন এবং নোটস ডাউনলোড করুন।",
+      "resourcesTitle": "স্টাডি ম্যাটেরিয়ালস",
+      "resourcesSubtitle": "শিক্ষকের দেওয়া সমস্ত নোটস, পিডিএফ এবং স্লাইডস অ্যাক্সেস করুন।",
+      "syllabusTitle": "কোর্স সিলেবাস",
+      "syllabusSubtitle": "বিস্তারিত কারিকুলাম এবং লার্নিং পাথ দেখুন।"
     }
   },
   "Footer": {

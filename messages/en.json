@@ -265,6 +265,21 @@
       "generalClasses": "General Classes",
       "watchRecording": "Watch Recording",
       "goLiveAgain": "Go Live Again"
+    },
+    "studentHero": {
+      "badge": "Student Dashboard",
+      "communityTitle": "Community",
+      "communitySubtitle": "Connect with your peers and instructors.",
+      "examsTitle": "Exams & Quizzes",
+      "examsSubtitle": "Take your exams and track your progress.",
+      "liveClassesTitle": "Live Classes",
+      "liveClassesSubtitle": "Join live sessions hosted by your instructors.",
+      "recordedClassesTitle": "Recorded Classes",
+      "recordedClassesSubtitle": "Watch your class recordings and download notes.",
+      "resourcesTitle": "Study Materials",
+      "resourcesSubtitle": "Access all course notes, PDFs, slides, and materials shared by your instructor.",
+      "syllabusTitle": "Course Syllabus",
+      "syllabusSubtitle": "Explore the detailed curriculum and learning path."
     }
   },
   "Footer": {

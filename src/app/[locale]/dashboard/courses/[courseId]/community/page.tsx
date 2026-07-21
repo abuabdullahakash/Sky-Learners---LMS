@@ -33,6 +33,7 @@ const PLATFORM_INFO: Record<string, { icon: React.FC<any>; colorClass: string; i
 };
 
 export default function StudentCommunity() {
+  const tHero = useTranslations('Dashboard.studentHero');
   const params = useParams();
   const courseId = params.courseId as string;
   const t = useTranslations('Community');
@@ -113,13 +114,13 @@ export default function StudentCommunity() {
         <div className="relative z-10 px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">Student Dashboard</span>
+              <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">{tHero('badge')}</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm flex items-center gap-3">
               <MessageSquare className="w-8 h-8 md:w-10 md:h-10 text-orange-400" />
-              {t('title')}
+              {tHero('communityTitle')}
             </h1>
-            <p className="text-gray-300 text-sm font-medium">{t('subtitle')}</p>
+            <p className="text-gray-300 text-sm font-medium">{tHero('communitySubtitle')}</p>
           </div>
         </div>
       </div>

@@ -18,6 +18,7 @@ type CompletedExamData = {
 };
 
 export default function StudentExams() {
+  const tHero = useTranslations('Dashboard.studentHero');
   const params = useParams();
   const courseId = params.courseId as string;
   const { user } = useAuth();
@@ -135,10 +136,10 @@ export default function StudentExams() {
         <div className="relative z-10 px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">Student Dashboard</span>
+              <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">{tHero('badge')}</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">{t('examsAndQuizzes')}</h1>
-            <p className="text-gray-300 text-sm font-medium">{t('takeYourExams')}</p>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">{tHero('examsTitle')}</h1>
+            <p className="text-gray-300 text-sm font-medium">{tHero('examsSubtitle')}</p>
           </div>
           {totalExamsSet > 0 && (
             <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-xl border border-white/20 text-sm font-bold shadow-sm shrink-0">

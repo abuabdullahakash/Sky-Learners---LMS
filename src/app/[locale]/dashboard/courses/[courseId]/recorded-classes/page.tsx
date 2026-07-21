@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from 'next-intl';
 
 import { useEffect, useState, useMemo } from 'react';
 import { db } from '@/lib/firebase';
@@ -8,6 +9,7 @@ import { Video as VideoIcon, Loader2, LayoutGrid, List as ListIcon, PlayCircle, 
 import { Link } from '@/i18n/routing';
 
 export default function StudentRecordedClasses() {
+  const tHero = useTranslations('Dashboard.studentHero');
   const params = useParams();
   const courseId = params.courseId as string;
   
@@ -144,10 +146,10 @@ export default function StudentRecordedClasses() {
         <div className="relative z-10 px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-3">
-              <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">Student Dashboard</span>
+              <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">{tHero('badge')}</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">Recorded Classes</h1>
-            <p className="text-gray-300 text-sm font-medium">Watch your class recordings and download notes.</p>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">{tHero('recordedClassesTitle')}</h1>
+            <p className="text-gray-300 text-sm font-medium">{tHero('recordedClassesSubtitle')}</p>
           </div>
           
           <div className="flex flex-wrap items-center gap-3 relative z-20">
@@ -231,7 +233,7 @@ export default function StudentRecordedClasses() {
         </div>
       ) : viewMode === 'list' ? (
         // --- LIST VIEW ---
-        <div className="space-y-4">
+        <div className="space-y-4 w-[96%] mx-auto">
           {filteredLessons.map((lesson: any, index: number) => (
             <Link 
               href={`/dashboard/courses/${courseId}/recorded-classes/${lesson.id}`} 
@@ -242,7 +244,7 @@ export default function StudentRecordedClasses() {
               <div className="absolute left-0 top-0 bottom-0 w-1 bg-orange-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
               
               {/* Thumbnail */}
-              <div className="relative w-full sm:w-64 h-40 sm:h-auto rounded-xl overflow-hidden flex-shrink-0">
+              <div className="relative w-full sm:w-64 h-40 sm:h-36 rounded-xl overflow-hidden flex-shrink-0">
                 {lesson.thumbnailUrl ? (
                   <img src={lesson.thumbnailUrl} alt={lesson.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 ) : (
@@ -304,7 +306,7 @@ export default function StudentRecordedClasses() {
         </div>
       ) : (
         // --- GRID VIEW ---
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-[96%] mx-auto">
           {filteredLessons.map((lesson: any, index: number) => (
             <Link 
               href={`/dashboard/courses/${courseId}/recorded-classes/${lesson.id}`} 

@@ -118,7 +118,7 @@ export default function LessonVideoPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 relative">
+    <div className="w-full space-y-6 relative">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link 

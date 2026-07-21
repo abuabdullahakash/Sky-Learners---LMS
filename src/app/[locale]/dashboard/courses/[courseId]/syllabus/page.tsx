@@ -1,6 +1,8 @@
+import { useTranslations } from 'next-intl';
 import { BookOpen } from 'lucide-react';
 
 export default function SyllabusPage() {
+  const tHero = useTranslations('Dashboard.studentHero');
   return (
     <div className="w-full space-y-6 animate-in fade-in duration-500">
       {/* Hero Section */}
@@ -19,10 +21,10 @@ export default function SyllabusPage() {
         <div className="relative z-10 px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">Student Dashboard</span>
+              <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">{tHero('badge')}</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">Course Syllabus</h1>
-            <p className="text-gray-300 text-sm font-medium">Explore the detailed curriculum and learning path.</p>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">{tHero('syllabusTitle')}</h1>
+            <p className="text-gray-300 text-sm font-medium">{tHero('syllabusSubtitle')}</p>
           </div>
         </div>
       </div>

@@ -24,6 +24,7 @@ type LiveClass = {
 };
 
 export default function StudentLiveClasses() {
+  const tHero = useTranslations('Dashboard.studentHero');
   const params = useParams();
   const courseId = params.courseId as string;
   const { user } = useAuth();
@@ -313,8 +314,8 @@ export default function StudentLiveClasses() {
                 <span className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-ping"></span> {t('liveSessions')}
               </span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">{t('title')}</h1>
-            <p className="text-gray-300 text-sm font-medium">{t('subtitle')}</p>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">{tHero('liveClassesTitle')}</h1>
+            <p className="text-gray-300 text-sm font-medium">{tHero('liveClassesSubtitle')}</p>
           </div>
         </div>
       </div>

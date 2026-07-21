@@ -20,6 +20,7 @@ const PLATFORMS = [
   { id: 'whatsapp', label: 'WhatsApp Group' },
   { id: 'telegram', label: 'Telegram Group' },
   { id: 'discord', label: 'Discord Server' },
+  { id: 'youtube', label: 'YouTube Channel' },
   { id: 'other', label: 'Other Link' },
 ];
 
@@ -109,13 +110,29 @@ export default function CourseCommunityPage() {
   if (isLoading) return <div className="flex justify-center items-center h-64">Loading...</div>;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div>
-        <h1 className="text-2xl font-bold mb-2">Community & Chat</h1>
-        <p className="text-foreground/70">Manage how you interact with students outside of video lessons.</p>
+  return (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      
+      {/* Colorful Hero Section */}
+      <div className="relative overflow-hidden rounded bg-gradient-to-r from-primary/90 to-blue-600/90 p-8 text-white shadow-md">
+        <div className="relative z-10 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
+              <MessageSquare className="w-6 h-6" />
+              Community & Chat
+            </h1>
+            <p className="text-white/80 max-w-lg text-sm">
+              Manage how you interact with students outside of video lessons. Add links to your community platforms so students can easily join discussions.
+            </p>
+          </div>
+        </div>
+        
+        {/* Background decorative elements */}
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+        <div className="absolute -bottom-10 right-20 w-32 h-32 bg-black/10 rounded-full blur-xl"></div>
       </div>
 
-      <div className="bg-background p-6 md:p-8 rounded-3xl border border-foreground/10 space-y-6 shadow-sm">
+      <div className="bg-background p-6 rounded border border-foreground/10 space-y-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
           <div>
             <h2 className="text-xl font-bold mb-1">Community Links</h2>
@@ -126,7 +143,7 @@ export default function CourseCommunityPage() {
           <button 
             type="button" 
             onClick={addLink}
-            className="px-4 py-2 bg-primary/10 text-primary font-medium rounded-xl hover:bg-primary/20 transition-colors flex items-center gap-2 whitespace-nowrap"
+            className="px-4 py-2 bg-primary/10 text-primary font-medium rounded hover:bg-primary/20 transition-colors flex items-center gap-2 whitespace-nowrap"
           >
             <Plus className="w-4 h-4" /> Add Link
           </button>
@@ -136,7 +153,7 @@ export default function CourseCommunityPage() {
         
         <form onSubmit={handleSave} className="space-y-4">
           {communityLinks.length === 0 ? (
-            <div className="p-8 text-center border-2 border-dashed border-foreground/10 rounded-2xl">
+            <div className="p-8 text-center border-2 border-dashed border-foreground/10 rounded">
               <LinkIcon className="w-10 h-10 mx-auto text-foreground/20 mb-3" />
               <p className="text-foreground/60 font-medium">No community links added yet.</p>
               <p className="text-sm text-foreground/40 mt-1">Click "Add Link" to create one.</p>
@@ -144,13 +161,13 @@ export default function CourseCommunityPage() {
           ) : (
             <div className="space-y-4">
               {communityLinks.map((link, index) => (
-                <div key={link.id} className="flex flex-col sm:flex-row gap-3 p-4 bg-foreground/5 rounded-2xl border border-foreground/10 relative group">
+                <div key={link.id} className="flex flex-col sm:flex-row gap-3 p-4 bg-foreground/5 rounded border border-foreground/10 relative group">
                   <div className="w-full sm:w-1/3">
                     <label className="block text-xs font-medium text-foreground/60 mb-1 ml-1 uppercase tracking-wider">Platform</label>
                     <select 
                       value={link.platform}
                       onChange={(e) => updateLink(link.id, 'platform', e.target.value)}
-                      className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary transition-colors appearance-none"
+                      className="w-full px-4 py-2.5 bg-background border border-foreground/10 rounded focus:border-primary focus:ring-1 focus:ring-primary transition-colors appearance-none text-sm"
                     >
                       {PLATFORMS.map(p => (
                         <option key={p.id} value={p.id}>{p.label}</option>
@@ -165,7 +182,7 @@ export default function CourseCommunityPage() {
                         value={link.url} 
                         onChange={e => updateLink(link.id, 'url', e.target.value)}
                         placeholder="https://..."
-                        className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                        className="w-full px-4 py-2.5 bg-background border border-foreground/10 rounded focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-sm"
                         required
                       />
                     </div>
@@ -173,7 +190,7 @@ export default function CourseCommunityPage() {
                       <button 
                         type="button" 
                         onClick={() => removeLink(link.id)}
-                        className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors"
+                        className="p-2.5 text-red-500 hover:bg-red-500/10 rounded transition-colors"
                         title="Remove Link"
                       >
                         <Trash2 className="w-5 h-5" />
@@ -186,15 +203,15 @@ export default function CourseCommunityPage() {
           )}
           
           <div className="flex justify-end pt-6 border-t border-foreground/10">
-            <button type="submit" disabled={isSaving} className="px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/30 flex items-center gap-2">
-              <Save className="w-5 h-5" /> {isSaving ? 'Saving...' : 'Save Changes'}
+            <button type="submit" disabled={isSaving} className="px-6 py-2.5 bg-primary text-white font-bold rounded hover:bg-primary/90 transition-all shadow-sm flex items-center gap-2">
+              <Save className="w-4 h-4" /> {isSaving ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </form>
       </div>
 
-      <div className="bg-background rounded-3xl border border-foreground/10 p-12 shadow-sm text-center">
-        <MessageSquare className="w-16 h-16 mx-auto text-primary/50 mb-4" />
+      <div className="bg-background rounded border border-foreground/10 p-12 shadow-sm text-center">
+        <MessageSquare className="w-12 h-12 mx-auto text-primary/50 mb-4" />
         <h2 className="text-xl font-bold mb-2">Internal Chat coming soon</h2>
         <p className="text-foreground/60 max-w-md mx-auto">
           We are working on an internal messaging system so students can chat with you directly on this platform.

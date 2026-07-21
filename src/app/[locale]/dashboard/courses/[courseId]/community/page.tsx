@@ -4,8 +4,12 @@ import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Facebook, MessageCircle, Send, Link as LinkIcon, ExternalLink, MessageSquare } from 'lucide-react';
+import { MessageCircle, Send, Link as LinkIcon, ExternalLink, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
+
+const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+);
 
 interface CommunityLink {
   id: string;
@@ -14,8 +18,8 @@ interface CommunityLink {
 }
 
 const PLATFORM_INFO: Record<string, { label: string; icon: React.FC<any>; color: string }> = {
-  facebook_public: { label: 'Public Facebook Group', icon: Facebook, color: 'text-blue-600 bg-blue-500/10 hover:bg-blue-500/20 border-blue-500/20 dark:text-blue-400 dark:border-blue-500/30' },
-  facebook_private: { label: 'Private Facebook Group', icon: Facebook, color: 'text-blue-700 bg-blue-600/10 hover:bg-blue-600/20 border-blue-600/20 dark:text-blue-500 dark:border-blue-600/30' },
+  facebook_public: { label: 'Public Facebook Group', icon: FacebookIcon, color: 'text-blue-600 bg-blue-500/10 hover:bg-blue-500/20 border-blue-500/20 dark:text-blue-400 dark:border-blue-500/30' },
+  facebook_private: { label: 'Private Facebook Group', icon: FacebookIcon, color: 'text-blue-700 bg-blue-600/10 hover:bg-blue-600/20 border-blue-600/20 dark:text-blue-500 dark:border-blue-600/30' },
   whatsapp: { label: 'WhatsApp Group', icon: MessageCircle, color: 'text-green-600 bg-green-500/10 hover:bg-green-500/20 border-green-500/20 dark:text-green-400 dark:border-green-500/30' },
   telegram: { label: 'Telegram Group', icon: Send, color: 'text-sky-500 bg-sky-500/10 hover:bg-sky-500/20 border-sky-500/20 dark:text-sky-400 dark:border-sky-500/30' },
   discord: { label: 'Discord Server', icon: MessageSquare, color: 'text-indigo-500 bg-indigo-500/10 hover:bg-indigo-500/20 border-indigo-500/20 dark:text-indigo-400 dark:border-indigo-500/30' },

@@ -348,7 +348,7 @@ export default function CourseExamsPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-orange-500/20 via-rose-500/10 to-purple-600/20 border border-foreground/10 p-8 shadow-xl">
+      <div className="relative rounded-none overflow-hidden bg-gradient-to-r from-orange-500/20 via-rose-500/10 to-purple-600/20 border-y border-foreground/10 p-8 shadow-xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/10 rounded-full filter blur-3xl -z-10 pointer-events-none" />
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div>
@@ -412,6 +412,27 @@ export default function CourseExamsPage() {
               <label className="block text-sm font-medium mb-1">End Time (Deadline) <span className="text-foreground/50 text-xs font-normal">(Optional)</span></label>
               <input type="datetime-local" value={newEndTime} onChange={e => setNewEndTime(e.target.value)} className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" />
             </div>
+            <div className="md:col-span-2 flex flex-col gap-3">
+              <label className="flex items-center gap-2 cursor-pointer bg-foreground/5 p-3 rounded-xl hover:bg-foreground/10 transition-colors w-fit">
+                <input 
+                  type="checkbox" 
+                  checked={allowLateSubmission} 
+                  onChange={e => setAllowLateSubmission(e.target.checked)}
+                  className="w-4 h-4 text-orange-500 rounded border-gray-300 focus:ring-orange-500"
+                />
+                <span className="text-sm font-medium">Allow students to take the exam after the deadline</span>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer bg-foreground/5 p-3 rounded-xl hover:bg-foreground/10 transition-colors w-fit">
+                <input 
+                  type="checkbox" 
+                  checked={strictTimeLimit} 
+                  onChange={e => setStrictTimeLimit(e.target.checked)}
+                  className="w-4 h-4 text-orange-500 rounded border-gray-300 focus:ring-orange-500"
+                />
+                <span className="text-sm font-medium">Strict Time Limit: Prevent option selection when time is up</span>
+              </label>
+            </div>
             {examType === 'link' && (
               <>
                 <div className="md:col-span-2">
@@ -443,7 +464,19 @@ export default function CourseExamsPage() {
               ) : (
                 <div className="space-y-4">
                   {questions.map((q, idx) => (
-                    <div key={q.id} className="border border-foreground/10 rounded-xl overflow-hidden bg-background">
+                    <div 
+                      key={q.id} 
+                      className="border border-foreground/10 rounded-xl overflow-hidden bg-background"
+                      onPaste={(e) => {
+                        if (e.clipboardData?.files && e.clipboardData.files.length > 0) {
+                          const file = e.clipboardData.files[0];
+                          if (file.type.startsWith('image/')) {
+                            e.preventDefault();
+                            handleQuestionImageUpload(q.id, file);
+                          }
+                        }
+                      }}
+                    >
                       <div 
                         className="flex justify-between items-center p-4 cursor-pointer hover:bg-foreground/5 transition-colors"
                         onClick={() => setExpandedQuestion(expandedQuestion === q.id ? null : q.id)}
@@ -467,13 +500,13 @@ export default function CourseExamsPage() {
                             <div className="flex items-center justify-between mb-1.5 flex-wrap gap-2">
                               <label className="block text-sm font-medium">Question Text</label>
                               <div className="flex items-center gap-2">
-                                <label className="cursor-pointer flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-bold rounded-lg border border-orange-500/20 transition-colors">
+                                <label className="cursor-pointer flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-bold rounded-lg border border-orange-500/20 transition-colors" title="ছবি ফাইলে ব্রাউজ করুন অথবা সরাসরি Ctrl+V প্রেস করে পেস্ট করুন">
                                   {uploadingImageQuestionId === q.id ? (
                                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
                                   ) : (
                                     <ImageIcon className="w-3.5 h-3.5" />
                                   )}
-                                  <span>{q.imageUrl ? 'ছবি পরিবর্তন করুন' : '📷 প্রশ্নের ছবি যোগ করুন'}</span>
+                                  <span>{q.imageUrl ? 'ছবি পরিবর্তন (বা Ctrl+V)' : '📷 প্রশ্নের ছবি / Ctrl+V পেস্ট'}</span>
                                   <input
                                     type="file"
                                     accept="image/*"
@@ -505,7 +538,22 @@ export default function CourseExamsPage() {
                                 </label>
                               </div>
                             </div>
-                            <input type="text" value={q.text} onChange={e => handleUpdateQuestion(q.id, 'text', e.target.value)} placeholder="Type your question here..." className="w-full px-4 py-2 bg-background border border-foreground/10 rounded-lg focus:border-primary focus:outline-none" />
+                            <input 
+                              type="text" 
+                              value={q.text} 
+                              onChange={e => handleUpdateQuestion(q.id, 'text', e.target.value)} 
+                              onPaste={(e) => {
+                                if (e.clipboardData?.files && e.clipboardData.files.length > 0) {
+                                  const file = e.clipboardData.files[0];
+                                  if (file.type.startsWith('image/')) {
+                                    e.preventDefault();
+                                    handleQuestionImageUpload(q.id, file);
+                                  }
+                                }
+                              }}
+                              placeholder="Type your question here... (বা স্ক্রিনশট নিয়া সরাসরি Ctrl+V প্রেস করে পেস্ট করুন)" 
+                              className="w-full px-4 py-2 bg-background border border-foreground/10 rounded-lg focus:border-primary focus:outline-none" 
+                            />
                             {q.imageUrl && (
                               <div className="mt-3 relative w-fit group">
                                 <img src={q.imageUrl} alt="Question" className="max-h-48 rounded-xl border border-foreground/10 object-contain bg-background shadow-sm" />
@@ -528,10 +576,19 @@ export default function CourseExamsPage() {
                                     type="text" 
                                     value={opt} 
                                     onChange={e => handleUpdateOption(q.id, optIdx, e.target.value)} 
-                                    placeholder={`Option ${optIdx + 1}`} 
+                                    onPaste={(e) => {
+                                      if (e.clipboardData?.files && e.clipboardData.files.length > 0) {
+                                        const file = e.clipboardData.files[0];
+                                        if (file.type.startsWith('image/')) {
+                                          e.preventDefault();
+                                          handleOptionImageUpload(q.id, optIdx, file);
+                                        }
+                                      }
+                                    }}
+                                    placeholder={`Option ${optIdx + 1} (বা Ctrl+V পেস্ট করুন)`} 
                                     className={`w-full px-3 py-2 bg-background border rounded-lg focus:outline-none transition-colors ${q.correctOptionIndex === optIdx ? 'border-green-500' : 'border-foreground/10 focus:border-primary'}`} 
                                   />
-                                  <label className="cursor-pointer shrink-0 p-2 bg-foreground/5 hover:bg-foreground/10 rounded-lg border border-foreground/10 text-foreground/60 transition-colors" title="Add Option Image">
+                                  <label className="cursor-pointer shrink-0 p-2 bg-foreground/5 hover:bg-foreground/10 rounded-lg border border-foreground/10 text-foreground/60 transition-colors" title="Add Option Image (বা সরাসরি Ctrl+V পেস্ট করুন)">
                                     {uploadingOptionKey === `${q.id}-${optIdx}` ? (
                                       <Loader2 className="w-4 h-4 animate-spin text-orange-500" />
                                     ) : (

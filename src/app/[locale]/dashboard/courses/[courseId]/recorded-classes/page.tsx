@@ -126,16 +126,19 @@ export default function StudentRecordedClasses() {
     <div className="w-full space-y-6 animate-in fade-in duration-500 relative">
       
       {/* Hero Section */}
-      <div className="relative w-full mb-6 shadow-lg rounded-none overflow-hidden">
-        <div className="absolute inset-0 bg-[#111827]"/>
-        <div className="absolute inset-0" style={{background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 30%, #111827 60%, #0f172a 100%)'}} />
-        <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 15% 60%, rgba(249,115,22,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 20%, rgba(239,68,68,0.2) 0%, transparent 40%)'}} />
-        <div className="absolute top-0 right-0 w-80 h-80 opacity-[0.04]" style={{background: 'repeating-linear-gradient(45deg, #f97316 0px, #f97316 1px, transparent 1px, transparent 14px)'}} />
-        <div className="absolute bottom-0 left-0 w-40 h-40 opacity-[0.06]" style={{background: 'radial-gradient(circle, #f97316 0%, transparent 70%)'}} />
-        
-        {/* Animated Icon Background */}
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none">
-          <PlayCircle className="w-32 h-32 text-orange-500 animate-pulse" />
+      <div className="relative w-full mb-6 shadow-lg rounded-none">
+        {/* Background Layers */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 bg-[#111827]"/>
+          <div className="absolute inset-0" style={{background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 30%, #111827 60%, #0f172a 100%)'}} />
+          <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 15% 60%, rgba(249,115,22,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 20%, rgba(239,68,68,0.2) 0%, transparent 40%)'}} />
+          <div className="absolute top-0 right-0 w-80 h-80 opacity-[0.04]" style={{background: 'repeating-linear-gradient(45deg, #f97316 0px, #f97316 1px, transparent 1px, transparent 14px)'}} />
+          <div className="absolute bottom-0 left-0 w-40 h-40 opacity-[0.06]" style={{background: 'radial-gradient(circle, #f97316 0%, transparent 70%)'}} />
+          
+          {/* Animated Icon Background */}
+          <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-[0.08]">
+            <PlayCircle className="w-32 h-32 text-orange-500 animate-pulse" />
+          </div>
         </div>
 
         <div className="relative z-10 px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -150,7 +153,7 @@ export default function StudentRecordedClasses() {
           <div className="flex flex-wrap items-center gap-3 relative z-20">
             {/* Search Popup */}
             <div className="relative">
-              <button onClick={() => setShowSearch(!showSearch)} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50" title="Search">
+              <button onClick={() => { setShowSearch(!showSearch); setShowModuleFilter(false); setShowSubjectFilter(false); }} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50" title="Search">
                 <Search className="w-5 h-5" />
               </button>
               {showSearch && (
@@ -172,7 +175,7 @@ export default function StudentRecordedClasses() {
 
             {/* Module Filter */}
             <div className="relative">
-              <button onClick={() => setShowModuleFilter(!showModuleFilter)} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 flex items-center gap-2" title="Filter by Module">
+              <button onClick={() => { setShowModuleFilter(!showModuleFilter); setShowSearch(false); setShowSubjectFilter(false); }} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 flex items-center gap-2" title="Filter by Module">
                 <Filter className="w-5 h-5" />
                 {selectedModule !== 'All' && <span className="w-2 h-2 rounded-full bg-orange-500"></span>}
               </button>
@@ -189,7 +192,7 @@ export default function StudentRecordedClasses() {
             {/* Subject Filter */}
             {availableSubjects.length > 0 && (
               <div className="relative">
-                <button onClick={() => setShowSubjectFilter(!showSubjectFilter)} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 flex items-center gap-2" title="Filter by Subject">
+                <button onClick={() => { setShowSubjectFilter(!showSubjectFilter); setShowSearch(false); setShowModuleFilter(false); }} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 flex items-center gap-2" title="Filter by Subject">
                   <BookOpen className="w-5 h-5" />
                   {selectedSubject !== 'All' && <span className="w-2 h-2 rounded-full bg-orange-500"></span>}
                 </button>

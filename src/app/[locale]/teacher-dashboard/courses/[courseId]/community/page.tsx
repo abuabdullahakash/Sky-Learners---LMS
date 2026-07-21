@@ -110,7 +110,6 @@ export default function CourseCommunityPage() {
   if (isLoading) return <div className="flex justify-center items-center h-64">Loading...</div>;
 
   return (
-  return (
     <div className="space-y-6 animate-in fade-in duration-500">
       
       {/* Colorful Hero Section */}

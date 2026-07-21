@@ -6,6 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { MessageCircle, Send, Link as LinkIcon, ExternalLink, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
@@ -21,19 +22,20 @@ interface CommunityLink {
   url: string;
 }
 
-const PLATFORM_INFO: Record<string, { label: string; icon: React.FC<any>; color: string }> = {
-  facebook_public: { label: 'Public Facebook Group', icon: FacebookIcon, color: 'text-blue-600 bg-blue-500/10 hover:bg-blue-500/20 border-blue-500/20 dark:text-blue-400 dark:border-blue-500/30' },
-  facebook_private: { label: 'Private Facebook Group', icon: FacebookIcon, color: 'text-blue-700 bg-blue-600/10 hover:bg-blue-600/20 border-blue-600/20 dark:text-blue-500 dark:border-blue-600/30' },
-  whatsapp: { label: 'WhatsApp Group', icon: MessageCircle, color: 'text-green-600 bg-green-500/10 hover:bg-green-500/20 border-green-500/20 dark:text-green-400 dark:border-green-500/30' },
-  telegram: { label: 'Telegram Group', icon: Send, color: 'text-sky-500 bg-sky-500/10 hover:bg-sky-500/20 border-sky-500/20 dark:text-sky-400 dark:border-sky-500/30' },
-  discord: { label: 'Discord Server', icon: MessageSquare, color: 'text-indigo-500 bg-indigo-500/10 hover:bg-indigo-500/20 border-indigo-500/20 dark:text-indigo-400 dark:border-indigo-500/30' },
-  youtube: { label: 'YouTube Channel', icon: YoutubeIcon, color: 'text-red-500 bg-red-500/10 hover:bg-red-500/20 border-red-500/20 dark:text-red-400 dark:border-red-500/30' },
-  other: { label: 'Community Link', icon: LinkIcon, color: 'text-primary bg-primary/10 hover:bg-primary/20 border-primary/20 dark:border-primary/30' },
+const PLATFORM_INFO: Record<string, { icon: React.FC<any>; color: string }> = {
+  facebook_public: { icon: FacebookIcon, color: 'text-blue-600 bg-blue-500/10 hover:bg-blue-500/20 border-blue-500/20 dark:text-blue-400 dark:border-blue-500/30' },
+  facebook_private: { icon: FacebookIcon, color: 'text-blue-700 bg-blue-600/10 hover:bg-blue-600/20 border-blue-600/20 dark:text-blue-500 dark:border-blue-600/30' },
+  whatsapp: { icon: MessageCircle, color: 'text-green-600 bg-green-500/10 hover:bg-green-500/20 border-green-500/20 dark:text-green-400 dark:border-green-500/30' },
+  telegram: { icon: Send, color: 'text-sky-500 bg-sky-500/10 hover:bg-sky-500/20 border-sky-500/20 dark:text-sky-400 dark:border-sky-500/30' },
+  discord: { icon: MessageSquare, color: 'text-indigo-500 bg-indigo-500/10 hover:bg-indigo-500/20 border-indigo-500/20 dark:text-indigo-400 dark:border-indigo-500/30' },
+  youtube: { icon: YoutubeIcon, color: 'text-red-500 bg-red-500/10 hover:bg-red-500/20 border-red-500/20 dark:text-red-400 dark:border-red-500/30' },
+  other: { icon: LinkIcon, color: 'text-primary bg-primary/10 hover:bg-primary/20 border-primary/20 dark:border-primary/30' },
 };
 
 export default function StudentCommunity() {
   const params = useParams();
   const courseId = params.courseId as string;
+  const t = useTranslations('Community');
   
   const [links, setLinks] = useState<CommunityLink[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -84,9 +86,9 @@ export default function StudentCommunity() {
         <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
           <MessageSquare className="w-10 h-10" />
         </div>
-        <h2 className="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">Community & Discussions</h2>
+        <h2 className="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">{t('notActiveTitle')}</h2>
         <p className="text-gray-600 dark:text-foreground/70 text-lg mb-8">
-          The community forum for this course is not yet active. Check back later to interact with your peers and instructors!
+          {t('notActiveSubtitle')}
         </p>
       </div>
     );
@@ -96,15 +98,15 @@ export default function StudentCommunity() {
     <div className="w-full space-y-6">
       
       {/* Colorful Hero Section */}
-      <div className="relative overflow-hidden rounded bg-gradient-to-r from-primary/90 to-blue-600/90 p-8 text-white shadow-md">
+      <div className="relative overflow-hidden rounded bg-gradient-to-r from-orange-500 to-red-600 p-8 text-white shadow-md">
         <div className="relative z-10 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
               <MessageSquare className="w-6 h-6" />
-              Join the Community
+              {t('title')}
             </h1>
-            <p className="text-white/80 max-w-lg text-sm">
-              Connect with your instructor and peers through the following community platforms. Click on any link below to join the discussion.
+            <p className="text-white/90 max-w-lg text-sm">
+              {t('subtitle')}
             </p>
           </div>
         </div>
@@ -132,8 +134,8 @@ export default function StudentCommunity() {
                   <Icon className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-foreground">{info.label}</h3>
-                  <p className="text-sm opacity-80 mt-1">Click to join</p>
+                  <h3 className="font-bold text-lg text-foreground">{t(`platforms.${link.platform}`)}</h3>
+                  <p className="text-sm opacity-80 mt-1">{t('clickToJoin')}</p>
                 </div>
               </div>
               <ExternalLink className="w-5 h-5 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />

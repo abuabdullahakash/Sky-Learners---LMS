@@ -44,13 +44,11 @@
     "statementPlaceholder": "Statement",
     "participants": "Participants",
     "leaderboard": "Leaderboard",
-    "rank": "Rank",
     "student": "Student",
     "score": "Score",
     "time": "Time Taken",
     "late": "Late",
-    "noParticipants": "No participants yet",
-    "backToExams": "Back to Exams"
+    "noParticipants": "No participants yet"
   },
   "Index": {
     "title": "Welcome to SkyLearners",
@@ -417,5 +415,21 @@
     "na": "N/A",
     "relatedCourses": "Related Courses by this Instructor",
     "noRelatedCourses": "No other courses available."
+  },
+  "Community": {
+    "title": "Join the Community",
+    "subtitle": "Connect with your instructor and peers through the following community platforms. Click on any link below to join the discussion.",
+    "notActiveTitle": "Community & Discussions",
+    "notActiveSubtitle": "The community forum for this course is not yet active. Check back later to interact with your peers and instructors!",
+    "clickToJoin": "Click to join",
+    "platforms": {
+      "facebook_public": "Public Facebook Group",
+      "facebook_private": "Private Facebook Group",
+      "whatsapp": "WhatsApp Group",
+      "telegram": "Telegram Group",
+      "discord": "Discord Server",
+      "youtube": "YouTube Channel",
+      "other": "Community Link"
+    }
   }
 }

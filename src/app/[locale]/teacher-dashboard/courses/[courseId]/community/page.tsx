@@ -113,7 +113,7 @@ export default function CourseCommunityPage() {
     <div className="space-y-6 animate-in fade-in duration-500">
       
       {/* Colorful Hero Section */}
-      <div className="relative overflow-hidden rounded bg-gradient-to-r from-primary/90 to-blue-600/90 p-8 text-white shadow-md">
+      <div className="relative overflow-hidden rounded bg-gradient-to-r from-orange-500 to-red-600 p-8 text-white shadow-md">
         <div className="relative z-10 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">

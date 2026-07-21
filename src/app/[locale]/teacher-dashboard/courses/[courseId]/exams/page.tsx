@@ -111,14 +111,34 @@ export default function CourseExamsPage() {
     fetchParticipants();
   }, [user, courseId, router]);
 
+  const getPastedImageFile = (e: React.ClipboardEvent): File | null => {
+    if (e.clipboardData?.files && e.clipboardData.files.length > 0) {
+      for (let i = 0; i < e.clipboardData.files.length; i++) {
+        const file = e.clipboardData.files[i];
+        if (file.type.startsWith('image/')) return file;
+      }
+    }
+    if (e.clipboardData?.items && e.clipboardData.items.length > 0) {
+      for (let i = 0; i < e.clipboardData.items.length; i++) {
+        const item = e.clipboardData.items[i];
+        if (item.type.startsWith('image/')) {
+          const file = item.getAsFile();
+          if (file) return file;
+        }
+      }
+    }
+    return null;
+  };
+
   const handleQuestionImageUpload = async (qId: string, file: File) => {
     try {
       setUploadingImageQuestionId(qId);
-      const url = await uploadImageToImgBB(file);
+      const safeFile = file.name ? file : new File([file], `question_${Date.now()}.png`, { type: file.type || 'image/png' });
+      const url = await uploadImageToImgBB(safeFile);
       handleUpdateQuestion(qId, 'imageUrl', url);
     } catch (err) {
       console.error('Error uploading question image:', err);
-      alert('Failed to upload image. Please try again.');
+      alert('Failed to upload question image. Please try again.');
     } finally {
       setUploadingImageQuestionId(null);
     }
@@ -127,7 +147,8 @@ export default function CourseExamsPage() {
   const handleOptionImageUpload = async (qId: string, optIdx: number, file: File) => {
     try {
       setUploadingOptionKey(`${qId}-${optIdx}`);
-      const url = await uploadImageToImgBB(file);
+      const safeFile = file.name ? file : new File([file], `option_${optIdx}_${Date.now()}.png`, { type: file.type || 'image/png' });
+      const url = await uploadImageToImgBB(safeFile);
       setQuestions(prev => prev.map(q => {
         if (q.id === qId) {
           const newOptionImages = [...(q.optionImages || ['', '', '', ''])];
@@ -138,7 +159,7 @@ export default function CourseExamsPage() {
       }));
     } catch (err) {
       console.error('Error uploading option image:', err);
-      alert('Failed to upload option image.');
+      alert('Failed to upload option image. Please try again.');
     } finally {
       setUploadingOptionKey(null);
     }
@@ -467,15 +488,6 @@ export default function CourseExamsPage() {
                     <div 
                       key={q.id} 
                       className="border border-foreground/10 rounded-xl overflow-hidden bg-background"
-                      onPaste={(e) => {
-                        if (e.clipboardData?.files && e.clipboardData.files.length > 0) {
-                          const file = e.clipboardData.files[0];
-                          if (file.type.startsWith('image/')) {
-                            e.preventDefault();
-                            handleQuestionImageUpload(q.id, file);
-                          }
-                        }
-                      }}
                     >
                       <div 
                         className="flex justify-between items-center p-4 cursor-pointer hover:bg-foreground/5 transition-colors"
@@ -543,12 +555,11 @@ export default function CourseExamsPage() {
                               value={q.text} 
                               onChange={e => handleUpdateQuestion(q.id, 'text', e.target.value)} 
                               onPaste={(e) => {
-                                if (e.clipboardData?.files && e.clipboardData.files.length > 0) {
-                                  const file = e.clipboardData.files[0];
-                                  if (file.type.startsWith('image/')) {
-                                    e.preventDefault();
-                                    handleQuestionImageUpload(q.id, file);
-                                  }
+                                const file = getPastedImageFile(e);
+                                if (file) {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleQuestionImageUpload(q.id, file);
                                 }
                               }}
                               placeholder="Type your question here... (বা স্ক্রিনশট নিয়া সরাসরি Ctrl+V প্রেস করে পেস্ট করুন)" 
@@ -577,12 +588,11 @@ export default function CourseExamsPage() {
                                     value={opt} 
                                     onChange={e => handleUpdateOption(q.id, optIdx, e.target.value)} 
                                     onPaste={(e) => {
-                                      if (e.clipboardData?.files && e.clipboardData.files.length > 0) {
-                                        const file = e.clipboardData.files[0];
-                                        if (file.type.startsWith('image/')) {
-                                          e.preventDefault();
-                                          handleOptionImageUpload(q.id, optIdx, file);
-                                        }
+                                      const file = getPastedImageFile(e);
+                                      if (file) {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleOptionImageUpload(q.id, optIdx, file);
                                       }
                                     }}
                                     placeholder={`Option ${optIdx + 1} (বা Ctrl+V পেস্ট করুন)`} 

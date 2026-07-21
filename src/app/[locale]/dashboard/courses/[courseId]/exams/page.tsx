@@ -5,7 +5,7 @@ import { db } from '@/lib/firebase';
 import { doc, onSnapshot, collection, query, where, getDocs, addDoc, deleteDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Trophy, Clock, CheckCircle2, Circle, ExternalLink, PlayCircle } from 'lucide-react';
+import { Trophy, Clock, CheckCircle2, Circle, ExternalLink, PlayCircle, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { Exam } from '@/app/[locale]/teacher-dashboard/courses/[courseId]/exams/page';
@@ -119,20 +119,34 @@ export default function StudentExams() {
 
   return (
     <div className="w-full max-w-7xl space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('examsAndQuizzes')}</h2>
-          <p className="text-gray-600 dark:text-foreground/70">
-            {t('takeYourExams')}
-          </p>
-        </div>
+      {/* Hero Section */}
+      <div className="relative w-full mb-6 shadow-lg rounded-2xl overflow-hidden">
+        <div className="absolute inset-0 bg-[#111827]"/>
+        <div className="absolute inset-0" style={{background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 30%, #111827 60%, #0f172a 100%)'}} />
+        <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 15% 60%, rgba(249,115,22,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 20%, rgba(239,68,68,0.2) 0%, transparent 40%)'}} />
+        <div className="absolute top-0 right-0 w-80 h-80 opacity-[0.04]" style={{background: 'repeating-linear-gradient(45deg, #f97316 0px, #f97316 1px, transparent 1px, transparent 14px)'}} />
+        <div className="absolute bottom-0 left-0 w-40 h-40 opacity-[0.06]" style={{background: 'radial-gradient(circle, #f97316 0%, transparent 70%)'}} />
         
-        {totalExamsSet > 0 && (
-          <div className="flex items-center gap-2 px-4 py-2 bg-foreground/5 rounded-xl border border-foreground/10 text-sm font-bold shadow-sm">
-            <span className="text-foreground/60">Total Exams:</span>
-            <span className="text-primary">{exams.length} / {totalExamsSet}</span>
+        {/* Animated Icon Background */}
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none">
+          <FileText className="w-32 h-32 text-orange-500 animate-pulse" />
+        </div>
+
+        <div className="relative z-10 px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">Student Dashboard</span>
+            </div>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">{t('examsAndQuizzes')}</h1>
+            <p className="text-gray-300 text-sm font-medium">{t('takeYourExams')}</p>
           </div>
-        )}
+          {totalExamsSet > 0 && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-xl border border-white/20 text-sm font-bold shadow-sm shrink-0">
+              <span className="text-white/70">Total Exams:</span>
+              <span className="text-white">{exams.length} / {totalExamsSet}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {exams.length === 0 && (

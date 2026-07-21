@@ -66,23 +66,30 @@ export default function StudentResources() {
     <div className="w-full space-y-6">
 
       {/* Hero Section */}
-      <div
-        className="relative overflow-hidden rounded p-8 text-white shadow-md"
-        style={{ background: 'linear-gradient(135deg, #f97316 0%, #ef4444 60%, #dc2626 100%)' }}
-      >
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 80% 20%, #fff 0%, transparent 50%)' }}></div>
-        <div className="relative z-10">
-          <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
-            <FileText className="w-6 h-6" />
-            Study Materials
-          </h1>
-          <p className="text-white/90 text-sm max-w-lg">
-            Access all course notes, PDFs, slides, and materials shared by your instructor.
-          </p>
+      <div className="relative w-full mb-6 shadow-lg rounded-2xl overflow-hidden">
+        <div className="absolute inset-0 bg-[#111827]"/>
+        <div className="absolute inset-0" style={{background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 30%, #111827 60%, #0f172a 100%)'}} />
+        <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 15% 60%, rgba(249,115,22,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 20%, rgba(239,68,68,0.2) 0%, transparent 40%)'}} />
+        <div className="absolute top-0 right-0 w-80 h-80 opacity-[0.04]" style={{background: 'repeating-linear-gradient(45deg, #f97316 0px, #f97316 1px, transparent 1px, transparent 14px)'}} />
+        <div className="absolute bottom-0 left-0 w-40 h-40 opacity-[0.06]" style={{background: 'radial-gradient(circle, #f97316 0%, transparent 70%)'}} />
+        
+        {/* Animated Icon Background */}
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none">
+          <BookOpen className="w-32 h-32 text-orange-500 animate-pulse" />
         </div>
-        {/* Decorative blobs */}
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
-        <div className="absolute -bottom-10 right-20 w-32 h-32 bg-black/10 rounded-full blur-xl"></div>
+
+        <div className="relative z-10 px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">Student Dashboard</span>
+            </div>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm flex items-center gap-3">
+              <FileText className="w-8 h-8 md:w-10 md:h-10 text-orange-400" />
+              Study Materials
+            </h1>
+            <p className="text-gray-300 text-sm font-medium">Access all course notes, PDFs, slides, and materials shared by your instructor.</p>
+          </div>
+        </div>
       </div>
 
       {/* Resources Grid */}

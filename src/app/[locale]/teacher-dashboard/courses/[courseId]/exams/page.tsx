@@ -197,6 +197,17 @@ export default function CourseExamsPage() {
     }));
   };
 
+  const handleUpdateStatement = (questionId: string, statementIndex: number, value: string) => {
+    setQuestions(questions.map(q => {
+      if (q.id === questionId) {
+        const newStatements = [...(q.statements || ['', '', ''])];
+        newStatements[statementIndex] = value;
+        return { ...q, statements: newStatements };
+      }
+      return q;
+    }));
+  };
+
   const handleRemoveQuestion = (id: string) => {
     setQuestions(questions.filter(q => q.id !== id));
   };
@@ -543,7 +554,19 @@ export default function CourseExamsPage() {
                                   <input
                                     type="checkbox"
                                     checked={q.isMultipleStatement || false}
-                                    onChange={(e) => handleUpdateQuestion(q.id, 'isMultipleStatement', e.target.checked)}
+                                    onChange={(e) => {
+                                      const isChecked = e.target.checked;
+                                      setQuestions(prev => prev.map(item => {
+                                        if (item.id === q.id) {
+                                          return {
+                                            ...item,
+                                            isMultipleStatement: isChecked,
+                                            statements: item.statements && item.statements.length > 0 ? item.statements : ['', '', '']
+                                          };
+                                        }
+                                        return item;
+                                      }));
+                                    }}
                                     className="w-3.5 h-3.5 text-primary rounded border-gray-300 focus:ring-primary"
                                   />
                                   <span className="text-xs font-bold text-primary">Multiple Statement MCQ</span>
@@ -568,6 +591,28 @@ export default function CourseExamsPage() {
                             {q.imageUrl && (
                               <div className="mt-3 relative w-fit group">
                                 <img src={q.imageUrl} alt="Question" className="max-h-48 rounded-xl border border-foreground/10 object-contain bg-background shadow-sm" />
+                              </div>
+                            )}
+
+                            {q.isMultipleStatement && (
+                              <div className="mt-3 p-3.5 bg-primary/5 rounded-xl border border-primary/15 space-y-2.5">
+                                <label className="block text-xs font-bold text-primary uppercase tracking-wider">
+                                  Statements (বহুপদী সমাপ্তিসূচক তথ্যসমূহ)
+                                </label>
+                                {(q.statements && q.statements.length > 0 ? q.statements : ['', '', '']).map((stmt, sIdx) => (
+                                  <div key={sIdx} className="flex items-center gap-2">
+                                    <span className="font-bold text-xs text-primary min-w-[24px] text-center">
+                                      {['i.', 'ii.', 'iii.', 'iv.'][sIdx] || `${sIdx + 1}.`}
+                                    </span>
+                                    <input
+                                      type="text"
+                                      value={stmt}
+                                      onChange={(e) => handleUpdateStatement(q.id, sIdx, e.target.value)}
+                                      placeholder={`Statement ${['i', 'ii', 'iii', 'iv'][sIdx] || sIdx + 1}`}
+                                      className="w-full px-3 py-2 bg-background border border-foreground/10 rounded-lg text-sm focus:border-primary focus:outline-none"
+                                    />
+                                  </div>
+                                ))}
                               </div>
                             )}
                           </div>

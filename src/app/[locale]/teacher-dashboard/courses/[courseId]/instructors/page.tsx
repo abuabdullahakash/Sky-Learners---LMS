@@ -205,17 +205,32 @@ export default function CourseInstructorsPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="flex justify-between items-start md:items-center flex-col md:flex-row gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">Instructors</h1>
-          <p className="text-foreground/70">Add teachers, guest lecturers, or doubt solving assistants for this course.</p>
+
+      {/* Hero Section */}
+      <div className="relative w-full mb-4 shadow-lg">
+        <div className="absolute inset-0 overflow-hidden rounded">
+          <div className="absolute inset-0 bg-[#111827]"/>
+          <div className="absolute inset-0" style={{background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 30%, #111827 60%, #0f172a 100%)'}} />
+          <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 15% 60%, rgba(249,115,22,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 20%, rgba(239,68,68,0.2) 0%, transparent 40%)'}} />
+          <div className="absolute top-0 right-0 w-80 h-80 opacity-[0.04]" style={{background: 'repeating-linear-gradient(45deg, #f97316 0px, #f97316 1px, transparent 1px, transparent 14px)'}} />
+          <div className="absolute bottom-0 left-0 w-40 h-40 opacity-[0.06]" style={{background: 'radial-gradient(circle, #f97316 0%, transparent 70%)'}} />
         </div>
-        {!isAdding && (
-          <button onClick={() => { resetForm(); setIsAdding(true); }} className="px-5 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2 whitespace-nowrap">
-            <Plus className="w-5 h-5" /> Add Instructor
-          </button>
-        )}
+        <div className="relative z-10 px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">Teacher Dashboard</span>
+            </div>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">Instructors</h1>
+            <p className="text-gray-300 text-sm font-medium">Add teachers, guest lecturers, or doubt solving assistants for this course.</p>
+          </div>
+          {!isAdding && (
+            <button onClick={() => { resetForm(); setIsAdding(true); }} className="px-5 py-2.5 bg-orange-500 text-white rounded font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2 whitespace-nowrap shrink-0">
+              <Plus className="w-5 h-5" /> Add Instructor
+            </button>
+          )}
+        </div>
       </div>
+
 
       {isAdding && (
         <form onSubmit={handleSaveInstructor} className="bg-background border border-foreground/10 p-6 rounded-3xl shadow-sm space-y-6">

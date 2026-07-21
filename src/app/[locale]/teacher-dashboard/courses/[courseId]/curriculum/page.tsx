@@ -296,24 +296,34 @@ export default function CourseCurriculumPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 relative">
       
-      <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">Curriculum Builder</h1>
-          <p className="text-foreground/70">Organize your course into modules and add video lessons.</p>
+
+      {/* Hero Section */}
+      <div className="relative w-full mb-4 shadow-lg">
+        <div className="absolute inset-0 overflow-hidden rounded">
+          <div className="absolute inset-0 bg-[#111827]"/>
+          <div className="absolute inset-0" style={{background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 30%, #111827 60%, #0f172a 100%)'}} />
+          <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 15% 60%, rgba(249,115,22,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 20%, rgba(239,68,68,0.2) 0%, transparent 40%)'}} />
+          <div className="absolute top-0 right-0 w-80 h-80 opacity-[0.04]" style={{background: 'repeating-linear-gradient(45deg, #f97316 0px, #f97316 1px, transparent 1px, transparent 14px)'}} />
+          <div className="absolute bottom-0 left-0 w-40 h-40 opacity-[0.06]" style={{background: 'radial-gradient(circle, #f97316 0%, transparent 70%)'}} />
         </div>
-        <div className="flex flex-col gap-3 w-full md:w-auto">
-          <div className="flex gap-3">
-            <button onClick={() => setIsSubjectModalOpen(true)} className="flex-1 justify-center px-4 py-2 bg-background border border-foreground/10 text-foreground rounded-xl font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap">
-              <Settings className="w-4 h-4" /> Subjects
-            </button>
-            <button onClick={handleAddModule} className="flex-1 justify-center px-4 py-2 bg-background border border-foreground/10 text-foreground rounded-xl font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap">
-              <Plus className="w-4 h-4" /> Add Module
-            </button>
+        <div className="relative z-10 px-8 py-8">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">Teacher Dashboard</span>
           </div>
-          <button onClick={() => openLessonModal()} className="w-full justify-center px-5 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2">
-            <VideoIcon className="w-4 h-4" /> Add Lesson
-          </button>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">Curriculum Builder</h1>
+          <p className="text-gray-300 text-sm font-medium">Organize your course into modules and add video lessons.</p>
         </div>
+      </div>
+      <div className="flex gap-3 flex-wrap mb-6">
+        <button onClick={() => setIsSubjectModalOpen(true)} className="px-4 py-2 bg-background border border-foreground/10 text-foreground rounded font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap text-sm">
+          <Settings className="w-4 h-4" /> Subjects
+        </button>
+        <button onClick={handleAddModule} className="px-4 py-2 bg-background border border-foreground/10 text-foreground rounded font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap text-sm">
+          <Plus className="w-4 h-4" /> Add Module
+        </button>
+        <button onClick={() => openLessonModal()} className="px-5 py-2 bg-orange-500 text-white rounded font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2 text-sm">
+          <VideoIcon className="w-4 h-4" /> Add Lesson
+        </button>
       </div>
 
       <div className="relative mb-6">

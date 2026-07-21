@@ -7,6 +7,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { Plus, GripVertical, Video as VideoIcon, Image as ImageIcon, Trash2, Upload, Loader2, X, FileText, Settings, Calendar, User, BookOpen, CheckCircle, Search, ChevronDown, ChevronRight, Edit2, HardDrive, Link as LinkIcon, AlertTriangle, PlayCircle } from 'lucide-react';
 import { uploadImageToImgBB } from '@/lib/imgbb';
+import toast from 'react-hot-toast';
 
 const scanVideoUrl = (url: string, isPrivateGroupCheck: boolean = false) => {
   if (!url) return null;
@@ -158,6 +159,7 @@ export default function CourseCurriculumPage() {
   };
 
   const handleSaveSyllabus = async () => {
+    const toastId = toast.loading('Saving syllabus...');
     try {
       await updateDoc(doc(db, 'courses', courseId), {
         syllabus: {
@@ -167,10 +169,10 @@ export default function CourseCurriculumPage() {
           modules: syllabusModules,
         }
       });
-      alert('Syllabus details saved successfully!');
+      toast.success('Syllabus saved successfully!', { id: toastId });
     } catch (error) {
       console.error(error);
-      alert('Failed to save syllabus');
+      toast.error('Failed to save syllabus', { id: toastId });
     }
   };
 

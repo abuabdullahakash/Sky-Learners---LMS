@@ -284,7 +284,12 @@
     "syllabus": {
       "videoCount": "{count} টি ভিডিও",
       "examCount": "{count} টি এক্সাম",
-      "noteCount": "{count} টি নোট"
+      "noteCount": "{count} টি নোট",
+      "courseCurriculum": "কোর্স কারিকুলাম",
+      "whatYouWillLearn": "আপনি যা যা শিখবেন",
+      "requirements": "প্রয়োজনীয়তা",
+      "grading": "গ্রেডিং এবং সার্টিফিকেশন",
+      "topicsCount": "{count} টি টপিক"
     }
   },
   "Footer": {

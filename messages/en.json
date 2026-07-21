@@ -284,7 +284,12 @@
     "syllabus": {
       "videoCount": "{count} Video",
       "examCount": "{count} Exam",
-      "noteCount": "{count} Note"
+      "noteCount": "{count} Note",
+      "courseCurriculum": "Course Curriculum",
+      "whatYouWillLearn": "What you will learn",
+      "requirements": "Requirements",
+      "grading": "Grading & Certification",
+      "topicsCount": "{count} Topics"
     }
   },
   "Footer": {

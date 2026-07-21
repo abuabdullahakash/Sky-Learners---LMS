@@ -84,7 +84,7 @@ export default function SyllabusPage() {
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm">
               <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-orange-500" /> Course Curriculum
+                <BookOpen className="w-5 h-5 text-orange-500" /> {tSyllabus('courseCurriculum')}
               </h2>
               
               {(!course?.syllabus?.modules || course.syllabus.modules.length === 0) ? (
@@ -111,13 +111,12 @@ export default function SyllabusPage() {
                               </div>
                             )}
                             <div>
-                              <span className="text-xs font-bold text-orange-500 uppercase tracking-wider block mb-0.5">Module {mIndex + 1}</span>
                               <span className="font-bold text-foreground text-lg">{module.title}</span>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
                             <div className="hidden sm:flex items-center gap-2 text-xs font-medium text-foreground/50 bg-background px-3 py-1.5 rounded-full border border-foreground/10">
-                              <span>{module.lessons?.length || 0} Lessons</span>
+                              <span>{tSyllabus('topicsCount', { count: module.lessons?.length || 0 })}</span>
                             </div>
                             <div className="text-foreground/50 bg-background p-1.5 rounded-lg border border-foreground/10">
                               {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
@@ -185,7 +184,7 @@ export default function SyllabusPage() {
                 {course?.syllabus?.objectives && (
                   <div className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm">
                     <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
-                      <CheckCircle2 className="w-5 h-5 text-green-500" /> What you will learn
+                      <CheckCircle2 className="w-5 h-5 text-green-500" /> {tSyllabus('whatYouWillLearn')}
                     </h3>
                     <div className="text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">
                       {course.syllabus.objectives}
@@ -196,7 +195,7 @@ export default function SyllabusPage() {
                 {course?.syllabus?.prerequisites && (
                   <div className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm">
                     <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
-                      <Clock className="w-5 h-5 text-blue-500" /> Requirements
+                      <Clock className="w-5 h-5 text-blue-500" /> {tSyllabus('requirements')}
                     </h3>
                     <div className="text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">
                       {course.syllabus.prerequisites}
@@ -207,7 +206,7 @@ export default function SyllabusPage() {
                 {course?.syllabus?.grading && (
                   <div className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm">
                     <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
-                      <FileText className="w-5 h-5 text-purple-500" /> Certification & Grading
+                      <FileText className="w-5 h-5 text-purple-500" /> {tSyllabus('grading')}
                     </h3>
                     <div className="text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">
                       {course.syllabus.grading}

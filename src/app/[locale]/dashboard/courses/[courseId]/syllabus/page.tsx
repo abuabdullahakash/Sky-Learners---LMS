@@ -1,8 +1,51 @@
+"use client";
 import { useTranslations } from 'next-intl';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronRight, Video, FileText, CheckCircle2, PlayCircle, Clock } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { useParams } from 'next/navigation';
 
 export default function SyllabusPage() {
   const tHero = useTranslations('Dashboard.studentHero');
+  const params = useParams();
+  const courseId = params.courseId as string;
+  
+  const [course, setCourse] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [expandedModules, setExpandedModules] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchCourse = async () => {
+      try {
+        const docRef = doc(db, 'courses', courseId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setCourse(docSnap.data());
+          // Expand the first module by default
+          if (docSnap.data().modules && docSnap.data().modules.length > 0) {
+            setExpandedModules([docSnap.data().modules[0].id]);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching course", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCourse();
+  }, [courseId]);
+
+  const toggleModule = (moduleId: string) => {
+    setExpandedModules(prev => 
+      prev.includes(moduleId) 
+        ? prev.filter(id => id !== moduleId) 
+        : [...prev, moduleId]
+    );
+  };
+
+  const hasSyllabusDetails = course?.syllabus?.objectives || course?.syllabus?.prerequisites || course?.syllabus?.grading;
+
   return (
     <div className="w-full space-y-6 animate-in fade-in duration-500">
       {/* Hero Section */}
@@ -29,12 +72,131 @@ export default function SyllabusPage() {
         </div>
       </div>
 
-      <div className="flex flex-col items-center justify-center h-full min-h-[300px] text-center bg-background border border-foreground/10 rounded-2xl p-8">
-        <h2 className="text-xl font-bold mb-2 text-foreground">Syllabus Coming Soon</h2>
-        <p className="text-foreground/60 max-w-md">
-          The syllabus content for this course will be updated soon. Please check back later.
-        </p>
-      </div>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : (
+        <div className="w-full md:w-[96%] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Main Content: Curriculum */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm">
+              <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-orange-500" /> Course Curriculum
+              </h2>
+              
+              {(!course?.modules || course.modules.length === 0) ? (
+                <div className="text-center py-10 bg-foreground/5 rounded-xl border-2 border-dashed border-foreground/10">
+                  <p className="text-foreground/50 font-medium">Curriculum is being prepared.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {course.modules.map((module: any, mIndex: number) => {
+                    const isExpanded = expandedModules.includes(module.id);
+                    return (
+                      <div key={module.id} className="border border-foreground/10 rounded-xl overflow-hidden shadow-sm transition-all duration-300">
+                        {/* Module Header */}
+                        <button 
+                          onClick={() => toggleModule(module.id)}
+                          className="w-full bg-foreground/5 hover:bg-foreground/10 p-4 flex items-center justify-between transition-colors text-left"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="bg-orange-500/10 text-orange-500 p-2 rounded-lg">
+                              {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+                            </div>
+                            <div>
+                              <span className="text-xs font-bold text-orange-500 uppercase tracking-wider block mb-0.5">Module {mIndex + 1}</span>
+                              <span className="font-bold text-foreground">{module.title}</span>
+                            </div>
+                          </div>
+                          <div className="hidden sm:flex items-center gap-2 text-xs font-medium text-foreground/50 bg-background px-3 py-1.5 rounded-full border border-foreground/10">
+                            <span>{module.lessons?.length || 0} Lessons</span>
+                          </div>
+                        </button>
+                        
+                        {/* Lessons List */}
+                        {isExpanded && (
+                          <div className="bg-background divide-y divide-foreground/5">
+                            {(!module.lessons || module.lessons.length === 0) ? (
+                              <div className="p-4 text-sm text-foreground/40 text-center">No lessons added yet.</div>
+                            ) : (
+                              module.lessons.map((lesson: any, lIndex: number) => (
+                                <div key={lesson.id} className="p-4 flex items-start sm:items-center gap-4 hover:bg-foreground/[0.02] transition-colors">
+                                  <div className="mt-1 sm:mt-0 text-foreground/30">
+                                    {lesson.type === 'video' || lesson.videoUrl ? <PlayCircle className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
+                                  </div>
+                                  <div className="flex-1">
+                                    <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                                      {lesson.title}
+                                      {lesson.isFreePreview && (
+                                        <span className="text-[10px] bg-green-500/10 text-green-500 px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">Preview</span>
+                                      )}
+                                    </h4>
+                                  </div>
+                                  <div className="text-xs text-foreground/50 font-medium">
+                                    Lesson {lIndex + 1}
+                                  </div>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Sidebar: Details */}
+          <div className="lg:col-span-1 space-y-6">
+            {!hasSyllabusDetails ? (
+              <div className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm text-center">
+                <BookOpen className="w-8 h-8 text-foreground/20 mx-auto mb-3" />
+                <p className="text-foreground/50 text-sm">More details coming soon.</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {course?.syllabus?.objectives && (
+                  <div className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm">
+                    <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5 text-green-500" /> What you will learn
+                    </h3>
+                    <div className="text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">
+                      {course.syllabus.objectives}
+                    </div>
+                  </div>
+                )}
+                
+                {course?.syllabus?.prerequisites && (
+                  <div className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm">
+                    <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-blue-500" /> Requirements
+                    </h3>
+                    <div className="text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">
+                      {course.syllabus.prerequisites}
+                    </div>
+                  </div>
+                )}
+
+                {course?.syllabus?.grading && (
+                  <div className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm">
+                    <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-purple-500" /> Certification & Grading
+                    </h3>
+                    <div className="text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">
+                      {course.syllabus.grading}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+        </div>
+      )}
     </div>
   );
 }

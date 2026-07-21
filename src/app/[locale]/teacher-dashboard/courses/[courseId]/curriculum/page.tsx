@@ -41,6 +41,7 @@ export default function CourseCurriculumPage() {
 
   // Search and Filter
   const [searchQuery, setSearchQuery] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
   const [expandedModules, setExpandedModules] = useState<string[]>([]);
 
   // Modals state
@@ -48,6 +49,12 @@ export default function CourseCurriculumPage() {
   const [newSubject, setNewSubject] = useState('');
   
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
+  
+  // Syllabus state
+  const [isSyllabusModalOpen, setIsSyllabusModalOpen] = useState(false);
+  const [syllabusObjectives, setSyllabusObjectives] = useState('');
+  const [syllabusPrerequisites, setSyllabusPrerequisites] = useState('');
+  const [syllabusGrading, setSyllabusGrading] = useState('');
   
   // Lesson form state
   const [editingModuleId, setEditingModuleId] = useState<string | null>(null);
@@ -78,7 +85,12 @@ export default function CourseCurriculumPage() {
           if (!data.modules) data.modules = [];
           if (!data.subjects) data.subjects = [];
           if (!data.instructors) data.instructors = [];
+          if (!data.syllabus) data.syllabus = {};
           setCourse(data);
+          
+          setSyllabusObjectives(data.syllabus.objectives || '');
+          setSyllabusPrerequisites(data.syllabus.prerequisites || '');
+          setSyllabusGrading(data.syllabus.grading || '');
         }
       } catch (error) {
         console.error("Error fetching course", error);
@@ -140,6 +152,22 @@ export default function CourseCurriculumPage() {
     updatedSubjects.splice(index, 1);
     setCourse({ ...course, subjects: updatedSubjects });
     await updateDoc(doc(db, 'courses', courseId), { subjects: updatedSubjects });
+  };
+
+  const handleSaveSyllabus = async () => {
+    try {
+      await updateDoc(doc(db, 'courses', courseId), {
+        syllabus: {
+          objectives: syllabusObjectives,
+          prerequisites: syllabusPrerequisites,
+          grading: syllabusGrading,
+        }
+      });
+      setIsSyllabusModalOpen(false);
+    } catch (error) {
+      console.error(error);
+      alert('Failed to save syllabus');
+    }
   };
 
   // --- Lesson Management ---
@@ -298,43 +326,67 @@ export default function CourseCurriculumPage() {
       
 
       {/* Hero Section */}
-      <div className="relative w-full mb-4 shadow-lg">
-        <div className="absolute inset-0 overflow-hidden rounded">
+      <div className="relative w-full mb-6 shadow-lg rounded-none">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute inset-0 bg-[#111827]"/>
           <div className="absolute inset-0" style={{background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 30%, #111827 60%, #0f172a 100%)'}} />
           <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 15% 60%, rgba(249,115,22,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 20%, rgba(239,68,68,0.2) 0%, transparent 40%)'}} />
           <div className="absolute top-0 right-0 w-80 h-80 opacity-[0.04]" style={{background: 'repeating-linear-gradient(45deg, #f97316 0px, #f97316 1px, transparent 1px, transparent 14px)'}} />
           <div className="absolute bottom-0 left-0 w-40 h-40 opacity-[0.06]" style={{background: 'radial-gradient(circle, #f97316 0%, transparent 70%)'}} />
         </div>
-        <div className="relative z-10 px-8 py-8">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">Teacher Dashboard</span>
+        <div className="relative z-10 px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">Teacher Dashboard</span>
+            </div>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">Curriculum Builder</h1>
+            <p className="text-gray-300 text-sm font-medium">Organize your course into modules and add video lessons.</p>
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">Curriculum Builder</h1>
-          <p className="text-gray-300 text-sm font-medium">Organize your course into modules and add video lessons.</p>
-        </div>
-      </div>
-      <div className="flex gap-3 flex-wrap mb-6">
-        <button onClick={() => setIsSubjectModalOpen(true)} className="px-4 py-2 bg-background border border-foreground/10 text-foreground rounded font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap text-sm">
-          <Settings className="w-4 h-4" /> Subjects
-        </button>
-        <button onClick={handleAddModule} className="px-4 py-2 bg-background border border-foreground/10 text-foreground rounded font-bold hover:bg-foreground/5 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap text-sm">
-          <Plus className="w-4 h-4" /> Add Module
-        </button>
-        <button onClick={() => openLessonModal()} className="px-5 py-2 bg-orange-500 text-white rounded font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2 text-sm">
-          <VideoIcon className="w-4 h-4" /> Add Lesson
-        </button>
-      </div>
 
-      <div className="relative mb-6">
-        <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-foreground/40" />
-        <input 
-          type="text" 
-          placeholder="Search modules..." 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-background border border-foreground/10 pl-11 pr-4 py-3 rounded-2xl focus:outline-none focus:border-orange-500 shadow-sm"
-        />
+          <div className="flex flex-wrap items-center gap-3 relative z-20">
+            {/* Search Popup */}
+            <div className="relative">
+              <button onClick={() => setShowSearch(!showSearch)} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50" title="Search Modules">
+                <Search className="w-5 h-5" />
+              </button>
+              {showSearch && (
+                <div className="absolute right-0 top-[calc(100%+8px)] w-64 bg-background border border-foreground/10 p-2 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 z-50">
+                   <div className="relative">
+                     <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40" />
+                     <input 
+                        type="text" 
+                        placeholder="Search modules..." 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        autoFocus
+                        className="w-full bg-foreground/5 border border-transparent pl-9 pr-3 py-2 rounded-lg text-sm focus:outline-none focus:border-orange-500/50 transition-colors text-foreground"
+                      />
+                   </div>
+                </div>
+              )}
+            </div>
+
+            {/* Edit Syllabus */}
+            <button onClick={() => setIsSyllabusModalOpen(true)} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50" title="Edit Syllabus Settings">
+              <FileText className="w-5 h-5" />
+            </button>
+
+            {/* Subjects */}
+            <button onClick={() => setIsSubjectModalOpen(true)} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50" title="Manage Subjects">
+              <BookOpen className="w-5 h-5" />
+            </button>
+
+            {/* Add Module */}
+            <button onClick={handleAddModule} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50" title="Add Module">
+              <Plus className="w-5 h-5" />
+            </button>
+
+            {/* Add Lesson */}
+            <button onClick={() => openLessonModal()} className="p-2.5 bg-orange-500 border border-orange-400 text-white rounded-xl hover:bg-orange-600 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-white/50" title="Add Lesson">
+              <VideoIcon className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -425,6 +477,54 @@ export default function CourseCurriculumPage() {
           </div>
         )}
       </div>
+
+      {/* --- Syllabus Settings Modal --- */}
+      {isSyllabusModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-3xl p-6 w-full max-w-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onClick={() => setIsSyllabusModalOpen(false)} className="absolute top-4 right-4 p-2 hover:bg-foreground/5 rounded-full transition-colors">
+              <X className="w-5 h-5 text-foreground/50" />
+            </button>
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><FileText className="w-5 h-5 text-orange-500" /> Syllabus Settings</h2>
+            <p className="text-sm text-foreground/60 mb-6">Provide additional details to be displayed on the student's Syllabus page.</p>
+            
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-bold text-foreground mb-1.5">What you will learn (Objectives)</label>
+                <textarea 
+                  value={syllabusObjectives} 
+                  onChange={(e) => setSyllabusObjectives(e.target.value)}
+                  placeholder="Enter key takeaways (e.g. You will learn how to build websites...)"
+                  className="w-full bg-foreground/5 border border-foreground/10 px-4 py-3 rounded-xl focus:outline-none focus:border-orange-500 min-h-[100px]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-foreground mb-1.5">Prerequisites & Requirements</label>
+                <textarea 
+                  value={syllabusPrerequisites} 
+                  onChange={(e) => setSyllabusPrerequisites(e.target.value)}
+                  placeholder="e.g. Basic understanding of HTML, a laptop..."
+                  className="w-full bg-foreground/5 border border-foreground/10 px-4 py-3 rounded-xl focus:outline-none focus:border-orange-500 min-h-[100px]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-foreground mb-1.5">Grading & Certification Info</label>
+                <textarea 
+                  value={syllabusGrading} 
+                  onChange={(e) => setSyllabusGrading(e.target.value)}
+                  placeholder="e.g. 80% passing score required to obtain a certificate."
+                  className="w-full bg-foreground/5 border border-foreground/10 px-4 py-3 rounded-xl focus:outline-none focus:border-orange-500 min-h-[100px]"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setIsSyllabusModalOpen(false)} className="px-5 py-2.5 rounded-xl font-bold hover:bg-foreground/5 transition-colors">Cancel</button>
+              <button onClick={handleSaveSyllabus} className="px-5 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30">Save Syllabus Details</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* --- Subject Settings Modal --- */}
       {isSubjectModalOpen && (

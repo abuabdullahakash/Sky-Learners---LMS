@@ -288,10 +288,16 @@ export default function TakeExamPage() {
       <form onSubmit={handleSubmit} className="space-y-8 px-4">
         {exam.questions?.map((q, idx) => (
           <div key={q.id} className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm">
-            <div className="flex justify-between items-start gap-4 mb-6">
+            <div className="flex justify-between items-start gap-4 mb-4">
               <h3 className="font-bold text-lg leading-relaxed"><span className="text-primary mr-2">{idx + 1}.</span> {q.text}</h3>
               <span className="shrink-0 bg-foreground/5 px-2 py-1 rounded text-xs font-bold text-foreground/50">{q.marks} {t('marks')}</span>
             </div>
+
+            {q.imageUrl && (
+              <div className="mb-6">
+                <img src={q.imageUrl} alt={`Question ${idx + 1}`} className="max-h-80 w-auto object-contain rounded-xl border border-foreground/10 shadow-sm bg-background" />
+              </div>
+            )}
             
             {q.isMultipleStatement && q.statements && (
               <div className="mb-6 pl-6 space-y-2">
@@ -308,20 +314,27 @@ export default function TakeExamPage() {
               {q.options.map((opt, optIdx) => (
                 <label 
                   key={optIdx} 
-                  className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${answers[q.id] === optIdx ? 'border-primary bg-primary/5 shadow-[0_0_0_1px_rgba(var(--primary),0.5)]' : 'border-foreground/10 hover:border-foreground/30 hover:bg-foreground/5'}`}
+                  className={`flex flex-col p-4 rounded-xl border cursor-pointer transition-all ${answers[q.id] === optIdx ? 'border-primary bg-primary/5 shadow-[0_0_0_1px_rgba(var(--primary),0.5)]' : 'border-foreground/10 hover:border-foreground/30 hover:bg-foreground/5'}`}
                 >
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${answers[q.id] === optIdx ? 'border-primary' : 'border-foreground/30'}`}>
-                    {answers[q.id] === optIdx && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                  <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${answers[q.id] === optIdx ? 'border-primary' : 'border-foreground/30'}`}>
+                      {answers[q.id] === optIdx && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                    </div>
+                    <input
+                      type="radio"
+                      name={`question-${q.id}`}
+                      value={optIdx}
+                      checked={answers[q.id] === optIdx}
+                      onChange={() => handleSelectAnswer(q.id, optIdx)}
+                      className="sr-only"
+                    />
+                    <span className="font-medium">{opt}</span>
                   </div>
-                  <input
-                    type="radio"
-                    name={`question-${q.id}`}
-                    value={optIdx}
-                    checked={answers[q.id] === optIdx}
-                    onChange={() => handleSelectAnswer(q.id, optIdx)}
-                    className="sr-only"
-                  />
-                  <span className="font-medium">{opt}</span>
+                  {q.optionImages?.[optIdx] && (
+                    <div className="mt-3 ml-8">
+                      <img src={q.optionImages[optIdx]} alt={`Option ${optIdx + 1}`} className="max-h-40 rounded-lg border border-foreground/10 object-contain bg-background" />
+                    </div>
+                  )}
                 </label>
               ))}
             </div>

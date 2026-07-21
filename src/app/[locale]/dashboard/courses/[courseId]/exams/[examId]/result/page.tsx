@@ -186,7 +186,7 @@ export default function ExamResultPage() {
           return (
             <div key={q.id} className={`border rounded-2xl overflow-hidden shadow-sm ${isCorrect ? 'border-green-500/30' : 'border-red-500/30'}`}>
               <div className={`p-6 ${isCorrect ? 'bg-green-500/5' : 'bg-red-500/5'}`}>
-                <div className="flex justify-between items-start gap-4 mb-6">
+                <div className="flex justify-between items-start gap-4 mb-4">
                   <h3 className="font-bold text-lg leading-relaxed flex items-start gap-3">
                     {isCorrect ? (
                       <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0 mt-0.5" />
@@ -202,6 +202,12 @@ export default function ExamResultPage() {
                     {skipped && <p className="text-xs text-red-500 mt-1 font-medium text-center">{t('skipped')}</p>}
                   </div>
                 </div>
+
+                {q.imageUrl && (
+                  <div className="mb-6 pl-9">
+                    <img src={q.imageUrl} alt={`Question ${idx + 1}`} className="max-h-72 w-auto object-contain rounded-xl border border-foreground/10 shadow-sm bg-background" />
+                  </div>
+                )}
 
                 {q.isMultipleStatement && q.statements && (
                   <div className="mb-6 pl-10 space-y-2">
@@ -233,10 +239,17 @@ export default function ExamResultPage() {
                     }
 
                     return (
-                      <div key={optIdx} className={`flex items-center gap-3 p-4 rounded-xl transition-all ${bgClass}`}>
-                        <div className="shrink-0">{icon}</div>
-                        <span className={`font-medium ${isActualCorrect ? 'text-green-700 dark:text-green-400' : isSelected ? 'text-red-700 dark:text-red-400' : 'text-foreground/70'}`}>{opt}</span>
-                        {isSelected && <span className="ml-auto text-xs font-bold uppercase tracking-wider opacity-50">{t('yourAnswer')}</span>}
+                      <div key={optIdx} className={`flex flex-col p-4 rounded-xl transition-all ${bgClass}`}>
+                        <div className="flex items-center gap-3">
+                          <div className="shrink-0">{icon}</div>
+                          <span className={`font-medium ${isActualCorrect ? 'text-green-700 dark:text-green-400' : isSelected ? 'text-red-700 dark:text-red-400' : 'text-foreground/70'}`}>{opt}</span>
+                          {isSelected && <span className="ml-auto text-xs font-bold uppercase tracking-wider opacity-50">{t('yourAnswer')}</span>}
+                        </div>
+                        {q.optionImages?.[optIdx] && (
+                          <div className="mt-2 ml-8">
+                            <img src={q.optionImages[optIdx]} alt={`Option ${optIdx + 1}`} className="max-h-36 rounded-lg border border-foreground/10 object-contain bg-background" />
+                          </div>
+                        )}
                       </div>
                     );
                   })}

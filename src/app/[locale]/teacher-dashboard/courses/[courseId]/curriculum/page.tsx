@@ -51,7 +51,7 @@ export default function CourseCurriculumPage() {
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
   
   // Syllabus state
-  const [isSyllabusModalOpen, setIsSyllabusModalOpen] = useState(false);
+  const [activeView, setActiveView] = useState<'curriculum' | 'syllabus'>('curriculum');
   const [syllabusObjectives, setSyllabusObjectives] = useState('');
   const [syllabusPrerequisites, setSyllabusPrerequisites] = useState('');
   const [syllabusGrading, setSyllabusGrading] = useState('');
@@ -163,7 +163,7 @@ export default function CourseCurriculumPage() {
           grading: syllabusGrading,
         }
       });
-      setIsSyllabusModalOpen(false);
+      alert('Syllabus details saved successfully!');
     } catch (error) {
       console.error(error);
       alert('Failed to save syllabus');
@@ -367,28 +367,29 @@ export default function CourseCurriculumPage() {
             </div>
 
             {/* Edit Syllabus */}
-            <button onClick={() => setIsSyllabusModalOpen(true)} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50" title="Edit Syllabus Settings">
+            <button onClick={() => setActiveView(prev => prev === 'syllabus' ? 'curriculum' : 'syllabus')} className={`p-2.5 border text-white rounded-xl transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 ${activeView === 'syllabus' ? 'bg-orange-500 border-orange-400' : 'bg-white/10 border-white/20 hover:bg-white/20'}`} title="Edit Syllabus Settings">
               <FileText className="w-5 h-5" />
             </button>
 
             {/* Subjects */}
-            <button onClick={() => setIsSubjectModalOpen(true)} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50" title="Manage Subjects">
+            <button onClick={() => { setActiveView('curriculum'); setIsSubjectModalOpen(true); }} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50" title="Manage Subjects">
               <BookOpen className="w-5 h-5" />
             </button>
 
             {/* Add Module */}
-            <button onClick={handleAddModule} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50" title="Add Module">
+            <button onClick={() => { setActiveView('curriculum'); handleAddModule(); }} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50" title="Add Module">
               <Plus className="w-5 h-5" />
             </button>
 
             {/* Add Lesson */}
-            <button onClick={() => openLessonModal()} className="p-2.5 bg-orange-500 border border-orange-400 text-white rounded-xl hover:bg-orange-600 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-white/50" title="Add Lesson">
+            <button onClick={() => { setActiveView('curriculum'); openLessonModal(); }} className="p-2.5 bg-orange-500 border border-orange-400 text-white rounded-xl hover:bg-orange-600 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-white/50" title="Add Lesson">
               <VideoIcon className="w-5 h-5" />
             </button>
           </div>
         </div>
       </div>
 
+      {activeView === 'curriculum' ? (
       <div className="space-y-4">
         {filteredModules?.map((module: any, mIndex: number) => {
           const isExpanded = expandedModules.includes(module.id) || searchQuery !== '';
@@ -477,54 +478,48 @@ export default function CourseCurriculumPage() {
           </div>
         )}
       </div>
-
-      {/* --- Syllabus Settings Modal --- */}
-      {isSyllabusModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-background rounded-3xl p-6 w-full max-w-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onClick={() => setIsSyllabusModalOpen(false)} className="absolute top-4 right-4 p-2 hover:bg-foreground/5 rounded-full transition-colors">
-              <X className="w-5 h-5 text-foreground/50" />
-            </button>
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><FileText className="w-5 h-5 text-orange-500" /> Syllabus Settings</h2>
-            <p className="text-sm text-foreground/60 mb-6">Provide additional details to be displayed on the student's Syllabus page.</p>
-            
-            <div className="space-y-4 mb-6">
-              <div>
-                <label className="block text-sm font-bold text-foreground mb-1.5">What you will learn (Objectives)</label>
-                <textarea 
-                  value={syllabusObjectives} 
-                  onChange={(e) => setSyllabusObjectives(e.target.value)}
-                  placeholder="Enter key takeaways (e.g. You will learn how to build websites...)"
-                  className="w-full bg-foreground/5 border border-foreground/10 px-4 py-3 rounded-xl focus:outline-none focus:border-orange-500 min-h-[100px]"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-foreground mb-1.5">Prerequisites & Requirements</label>
-                <textarea 
-                  value={syllabusPrerequisites} 
-                  onChange={(e) => setSyllabusPrerequisites(e.target.value)}
-                  placeholder="e.g. Basic understanding of HTML, a laptop..."
-                  className="w-full bg-foreground/5 border border-foreground/10 px-4 py-3 rounded-xl focus:outline-none focus:border-orange-500 min-h-[100px]"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-foreground mb-1.5">Grading & Certification Info</label>
-                <textarea 
-                  value={syllabusGrading} 
-                  onChange={(e) => setSyllabusGrading(e.target.value)}
-                  placeholder="e.g. 80% passing score required to obtain a certificate."
-                  className="w-full bg-foreground/5 border border-foreground/10 px-4 py-3 rounded-xl focus:outline-none focus:border-orange-500 min-h-[100px]"
-                />
-              </div>
+      ) : (
+        <div className="bg-background rounded p-6 shadow-sm border border-foreground/10 space-y-6">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <h2 className="text-xl font-bold flex items-center gap-2 text-foreground"><FileText className="w-5 h-5 text-orange-500" /> Syllabus Settings</h2>
+              <p className="text-sm text-foreground/60 mt-1">Provide additional details to be displayed on the student's Syllabus page.</p>
             </div>
-
-            <div className="flex justify-end gap-3">
-              <button onClick={() => setIsSyllabusModalOpen(false)} className="px-5 py-2.5 rounded-xl font-bold hover:bg-foreground/5 transition-colors">Cancel</button>
-              <button onClick={handleSaveSyllabus} className="px-5 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30">Save Syllabus Details</button>
+            <button onClick={handleSaveSyllabus} className="px-5 py-2.5 bg-orange-500 text-white rounded font-bold hover:bg-orange-600 transition-colors shadow-sm">Save Details</button>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-bold text-foreground mb-1.5">What you will learn (Objectives)</label>
+              <textarea 
+                value={syllabusObjectives} 
+                onChange={(e) => setSyllabusObjectives(e.target.value)}
+                placeholder="Enter key takeaways (e.g. You will learn how to build websites...)"
+                className="w-full bg-foreground/5 border border-foreground/10 px-4 py-3 rounded focus:outline-none focus:border-orange-500 min-h-[100px]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-foreground mb-1.5">Prerequisites & Requirements</label>
+              <textarea 
+                value={syllabusPrerequisites} 
+                onChange={(e) => setSyllabusPrerequisites(e.target.value)}
+                placeholder="e.g. Basic understanding of HTML, a laptop..."
+                className="w-full bg-foreground/5 border border-foreground/10 px-4 py-3 rounded focus:outline-none focus:border-orange-500 min-h-[100px]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-foreground mb-1.5">Grading & Certification Info</label>
+              <textarea 
+                value={syllabusGrading} 
+                onChange={(e) => setSyllabusGrading(e.target.value)}
+                placeholder="e.g. 80% passing score required to obtain a certificate."
+                className="w-full bg-foreground/5 border border-foreground/10 px-4 py-3 rounded focus:outline-none focus:border-orange-500 min-h-[100px]"
+              />
             </div>
           </div>
         </div>
       )}
+
 
       {/* --- Subject Settings Modal --- */}
       {isSubjectModalOpen && (

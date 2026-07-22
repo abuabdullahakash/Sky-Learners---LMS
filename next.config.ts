@@ -6,6 +6,7 @@ const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   images: {
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -24,6 +25,9 @@ const nextConfig: NextConfig = {
         hostname: 'i.ibb.co.com',
       },
     ],
+  },
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'framer-motion', 'gsap', 'next-intl'],
   },
 };
 

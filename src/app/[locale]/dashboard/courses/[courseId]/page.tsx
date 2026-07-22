@@ -5,7 +5,7 @@ import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { useParams } from 'next/navigation';
-import { Clock, CheckCircle2, PlayCircle, Trophy, BookOpen, AlertCircle, Calendar, Video, UserCircle, ExternalLink } from 'lucide-react';
+import { Clock, CheckCircle2, PlayCircle, Trophy, BookOpen, AlertCircle, Calendar, Video, UserCircle, ExternalLink, HelpCircle } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 
@@ -108,7 +108,7 @@ export default function StudentCourseOverview() {
     return <div className="text-center py-20 text-gray-500">Loading course overview...</div>;
   }
 
-  // Calculate actual total video lessons from course modules as fallback
+  // Actual uploaded lessons from course modules as fallback
   const actualUploadedLessons = (course.modules || []).reduce(
     (sum: number, mod: any) => sum + (mod.lessons?.length || 0),
     0
@@ -118,29 +118,14 @@ export default function StudentCourseOverview() {
   const promisedVideos = Number(course.totalVideoLessons) || actualUploadedLessons;
   const promisedExams = Number(course.totalExams) || (course.exams?.length || 0);
 
-  // Total lessons to display on progress widget
-  const displayTotalLessons = promisedVideos;
+  // Linear total items & total completed items across videos & exams
+  const totalCourseItems = promisedVideos + promisedExams;
+  const totalCompletedItems = completedCount + completedExamsCount;
 
-  // Calculate individual video and exam progress ratios
-  const videoProgress = promisedVideos > 0 
-    ? Math.min(100, (completedCount / promisedVideos) * 100) 
+  // Single linear progress percentage
+  const progressPercentage = totalCourseItems > 0 
+    ? Math.min(100, Math.round((totalCompletedItems / totalCourseItems) * 100))
     : 0;
-
-  const examProgress = promisedExams > 0 
-    ? Math.min(100, (completedExamsCount / promisedExams) * 100) 
-    : 0;
-
-  // Combined overall course progress percentage
-  let progressPercentage = 0;
-  if (promisedVideos > 0 && promisedExams > 0) {
-    progressPercentage = Math.round((videoProgress + examProgress) / 2);
-  } else if (promisedVideos > 0) {
-    progressPercentage = Math.round(videoProgress);
-  } else if (promisedExams > 0) {
-    progressPercentage = Math.round(examProgress);
-  }
-
-  progressPercentage = Math.min(100, Math.max(0, progressPercentage));
   
   // Find next upcoming live class
   const upcomingClasses = (course.liveClasses || [])
@@ -251,14 +236,20 @@ export default function StudentCourseOverview() {
               <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{progressPercentage}%</span>
             </div>
           </div>
-          <div className="mt-6 flex items-center justify-between w-full text-sm font-medium">
-            <div className="flex flex-col">
-              <span className="text-gray-500 dark:text-foreground/60">Completed</span>
-              <span className="text-gray-900 dark:text-white font-bold text-base">{completedCount} Lessons</span>
+
+          <div className="mt-6 space-y-3 w-full border-t border-gray-100 dark:border-foreground/10 pt-4 text-sm font-medium">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500 dark:text-foreground/60 flex items-center gap-1.5">
+                <BookOpen className="w-4 h-4 text-blue-500" /> Lessons
+              </span>
+              <span className="text-gray-900 dark:text-white font-bold">{completedCount} / {promisedVideos}</span>
             </div>
-            <div className="flex flex-col text-right">
-              <span className="text-gray-500 dark:text-foreground/60">Total</span>
-              <span className="text-gray-900 dark:text-white font-bold text-base">{displayTotalLessons} Lessons</span>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500 dark:text-foreground/60 flex items-center gap-1.5">
+                <HelpCircle className="w-4 h-4 text-orange-500" /> Exams
+              </span>
+              <span className="text-gray-900 dark:text-white font-bold">{completedExamsCount} / {promisedExams}</span>
             </div>
           </div>
         </div>

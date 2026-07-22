@@ -7,7 +7,7 @@ import gsap from 'gsap';
 import { BookOpen, CheckCircle, Trophy, PlayCircle, ArrowRight, Sparkles, Flame, Clock, Video, Megaphone, HelpCircle, Bell, ChevronRight } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, limit, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import Image from 'next/image';
 
 interface ActivityFeedItem {
@@ -31,6 +31,8 @@ export default function DashboardOverview() {
   
   const [enrolledCount, setEnrolledCount] = useState<number | null>(null);
   const [completedCount, setCompletedCount] = useState<number>(0);
+  const [avgScore, setAvgScore] = useState<string>('0%');
+  const [streakDays, setStreakDays] = useState<number>(1);
   const [lastAccessed, setLastAccessed] = useState<any>(null);
   const [recommendedCourses, setRecommendedCourses] = useState<any[]>([]);
   const [activityFeed, setActivityFeed] = useState<ActivityFeedItem[]>([]);
@@ -75,7 +77,46 @@ export default function DashboardOverview() {
       if (!user) return;
 
       try {
-        // Fetch approved enrollments count & IDs
+        // 1. Calculate & Update Dynamic Streak
+        try {
+          const streakRef = doc(db, 'user_streaks', user.uid);
+          const streakSnap = await getDoc(streakRef);
+          const todayStr = new Date().toISOString().split('T')[0];
+
+          if (streakSnap.exists()) {
+            const sData = streakSnap.data();
+            const lastDate = sData.lastActiveDate;
+            let currentStreak = sData.streakCount || 1;
+
+            if (lastDate !== todayStr) {
+              const yesterday = new Date();
+              yesterday.setDate(yesterday.getDate() - 1);
+              const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+              if (lastDate === yesterdayStr) {
+                currentStreak += 1;
+              } else {
+                currentStreak = 1;
+              }
+
+              await updateDoc(streakRef, {
+                streakCount: currentStreak,
+                lastActiveDate: todayStr
+              });
+            }
+            setStreakDays(currentStreak);
+          } else {
+            await setDoc(streakRef, {
+              streakCount: 1,
+              lastActiveDate: todayStr
+            });
+            setStreakDays(1);
+          }
+        } catch (streakErr) {
+          console.error("Streak calculation error:", streakErr);
+        }
+
+        // 2. Fetch approved enrollments count & IDs
         const enrollmentsRef = collection(db, 'enrollments');
         const enrollmentsQuery = query(
           enrollmentsRef,
@@ -87,13 +128,50 @@ export default function DashboardOverview() {
 
         const enrolledCourseIds = enrollmentsSnap.docs.map(d => d.data().courseId).filter(Boolean);
 
-        // Fetch completed lessons count
+        // 3. Fetch completed lessons count
         const completedRef = collection(db, 'completed_lessons');
         const completedQuery = query(completedRef, where('studentId', '==', user.uid));
         const completedSnap = await getDocs(completedQuery);
         setCompletedCount(completedSnap.size);
 
-        // Fetch last accessed lesson
+        // 4. Calculate Real Average Exam Score Percentage
+        try {
+          const completedExamsRef = collection(db, 'completed_exams');
+          const completedExamsQuery = query(completedExamsRef, where('studentId', '==', user.uid));
+          const completedExamsSnap = await getDocs(completedExamsQuery);
+
+          if (!completedExamsSnap.empty) {
+            let totalPercentageSum = 0;
+            let validExamsCount = 0;
+
+            completedExamsSnap.docs.forEach(docSnap => {
+              const examData = docSnap.data();
+              if (examData.totalMarks && examData.totalMarks > 0) {
+                const percentage = (examData.score / examData.totalMarks) * 100;
+                totalPercentageSum += Math.min(100, Math.max(0, percentage));
+                validExamsCount++;
+              } else if (examData.score !== undefined) {
+                totalPercentageSum += Math.min(100, examData.score * 10);
+                validExamsCount++;
+              }
+            });
+
+            if (validExamsCount > 0) {
+              const avg = Math.round(totalPercentageSum / validExamsCount);
+              const formattedAvg = new Intl.NumberFormat(locale === 'bn' ? 'bn-BD' : 'en-US').format(avg);
+              setAvgScore(`${formattedAvg}%`);
+            } else {
+              setAvgScore('0%');
+            }
+          } else {
+            setAvgScore('0%');
+          }
+        } catch (scoreErr) {
+          console.error("Average score calculation error:", scoreErr);
+          setAvgScore('0%');
+        }
+
+        // 5. Fetch last accessed lesson
         const lastAccessedRef = collection(db, 'last_accessed');
         const lastAccessedQuery = query(lastAccessedRef, where('__name__', '==', user.uid));
         const lastAccessedSnap = await getDocs(lastAccessedQuery);
@@ -101,7 +179,7 @@ export default function DashboardOverview() {
           setLastAccessed(lastAccessedSnap.docs[0].data());
         }
 
-        // Fetch recommended courses
+        // 6. Fetch recommended courses
         const coursesRef = collection(db, 'courses');
         let courseQuery = query(coursesRef, where('isPublished', '==', true), limit(3));
         
@@ -125,11 +203,10 @@ export default function DashboardOverview() {
 
         setRecommendedCourses(coursesData);
 
-        // Fetch Activity Feed Items across enrolled courses (Limit to latest 3 total)
+        // 7. Fetch Activity Feed Items across enrolled courses (Limit to latest 3 total)
         if (enrolledCourseIds.length > 0) {
           const feedItems: ActivityFeedItem[] = [];
 
-          // Process course docs in parallel for fast loading
           await Promise.all(
             enrolledCourseIds.map(async (courseId) => {
               try {
@@ -138,7 +215,6 @@ export default function DashboardOverview() {
                   const cData = courseDocSnap.data();
                   const courseTitle = cData.title || 'Enrolled Course';
 
-                  // 📢 Notices (take top 2 max per course)
                   if (cData.notices && Array.isArray(cData.notices)) {
                     cData.notices.slice(0, 2).forEach((n: any) => {
                       feedItems.push({
@@ -155,7 +231,6 @@ export default function DashboardOverview() {
                     });
                   }
 
-                  // 🔴 Live Classes (take top 2 max per course)
                   if (cData.liveClasses && Array.isArray(cData.liveClasses)) {
                     cData.liveClasses.slice(0, 2).forEach((lc: any) => {
                       const lcTime = new Date(`${lc.date}T${lc.time}`).getTime() || Date.now();
@@ -174,7 +249,6 @@ export default function DashboardOverview() {
                     });
                   }
 
-                  // 📝 Exams (take top 2 max per course)
                   if (cData.exams && Array.isArray(cData.exams)) {
                     cData.exams.slice(0, 2).forEach((ex: any) => {
                       if (ex.isPublished !== false) {
@@ -199,7 +273,6 @@ export default function DashboardOverview() {
             })
           );
 
-          // Sort by timestamp (newest/upcoming first) and strictly keep ONLY top 3 items
           feedItems.sort((a, b) => b.timestamp - a.timestamp);
           setActivityFeed(feedItems.slice(0, 3));
         }
@@ -224,9 +297,9 @@ export default function DashboardOverview() {
   }, []);
 
   const stats = [
-    { title: t('enrolled'), value: enrolledCount !== null ? enrolledCount : '-', icon: BookOpen, color: 'from-blue-500 to-cyan-400', shadow: 'shadow-blue-500/20' },
+    { title: t('enrolled'), value: enrolledCount !== null ? enrolledCount.toString() : '-', icon: BookOpen, color: 'from-blue-500 to-cyan-400', shadow: 'shadow-blue-500/20' },
     { title: t('completed'), value: completedCount.toString(), icon: CheckCircle, color: 'from-green-500 to-emerald-400', shadow: 'shadow-green-500/20' },
-    { title: t('score'), value: (completedCount * 10).toString(), icon: Trophy, color: 'from-orange-500 to-yellow-400', shadow: 'shadow-orange-500/20' },
+    { title: locale === 'bn' ? 'গড় পরীক্ষা নম্বর' : 'Average Score', value: avgScore, icon: Trophy, color: 'from-orange-500 to-yellow-400', shadow: 'shadow-orange-500/20' },
   ];
 
   return (
@@ -243,8 +316,8 @@ export default function DashboardOverview() {
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold mb-4">
-              <Flame className="w-4 h-4" />
-              <span>{t('streak')}</span>
+              <Flame className="w-4 h-4 text-orange-500 animate-pulse" />
+              <span>{new Intl.NumberFormat(locale === 'bn' ? 'bn-BD' : 'en-US').format(streakDays)} {locale === 'bn' ? 'দিনের স্ট্রীক!' : 'Day Streak!'}</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold mb-3 tracking-tight text-gray-900 dark:text-white">
               {t('welcome')}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">{user?.displayName?.split(' ')[0] || 'Student'}</span>! 👋

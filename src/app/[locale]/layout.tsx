@@ -35,6 +35,15 @@ export const metadata: Metadata = {
   title: "SkyLearners - LMS",
   description: "Get all academic content here",
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "SkyLearners",
+  },
+  icons: {
+    icon: "/icons/icon-192x192.png",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default async function RootLayout({

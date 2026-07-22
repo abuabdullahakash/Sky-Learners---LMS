@@ -4,7 +4,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { BookOpen, CheckCircle, Trophy, PlayCircle, ArrowRight, Sparkles, Flame, Clock, Video, Megaphone, HelpCircle, Bell } from 'lucide-react';
+import { BookOpen, CheckCircle, Trophy, PlayCircle, ArrowRight, Sparkles, Flame, Clock, Video, Megaphone, HelpCircle, Bell, ChevronRight } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore';
@@ -125,80 +125,83 @@ export default function DashboardOverview() {
 
         setRecommendedCourses(coursesData);
 
-        // Fetch Activity Feed Items across all enrolled courses
+        // Fetch Activity Feed Items across enrolled courses (Limit to latest 3 total)
         if (enrolledCourseIds.length > 0) {
           const feedItems: ActivityFeedItem[] = [];
 
-          for (const courseId of enrolledCourseIds) {
-            try {
-              const courseDocSnap = await getDoc(doc(db, 'courses', courseId));
-              if (courseDocSnap.exists()) {
-                const cData = courseDocSnap.data();
-                const courseTitle = cData.title || 'Enrolled Course';
+          // Process course docs in parallel for fast loading
+          await Promise.all(
+            enrolledCourseIds.map(async (courseId) => {
+              try {
+                const courseDocSnap = await getDoc(doc(db, 'courses', courseId));
+                if (courseDocSnap.exists()) {
+                  const cData = courseDocSnap.data();
+                  const courseTitle = cData.title || 'Enrolled Course';
 
-                // 📢 Notices
-                if (cData.notices && Array.isArray(cData.notices)) {
-                  cData.notices.forEach((n: any) => {
-                    feedItems.push({
-                      id: `notice-${n.id}`,
-                      type: 'notice',
-                      title: n.title,
-                      subtitle: n.content,
-                      dateStr: formatTimeAgo(n.createdAt),
-                      courseTitle,
-                      courseId,
-                      link: `/dashboard/courses/${courseId}/community`,
-                      timestamp: new Date(n.createdAt || Date.now()).getTime()
-                    });
-                  });
-                }
-
-                // 🔴 Live Classes
-                if (cData.liveClasses && Array.isArray(cData.liveClasses)) {
-                  cData.liveClasses.forEach((lc: any) => {
-                    const lcTime = new Date(`${lc.date}T${lc.time}`).getTime() || Date.now();
-                    feedItems.push({
-                      id: `live-${lc.id}`,
-                      type: 'live_class',
-                      title: lc.title,
-                      subtitle: lc.isLive ? '🔴 Live Now! (লাইভ চলছে)' : `${lc.date} • ${lc.time}`,
-                      dateStr: lc.date,
-                      courseTitle,
-                      courseId,
-                      isLive: lc.isLive,
-                      link: `/dashboard/courses/${courseId}/live-classes`,
-                      timestamp: lc.isLive ? Date.now() + 100000000 : lcTime
-                    });
-                  });
-                }
-
-                // 📝 Exams
-                if (cData.exams && Array.isArray(cData.exams)) {
-                  cData.exams.forEach((ex: any) => {
-                    if (ex.isPublished !== false) {
+                  // 📢 Notices (take top 2 max per course)
+                  if (cData.notices && Array.isArray(cData.notices)) {
+                    cData.notices.slice(0, 2).forEach((n: any) => {
                       feedItems.push({
-                        id: `exam-${ex.id}`,
-                        type: 'exam',
-                        title: ex.title,
-                        subtitle: ex.endTime ? `Deadline: ${new Date(ex.endTime).toLocaleDateString()}` : `${ex.totalMarks} Marks • ${ex.durationMinutes} mins`,
-                        dateStr: ex.durationMinutes ? `${ex.durationMinutes}m` : '',
+                        id: `notice-${n.id}`,
+                        type: 'notice',
+                        title: n.title,
+                        subtitle: n.content,
+                        dateStr: formatTimeAgo(n.createdAt),
                         courseTitle,
                         courseId,
-                        link: `/dashboard/courses/${courseId}/exams`,
-                        timestamp: ex.endTime ? new Date(ex.endTime).getTime() : Date.now()
+                        link: `/dashboard/courses/${courseId}/community`,
+                        timestamp: new Date(n.createdAt || Date.now()).getTime()
                       });
-                    }
-                  });
-                }
-              }
-            } catch (err) {
-              console.error(`Error fetching updates for course ${courseId}:`, err);
-            }
-          }
+                    });
+                  }
 
-          // Sort by timestamp (newest/upcoming first)
+                  // 🔴 Live Classes (take top 2 max per course)
+                  if (cData.liveClasses && Array.isArray(cData.liveClasses)) {
+                    cData.liveClasses.slice(0, 2).forEach((lc: any) => {
+                      const lcTime = new Date(`${lc.date}T${lc.time}`).getTime() || Date.now();
+                      feedItems.push({
+                        id: `live-${lc.id}`,
+                        type: 'live_class',
+                        title: lc.title,
+                        subtitle: lc.isLive ? '🔴 Live Now! (লাইভ ক্লাস শুরু হয়েছে)' : `${lc.date} • ${lc.time}`,
+                        dateStr: lc.date,
+                        courseTitle,
+                        courseId,
+                        isLive: lc.isLive,
+                        link: `/dashboard/courses/${courseId}/live-classes`,
+                        timestamp: lc.isLive ? Date.now() + 100000000 : lcTime
+                      });
+                    });
+                  }
+
+                  // 📝 Exams (take top 2 max per course)
+                  if (cData.exams && Array.isArray(cData.exams)) {
+                    cData.exams.slice(0, 2).forEach((ex: any) => {
+                      if (ex.isPublished !== false) {
+                        feedItems.push({
+                          id: `exam-${ex.id}`,
+                          type: 'exam',
+                          title: ex.title,
+                          subtitle: ex.endTime ? `Deadline: ${new Date(ex.endTime).toLocaleDateString()}` : `${ex.totalMarks} Marks • ${ex.durationMinutes} mins`,
+                          dateStr: ex.durationMinutes ? `${ex.durationMinutes}m` : '',
+                          courseTitle,
+                          courseId,
+                          link: `/dashboard/courses/${courseId}/exams`,
+                          timestamp: ex.endTime ? new Date(ex.endTime).getTime() : Date.now()
+                        });
+                      }
+                    });
+                  }
+                }
+              } catch (err) {
+                console.error(`Error fetching updates for course ${courseId}:`, err);
+              }
+            })
+          );
+
+          // Sort by timestamp (newest/upcoming first) and strictly keep ONLY top 3 items
           feedItems.sort((a, b) => b.timestamp - a.timestamp);
-          setActivityFeed(feedItems.slice(0, 5));
+          setActivityFeed(feedItems.slice(0, 3));
         }
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -355,72 +358,96 @@ export default function DashboardOverview() {
           )}
         </div>
 
-        {/* Sidebar / Dynamic Activity Feed (আসন্ন কাজসমূহ ও সাম্প্রতিক আপডেট) */}
+        {/* Sidebar / Dynamic Activity Feed (সাম্প্রতিক ৩টি আপডেট) */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
-              <Bell className="w-5 h-5 text-primary animate-bounce" />
+              <Bell className="w-5 h-5 text-primary" />
               {t('upcomingTasks')} & আপডেট
             </h2>
+            <span className="px-2.5 py-1 text-xs font-bold bg-primary/10 text-primary rounded-full border border-primary/20">
+              সর্বশেষ ৩টি
+            </span>
           </div>
           
-          <div className="bg-white dark:bg-foreground/5 rounded-3xl p-5 border border-gray-200 dark:border-foreground/10 space-y-3 relative overflow-hidden backdrop-blur-md shadow-md dark:shadow-none">
+          <div className="bg-white dark:bg-foreground/5 rounded-3xl p-5 border border-gray-200 dark:border-foreground/10 space-y-3 relative overflow-hidden backdrop-blur-xl shadow-lg">
             
             {isFeedLoading ? (
-              <div className="p-8 text-center text-sm font-medium text-foreground/50">
-                আপডেট লোড হচ্ছে...
+              <div className="space-y-3 p-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-20 bg-foreground/5 animate-pulse rounded-2xl border border-foreground/5"></div>
+                ))}
               </div>
             ) : activityFeed.length === 0 ? (
-              <div className="p-6 text-center text-foreground/50 text-sm">
+              <div className="p-8 text-center text-foreground/50 text-sm">
                 <Bell className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                আপনার এনরোল করা কোর্সে কোনো সাম্প্রতিক নোটিশ বা ক্লাস নেই।
+                আপনার এনরোল করা কোর্সে কোনো নোটিশ বা নতুন ক্লাস নেই।
               </div>
             ) : (
               activityFeed.map((item) => {
                 let IconComponent = Megaphone;
-                let iconColor = "text-orange-500 bg-orange-500/10";
+                let iconWrapperClass = "bg-amber-500/10 text-amber-500 ring-1 ring-amber-500/20";
                 
                 if (item.type === 'live_class') {
                   IconComponent = Video;
-                  iconColor = item.isLive ? "text-red-500 bg-red-500/10 animate-pulse" : "text-purple-500 bg-purple-500/10";
+                  iconWrapperClass = item.isLive 
+                    ? "bg-red-500/15 text-red-500 ring-1 ring-red-500/30 animate-pulse" 
+                    : "bg-purple-500/10 text-purple-500 ring-1 ring-purple-500/20";
                 } else if (item.type === 'exam') {
                   IconComponent = HelpCircle;
-                  iconColor = "text-blue-500 bg-blue-500/10";
+                  iconWrapperClass = "bg-blue-500/10 text-blue-500 ring-1 ring-blue-500/20";
                 } else if (item.type === 'lesson') {
                   IconComponent = BookOpen;
-                  iconColor = "text-emerald-500 bg-emerald-500/10";
+                  iconWrapperClass = "bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/20";
                 }
 
                 return (
-                  <Link key={item.id} href={item.link} className="block">
-                    <div className="flex items-start gap-3.5 p-3.5 bg-gray-50 dark:bg-background/50 rounded-2xl hover:bg-primary/10 dark:hover:bg-primary/10 transition-all cursor-pointer group border border-transparent hover:border-primary/30">
+                  <Link key={item.id} href={item.link} className="block group">
+                    <div className="flex items-center gap-3.5 p-4 bg-gray-50/80 dark:bg-white/[0.04] hover:bg-white dark:hover:bg-white/[0.08] rounded-2xl border border-gray-200/60 dark:border-white/10 hover:border-primary/40 dark:hover:border-primary/40 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5">
                       
-                      {/* Clean SVG Icon */}
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform ${iconColor}`}>
+                      {/* Clean SVG Icon Box */}
+                      <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-300 ${iconWrapperClass}`}>
                         <IconComponent className="w-5 h-5" />
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        {/* Course Tag Badge */}
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="px-2 py-0.5 text-[10px] font-extrabold bg-primary/10 text-primary border border-primary/20 rounded-full truncate max-w-[160px]" title={item.courseTitle}>
+                        {/* Course Tag & Type Badges */}
+                        <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+                          <span className="px-2.5 py-0.5 text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 rounded-md truncate max-w-[130px]" title={item.courseTitle}>
                             {item.courseTitle}
                           </span>
-                          {item.type === 'notice' && <span className="text-[10px] font-bold text-orange-500">নোটিশ</span>}
-                          {item.type === 'live_class' && <span className="text-[10px] font-bold text-red-500">{item.isLive ? '🔴 লাইভ' : 'লাইভ ক্লাস'}</span>}
-                          {item.type === 'exam' && <span className="text-[10px] font-bold text-blue-500">পরীক্ষা</span>}
+                          {item.type === 'notice' && (
+                            <span className="px-2 py-0.5 text-[10px] font-extrabold text-amber-500 bg-amber-500/10 rounded-md">
+                              নোটিশ
+                            </span>
+                          )}
+                          {item.type === 'live_class' && (
+                            <span className={`px-2 py-0.5 text-[10px] font-extrabold rounded-md flex items-center gap-1 ${item.isLive ? 'text-red-500 bg-red-500/10 animate-pulse' : 'text-purple-500 bg-purple-500/10'}`}>
+                              {item.isLive ? '🔴 লাইভ চলছে' : 'লাইভ ক্লাস'}
+                            </span>
+                          )}
+                          {item.type === 'exam' && (
+                            <span className="px-2 py-0.5 text-[10px] font-extrabold text-blue-500 bg-blue-500/10 rounded-md">
+                              পরীক্ষা
+                            </span>
+                          )}
                         </div>
 
-                        <h4 className="font-bold text-sm text-gray-900 dark:text-white truncate group-hover:text-primary transition-colors">
+                        <h4 className="font-bold text-sm text-gray-900 dark:text-white group-hover:text-primary transition-colors truncate">
                           {item.title}
                         </h4>
                         
                         {item.subtitle && (
-                          <p className="text-xs text-foreground/60 mt-0.5 line-clamp-1">
+                          <p className="text-xs text-foreground/60 mt-0.5 truncate font-medium">
                             {item.subtitle}
                           </p>
                         )}
                       </div>
+
+                      <div className="text-foreground/30 group-hover:text-primary group-hover:translate-x-1 transition-all">
+                        <ChevronRight className="w-5 h-5" />
+                      </div>
+
                     </div>
                   </Link>
                 );

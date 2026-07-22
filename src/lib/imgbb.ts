@@ -1,49 +1,66 @@
 export const uploadImageToImgBB = async (file: File | Blob): Promise<string> => {
-  const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY || '5750d8e64e0b691f245a402c24f73944';
+  const imgbbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY || '5750d8e64e0b691f245a402c24f73944';
+  const cloudinaryCloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const cloudinaryUploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
   try {
-    // 1. Convert File/Blob to Base64 string (ImgBB API native & 100% reliable for clipboard screenshots)
-    const base64Clean = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        const clean = result.split(',')[1] || result;
-        resolve(clean);
-      };
-      reader.onerror = (err) => reject(err);
-      reader.readAsDataURL(file);
-    });
+    // 1. Try uploading to ImgBB First (Primary Strategy)
+    try {
+      const base64Clean = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          const clean = result.split(',')[1] || result;
+          resolve(clean);
+        };
+        reader.onerror = (err) => reject(err);
+        reader.readAsDataURL(file);
+      });
 
-    const formData = new FormData();
-    formData.append('image', base64Clean);
+      const formData = new FormData();
+      formData.append('image', base64Clean);
 
-    const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
-      method: 'POST',
-      body: formData,
-    });
+      const response = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
+        method: 'POST',
+        body: formData,
+      });
 
-    const data = await response.json();
-    if (data.success && data.data?.url) {
-      return data.data.url;
+      const data = await response.json();
+      if (data.success && data.data?.url) {
+        return data.data.url;
+      }
+      
+      console.warn("ImgBB upload failed (possibly maintenance), falling back to Cloudinary...", data);
+    } catch (imgbbError) {
+      console.warn("ImgBB network error, falling back to Cloudinary...", imgbbError);
     }
 
-    // 2. Fallback to direct binary FormData upload with explicit filename if base64 attempt responded with error
-    const fallbackData = new FormData();
-    fallbackData.append('image', file, (file as File).name || 'screenshot.png');
+    // 2. Fallback to Cloudinary (if ImgBB fails)
+    if (cloudinaryCloudName && cloudinaryUploadPreset) {
+      console.log("Attempting Fallback upload to Cloudinary...");
+      const cloudinaryFormData = new FormData();
+      
+      // Cloudinary accepts binary files directly, which is faster and cleaner
+      cloudinaryFormData.append('file', file);
+      cloudinaryFormData.append('upload_preset', cloudinaryUploadPreset);
 
-    const fallbackRes = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
-      method: 'POST',
-      body: fallbackData,
-    });
+      const cloudinaryResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/image/upload`, {
+        method: 'POST',
+        body: cloudinaryFormData,
+      });
 
-    const fallbackDataJson = await fallbackRes.json();
-    if (fallbackDataJson.success && fallbackDataJson.data?.url) {
-      return fallbackDataJson.data.url;
+      const cloudinaryData = await cloudinaryResponse.json();
+      
+      if (cloudinaryResponse.ok && cloudinaryData.secure_url) {
+        return cloudinaryData.secure_url;
+      }
+      
+      throw new Error(cloudinaryData.error?.message || 'Failed to upload image to Cloudinary');
     }
 
-    throw new Error(data.error?.message || fallbackDataJson.error?.message || 'Failed to upload image to ImgBB');
+    throw new Error('Both ImgBB and Cloudinary uploads failed.');
   } catch (error) {
-    console.error('Error uploading image to ImgBB:', error);
+    console.error('Error uploading image:', error);
     throw error;
   }
 };

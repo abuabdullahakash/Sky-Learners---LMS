@@ -196,16 +196,30 @@ export default function TeacherProfilePage({ params }: { params: Promise<{ teach
                   <h3 className="font-bold mb-3 uppercase text-xs tracking-wider text-foreground/50">Follow & Contact</h3>
                   <div className="flex flex-wrap gap-3">
                     {profileData.website && (
-                      <a href={profileData.website} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-xl bg-foreground/5 border border-foreground/10 flex items-center justify-center hover:bg-primary hover:text-white transition-colors text-foreground"><Globe className="w-4 h-4" /></a>
+                      <a href={profileData.website} target="_blank" rel="noreferrer" title="Website" className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 border border-blue-500/20 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all transform hover:scale-105">
+                        <Globe className="w-5 h-5" />
+                      </a>
                     )}
                     {profileData.facebook && (
-                      <a href={profileData.facebook} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-xl bg-[#1877F2]/10 text-[#1877F2] border border-[#1877F2]/20 flex items-center justify-center hover:bg-[#1877F2] hover:text-white transition-colors"><LinkIcon className="w-4 h-4" /></a>
+                      <a href={profileData.facebook} target="_blank" rel="noreferrer" title="Facebook" className="w-10 h-10 rounded-xl bg-[#1877F2]/10 text-[#1877F2] border border-[#1877F2]/20 flex items-center justify-center hover:bg-[#1877F2] hover:text-white transition-all transform hover:scale-105">
+                        <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                      </a>
                     )}
                     {profileData.youtube && (
-                      <a href={profileData.youtube} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-xl bg-[#FF0000]/10 text-[#FF0000] border border-[#FF0000]/20 flex items-center justify-center hover:bg-[#FF0000] hover:text-white transition-colors"><LinkIcon className="w-4 h-4" /></a>
+                      <a href={profileData.youtube} target="_blank" rel="noreferrer" title="YouTube" className="w-10 h-10 rounded-xl bg-[#FF0000]/10 text-[#FF0000] border border-[#FF0000]/20 flex items-center justify-center hover:bg-[#FF0000] hover:text-white transition-all transform hover:scale-105">
+                        <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                      </a>
                     )}
                     {profileData.linkedin && (
-                      <a href={profileData.linkedin} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-xl bg-[#0A66C2]/10 text-[#0A66C2] border border-[#0A66C2]/20 flex items-center justify-center hover:bg-[#0A66C2] hover:text-white transition-colors"><LinkIcon className="w-4 h-4" /></a>
+                      <a href={profileData.linkedin} target="_blank" rel="noreferrer" title="LinkedIn" className="w-10 h-10 rounded-xl bg-[#0A66C2]/10 text-[#0A66C2] border border-[#0A66C2]/20 flex items-center justify-center hover:bg-[#0A66C2] hover:text-white transition-all transform hover:scale-105">
+                        <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.239-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        </svg>
+                      </a>
                     )}
                     {!profileData.website && !profileData.facebook && !profileData.youtube && !profileData.linkedin && (
                       <p className="text-xs text-foreground/40 italic">No social links added.</p>

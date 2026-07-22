@@ -225,15 +225,15 @@ export default function StudentCourseOverview() {
           if (nextLesson) {
             return (
               <div className="bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-purple-600/10 dark:from-blue-600/20 dark:via-indigo-600/20 dark:to-purple-600/20 rounded-3xl p-8 border border-blue-200 dark:border-blue-500/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
                 
                 <div className="flex items-start gap-4 z-10">
-                  <div className="w-14 h-14 bg-primary/20 text-primary rounded-2xl flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform mt-1">
+                  <div className="w-14 h-14 bg-orange-500/20 text-orange-600 dark:text-orange-400 rounded-2xl flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform mt-1">
                     <PlayCircle className="w-8 h-8" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="px-2.5 py-0.5 bg-primary/10 text-primary text-xs font-bold rounded-full uppercase tracking-wider">
+                      <span className="px-2.5 py-0.5 bg-orange-500/10 text-orange-600 dark:text-orange-400 text-xs font-bold rounded-full uppercase tracking-wider">
                         {completedCount > 0 
                           ? (locale === 'bn' ? 'পড়া চালিয়ে যান' : 'Continue Learning') 
                           : (locale === 'bn' ? 'প্রথম লেসন শুরু করুন' : 'Start First Lesson')}
@@ -257,9 +257,9 @@ export default function StudentCourseOverview() {
 
                 <Link 
                   href={`/dashboard/courses/${courseId}/recorded-classes/${nextLesson.id}`}
-                  className="w-full md:w-auto px-7 py-3.5 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/30 z-10 hover:-translate-y-0.5 shrink-0 flex items-center justify-center gap-2 text-sm"
+                  className="w-full md:w-auto px-7 py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-orange-500/30 z-10 hover:-translate-y-0.5 shrink-0 flex items-center justify-center gap-2 text-sm"
                 >
-                  <PlayCircle className="w-5 h-5" /> 
+                  <PlayCircle className="w-5 h-5 text-white" /> 
                   {completedCount > 0 
                     ? (locale === 'bn' ? 'লেসনে যান' : 'Continue Lesson') 
                     : (locale === 'bn' ? 'ক্লাস শুরু করুন' : 'Start Class')}
@@ -270,14 +270,14 @@ export default function StudentCourseOverview() {
 
           return (
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-foreground/5 dark:to-foreground/10 rounded-3xl p-8 border border-gray-200 dark:border-foreground/20 text-center flex flex-col items-center shadow-sm relative overflow-hidden group">
-              <div className="w-14 h-14 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4 relative z-10 shadow-inner group-hover:scale-110 transition-transform">
+              <div className="w-14 h-14 bg-orange-500/10 text-orange-500 rounded-full flex items-center justify-center mb-4 relative z-10 shadow-inner group-hover:scale-110 transition-transform">
                 <BookOpen className="w-7 h-7" />
               </div>
               <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white relative z-10">{t('readyToStart')}</h2>
               <p className="text-gray-600 dark:text-foreground/70 max-w-md mb-6 relative z-10 text-sm">{t('diveInto')}</p>
               <Link 
                 href={`/dashboard/courses/${courseId}/curriculum`}
-                className="px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/30 relative z-10 hover:-translate-y-1"
+                className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-orange-500/30 relative z-10 hover:-translate-y-1"
               >
                 {t('goToCurriculum')}
               </Link>

@@ -41,8 +41,12 @@ export const metadata: Metadata = {
     title: "SkyLearners",
   },
   icons: {
-    icon: "/icons/icon-192x192.png",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/Fav Icon.png" },
+      { url: "/favicon.png", type: "image/png" }
+    ],
+    shortcut: "/favicon.png",
+    apple: "/Fav Icon.png",
   },
 };
 

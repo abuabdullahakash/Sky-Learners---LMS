@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { uploadImageToImgBB } from '@/lib/imgbb';
 import { Building2, User, Camera, Link as LinkIcon, Save, CheckCircle2, Globe, Star, Users, Video, X, Plus, GraduationCap, Briefcase, BookOpen, Presentation, Eye, Upload, Loader2, Image as ImageIcon } from 'lucide-react';
 
 export default function ProfileBuilderPage() {
@@ -64,23 +65,12 @@ export default function ProfileBuilderPage() {
     if (!file) return;
 
     setUploadingProfilePhoto(true);
-    const formData = new FormData();
-    formData.append('image', file);
-
     try {
-      const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.success) {
-        setProfileData(prev => ({ ...prev, profilePhoto: data.data.url }));
-      } else {
-        alert("Failed to upload profile photo.");
-      }
+      const url = await uploadImageToImgBB(file);
+      setProfileData(prev => ({ ...prev, profilePhoto: url }));
     } catch (error) {
       console.error("Error uploading profile photo:", error);
-      alert("Error uploading image.");
+      alert("Failed to upload profile photo. Please try again.");
     } finally {
       setUploadingProfilePhoto(false);
     }
@@ -91,23 +81,12 @@ export default function ProfileBuilderPage() {
     if (!file) return;
 
     setUploadingCoverPhoto(true);
-    const formData = new FormData();
-    formData.append('image', file);
-
     try {
-      const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.success) {
-        setProfileData(prev => ({ ...prev, coverPhoto: data.data.url }));
-      } else {
-        alert("Failed to upload cover banner.");
-      }
+      const url = await uploadImageToImgBB(file);
+      setProfileData(prev => ({ ...prev, coverPhoto: url }));
     } catch (error) {
       console.error("Error uploading cover photo:", error);
-      alert("Error uploading image.");
+      alert("Failed to upload cover photo. Please try again.");
     } finally {
       setUploadingCoverPhoto(false);
     }
@@ -118,23 +97,12 @@ export default function ProfileBuilderPage() {
     if (!file) return;
 
     setUploadingTeacherImageId(id);
-    const formData = new FormData();
-    formData.append('image', file);
-
     try {
-      const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.success) {
-        updateTeacherRoster(id, 'image', data.data.url);
-      } else {
-        alert("Failed to upload teacher image.");
-      }
+      const url = await uploadImageToImgBB(file);
+      updateTeacherRoster(id, 'image', url);
     } catch (error) {
       console.error("Error uploading teacher image:", error);
-      alert("Error uploading image.");
+      alert("Failed to upload teacher image. Please try again.");
     } finally {
       setUploadingTeacherImageId(null);
     }

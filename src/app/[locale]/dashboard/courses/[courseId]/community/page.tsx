@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { MessageCircle, Send, Link as LinkIcon, ExternalLink, MessageSquare } from 'lucide-react';
+import { MessageCircle, Send, Link as LinkIcon, ExternalLink, MessageSquare, Megaphone, Bell } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
@@ -20,6 +20,14 @@ interface CommunityLink {
   id: string;
   platform: string;
   url: string;
+}
+
+interface CourseNotice {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  teacherName?: string;
 }
 
 const PLATFORM_INFO: Record<string, { icon: React.FC<any>; colorClass: string; iconBg: string }> = {
@@ -39,10 +47,11 @@ export default function StudentCommunity() {
   const t = useTranslations('Community');
   
   const [links, setLinks] = useState<CommunityLink[]>([]);
+  const [notices, setNotices] = useState<CourseNotice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchLinks = async () => {
+    const fetchCourseData = async () => {
       if (!courseId) return;
       try {
         const docRef = doc(db, 'courses', courseId);
@@ -52,7 +61,6 @@ export default function StudentCommunity() {
           const data = docSnap.data();
           let fetchedLinks: CommunityLink[] = data.communityLinks || [];
           
-          // Fallback for old data structure
           if (fetchedLinks.length === 0 && data.facebookGroupUrl) {
             fetchedLinks = [{
               id: 'legacy',
@@ -62,15 +70,16 @@ export default function StudentCommunity() {
           }
           
           setLinks(fetchedLinks);
+          setNotices(data.notices || []);
         }
       } catch (error) {
-        console.error("Error fetching community links", error);
+        console.error("Error fetching community & notices", error);
       } finally {
         setIsLoading(false);
       }
     };
     
-    fetchLinks();
+    fetchCourseData();
   }, [courseId]);
 
   if (isLoading) {
@@ -81,32 +90,17 @@ export default function StudentCommunity() {
     );
   }
 
-  if (links.length === 0) {
-    return (
-      <div className="text-center py-20 max-w-2xl mx-auto">
-        <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
-          <MessageSquare className="w-10 h-10" />
-        </div>
-        <h2 className="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">{t('notActiveTitle')}</h2>
-        <p className="text-gray-600 dark:text-foreground/70 text-lg mb-8">
-          {t('notActiveSubtitle')}
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-8">
       
       {/* Hero Section */}
-      <div className="relative w-full mb-6 shadow-lg rounded-none overflow-hidden">
+      <div className="relative w-full shadow-lg rounded-none overflow-hidden">
         <div className="absolute inset-0 bg-[#111827]"/>
         <div className="absolute inset-0" style={{background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 30%, #111827 60%, #0f172a 100%)'}} />
         <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 15% 60%, rgba(249,115,22,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 20%, rgba(239,68,68,0.2) 0%, transparent 40%)'}} />
         <div className="absolute top-0 right-0 w-80 h-80 opacity-[0.04]" style={{background: 'repeating-linear-gradient(45deg, #f97316 0px, #f97316 1px, transparent 1px, transparent 14px)'}} />
         <div className="absolute bottom-0 left-0 w-40 h-40 opacity-[0.06]" style={{background: 'radial-gradient(circle, #f97316 0%, transparent 70%)'}} />
         
-        {/* Animated Icon Background */}
         <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none">
           <MessageSquare className="w-32 h-32 text-orange-500 animate-pulse" />
         </div>
@@ -124,34 +118,82 @@ export default function StudentCommunity() {
           </div>
         </div>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {links.map((link) => {
-          const info = PLATFORM_INFO[link.platform] || PLATFORM_INFO['other'];
-          const Icon = info.icon;
-          
-          return (
-            <Link 
-              key={link.id} 
-              href={link.url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-            className={`flex items-center justify-between p-5 rounded border transition-all duration-300 group ${info.colorClass}`}
-            >
-              <div className="flex items-center gap-4">
-                <div className={`p-3 rounded shadow-sm ${info.iconBg}`}>
-                  <Icon className="w-6 h-6" />
+
+      {/* 📢 Course Notices Section */}
+      <div className="bg-white dark:bg-foreground/5 rounded-3xl p-6 border border-gray-200 dark:border-foreground/10 space-y-4">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <Megaphone className="w-5 h-5 text-orange-500" />
+          Teacher Announcements & Notices (নোটিশ বোর্ড)
+        </h2>
+        
+        {notices.length === 0 ? (
+          <div className="p-6 text-center border border-dashed border-gray-200 dark:border-foreground/10 rounded-2xl">
+            <Bell className="w-8 h-8 mx-auto text-gray-400 mb-2" />
+            <p className="text-gray-500 dark:text-foreground/60 text-sm font-medium">No teacher notices posted for this course yet.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {notices.map((notice) => (
+              <div key={notice.id} className="p-5 bg-orange-500/5 dark:bg-foreground/5 rounded-2xl border border-orange-500/20 space-y-2">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <span className="px-2.5 py-0.5 bg-orange-500/10 text-orange-500 text-xs font-bold rounded-full uppercase tracking-wider">Announcement</span>
+                  <span className="text-xs text-foreground/50">{new Date(notice.createdAt).toLocaleString()}</span>
                 </div>
-                <div>
-                  <h3 className="font-bold text-lg text-foreground">{t(`platforms.${link.platform}`)}</h3>
-                  <p className="text-sm opacity-80 mt-1">{t('clickToJoin')}</p>
-                </div>
+                <h3 className="font-bold text-lg text-gray-900 dark:text-white">{notice.title}</h3>
+                <p className="text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed">{notice.content}</p>
+                {notice.teacherName && (
+                  <p className="text-xs font-semibold text-primary pt-1">— {notice.teacherName}</p>
+                )}
               </div>
-              <ExternalLink className="w-5 h-5 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-            </Link>
-          );
-        })}
+            ))}
+          </div>
+        )}
       </div>
+
+      {/* 🔗 Community Links Section */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <LinkIcon className="w-5 h-5 text-primary" />
+          Community Groups
+        </h2>
+
+        {links.length === 0 ? (
+          <div className="text-center py-12 bg-white dark:bg-foreground/5 rounded-3xl border border-gray-200 dark:border-foreground/10">
+            <MessageSquare className="w-10 h-10 mx-auto text-foreground/30 mb-3" />
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('notActiveTitle')}</h3>
+            <p className="text-gray-500 dark:text-foreground/60 text-sm mt-1">{t('notActiveSubtitle')}</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {links.map((link) => {
+              const info = PLATFORM_INFO[link.platform] || PLATFORM_INFO['other'];
+              const Icon = info.icon;
+              
+              return (
+                <Link 
+                  key={link.id} 
+                  href={link.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={`flex items-center justify-between p-5 rounded-2xl border transition-all duration-300 group ${info.colorClass}`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-xl shadow-sm ${info.iconBg}`}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-foreground">{t(`platforms.${link.platform}`)}</h3>
+                      <p className="text-sm opacity-80 mt-1">{t('clickToJoin')}</p>
+                    </div>
+                  </div>
+                  <ExternalLink className="w-5 h-5 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }

@@ -2,14 +2,26 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { BookOpen, CheckCircle, Trophy, PlayCircle, ArrowRight, Sparkles, Flame, Clock } from 'lucide-react';
+import { BookOpen, CheckCircle, Trophy, PlayCircle, ArrowRight, Sparkles, Flame, Clock, Video, Megaphone, HelpCircle, Bell } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, limit } from 'firebase/firestore';
-import { useState } from 'react';
+import { collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore';
 import Image from 'next/image';
+
+interface ActivityFeedItem {
+  id: string;
+  type: 'notice' | 'live_class' | 'exam' | 'lesson';
+  title: string;
+  subtitle?: string;
+  dateStr?: string;
+  courseTitle: string;
+  courseId: string;
+  link: string;
+  isLive?: boolean;
+  timestamp: number;
+}
 
 export default function DashboardOverview() {
   const t = useTranslations('Dashboard.overview');
@@ -21,10 +33,13 @@ export default function DashboardOverview() {
   const [completedCount, setCompletedCount] = useState<number>(0);
   const [lastAccessed, setLastAccessed] = useState<any>(null);
   const [recommendedCourses, setRecommendedCourses] = useState<any[]>([]);
+  const [activityFeed, setActivityFeed] = useState<ActivityFeedItem[]>([]);
+  const [isFeedLoading, setIsFeedLoading] = useState(true);
 
-  const formatTimeAgo = (timestamp: string) => {
+  const formatTimeAgo = (timestamp: string | number) => {
     if (!timestamp) return t('timeAgo.justNow');
-    const diff = Date.now() - new Date(timestamp).getTime();
+    const timeMs = typeof timestamp === 'number' ? timestamp : new Date(timestamp).getTime();
+    const diff = Date.now() - timeMs;
     const minutes = Math.floor(diff / 60000);
     if (minutes < 1) return t('timeAgo.justNow');
     
@@ -60,7 +75,7 @@ export default function DashboardOverview() {
       if (!user) return;
 
       try {
-        // Fetch approved enrollments count
+        // Fetch approved enrollments count & IDs
         const enrollmentsRef = collection(db, 'enrollments');
         const enrollmentsQuery = query(
           enrollmentsRef,
@@ -69,6 +84,8 @@ export default function DashboardOverview() {
         );
         const enrollmentsSnap = await getDocs(enrollmentsQuery);
         setEnrolledCount(enrollmentsSnap.size);
+
+        const enrolledCourseIds = enrollmentsSnap.docs.map(d => d.data().courseId).filter(Boolean);
 
         // Fetch completed lessons count
         const completedRef = collection(db, 'completed_lessons');
@@ -98,18 +115,95 @@ export default function DashboardOverview() {
         }
 
         const courseSnap = await getDocs(courseQuery);
-        let coursesData = courseSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        let coursesData = courseSnap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
 
-        // Fallback if no category matches
         if (coursesData.length === 0 && userData?.eduLevel) {
           const fallbackQuery = query(coursesRef, where('isPublished', '==', true), limit(3));
           const fallbackSnap = await getDocs(fallbackQuery);
-          coursesData = fallbackSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          coursesData = fallbackSnap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
         }
 
         setRecommendedCourses(coursesData);
+
+        // Fetch Activity Feed Items across all enrolled courses
+        if (enrolledCourseIds.length > 0) {
+          const feedItems: ActivityFeedItem[] = [];
+
+          for (const courseId of enrolledCourseIds) {
+            try {
+              const courseDocSnap = await getDoc(doc(db, 'courses', courseId));
+              if (courseDocSnap.exists()) {
+                const cData = courseDocSnap.data();
+                const courseTitle = cData.title || 'Enrolled Course';
+
+                // 📢 Notices
+                if (cData.notices && Array.isArray(cData.notices)) {
+                  cData.notices.forEach((n: any) => {
+                    feedItems.push({
+                      id: `notice-${n.id}`,
+                      type: 'notice',
+                      title: n.title,
+                      subtitle: n.content,
+                      dateStr: formatTimeAgo(n.createdAt),
+                      courseTitle,
+                      courseId,
+                      link: `/dashboard/courses/${courseId}/community`,
+                      timestamp: new Date(n.createdAt || Date.now()).getTime()
+                    });
+                  });
+                }
+
+                // 🔴 Live Classes
+                if (cData.liveClasses && Array.isArray(cData.liveClasses)) {
+                  cData.liveClasses.forEach((lc: any) => {
+                    const lcTime = new Date(`${lc.date}T${lc.time}`).getTime() || Date.now();
+                    feedItems.push({
+                      id: `live-${lc.id}`,
+                      type: 'live_class',
+                      title: lc.title,
+                      subtitle: lc.isLive ? '🔴 Live Now! (লাইভ চলছে)' : `${lc.date} • ${lc.time}`,
+                      dateStr: lc.date,
+                      courseTitle,
+                      courseId,
+                      isLive: lc.isLive,
+                      link: `/dashboard/courses/${courseId}/live-classes`,
+                      timestamp: lc.isLive ? Date.now() + 100000000 : lcTime
+                    });
+                  });
+                }
+
+                // 📝 Exams
+                if (cData.exams && Array.isArray(cData.exams)) {
+                  cData.exams.forEach((ex: any) => {
+                    if (ex.isPublished !== false) {
+                      feedItems.push({
+                        id: `exam-${ex.id}`,
+                        type: 'exam',
+                        title: ex.title,
+                        subtitle: ex.endTime ? `Deadline: ${new Date(ex.endTime).toLocaleDateString()}` : `${ex.totalMarks} Marks • ${ex.durationMinutes} mins`,
+                        dateStr: ex.durationMinutes ? `${ex.durationMinutes}m` : '',
+                        courseTitle,
+                        courseId,
+                        link: `/dashboard/courses/${courseId}/exams`,
+                        timestamp: ex.endTime ? new Date(ex.endTime).getTime() : Date.now()
+                      });
+                    }
+                  });
+                }
+              }
+            } catch (err) {
+              console.error(`Error fetching updates for course ${courseId}:`, err);
+            }
+          }
+
+          // Sort by timestamp (newest/upcoming first)
+          feedItems.sort((a, b) => b.timestamp - a.timestamp);
+          setActivityFeed(feedItems.slice(0, 5));
+        }
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
+      } finally {
+        setIsFeedLoading(false);
       }
     };
 
@@ -137,7 +231,6 @@ export default function DashboardOverview() {
       
       {/* Welcome Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 p-8 md:p-12">
-        {/* Decorative elements */}
         <div className="absolute top-0 right-0 p-8 opacity-20 pointer-events-none">
           <Sparkles className="w-32 h-32 text-primary animate-pulse" />
         </div>
@@ -187,7 +280,7 @@ export default function DashboardOverview() {
         })}
       </div>
 
-      {/* Continue Learning & Recent Activity */}
+      {/* Continue Learning & Activity Feed */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Main Focus / Continue Learning */}
@@ -202,7 +295,6 @@ export default function DashboardOverview() {
           {lastAccessed ? (
             <Link href={`/dashboard/courses/${lastAccessed.courseId}/recorded-classes/${lastAccessed.lessonId}`} className="block">
               <div className="bg-white dark:bg-foreground/5 rounded-3xl p-3 border border-gray-200 dark:border-foreground/10 flex flex-col sm:flex-row items-stretch gap-4 group hover:border-primary/40 transition-all duration-300 shadow-md hover:shadow-2xl dark:shadow-none dark:hover:shadow-primary/5 cursor-pointer relative overflow-hidden">
-                {/* Glossy overlay */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
                 <div className="w-full sm:w-56 h-48 sm:h-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl relative overflow-hidden flex-shrink-0 group-hover:scale-[1.02] transition-transform duration-500 shadow-inner">
@@ -263,34 +355,81 @@ export default function DashboardOverview() {
           )}
         </div>
 
-        {/* Sidebar / Upcoming */}
+        {/* Sidebar / Dynamic Activity Feed (আসন্ন কাজসমূহ ও সাম্প্রতিক আপডেট) */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{t('upcomingTasks')}</h2>
-          <div className="bg-white dark:bg-foreground/5 rounded-3xl p-6 border border-gray-200 dark:border-foreground/10 space-y-4 relative overflow-hidden backdrop-blur-md shadow-md dark:shadow-none">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
+              <Bell className="w-5 h-5 text-primary animate-bounce" />
+              {t('upcomingTasks')} & আপডেট
+            </h2>
+          </div>
+          
+          <div className="bg-white dark:bg-foreground/5 rounded-3xl p-5 border border-gray-200 dark:border-foreground/10 space-y-3 relative overflow-hidden backdrop-blur-md shadow-md dark:shadow-none">
             
-            <div className="flex items-start gap-4 p-4 bg-background/50 rounded-2xl hover:bg-primary/5 transition-colors cursor-pointer group border border-transparent hover:border-primary/20">
-              <div className="w-12 h-12 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                <Clock className="w-6 h-6" />
+            {isFeedLoading ? (
+              <div className="p-8 text-center text-sm font-medium text-foreground/50">
+                আপডেট লোড হচ্ছে...
               </div>
-              <div>
-                <h4 className="font-bold text-foreground">{t('mathQuiz')}</h4>
-                <p className="text-sm text-foreground/50 mt-1">{t('today')}, 8:00 PM</p>
+            ) : activityFeed.length === 0 ? (
+              <div className="p-6 text-center text-foreground/50 text-sm">
+                <Bell className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                আপনার এনরোল করা কোর্সে কোনো সাম্প্রতিক নোটিশ বা ক্লাস নেই।
               </div>
-            </div>
+            ) : (
+              activityFeed.map((item) => {
+                let IconComponent = Megaphone;
+                let iconColor = "text-orange-500 bg-orange-500/10";
+                
+                if (item.type === 'live_class') {
+                  IconComponent = Video;
+                  iconColor = item.isLive ? "text-red-500 bg-red-500/10 animate-pulse" : "text-purple-500 bg-purple-500/10";
+                } else if (item.type === 'exam') {
+                  IconComponent = HelpCircle;
+                  iconColor = "text-blue-500 bg-blue-500/10";
+                } else if (item.type === 'lesson') {
+                  IconComponent = BookOpen;
+                  iconColor = "text-emerald-500 bg-emerald-500/10";
+                }
 
-            <div className="flex items-start gap-4 p-4 bg-background/50 rounded-2xl hover:bg-primary/5 transition-colors cursor-pointer group border border-transparent hover:border-primary/20">
-              <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                <BookOpen className="w-6 h-6" />
-              </div>
-              <div>
-                <h4 className="font-bold text-foreground">{t('chemistryAssign')}</h4>
-                <p className="text-sm text-foreground/50 mt-1">{t('tomorrow')}, 11:59 PM</p>
-              </div>
-            </div>
+                return (
+                  <Link key={item.id} href={item.link} className="block">
+                    <div className="flex items-start gap-3.5 p-3.5 bg-gray-50 dark:bg-background/50 rounded-2xl hover:bg-primary/10 dark:hover:bg-primary/10 transition-all cursor-pointer group border border-transparent hover:border-primary/30">
+                      
+                      {/* Clean SVG Icon */}
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform ${iconColor}`}>
+                        <IconComponent className="w-5 h-5" />
+                      </div>
 
-            <button className="w-full py-3 mt-2 text-sm font-bold text-gray-500 hover:text-primary dark:text-foreground/60 dark:hover:text-primary transition-colors border-t border-gray-100 dark:border-foreground/10 pt-4">
-              {t('viewCalendar')}
-            </button>
+                      <div className="flex-1 min-w-0">
+                        {/* Course Tag Badge */}
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className="px-2 py-0.5 text-[10px] font-extrabold bg-primary/10 text-primary border border-primary/20 rounded-full truncate max-w-[160px]" title={item.courseTitle}>
+                            {item.courseTitle}
+                          </span>
+                          {item.type === 'notice' && <span className="text-[10px] font-bold text-orange-500">নোটিশ</span>}
+                          {item.type === 'live_class' && <span className="text-[10px] font-bold text-red-500">{item.isLive ? '🔴 লাইভ' : 'লাইভ ক্লাস'}</span>}
+                          {item.type === 'exam' && <span className="text-[10px] font-bold text-blue-500">পরীক্ষা</span>}
+                        </div>
+
+                        <h4 className="font-bold text-sm text-gray-900 dark:text-white truncate group-hover:text-primary transition-colors">
+                          {item.title}
+                        </h4>
+                        
+                        {item.subtitle && (
+                          <p className="text-xs text-foreground/60 mt-0.5 line-clamp-1">
+                            {item.subtitle}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })
+            )}
+
+            <Link href="/dashboard/courses" className="block w-full text-center py-2.5 mt-2 text-xs font-bold text-gray-500 hover:text-primary dark:text-foreground/60 dark:hover:text-primary transition-colors border-t border-gray-100 dark:border-foreground/10 pt-3">
+              সকল কোর্স দেখুন →
+            </Link>
           </div>
         </div>
 
@@ -309,7 +448,7 @@ export default function DashboardOverview() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recommendedCourses.map((course, index) => (
+          {recommendedCourses.map((course) => (
             <Link key={course.id} href={`/courses/${course.id}`} className="bg-white dark:bg-foreground/5 rounded-3xl p-4 border border-gray-200 dark:border-foreground/10 hover:border-primary/30 dark:hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-xl dark:shadow-none group cursor-pointer flex flex-col">
               <div className="h-40 bg-gradient-to-br from-primary/80 to-accent rounded-2xl mb-4 relative overflow-hidden flex-shrink-0">
                 {course.thumbnailUrl ? (
@@ -335,12 +474,6 @@ export default function DashboardOverview() {
         </div>
       </div>
 
-      <style jsx global>{`
-        @keyframes progress {
-          from { background-position: 1rem 0; }
-          to { background-position: 0 0; }
-        }
-      `}</style>
     </div>
   );
 }

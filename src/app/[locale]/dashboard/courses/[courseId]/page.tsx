@@ -18,7 +18,6 @@ export default function StudentCourseOverview() {
   
   const [completedCount, setCompletedCount] = useState<number>(0);
   const [completedExamsCount, setCompletedExamsCount] = useState<number>(0);
-  const [totalLessons, setTotalLessons] = useState<number>(0);
   const [teacherProfile, setTeacherProfile] = useState<any>(null);
 
   // Time state for live classes
@@ -27,21 +26,20 @@ export default function StudentCourseOverview() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
-    }, 1000); // Check every second
+    }, 1000);
     return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
     if (!courseId) return;
 
-    // Real-time listener for the course to get immediate live class updates
+    // Real-time listener for the course
     const docRef = doc(db, 'courses', courseId);
     const unsubscribeCourse = onSnapshot(docRef, async (docSnap) => {
       if (docSnap.exists()) {
         const courseData = docSnap.data();
         setCourse(courseData);
 
-        // Fetch teacher profile (only fetch if we haven't already or if it changed)
         if (courseData.teacherId && !teacherProfile) {
           const teacherRef = doc(db, 'teacherProfiles', courseData.teacherId);
           const teacherSnap = await getDoc(teacherRef);
@@ -52,7 +50,7 @@ export default function StudentCourseOverview() {
       }
     });
 
-    // Fetch static completion data once
+    // Fetch completion data once
     const fetchCompletionData = async () => {
       if (user && courseId) {
         try {
@@ -110,15 +108,39 @@ export default function StudentCourseOverview() {
     return <div className="text-center py-20 text-gray-500">Loading course overview...</div>;
   }
 
-  // Calculate Progress using Marketing Stats
-  const promisedVideos = Number(course.totalVideoLessons) || 0;
-  const promisedExams = Number(course.totalExams) || 0;
-  const totalPromisedItems = promisedVideos + promisedExams;
-  const totalCompletedItems = completedCount + completedExamsCount;
-  
-  const progressPercentage = totalPromisedItems > 0 
-    ? Math.min(100, Math.round((totalCompletedItems / totalPromisedItems) * 100))
+  // Calculate actual total video lessons from course modules as fallback
+  const actualUploadedLessons = (course.modules || []).reduce(
+    (sum: number, mod: any) => sum + (mod.lessons?.length || 0),
+    0
+  );
+
+  // Marketing stats set by teacher in course settings
+  const promisedVideos = Number(course.totalVideoLessons) || actualUploadedLessons;
+  const promisedExams = Number(course.totalExams) || (course.exams?.length || 0);
+
+  // Total lessons to display on progress widget
+  const displayTotalLessons = promisedVideos;
+
+  // Calculate individual video and exam progress ratios
+  const videoProgress = promisedVideos > 0 
+    ? Math.min(100, (completedCount / promisedVideos) * 100) 
     : 0;
+
+  const examProgress = promisedExams > 0 
+    ? Math.min(100, (completedExamsCount / promisedExams) * 100) 
+    : 0;
+
+  // Combined overall course progress percentage
+  let progressPercentage = 0;
+  if (promisedVideos > 0 && promisedExams > 0) {
+    progressPercentage = Math.round((videoProgress + examProgress) / 2);
+  } else if (promisedVideos > 0) {
+    progressPercentage = Math.round(videoProgress);
+  } else if (promisedExams > 0) {
+    progressPercentage = Math.round(examProgress);
+  }
+
+  progressPercentage = Math.min(100, Math.max(0, progressPercentage));
   
   // Find next upcoming live class
   const upcomingClasses = (course.liveClasses || [])
@@ -236,7 +258,7 @@ export default function StudentCourseOverview() {
             </div>
             <div className="flex flex-col text-right">
               <span className="text-gray-500 dark:text-foreground/60">Total</span>
-              <span className="text-gray-900 dark:text-white font-bold text-base">{totalLessons} Lessons</span>
+              <span className="text-gray-900 dark:text-white font-bold text-base">{displayTotalLessons} Lessons</span>
             </div>
           </div>
         </div>

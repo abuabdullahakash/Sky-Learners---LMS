@@ -19,6 +19,7 @@ export default function StudentCourseOverview() {
   
   const [completedCount, setCompletedCount] = useState<number>(0);
   const [completedExamsCount, setCompletedExamsCount] = useState<number>(0);
+  const [completedLessonIds, setCompletedLessonIds] = useState<string[]>([]);
   const [teacherProfile, setTeacherProfile] = useState<any>(null);
 
   // Time state for live classes
@@ -66,6 +67,8 @@ export default function StudentCourseOverview() {
           );
           const completedLessonsSnap = await getDocs(completedLessonsQuery);
           setCompletedCount(completedLessonsSnap.size);
+          const completedIds = completedLessonsSnap.docs.map((d) => d.data().lessonId);
+          setCompletedLessonIds(completedIds);
 
           const completedExamsQuery = query(
             collection(db, 'completed_exams'),
@@ -176,23 +179,111 @@ export default function StudentCourseOverview() {
           </div>
         </div>
 
-        {/* Continue Learning CTA */}
-        <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-foreground/5 dark:to-foreground/10 rounded-3xl p-8 border border-gray-200 dark:border-foreground/20 text-center flex flex-col items-center shadow-sm relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-primary/10 transition-colors"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl -ml-8 -mb-8 group-hover:bg-blue-500/10 transition-colors"></div>
-          
-          <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4 relative z-10 shadow-inner group-hover:scale-110 transition-transform">
-            <PlayCircle className="w-8 h-8" />
-          </div>
-          <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white relative z-10">{t('readyToStart')}</h2>
-          <p className="text-gray-600 dark:text-foreground/70 max-w-md mb-6 relative z-10">{t('diveInto')}</p>
-          <Link 
-            href={`/dashboard/courses/${courseId}/curriculum`}
-            className="px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/30 relative z-10 hover:-translate-y-1"
-          >
-            {t('goToCurriculum')}
-          </Link>
-        </div>
+        {/* Continue Learning Dynamic Banner */}
+        {(() => {
+          // Collect all uploaded lessons across modules
+          const allLessons: Array<{ id: string; title: string; duration?: string; videoUrl?: string; moduleTitle?: string }> = [];
+          (course.modules || []).forEach((mod: any) => {
+            (mod.lessons || []).forEach((les: any) => {
+              allLessons.push({
+                ...les,
+                moduleTitle: mod.title || mod.name || (locale === 'bn' ? 'মডিউল' : 'Module')
+              });
+            });
+          });
+
+          const isCompletedAll = allLessons.length > 0 && completedLessonIds.length >= allLessons.length;
+          const nextLesson = allLessons.find(les => !completedLessonIds.includes(les.id)) || allLessons[0];
+
+          if (isCompletedAll) {
+            return (
+              <div className="bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-green-500/10 dark:from-emerald-500/20 dark:via-teal-500/20 dark:to-green-500/20 rounded-3xl p-8 border border-emerald-200 dark:border-emerald-500/30 text-center flex flex-col items-center shadow-sm relative overflow-hidden group">
+                <div className="w-16 h-16 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-4 relative z-10 shadow-inner group-hover:scale-110 transition-transform">
+                  <Trophy className="w-8 h-8" />
+                </div>
+                <span className="px-3 py-1 bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-full uppercase tracking-wider mb-2">
+                  {locale === 'bn' ? '🎉 অভিনন্দন!' : '🎉 Congratulations!'}
+                </span>
+                <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white relative z-10">
+                  {locale === 'bn' ? 'আপনি কোর্সটি সফলভাবে সম্পন্ন করেছেন!' : 'You have completed this course!'}
+                </h2>
+                <p className="text-gray-600 dark:text-foreground/70 max-w-md mb-6 relative z-10 text-sm">
+                  {locale === 'bn' 
+                    ? 'আপনার অর্জিত জ্ঞান বৃদ্ধি করতে সিলেবাস থেকে যেকোনো লেসন পুনরাই রিভিশন দিতে পারেন।' 
+                    : 'You can review any lesson from the curriculum anytime to refresh your knowledge.'}
+                </p>
+                <Link 
+                  href={`/dashboard/courses/${courseId}/curriculum`}
+                  className="px-8 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-500/30 relative z-10 hover:-translate-y-1 flex items-center gap-2"
+                >
+                  <BookOpen className="w-5 h-5" /> {locale === 'bn' ? 'সিলেবাস রিভিশন দিন' : 'Review Curriculum'}
+                </Link>
+              </div>
+            );
+          }
+
+          if (nextLesson) {
+            return (
+              <div className="bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-purple-600/10 dark:from-blue-600/20 dark:via-indigo-600/20 dark:to-purple-600/20 rounded-3xl p-8 border border-blue-200 dark:border-blue-500/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                
+                <div className="flex items-start gap-4 z-10">
+                  <div className="w-14 h-14 bg-primary/20 text-primary rounded-2xl flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform mt-1">
+                    <PlayCircle className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="px-2.5 py-0.5 bg-primary/10 text-primary text-xs font-bold rounded-full uppercase tracking-wider">
+                        {completedCount > 0 
+                          ? (locale === 'bn' ? 'পড়া চালিয়ে যান' : 'Continue Learning') 
+                          : (locale === 'bn' ? 'প্রথম লেসন শুরু করুন' : 'Start First Lesson')}
+                      </span>
+                      {nextLesson.moduleTitle && (
+                        <span className="text-xs text-gray-500 dark:text-foreground/50 font-medium">
+                          • {nextLesson.moduleTitle}
+                        </span>
+                      )}
+                    </div>
+                    <h2 className="text-xl md:text-2xl font-extrabold text-gray-900 dark:text-white line-clamp-1">
+                      {nextLesson.title}
+                    </h2>
+                    <p className="text-xs md:text-sm text-gray-600 dark:text-foreground/70 mt-1 line-clamp-1">
+                      {locale === 'bn' 
+                        ? 'ভিডিওটি প্লে করে আপনার পড়া সম্পূর্ণ করুন।' 
+                        : 'Click play to start watching your next video lesson.'}
+                    </p>
+                  </div>
+                </div>
+
+                <Link 
+                  href={`/dashboard/courses/${courseId}/recorded-classes/${nextLesson.id}`}
+                  className="w-full md:w-auto px-7 py-3.5 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/30 z-10 hover:-translate-y-0.5 shrink-0 flex items-center justify-center gap-2 text-sm"
+                >
+                  <PlayCircle className="w-5 h-5" /> 
+                  {completedCount > 0 
+                    ? (locale === 'bn' ? 'লেসনে যান' : 'Continue Lesson') 
+                    : (locale === 'bn' ? 'ক্লাস শুরু করুন' : 'Start Class')}
+                </Link>
+              </div>
+            );
+          }
+
+          return (
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-foreground/5 dark:to-foreground/10 rounded-3xl p-8 border border-gray-200 dark:border-foreground/20 text-center flex flex-col items-center shadow-sm relative overflow-hidden group">
+              <div className="w-14 h-14 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4 relative z-10 shadow-inner group-hover:scale-110 transition-transform">
+                <BookOpen className="w-7 h-7" />
+              </div>
+              <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white relative z-10">{t('readyToStart')}</h2>
+              <p className="text-gray-600 dark:text-foreground/70 max-w-md mb-6 relative z-10 text-sm">{t('diveInto')}</p>
+              <Link 
+                href={`/dashboard/courses/${courseId}/curriculum`}
+                className="px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/30 relative z-10 hover:-translate-y-1"
+              >
+                {t('goToCurriculum')}
+              </Link>
+            </div>
+          );
+        })()}
         
         {/* Announcements / Latest Notices */}
         <div className="space-y-4">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useState, useEffect } from 'react';
 import { User, Shield, Bell, CreditCard, Camera, CheckCircle2, XCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -13,6 +13,7 @@ import { uploadImageToImgBB } from '@/lib/imgbb';
 
 export default function SettingsPage() {
   const t = useTranslations('Dashboard.settings');
+  const locale = useLocale();
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'preferences' | 'billing'>('profile');
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -491,26 +492,39 @@ export default function SettingsPage() {
       {/* Success Modal */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowSuccessModal(false)}></div>
-          <div className="relative bg-background border border-foreground/10 rounded-3xl p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="w-16 h-16 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle2 className="w-8 h-8" />
-            </div>
-            <h3 className="text-2xl font-bold text-center mb-2">অভিনন্দন! (Congratulations!)</h3>
-            <p className="text-foreground/60 text-center mb-8">Your profile has been successfully updated. We have tailored some courses based on your academic profile.</p>
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={() => setShowSuccessModal(false)}></div>
+          <div className="relative bg-white dark:bg-slate-900 border border-gray-100 dark:border-white/10 rounded-[2.5rem] p-8 sm:p-10 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden text-center">
             
-            <div className="flex flex-col gap-3">
+            {/* Ambient Glow */}
+            <div className="absolute -top-20 -right-20 w-48 h-48 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-gradient-to-br from-orange-500/20 to-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="relative w-20 h-20 mx-auto mb-6 flex items-center justify-center rounded-3xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shadow-inner">
+              <CheckCircle2 className="w-10 h-10 animate-bounce" />
+            </div>
+            
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mb-3 tracking-tight">
+              {locale === 'bn' ? 'অভিনন্দন!' : 'Congratulations!'}
+            </h3>
+
+            <p className="text-foreground/70 text-sm sm:text-base leading-relaxed mb-8">
+              {locale === 'bn' 
+                ? 'আপনার প্রোফাইল সফলভাবে আপডেট করা হয়েছে। আপনার শিক্ষাগত তথ্যের ভিত্তিতে আমরা কিছু বিশেষ কোর্স সাজিয়েছি।' 
+                : 'Your profile has been successfully updated. We have tailored some courses based on your academic profile.'}
+            </p>
+            
+            <div className="flex flex-col gap-3.5">
               <Link 
                 href="/dashboard/recommended" 
-                className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-bold shadow-lg hover:shadow-primary/40 transition-all hover:-translate-y-0.5 text-center flex items-center justify-center gap-2"
+                className="w-full py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-xl font-bold text-sm sm:text-base shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
               >
-                View Available Courses
+                <span>{locale === 'bn' ? 'উপযোগী কোর্সসমূহ দেখুন' : 'View Available Courses'}</span>
               </Link>
               <button 
                 onClick={() => setShowSuccessModal(false)}
-                className="w-full py-3 bg-foreground/5 hover:bg-foreground/10 text-foreground rounded-xl font-semibold transition-colors"
+                className="w-full py-3 bg-foreground/5 hover:bg-foreground/10 text-foreground rounded-xl font-semibold transition-colors text-sm"
               >
-                Close
+                {locale === 'bn' ? 'বন্ধ করুন' : 'Close'}
               </button>
             </div>
           </div>

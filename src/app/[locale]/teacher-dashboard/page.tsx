@@ -108,43 +108,48 @@ export default function TeacherDashboard() {
   ];
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
       
-      {/* Welcome Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 bg-foreground/5 p-8 rounded-3xl border border-foreground/10 relative overflow-hidden">
-        <div className="relative z-10 space-y-2">
-          <h1 className="text-3xl font-bold">Welcome back, {user?.displayName || userData?.name || 'Teacher'}! 👋</h1>
-          <p className="text-foreground/60 text-lg max-w-2xl">
-            Here&apos;s what&apos;s happening with your courses today. You have <span className="font-semibold text-orange-500">{pendingRequests.length}</span> pending payment verification requests.
-          </p>
+      {/* Welcome Section (Border Radius 0px / rounded-none for flush edge-to-edge) */}
+      <div className="relative overflow-hidden rounded-none p-6 md:p-8 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white shadow-xl border-b border-white/10 -mx-4 -mt-4 mb-6">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <span className="inline-block px-3 py-1 bg-orange-500/20 text-orange-400 text-xs font-bold rounded-full uppercase tracking-wider border border-orange-500/30">
+              Teacher Dashboard
+            </span>
+            <h1 className="text-2xl md:text-4xl font-black text-white leading-tight">
+              Welcome back, {user?.displayName || userData?.name || 'Teacher'}! 👋
+            </h1>
+            <p className="text-gray-300 text-sm md:text-base max-w-2xl leading-relaxed">
+              Here&apos;s what&apos;s happening with your courses today. You have <span className="font-extrabold text-orange-400">{pendingRequests.length}</span> pending payment verification requests.
+            </p>
+          </div>
+          
+          <Link 
+            href="/teacher-dashboard/courses/create" 
+            className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-orange-500/30 hover:-translate-y-0.5 text-sm"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>Create New Course</span>
+          </Link>
         </div>
-        
-        <Link 
-          href="/teacher-dashboard/courses/create" 
-          className="relative z-10 flex items-center justify-center gap-2 px-6 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-all shadow-lg hover:shadow-orange-500/30 hover:-translate-y-0.5"
-        >
-          <PlusCircle className="w-5 h-5" />
-          Create New Course
-        </Link>
-
-        {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Stats Grid - 2 Columns on Mobile (grid-cols-2) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {stats.map((stat, i) => {
           const Icon = stat.icon;
           return (
-            <div key={i} className="bg-foreground/5 p-6 rounded-3xl border border-foreground/10 hover:border-foreground/20 transition-colors">
-              <div className="flex items-start justify-between mb-4">
-                <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color}`}>
-                  <Icon className="w-6 h-6" />
+            <div key={i} className="bg-foreground/5 p-3.5 sm:p-6 rounded-2xl border border-foreground/10 hover:border-foreground/20 transition-colors">
+              <div className="flex items-start justify-between mb-2 sm:mb-4">
+                <div className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl ${stat.bg} ${stat.color}`}>
+                  <Icon className="w-4 h-4 sm:w-6 sm:h-6" />
                 </div>
               </div>
               <div>
-                <h3 className="text-foreground/60 text-sm font-medium mb-1">{stat.title}</h3>
-                <p className="text-3xl font-bold">{stat.value}</p>
+                <h3 className="text-foreground/60 text-xs sm:text-sm font-medium mb-0.5 truncate">{stat.title}</h3>
+                <p className="text-xl sm:text-3xl font-extrabold text-foreground">{stat.value}</p>
               </div>
             </div>
           );
@@ -152,58 +157,70 @@ export default function TeacherDashboard() {
       </div>
 
       {/* Enrollments Activity Widget */}
-      <div className="bg-foreground/5 rounded-3xl border border-foreground/10 overflow-hidden">
+      <div className="bg-foreground/5 rounded-2xl border border-foreground/10 overflow-hidden">
         
-        <div className="p-4 border-b border-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex gap-2 p-1 bg-foreground/5 rounded-xl">
+        <div className="p-3.5 sm:p-4 border-b border-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-3 bg-background/50">
+          {/* Tabs with Orange Active Color */}
+          <div className="flex gap-1.5 p-1 bg-foreground/5 rounded-xl w-full sm:w-auto">
             <button 
               onClick={() => setActiveTab('pending')}
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'pending' ? 'bg-background shadow text-foreground' : 'text-foreground/60 hover:text-foreground'}`}
+              className={`flex-1 sm:flex-none px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 ${
+                activeTab === 'pending' 
+                  ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' 
+                  : 'text-foreground/70 hover:text-foreground hover:bg-foreground/5'
+              }`}
             >
-              Pending Requests
+              <span>Pending Requests</span>
               {pendingRequests.length > 0 && (
-                <span className="bg-orange-500 text-white text-[10px] px-2 py-0.5 rounded-full">{pendingRequests.length}</span>
+                <span className="bg-white text-orange-600 text-[10px] px-1.5 py-0.2 rounded-full font-extrabold">{pendingRequests.length}</span>
               )}
             </button>
             <button 
               onClick={() => setActiveTab('recent')}
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'recent' ? 'bg-background shadow text-foreground' : 'text-foreground/60 hover:text-foreground'}`}
+              className={`flex-1 sm:flex-none px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center justify-center ${
+                activeTab === 'recent' 
+                  ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' 
+                  : 'text-foreground/70 hover:text-foreground hover:bg-foreground/5'
+              }`}
             >
-              Recent Enrollments
+              <span>Recent Enrollments</span>
             </button>
           </div>
-          <Link href="/teacher-dashboard/students" className="text-sm text-primary hover:underline font-medium">View All Students</Link>
+          <Link href="/teacher-dashboard/students" className="text-xs sm:text-sm text-orange-500 hover:underline font-bold self-end sm:self-center">View All Students →</Link>
         </div>
         
-        <div className="divide-y divide-foreground/5 min-h-[200px]">
+        {/* Compact List Rendering */}
+        <div className="divide-y divide-foreground/5 min-h-[160px]">
           {isLoadingRequests ? (
-             <div className="p-12 flex justify-center text-primary"><Loader2 className="w-8 h-8 animate-spin" /></div>
+             <div className="p-10 flex justify-center text-orange-500"><Loader2 className="w-7 h-7 animate-spin" /></div>
           ) : activeTab === 'pending' ? (
             pendingRequests.length === 0 ? (
-              <div className="p-12 text-center text-foreground/50">
-                <Clock className="w-10 h-10 mx-auto mb-3 opacity-20" />
-                <p>No pending enrollment requests right now.</p>
+              <div className="p-10 text-center text-foreground/50">
+                <Clock className="w-9 h-9 mx-auto mb-2 opacity-20" />
+                <p className="text-sm">No pending enrollment requests right now.</p>
               </div>
             ) : (
               pendingRequests.map((req) => (
-                <div key={req.id} className="p-6 flex flex-col md:flex-row md:items-center gap-4 hover:bg-foreground/[0.02] transition-colors">
-                  <div className="w-12 h-12 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
-                    <Clock className="w-6 h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold">{req.studentName}</h4>
-                    <p className="text-sm text-foreground/50 mb-1">Requested enrollment for <span className="font-medium text-foreground/70">{req.courseTitle}</span></p>
-                    <div className="flex gap-4 text-xs font-medium text-foreground/60">
-                      <span>Sender: <span className="text-foreground">{req.senderNumber}</span></span>
-                      <span>TrxID: <span className="text-foreground font-mono">{req.trxId}</span></span>
+                <div key={req.id} className="p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-foreground/[0.02] transition-colors">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
+                      <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-sm text-foreground truncate">{req.studentName}</h4>
+                      <p className="text-xs text-foreground/60 truncate">Requested for <span className="font-semibold text-foreground/80">{req.courseTitle}</span></p>
+                      <div className="flex gap-3 text-[11px] font-medium text-foreground/60 mt-0.5">
+                        <span>Sender: <strong className="text-primary font-semibold">{req.senderNumber}</strong></span>
+                        <span>TrxID: <code className="font-mono bg-foreground/10 px-1 py-0.2 rounded font-bold">{req.trxId}</code></span>
+                      </div>
                     </div>
                   </div>
-                  <div className="shrink-0">
+                  <div className="shrink-0 self-end sm:self-center pt-1 sm:pt-0">
                     <button 
                       onClick={() => handleApprove(req.id)}
-                      className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl shadow-lg shadow-green-500/20 transition-all hover:-translate-y-0.5 flex items-center gap-2 text-sm"
+                      className="px-3.5 py-1.5 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg shadow transition-all flex items-center gap-1.5 text-xs"
                     >
-                      <CheckCircle2 className="w-4 h-4" /> Approve
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Approve
                     </button>
                   </div>
                 </div>
@@ -211,22 +228,24 @@ export default function TeacherDashboard() {
             )
           ) : (
             recentEnrollments.length === 0 ? (
-              <div className="p-12 text-center text-foreground/50">
-                <UserCheck className="w-10 h-10 mx-auto mb-3 opacity-20" />
-                <p>No recent enrollments found.</p>
+              <div className="p-10 text-center text-foreground/50">
+                <UserCheck className="w-9 h-9 mx-auto mb-2 opacity-20" />
+                <p className="text-sm">No recent enrollments found.</p>
               </div>
             ) : (
               recentEnrollments.map((req) => (
-                <div key={req.id} className="p-6 flex flex-col md:flex-row md:items-center gap-4 hover:bg-foreground/[0.02] transition-colors">
-                  <div className="w-12 h-12 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0 font-bold">
-                    {req.studentName.charAt(0)}
+                <div key={req.id} className="p-3.5 sm:p-5 flex items-center justify-between gap-3 hover:bg-foreground/[0.02] transition-colors">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0 font-extrabold text-sm sm:text-base border border-blue-500/20">
+                      {req.studentName?.charAt(0) || 'S'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-sm text-foreground truncate">{req.studentName}</h4>
+                      <p className="text-xs text-foreground/60 truncate">Enrolled in <span className="font-semibold text-foreground/80">&quot;{req.courseTitle}&quot;</span></p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold">{req.studentName}</h4>
-                    <p className="text-sm text-foreground/50">Successfully enrolled in <span className="font-medium text-foreground/70">&quot;{req.courseTitle}&quot;</span></p>
-                  </div>
-                  <div className="text-sm text-green-500 font-bold bg-green-500/10 px-3 py-1 rounded-full flex items-center gap-1.5 shrink-0">
-                    <CheckCircle2 className="w-4 h-4" /> Approved
+                  <div className="text-[11px] sm:text-xs text-green-500 font-bold bg-green-500/10 px-2.5 py-1 rounded-full flex items-center gap-1 shrink-0">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Approved
                   </div>
                 </div>
               ))

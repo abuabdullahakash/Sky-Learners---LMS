@@ -31,7 +31,8 @@ import {
   ClipboardList,
   AlertCircle,
   MoreVertical,
-  UserCircle
+  UserCircle,
+  PlusCircle
 } from 'lucide-react';
 import RoleSelectionModal from './RoleSelectionModal';
 
@@ -121,6 +122,7 @@ export default function Navbar() {
 
   const teacherDashboardLinks = [
     { name: 'Overview', href: '/teacher-dashboard', icon: LayoutDashboard },
+    { name: '+ Create New Course', href: '/teacher-dashboard/courses/create', icon: PlusCircle, isHighlight: true },
     { name: 'My Courses', href: '/teacher-dashboard/courses', icon: Video },
     { name: 'Students', href: '/teacher-dashboard/students', icon: Users },
     { name: 'Earnings', href: '/teacher-dashboard/earnings', icon: DollarSign },

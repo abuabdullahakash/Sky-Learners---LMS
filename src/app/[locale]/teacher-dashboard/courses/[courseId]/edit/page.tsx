@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { uploadImageToImgBB } from '@/lib/imgbb';
-import { ImagePlus, Loader2, ArrowLeft } from 'lucide-react';
+import { ImagePlus, Loader2, ArrowLeft, Sparkles, BookOpen, Trash2 } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 
@@ -196,63 +196,95 @@ export default function EditCoursePage() {
   }
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-6 pb-12 animate-in fade-in duration-300">
       
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold mb-2">Edit Basic Information</h1>
-        <p className="text-foreground/70">Change the core identity of your course.</p>
+      {/* Hero Header Banner (0px border radius / rounded-none) */}
+      <div className="relative overflow-hidden rounded-none p-6 md:p-9 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white shadow-2xl border-b border-white/10 -mx-4 -mt-4 sm:-mx-6 sm:-mt-6 md:-mx-8 md:-mt-8 mb-8">
+        <div className="absolute top-0 right-0 w-72 h-72 bg-orange-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl -ml-16 -mb-16 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+
+        <div className="relative z-10 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-400 text-xs font-bold rounded-full uppercase tracking-wider border border-orange-500/30 shadow-xs">
+                <Sparkles className="w-3.5 h-3.5 text-orange-400 animate-pulse" /> Course Management
+              </span>
+            </div>
+
+            <Link 
+              href="/teacher-dashboard/courses" 
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl transition-all border border-white/15"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" /> Back to My Courses
+            </Link>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight">
+            Edit <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500">Basic Information</span>
+          </h1>
+
+          <p className="text-sm md:text-base text-gray-300 max-w-2xl leading-relaxed font-medium pt-1">
+            Change the core identity, pricing, subject distribution, and marketing details of your course.
+          </p>
+        </div>
       </div>
 
-      <div className="bg-background/40 backdrop-blur-md border border-foreground/10 rounded-3xl p-6 shadow-xl">
+      {/* Main Form Container (Compact Padding on Mobile: p-4 sm:p-6 md:p-8) */}
+      <div className="bg-foreground/5 border border-foreground/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl">
         {error && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl text-red-500 text-sm">
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl text-red-500 text-sm font-medium">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           
-          <div className="space-y-4">
+          <div className="space-y-5">
+            {/* Course Title */}
             <div>
-              <label className="block text-sm font-medium mb-1 text-foreground/80">Course Title <span className="text-red-500">*</span></label>
+              <label className="block text-xs sm:text-sm font-bold mb-1.5 text-foreground/80">Course Title <span className="text-red-500">*</span></label>
               <input 
                 type="text" 
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Master React in 30 Days"
-                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all"
+                className="w-full px-4 py-3 bg-background border border-foreground/15 rounded-xl focus:outline-none focus:border-orange-500 transition-colors text-sm font-medium"
                 required
               />
             </div>
 
+            {/* Subtitle */}
             <div>
-              <label className="block text-sm font-medium mb-1 text-foreground/80">Subtitle / Short Description</label>
+              <label className="block text-xs sm:text-sm font-bold mb-1.5 text-foreground/80">Subtitle / Short Description</label>
               <textarea 
                 value={subtitle}
                 onChange={(e) => setSubtitle(e.target.value)}
                 placeholder="A brief catchy description of what students will learn..."
                 rows={3}
-                className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all resize-none custom-scrollbar"
+                className="w-full px-4 py-3 bg-background border border-foreground/15 rounded-xl focus:outline-none focus:border-orange-500 transition-colors text-sm font-medium resize-none custom-scrollbar"
               ></textarea>
             </div>
 
+            {/* Course Type in 1 Row (2 Columns like Create Course page) */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-foreground/80">Course Type <span className="text-red-500">*</span></label>
-              <div className="flex gap-4 flex-col sm:flex-row">
-                <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${courseType === 'individual' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
-                  <input type="radio" name="courseType" value="individual" checked={courseType === 'individual'} onChange={() => setCourseType('individual')} className="accent-orange-500 w-4 h-4" />
-                  <span className="text-sm font-medium">Individual Teacher</span>
+              <label className="block text-xs sm:text-sm font-bold mb-1.5 text-foreground/80">Course Type <span className="text-red-500">*</span></label>
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+                <label className={`flex items-center gap-2 cursor-pointer p-2.5 sm:p-3 rounded-xl border transition-all ${courseType === 'individual' ? 'border-orange-500 bg-orange-500/10 text-foreground font-bold shadow-xs' : 'border-foreground/15 bg-background hover:border-orange-500/40 text-foreground/70'}`}>
+                  <input type="radio" name="courseType" value="individual" checked={courseType === 'individual'} onChange={() => setCourseType('individual')} className="accent-orange-500 w-4 h-4 shrink-0" />
+                  <span className="text-xs sm:text-sm font-bold truncate">Individual Teacher</span>
                 </label>
-                <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${courseType === 'coaching' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
-                  <input type="radio" name="courseType" value="coaching" checked={courseType === 'coaching'} onChange={() => setCourseType('coaching')} className="accent-orange-500 w-4 h-4" />
-                  <span className="text-sm font-medium">Coaching Center</span>
+                <label className={`flex items-center gap-2 cursor-pointer p-2.5 sm:p-3 rounded-xl border transition-all ${courseType === 'coaching' ? 'border-orange-500 bg-orange-500/10 text-foreground font-bold shadow-xs' : 'border-foreground/15 bg-background hover:border-orange-500/40 text-foreground/70'}`}>
+                  <input type="radio" name="courseType" value="coaching" checked={courseType === 'coaching'} onChange={() => setCourseType('coaching')} className="accent-orange-500 w-4 h-4 shrink-0" />
+                  <span className="text-xs sm:text-sm font-bold truncate">Coaching Center</span>
                 </label>
               </div>
             </div>
 
+            {/* Education Level & Coaching Name */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className={courseType === 'individual' ? "md:col-span-2" : ""}>
-                <label className="block text-sm font-medium mb-1 text-foreground/80">Education Level (Category) <span className="text-red-500">*</span></label>
+                <label className="block text-xs sm:text-sm font-bold mb-1.5 text-foreground/80">Education Level (Category) <span className="text-red-500">*</span></label>
                 <select 
                   value={category}
                   onChange={(e) => {
@@ -262,7 +294,7 @@ export default function EditCoursePage() {
                     setYear('');
                     setSpecificSubjects([]);
                   }}
-                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all appearance-none"
+                  className="w-full px-4 py-3 bg-background border border-foreground/15 rounded-xl focus:outline-none focus:border-orange-500 transition-colors text-sm font-medium appearance-none"
                   required
                 >
                   <option value="" disabled className="bg-background text-foreground">Select Level</option>
@@ -277,26 +309,27 @@ export default function EditCoursePage() {
               </div>
               {courseType === 'coaching' && (
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-foreground/80">Your School / Coaching Name <span className="text-red-500">*</span></label>
+                  <label className="block text-xs sm:text-sm font-bold mb-1.5 text-foreground/80">Your School / Coaching Name <span className="text-red-500">*</span></label>
                   <input 
                     type="text" 
                     value={coachingName}
                     onChange={(e) => setCoachingName(e.target.value)}
                     placeholder="e.g. ABC Coaching Center"
-                    className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all"
+                    className="w-full px-4 py-3 bg-background border border-foreground/15 rounded-xl focus:outline-none focus:border-orange-500 transition-colors text-sm font-medium"
                     required
                   />
                 </div>
               )}
             </div>
 
+            {/* Primary & High School Class Select */}
             {(category === 'primary' || category === 'high_school') && (
               <div>
-                <label className="block text-sm font-medium mb-1 text-foreground/80">Class <span className="text-red-500">*</span></label>
+                <label className="block text-xs sm:text-sm font-bold mb-1.5 text-foreground/80">Class <span className="text-red-500">*</span></label>
                 <select 
                   value={eduClass}
                   onChange={(e) => setEduClass(e.target.value)}
-                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 transition-all appearance-none"
+                  className="w-full px-4 py-3 bg-background border border-foreground/15 rounded-xl focus:outline-none focus:border-orange-500 transition-colors text-sm font-medium appearance-none"
                   required
                 >
                   <option value="" disabled className="bg-background text-foreground">Select Class</option>
@@ -308,19 +341,20 @@ export default function EditCoursePage() {
               </div>
             )}
 
+            {/* Intermediate Class & Group Select */}
             {category === 'intermediate' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-foreground/80">Class <span className="text-red-500">*</span></label>
-                  <select value={eduClass} onChange={(e) => setEduClass(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 transition-all appearance-none" required>
+                  <label className="block text-xs sm:text-sm font-bold mb-1.5 text-foreground/80">Class <span className="text-red-500">*</span></label>
+                  <select value={eduClass} onChange={(e) => setEduClass(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/15 rounded-xl focus:outline-none focus:border-orange-500 transition-colors text-sm font-medium appearance-none" required>
                     <option value="" disabled className="bg-background text-foreground">Select Class</option>
                     <option value="11" className="bg-background text-foreground">Class 11</option>
                     <option value="12" className="bg-background text-foreground">Class 12</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-foreground/80">Group <span className="text-red-500">*</span></label>
-                  <select value={department} onChange={(e) => setDepartment(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 transition-all appearance-none" required>
+                  <label className="block text-xs sm:text-sm font-bold mb-1.5 text-foreground/80">Group <span className="text-red-500">*</span></label>
+                  <select value={department} onChange={(e) => setDepartment(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/15 rounded-xl focus:outline-none focus:border-orange-500 transition-colors text-sm font-medium appearance-none" required>
                     <option value="" disabled className="bg-background text-foreground">Select Group</option>
                     <option value="science" className="bg-background text-foreground">Science</option>
                     <option value="arts" className="bg-background text-foreground">Arts (Humanities)</option>
@@ -330,10 +364,11 @@ export default function EditCoursePage() {
               </div>
             )}
 
+            {/* Admission Unit Select */}
             {category === 'admission' && (
               <div>
-                <label className="block text-sm font-medium mb-1 text-foreground/80">Target Segment / Unit <span className="text-red-500">*</span></label>
-                <select value={department} onChange={(e) => setDepartment(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 transition-all appearance-none" required>
+                <label className="block text-xs sm:text-sm font-bold mb-1.5 text-foreground/80">Target Segment / Unit <span className="text-red-500">*</span></label>
+                <select value={department} onChange={(e) => setDepartment(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/15 rounded-xl focus:outline-none focus:border-orange-500 transition-colors text-sm font-medium appearance-none" required>
                   <option value="" disabled className="bg-background text-foreground">Select Target Segment</option>
                   <option value="engineering" className="bg-background text-foreground">Engineering</option>
                   <option value="medical" className="bg-background text-foreground">Medical</option>
@@ -343,170 +378,240 @@ export default function EditCoursePage() {
               </div>
             )}
 
+            {/* Honours & Masters inputs */}
             {(category === 'honours' || category === 'masters') && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-foreground/80">Department / Subject <span className="text-red-500">*</span></label>
+                  <label className="block text-xs sm:text-sm font-bold mb-1.5 text-foreground/80">Department / Subject <span className="text-red-500">*</span></label>
                   <input 
                     type="text" 
                     value={department}
                     onChange={(e) => setDepartment(e.target.value)}
                     placeholder="e.g. Physics"
-                    className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 transition-all"
+                    className="w-full px-4 py-3 bg-background border border-foreground/15 rounded-xl focus:outline-none focus:border-orange-500 transition-colors text-sm font-medium"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-foreground/80">Year / Semester <span className="text-red-500">*</span></label>
+                  <label className="block text-xs sm:text-sm font-bold mb-1.5 text-foreground/80">Year / Semester <span className="text-red-500">*</span></label>
                   <input 
                     type="text" 
                     value={year}
                     onChange={(e) => setYear(e.target.value)}
                     placeholder="e.g. 1st Year"
-                    className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 transition-all"
+                    className="w-full px-4 py-3 bg-background border border-foreground/15 rounded-xl focus:outline-none focus:border-orange-500 transition-colors text-sm font-medium"
                     required
                   />
                 </div>
               </div>
             )}
 
-
+            {/* Course Subjects & Class Distribution (Enhanced Mobile UI & Proper Remove Button) */}
             {category && category !== 'skills' && (
-              <div className="bg-foreground/5 p-5 rounded-2xl border border-foreground/10 space-y-4">
-                <div className="flex justify-between items-center">
-                  <label className="block text-sm font-medium text-foreground/80">Course Subjects & Class Distribution <span className="text-red-500">*</span></label>
-                  <button type="button" onClick={handleAddSubject} className="px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-lg hover:bg-primary/20 transition-colors">
+              <div className="bg-foreground/5 p-3.5 sm:p-5 rounded-2xl border border-foreground/10 space-y-4">
+                <div className="flex justify-between items-center flex-wrap gap-2">
+                  <div>
+                    <label className="block text-xs sm:text-sm font-bold text-foreground/90">Course Subjects & Class Distribution <span className="text-red-500">*</span></label>
+                    <p className="text-[11px] sm:text-xs text-foreground/60">Define subject-wise class breakdown for your students.</p>
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={handleAddSubject} 
+                    className="px-3.5 py-1.5 bg-orange-500/10 hover:bg-orange-500 text-orange-500 hover:text-white text-xs font-bold rounded-xl transition-all border border-orange-500/20 cursor-pointer shadow-xs"
+                  >
                     + Add Subject
                   </button>
                 </div>
 
                 <div className="space-y-3">
                   {specificSubjects.map((sub, idx) => (
-                    <div key={idx} className="flex flex-wrap md:flex-nowrap gap-3 p-3 bg-background rounded-xl border border-foreground/10 relative pr-10">
-                      <button type="button" onClick={() => removeSubject(idx)} className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-red-500 transition-colors">✖</button>
-                      
-                      <div className="w-full md:w-1/3">
-                        <input type="text" value={sub.name} onChange={e => updateSubject(idx, 'name', e.target.value)} placeholder="Subject Name (e.g. Physics)" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" required />
+                    <div key={idx} className="p-3.5 sm:p-4 bg-background rounded-2xl border border-foreground/10 space-y-3 shadow-xs">
+                      {/* Subject Header Row with Clean Remove Button */}
+                      <div className="flex items-center justify-between border-b border-foreground/10 pb-2">
+                        <span className="text-xs font-extrabold uppercase tracking-wider text-orange-500 flex items-center gap-1.5">
+                          <BookOpen className="w-3.5 h-3.5" /> Subject #{idx + 1}
+                        </span>
+                        <button 
+                          type="button" 
+                          onClick={() => removeSubject(idx)} 
+                          className="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white transition-all text-xs font-bold flex items-center gap-1 border border-red-500/20 cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" /> Remove
+                        </button>
                       </div>
                       
-                      {courseType === 'coaching' && (
-                        <div className="w-full md:w-1/4">
-                          <input type="text" value={sub.instructor || ''} onChange={e => updateSubject(idx, 'instructor', e.target.value)} placeholder="Instructor Name" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" />
+                      {/* Name & Instructor */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-bold text-foreground/70 mb-1">Subject Name</label>
+                          <input 
+                            type="text" 
+                            value={sub.name} 
+                            onChange={e => updateSubject(idx, 'name', e.target.value)} 
+                            placeholder="e.g. Physics" 
+                            className="w-full px-3 py-2 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500 text-xs sm:text-sm font-medium" 
+                            required 
+                          />
                         </div>
-                      )}
-                      
-                      <div className="w-full md:w-24">
-                        <input type="number" value={sub.liveClasses || ''} onChange={e => updateSubject(idx, 'liveClasses', e.target.value)} placeholder="Live" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" />
+                        {courseType === 'coaching' && (
+                          <div>
+                            <label className="block text-[11px] font-bold text-foreground/70 mb-1">Instructor Name</label>
+                            <input 
+                              type="text" 
+                              value={sub.instructor || ''} 
+                              onChange={e => updateSubject(idx, 'instructor', e.target.value)} 
+                              placeholder="e.g. Dr. Rahat" 
+                              className="w-full px-3 py-2 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500 text-xs sm:text-sm font-medium" 
+                            />
+                          </div>
+                        )}
                       </div>
-                      <div className="w-full md:w-24">
-                        <input type="number" value={sub.videoLessons || ''} onChange={e => updateSubject(idx, 'videoLessons', e.target.value)} placeholder="Videos" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" />
-                      </div>
-                      <div className="w-full md:w-24">
-                        <input type="number" value={sub.exams || ''} onChange={e => updateSubject(idx, 'exams', e.target.value)} placeholder="Exams" className="w-full px-3 py-2 bg-foreground/5 border border-transparent rounded-lg focus:outline-none focus:border-primary/50 text-sm" />
+
+                      {/* Class Distribution Numbers (3 columns on mobile) */}
+                      <div className="grid grid-cols-3 gap-2 pt-1">
+                        <div>
+                          <label className="block text-[11px] font-bold text-foreground/70 mb-1 text-center">Live Classes</label>
+                          <input 
+                            type="number" 
+                            value={sub.liveClasses || ''} 
+                            onChange={e => updateSubject(idx, 'liveClasses', e.target.value)} 
+                            placeholder="0" 
+                            className="w-full px-3 py-2 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500 text-xs font-medium text-center" 
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-foreground/70 mb-1 text-center">Videos</label>
+                          <input 
+                            type="number" 
+                            value={sub.videoLessons || ''} 
+                            onChange={e => updateSubject(idx, 'videoLessons', e.target.value)} 
+                            placeholder="0" 
+                            className="w-full px-3 py-2 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500 text-xs font-medium text-center" 
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-foreground/70 mb-1 text-center">Exams</label>
+                          <input 
+                            type="number" 
+                            value={sub.exams || ''} 
+                            onChange={e => updateSubject(idx, 'exams', e.target.value)} 
+                            placeholder="0" 
+                            className="w-full px-3 py-2 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500 text-xs font-medium text-center" 
+                          />
+                        </div>
                       </div>
                     </div>
                   ))}
                   {specificSubjects.length === 0 && (
-                    <div className="text-center py-4 text-sm text-foreground/40">No subjects added. Click "+ Add Subject" to start.</div>
+                    <div className="text-center py-6 text-xs text-foreground/50 border border-dashed border-foreground/15 rounded-2xl">
+                      No subjects added yet. Click "+ Add Subject" to start.
+                    </div>
                   )}
                 </div>
               </div>
             )}
 
-            <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
-              <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">Marketing Stats & Features</h3>
+            {/* Marketing Stats & Features */}
+            <div className="space-y-4 p-4 sm:p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+              <h3 className="font-bold text-base sm:text-lg border-b border-foreground/10 pb-2 mb-4">Marketing Stats & Features</h3>
               
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Total Live Classes</label>
-                  <input type="number" value={totalLiveClasses} onChange={e => setTotalLiveClasses(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
+                  <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Total Live Classes</label>
+                  <input type="number" value={totalLiveClasses} onChange={e => setTotalLiveClasses(e.target.value)} className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 text-sm font-medium" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Total Videos</label>
-                  <input type="number" value={totalVideoLessons} onChange={e => setTotalVideoLessons(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
+                  <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Total Videos</label>
+                  <input type="number" value={totalVideoLessons} onChange={e => setTotalVideoLessons(e.target.value)} className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 text-sm font-medium" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Total Exams</label>
-                  <input type="number" value={totalExams} onChange={e => setTotalExams(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
+                  <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Total Exams</label>
+                  <input type="number" value={totalExams} onChange={e => setTotalExams(e.target.value)} className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 text-sm font-medium" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Total Notes/PDFs</label>
-                  <input type="number" value={totalPdfs} onChange={e => setTotalPdfs(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
+                  <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Total Notes/PDFs</label>
+                  <input type="number" value={totalPdfs} onChange={e => setTotalPdfs(e.target.value)} className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 text-sm font-medium" />
                 </div>
               </div>
               
-              <div className="mt-4 flex items-center gap-3">
+              <div className="mt-4 flex items-center gap-3 pt-2">
                 <input 
                   type="checkbox" 
                   id="doubtSolving" 
                   checked={hasDoubtSolving} 
                   onChange={e => setHasDoubtSolving(e.target.checked)} 
-                  className="w-5 h-5 accent-orange-500"
+                  className="w-5 h-5 accent-orange-500 shrink-0 cursor-pointer"
                 />
-                <label htmlFor="doubtSolving" className="text-sm font-medium cursor-pointer">
+                <label htmlFor="doubtSolving" className="text-xs sm:text-sm font-semibold cursor-pointer text-foreground/90">
                   Includes 24/7 Doubt Solving Support / Group
                 </label>
               </div>
             </div>
 
-            <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
-              <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">Pricing, Dates & Contact</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Pricing, Dates & Contact Section */}
+            <div className="space-y-4 p-4 sm:p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+              <h3 className="font-bold text-base sm:text-lg border-b border-foreground/10 pb-2 mb-4">Pricing, Dates & Contact</h3>
+              
+              {/* Regular Price & Discount Price in 1 Row on Mobile (grid grid-cols-2) */}
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Regular Price (BDT) <span className="text-red-500">*</span></label>
+                  <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Regular Price (BDT) <span className="text-red-500">*</span></label>
                   <input 
                     type="number" value={price} onChange={e => setPrice(e.target.value)}
-                    className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                    placeholder="e.g. 2000"
+                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 transition-colors text-sm font-semibold"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Discount Price (Optional)</label>
+                  <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Discount Price (Optional)</label>
                   <input 
                     type="number" value={discountPrice} onChange={e => setDiscountPrice(e.target.value)}
-                    className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                    placeholder="e.g. 1500"
+                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 transition-colors text-sm font-semibold"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Discount Valid Until</label>
+                <div className="col-span-2 md:col-span-1">
+                  <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Discount Valid Until</label>
                   <input 
                     type="date" value={discountValidUntil} onChange={e => setDiscountValidUntil(e.target.value)}
-                    className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 transition-colors text-sm font-medium"
                   />
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Class Start Date</label>
+                  <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Class Start Date</label>
                   <input 
                     type="date" value={classStartDate} onChange={e => setClassStartDate(e.target.value)}
-                    className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 transition-colors text-sm font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Course Validity</label>
+                  <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Course Validity</label>
                   <input 
                     type="text" value={courseValidity} onChange={e => setCourseValidity(e.target.value)} placeholder="e.g. 6 Months, Till Admission Test"
-                    className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 transition-colors text-sm font-medium"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Contact Number (For Inquiries)</label>
+                <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Contact Number (For Inquiries)</label>
                 <input 
                   type="text" value={contactNumber} onChange={e => setContactNumber(e.target.value)}
                   placeholder="e.g. 16910 or 017XXXXXXX"
-                  className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                  className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 transition-colors text-sm font-medium"
                 />
               </div>
             </div>
 
+            {/* Course Thumbnail */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-foreground/80">Course Thumbnail <span className="text-red-500">*</span></label>
+              <label className="block text-xs sm:text-sm font-bold mb-2 text-foreground/80">Course Thumbnail <span className="text-red-500">*</span></label>
               
               <div className="relative group w-full aspect-video md:aspect-[21/9] rounded-2xl border-2 border-dashed border-foreground/20 hover:border-orange-500/50 bg-foreground/5 flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-colors">
-                  <input 
+                <input 
                   type="file" 
                   accept="image/*" 
                   onChange={handleImageChange}
@@ -518,15 +623,14 @@ export default function EditCoursePage() {
                 ) : (
                   <div className="text-center p-6">
                     <ImagePlus className="w-10 h-10 text-foreground/40 mx-auto mb-2 group-hover:text-orange-500 transition-colors" />
-                    <p className="font-medium text-foreground/70">Click to upload thumbnail</p>
+                    <p className="font-medium text-foreground/70 text-sm">Click to upload thumbnail</p>
                     <p className="text-xs text-foreground/40 mt-1">1920x1080 (16:9) recommended. JPG, PNG or WEBP.</p>
                   </div>
                 )}
                 
-                {/* Overlay on hover if image exists */}
                 {thumbnailPreview && (
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <p className="text-white font-medium flex items-center gap-2">
+                    <p className="text-white font-medium flex items-center gap-2 text-sm">
                       <ImagePlus className="w-5 h-5" /> Change Image
                     </p>
                   </div>
@@ -535,20 +639,21 @@ export default function EditCoursePage() {
             </div>
           </div>
 
+          {/* Form Action Buttons */}
           <div className="pt-6 border-t border-foreground/10 flex justify-end gap-3">
             <Link 
-              href="/teacher-dashboard"
-              className="px-6 py-3 bg-foreground/5 hover:bg-foreground/10 text-foreground rounded-xl font-semibold transition-colors"
+              href="/teacher-dashboard/courses"
+              className="px-5 py-2.5 sm:px-6 sm:py-3 bg-foreground/5 hover:bg-foreground/10 text-foreground rounded-xl font-bold text-xs sm:text-sm transition-colors"
             >
               Cancel
             </Link>
             <button 
               type="submit" 
               disabled={isLoading}
-              className="px-8 py-3 bg-orange-500 text-white hover:bg-orange-600 rounded-xl font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 flex items-center gap-2"
+              className="px-6 py-2.5 sm:px-8 sm:py-3 bg-orange-500 text-white hover:bg-orange-600 rounded-xl font-bold text-xs sm:text-sm shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 flex items-center gap-2 cursor-pointer"
             >
               {isLoading ? (
-                <><Loader2 className="w-5 h-5 animate-spin" /> Saving...</>
+                <><Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" /> Saving...</>
               ) : (
                 'Save Changes'
               )}

@@ -553,9 +553,11 @@ export default function EditCoursePage() {
               <h3 className="font-bold text-base sm:text-lg border-b border-foreground/10 pb-2 mb-4">Pricing, Dates & Contact</h3>
               
               {/* Regular Price & Discount Price in 1 Row on Mobile (grid grid-cols-2) */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-                <div>
-                  <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Regular Price (BDT) <span className="text-red-500">*</span></label>
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 items-end">
+                <div className="flex flex-col justify-end h-full">
+                  <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1 leading-snug min-h-[32px] sm:min-h-[36px] flex items-end">
+                    <span>Regular Price (BDT) <span className="text-red-500">*</span></span>
+                  </label>
                   <input 
                     type="number" value={price} onChange={e => setPrice(e.target.value)}
                     placeholder="e.g. 2000"
@@ -563,16 +565,20 @@ export default function EditCoursePage() {
                     required
                   />
                 </div>
-                <div>
-                  <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Discount Price (Optional)</label>
+                <div className="flex flex-col justify-end h-full">
+                  <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1 leading-snug min-h-[32px] sm:min-h-[36px] flex items-end">
+                    <span>Discount Price (Optional)</span>
+                  </label>
                   <input 
                     type="number" value={discountPrice} onChange={e => setDiscountPrice(e.target.value)}
                     placeholder="e.g. 1500"
                     className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 transition-colors text-sm font-semibold"
                   />
                 </div>
-                <div className="col-span-2 md:col-span-1">
-                  <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Discount Valid Until</label>
+                <div className="col-span-2 md:col-span-1 flex flex-col justify-end h-full mt-1 md:mt-0">
+                  <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1 leading-snug min-h-[32px] sm:min-h-[36px] flex items-end">
+                    <span>Discount Valid Until</span>
+                  </label>
                   <input 
                     type="date" value={discountValidUntil} onChange={e => setDiscountValidUntil(e.target.value)}
                     className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 transition-colors text-sm font-medium"

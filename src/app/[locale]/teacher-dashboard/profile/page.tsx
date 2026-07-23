@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { uploadImageToImgBB } from '@/lib/imgbb';
-import { User, Camera, Link as LinkIcon, Save, CheckCircle2, Globe, GraduationCap, BookOpen, Presentation, Eye, Upload, Loader2, Image as ImageIcon, Plus, X, Trash2, Sparkles, ChevronDown, ShieldCheck, Building2 } from 'lucide-react';
+import { User, Camera, Link as LinkIcon, Save, CheckCircle2, Globe, GraduationCap, BookOpen, Presentation, Eye, Upload, Loader2, Image as ImageIcon, Plus, X, Trash2, Sparkles, ShieldCheck, Building2 } from 'lucide-react';
 
 export default function ProfileBuilderPage() {
   const { user } = useAuth();
@@ -13,7 +13,6 @@ export default function ProfileBuilderPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
   
   const [uploadingProfilePhoto, setUploadingProfilePhoto] = useState(false);
   const [uploadingCoverPhoto, setUploadingCoverPhoto] = useState(false);
@@ -256,7 +255,7 @@ export default function ProfileBuilderPage() {
       <form onSubmit={handleSave} className="space-y-8">
 
         {/* SECTION 1: Account Profile Type Selector */}
-        <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-5 sm:p-7 shadow-sm space-y-4">
+        <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-5 sm:p-7 shadow-sm space-y-5">
           <div className="border-b border-foreground/10 pb-3.5">
             <h2 className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground">
               <User className="w-5 h-5 text-orange-500 shrink-0" /> 1. Account Profile Type
@@ -266,151 +265,61 @@ export default function ProfileBuilderPage() {
             </p>
           </div>
 
-          {/* Custom Dropdown Trigger Box (Mobile & Desktop Friendly) */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
-              className="w-full bg-background dark:bg-slate-900/60 border border-foreground/20 hover:border-orange-500/50 rounded-xl p-3.5 sm:p-4 text-left transition-all flex items-center justify-between gap-3 shadow-xs group"
-            >
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="p-2.5 rounded-xl bg-orange-500/10 text-orange-500 border border-orange-500/20 shrink-0 group-hover:scale-105 transition-transform">
-                  {profileData.type === 'individual' ? <User className="w-5 h-5" /> : <Building2 className="w-5 h-5" />}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-extrabold text-sm sm:text-base text-foreground">
-                      {profileData.type === 'individual' ? 'Individual Teacher' : 'Institution / Academy'}
-                    </p>
-                    <span className="px-2 py-0.5 bg-orange-500/10 text-orange-500 text-[10px] font-bold uppercase rounded-full shrink-0 border border-orange-500/20">
-                      Active Type
-                    </span>
-                  </div>
-                  <p className="text-xs text-foreground/70 font-medium leading-relaxed mt-1 break-words">
-                    {profileData.type === 'individual' 
-                      ? 'Single instructor profile for independent tutors and teachers' 
-                      : 'Coaching center, school, or organization with multiple teachers'}
-                  </p>
-                </div>
-              </div>
-              <div className="p-2 rounded-lg bg-foreground/5 text-foreground/60 group-hover:text-orange-500 shrink-0 transition-colors">
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isTypeDropdownOpen ? 'rotate-180' : ''}`} />
-              </div>
-            </button>
-
-            {/* Custom Floating Dropdown Popup Overlay */}
-            {isTypeDropdownOpen && (
-              <>
-                <div 
-                  className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs transition-opacity" 
-                  onClick={() => setIsTypeDropdownOpen(false)}
-                />
-                
-                <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-background dark:bg-slate-900 border border-foreground/15 rounded-2xl shadow-2xl overflow-hidden p-2 space-y-2 animate-in fade-in zoom-in-95 duration-200">
-                  <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-foreground/50 border-b border-foreground/10 flex items-center justify-between">
-                    <span>Select Profile Structure</span>
-                    <span className="text-[10px] text-orange-500 font-semibold">Clean Text Wrap</span>
-                  </div>
-
-                  {/* Option 1: Individual */}
-                  <div
-                    onClick={() => {
-                      setProfileData({...profileData, type: 'individual'});
-                      setIsTypeDropdownOpen(false);
-                    }}
-                    className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3.5 ${
-                      profileData.type === 'individual'
-                        ? 'bg-orange-500/10 border-orange-500/50 shadow-xs'
-                        : 'bg-background hover:bg-foreground/5 border-foreground/10'
-                    }`}
-                  >
-                    <div className={`p-2.5 rounded-xl shrink-0 mt-0.5 ${
-                      profileData.type === 'individual' ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' : 'bg-foreground/10 text-foreground/70'
-                    }`}>
-                      <User className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <h4 className="font-bold text-sm sm:text-base text-foreground leading-snug">Individual Teacher</h4>
-                        {profileData.type === 'individual' && (
-                          <CheckCircle2 className="w-5 h-5 text-orange-500 shrink-0" />
-                        )}
-                      </div>
-                      <p className="text-xs text-foreground/70 leading-relaxed font-medium mt-1 break-words">
-                        Single instructor profile for independent tutors, school teachers, and private educators.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Option 2: Institution */}
-                  <div
-                    onClick={() => {
-                      setProfileData({...profileData, type: 'institution'});
-                      setIsTypeDropdownOpen(false);
-                    }}
-                    className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3.5 ${
-                      profileData.type === 'institution'
-                        ? 'bg-orange-500/10 border-orange-500/50 shadow-xs'
-                        : 'bg-background hover:bg-foreground/5 border-foreground/10'
-                    }`}
-                  >
-                    <div className={`p-2.5 rounded-xl shrink-0 mt-0.5 ${
-                      profileData.type === 'institution' ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' : 'bg-foreground/10 text-foreground/70'
-                    }`}>
-                      <Building2 className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <h4 className="font-bold text-sm sm:text-base text-foreground leading-snug">Institution / Academy</h4>
-                        {profileData.type === 'institution' && (
-                          <CheckCircle2 className="w-5 h-5 text-orange-500 shrink-0" />
-                        )}
-                      </div>
-                      <p className="text-xs text-foreground/70 leading-relaxed font-medium mt-1 break-words">
-                        Coaching center, school, or educational institution with multiple teachers roster and team branding.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* Quick Choice Interactive Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+          {/* Interactive Profile Type Choice Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+            {/* Card 1: Individual Teacher */}
             <button
               type="button"
               onClick={() => setProfileData({...profileData, type: 'individual'})}
-              className={`p-4 rounded-xl border text-left transition-all flex items-start gap-3 ${
+              className={`p-4 sm:p-5 rounded-2xl border text-left transition-all relative flex items-start gap-4 ${
                 profileData.type === 'individual'
-                  ? 'bg-orange-500/10 border-orange-500 ring-2 ring-orange-500/30 shadow-xs'
-                  : 'bg-background hover:bg-foreground/5 border-foreground/10'
+                  ? 'bg-orange-500/10 border-orange-500 ring-2 ring-orange-500/30 shadow-md'
+                  : 'bg-background hover:bg-foreground/5 border-foreground/15'
               }`}
             >
-              <div className={`p-2 rounded-lg shrink-0 ${profileData.type === 'individual' ? 'bg-orange-500 text-white' : 'bg-foreground/10 text-foreground/60'}`}>
-                <User className="w-4 h-4" />
+              <div className={`p-3 rounded-xl shrink-0 ${
+                profileData.type === 'individual' ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' : 'bg-foreground/10 text-foreground/60'
+              }`}>
+                <User className="w-5 h-5" />
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-bold text-xs sm:text-sm text-foreground">Individual Teacher</p>
-                <p className="text-[11px] text-foreground/70 leading-relaxed mt-0.5 break-words">Single instructor profile</p>
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="font-extrabold text-sm sm:text-base text-foreground">Individual Teacher</h3>
+                  {profileData.type === 'individual' && (
+                    <CheckCircle2 className="w-5 h-5 text-orange-500 shrink-0" />
+                  )}
+                </div>
+                <p className="text-xs text-foreground/70 leading-relaxed font-medium break-words">
+                  Single instructor profile for independent tutors, solo educators, and private teachers.
+                </p>
               </div>
             </button>
 
+            {/* Card 2: Institution / Academy */}
             <button
               type="button"
               onClick={() => setProfileData({...profileData, type: 'institution'})}
-              className={`p-4 rounded-xl border text-left transition-all flex items-start gap-3 ${
+              className={`p-4 sm:p-5 rounded-2xl border text-left transition-all relative flex items-start gap-4 ${
                 profileData.type === 'institution'
-                  ? 'bg-orange-500/10 border-orange-500 ring-2 ring-orange-500/30 shadow-xs'
-                  : 'bg-background hover:bg-foreground/5 border-foreground/10'
+                  ? 'bg-orange-500/10 border-orange-500 ring-2 ring-orange-500/30 shadow-md'
+                  : 'bg-background hover:bg-foreground/5 border-foreground/15'
               }`}
             >
-              <div className={`p-2 rounded-lg shrink-0 ${profileData.type === 'institution' ? 'bg-orange-500 text-white' : 'bg-foreground/10 text-foreground/60'}`}>
-                <Building2 className="w-4 h-4" />
+              <div className={`p-3 rounded-xl shrink-0 ${
+                profileData.type === 'institution' ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' : 'bg-foreground/10 text-foreground/60'
+              }`}>
+                <Building2 className="w-5 h-5" />
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-bold text-xs sm:text-sm text-foreground">Institution / Academy</p>
-                <p className="text-[11px] text-foreground/70 leading-relaxed mt-0.5 break-words">Coaching center or school</p>
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="font-extrabold text-sm sm:text-base text-foreground">Institution / Academy</h3>
+                  {profileData.type === 'institution' && (
+                    <CheckCircle2 className="w-5 h-5 text-orange-500 shrink-0" />
+                  )}
+                </div>
+                <p className="text-xs text-foreground/70 leading-relaxed font-medium break-words">
+                  Coaching center, school, or organization with multiple teachers roster and team branding.
+                </p>
               </div>
             </button>
           </div>

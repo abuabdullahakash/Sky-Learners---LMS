@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { 
   ShieldCheck, CreditCard, Bell, Save, AlertCircle, CheckCircle2, ChevronRight, ChevronLeft, Loader2,
-  Sparkles, Eye, EyeOff, Lock, Key, Laptop, Smartphone, Tablet, Globe, LogOut, X
+  Sparkles, Eye, EyeOff, Lock, Key, Laptop, Smartphone, Tablet, Globe, LogOut, X, MapPin, Clock
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { db, auth } from '@/lib/firebase';
@@ -552,7 +552,7 @@ export default function TeacherSettingsPage() {
                 </div>
 
                 {/* Active Login Sessions */}
-                <div className="bg-background rounded-2xl p-4 sm:p-6 border border-foreground/10 shadow-sm space-y-4">
+                <div className="bg-background rounded-2xl p-4 sm:p-6 border border-foreground/10 shadow-sm space-y-4 w-full max-w-full overflow-hidden">
                   <div className="border-b border-foreground/10 pb-3">
                     <h3 className="font-extrabold text-base sm:text-lg flex items-center gap-2 text-foreground">
                       <Laptop className="w-5 h-5 text-orange-500 shrink-0" />
@@ -563,45 +563,33 @@ export default function TeacherSettingsPage() {
                     </p>
                   </div>
 
-                  <div className="space-y-3.5 pt-1">
+                  <div className="space-y-3.5 pt-1 w-full max-w-full overflow-hidden">
                     {sessions.map((session) => (
                       <div 
                         key={session.id} 
-                        className={`p-3.5 sm:p-4.5 rounded-2xl border transition-all space-y-3 ${
+                        className={`p-3.5 sm:p-4.5 rounded-2xl border transition-all space-y-3 w-full max-w-full overflow-hidden ${
                           session.isCurrent 
                             ? 'bg-emerald-500/5 border-emerald-500/30 shadow-xs' 
                             : 'bg-background dark:bg-foreground/5 border-foreground/10 hover:border-foreground/20'
                         }`}
                       >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex items-start gap-3 min-w-0 flex-1">
-                            <div className={`p-2.5 rounded-xl shrink-0 mt-0.5 ${
+                        <div className="flex items-start justify-between gap-3 w-full max-w-full overflow-hidden">
+                          <div className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
+                            <div className={`p-2.5 rounded-xl shrink-0 ${
                               session.isCurrent ? 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/30' : 'bg-foreground/10 text-foreground/60'
                             }`}>
                               {session.type === 'mobile' ? <Smartphone className="w-5 h-5" /> : session.type === 'tablet' ? <Tablet className="w-5 h-5" /> : <Laptop className="w-5 h-5" />}
                             </div>
                             
-                            <div className="min-w-0 flex-1">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <p className="font-extrabold text-xs sm:text-sm text-foreground leading-snug break-words">
+                            <div className="min-w-0 flex-1 overflow-hidden">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h4 className="font-extrabold text-xs sm:text-sm text-foreground leading-snug break-words">
                                   {session.deviceName}
-                                </p>
+                                </h4>
                                 {session.isCurrent && (
-                                  <span className="px-2 py-0.5 bg-emerald-500 text-white text-[10px] font-bold rounded-md uppercase tracking-wider shadow-xs">
+                                  <span className="px-2 py-0.5 bg-emerald-500 text-white text-[10px] font-bold rounded-md uppercase tracking-wider shadow-xs shrink-0">
                                     Active Now
                                   </span>
-                                )}
-                              </div>
-
-                              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-foreground/70 font-medium mt-1">
-                                <span className="break-words">{session.location}</span>
-                                <span className="text-foreground/30">•</span>
-                                <span className="break-all">IP: {session.ip}</span>
-                                {!session.isCurrent && (
-                                  <>
-                                    <span className="text-foreground/30">•</span>
-                                    <span className="text-foreground/90 font-semibold break-words">Last active: {session.lastActive}</span>
-                                  </>
                                 )}
                               </div>
                             </div>
@@ -618,8 +606,27 @@ export default function TeacherSettingsPage() {
                           )}
                         </div>
 
+                        {/* Location, IP, and Last Active Metadata - Vertical stack on mobile with MapPin, Globe, Clock icons */}
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4 text-xs text-foreground/70 font-medium pt-2.5 border-t border-foreground/10 w-full overflow-hidden">
+                          <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
+                            <MapPin className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                            <span className="break-words">{session.location}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
+                            <Globe className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                            <span className="break-all">IP: {session.ip}</span>
+                          </div>
+                          {!session.isCurrent && (
+                            <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
+                              <Clock className="w-3.5 h-3.5 text-foreground/50 shrink-0" />
+                              <span className="break-words font-semibold text-foreground/90">Last active: {session.lastActive}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Mobile Log Out Button */}
                         {!session.isCurrent && (
-                          <div className="sm:hidden pt-2.5 border-t border-foreground/10 flex justify-end">
+                          <div className="sm:hidden pt-2 border-t border-foreground/10 flex justify-end">
                             <button 
                               type="button" 
                               onClick={() => handleLogoutSession(session.id)}

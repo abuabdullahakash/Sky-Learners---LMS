@@ -4,7 +4,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { BookOpen, CheckCircle, Trophy, PlayCircle, ArrowRight, Sparkles, Flame, Clock, Video, Megaphone, HelpCircle, Bell, ChevronRight } from 'lucide-react';
+import { BookOpen, CheckCircle, Trophy, PlayCircle, ArrowRight, Sparkles, Flame, Clock, Video, Megaphone, HelpCircle, Bell, ChevronRight, CheckSquare, Users } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, limit, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
@@ -28,6 +28,10 @@ export default function DashboardOverview() {
   const locale = useLocale();
   const { user, userData } = useAuth();
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const formatNumber = (num: number) => {
+    return new Intl.NumberFormat(locale === 'bn' ? 'bn-BD' : 'en-US').format(num);
+  };
   
   const [enrolledCount, setEnrolledCount] = useState<number | null>(null);
   const [completedCount, setCompletedCount] = useState<number>(0);
@@ -535,7 +539,7 @@ export default function DashboardOverview() {
 
       </div>
 
-      {/* Ongoing Courses (Based on Profile) */}
+      {/* Ongoing Courses / Recommended Courses (Based on Profile) */}
       <div className="space-y-6 pt-8 border-t border-gray-200 dark:border-foreground/10">
         <div className="flex justify-between items-end">
           <div>
@@ -548,24 +552,126 @@ export default function DashboardOverview() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recommendedCourses.map((course) => (
-            <Link key={course.id} href={`/courses/${course.id}`} className="bg-white dark:bg-foreground/5 rounded-3xl p-4 border border-gray-200 dark:border-foreground/10 hover:border-primary/30 dark:hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-xl dark:shadow-none group cursor-pointer flex flex-col">
-              <div className="h-40 bg-gradient-to-br from-primary/80 to-accent rounded-2xl mb-4 relative overflow-hidden flex-shrink-0">
-                {course.thumbnailUrl ? (
-                  <Image src={course.thumbnailUrl} alt={course.title} fill className="object-cover" />
-                ) : (
-                  <div className="absolute inset-0 bg-black/10"></div>
-                )}
-                <div className="absolute bottom-3 left-3 bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg text-white text-xs font-bold capitalize shadow-sm">{course.category || t('categories.primary')}</div>
+          {recommendedCourses.map((course) => {
+            const hasDiscount = course.discountPrice !== undefined && course.discountPrice !== null && (course.discountPrice as any) !== '';
+            const isDiscountValid = hasDiscount && course.discountValidUntil && new Date() <= (course.discountValidUntil?.toDate ? course.discountValidUntil.toDate() : new Date(course.discountValidUntil));
+            const activePrice = isDiscountValid ? Number(course.discountPrice) : Number(course.price || 0);
+            const isFree = activePrice === 0;
+
+            const categoryColors: Record<string, string> = {
+              primary: 'from-blue-500 to-cyan-500 text-blue-500 bg-blue-500/10',
+              secondary: 'from-purple-500 to-indigo-500 text-purple-500 bg-purple-500/10',
+              intermediate: 'from-emerald-500 to-teal-500 text-emerald-500 bg-emerald-500/10',
+              admission: 'from-orange-500 to-rose-500 text-orange-500 bg-orange-500/10',
+            };
+
+            const catKey = (course.category || '').toLowerCase();
+            const colorClass = categoryColors[catKey] || 'from-orange-500 to-amber-500 text-orange-500 bg-orange-500/10';
+            const gradientParts = colorClass.split(' ');
+            const badgeTextColor = gradientParts[2];
+            const badgeBg = gradientParts[3];
+
+            return (
+              <div 
+                key={course.id} 
+                className="group relative bg-white dark:bg-slate-900/80 rounded-[2rem] border border-gray-100 dark:border-white/10 overflow-hidden hover:border-transparent transition-all duration-500 flex flex-col h-full shadow-lg hover:shadow-2xl hover:-translate-y-2 z-10"
+              >
+                {/* Border Gradient Overlay */}
+                <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-orange-500 via-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" style={{ margin: '-2px' }}></div>
+                <div className="absolute inset-0 bg-white dark:bg-[#0f172a] rounded-[2rem] z-[-5]"></div>
+
+                {/* Thumbnail */}
+                <div className="relative aspect-[16/9] w-full bg-gray-100 dark:bg-foreground/5 flex-shrink-0 overflow-hidden rounded-t-[2rem]">
+                  {course.thumbnailUrl ? (
+                    <Image 
+                      src={course.thumbnailUrl} 
+                      alt={course.title} 
+                      fill 
+                      className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-foreground/30 font-semibold">
+                      SkyLearners
+                    </div>
+                  )}
+
+                  {/* Dark gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20 opacity-70"></div>
+
+                  {/* Category Pill */}
+                  <div className="absolute top-4 left-4 z-10">
+                    <span className={`px-3.5 py-1.5 rounded-full text-xs font-extrabold shadow-md uppercase tracking-wider backdrop-blur-md border border-white/20 ${badgeBg} ${badgeTextColor}`}>
+                      {course.category || 'General'}
+                    </span>
+                  </div>
+
+                  {/* Free badge */}
+                  {isFree && (
+                    <div className="absolute top-4 right-4 z-10 bg-emerald-500 text-white font-extrabold text-xs px-3 py-1.5 rounded-full shadow-lg border border-white/20">
+                      🎁 {locale === 'bn' ? 'ফ্রি' : 'FREE'}
+                    </div>
+                  )}
+                </div>
+
+                {/* Body Content */}
+                <div className="p-6 flex flex-col flex-grow relative z-10">
+                  <h3 className="text-xl font-bold mb-2 line-clamp-2 text-gray-900 dark:text-white group-hover:text-orange-500 transition-colors duration-300">
+                    {course.title}
+                  </h3>
+
+                  <p className="text-foreground/60 text-xs sm:text-sm line-clamp-2 leading-relaxed mb-4">
+                    {course.subtitle || (locale === 'bn' ? 'অভিজ্ঞ শিক্ষকমণ্ডলীর নির্দেশনায় সম্পূর্ণ কোর্স সম্পন্ন করুন।' : 'Master your skills with comprehensive guidance.')}
+                  </p>
+
+                  {/* Course Metadata Stats */}
+                  <div className="grid grid-cols-2 gap-3 p-3 rounded-2xl bg-foreground/[0.03] border border-foreground/10 mb-6 text-xs font-semibold text-foreground/70">
+                    <div className="flex items-center gap-2">
+                      <Video className="w-4 h-4 text-blue-500" />
+                      <span>{formatNumber(course.totalVideoLessons || 0)} {locale === 'bn' ? 'টি ভিডিও' : 'Lessons'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckSquare className="w-4 h-4 text-green-500" />
+                      <span>{formatNumber(course.totalExams || 0)} {locale === 'bn' ? 'টি এক্সাম' : 'Exams'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-orange-500" />
+                      <span>{course.courseValidity || (locale === 'bn' ? 'লাইফটাইম' : 'Lifetime')}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-purple-500" />
+                      <span>{formatNumber(course.enrolledStudents || 0)} {locale === 'bn' ? 'শিক্ষার্থী' : 'Students'}</span>
+                    </div>
+                  </div>
+
+                  {/* Price & Action */}
+                  <div className="mt-auto pt-4 border-t border-foreground/10 flex items-center justify-between gap-4">
+                    <div className="flex flex-col">
+                      {isFree ? (
+                        <span className="text-2xl font-extrabold text-emerald-500">{locale === 'bn' ? 'ফ্রি' : 'FREE'}</span>
+                      ) : isDiscountValid ? (
+                        <>
+                          <span className="text-xs text-foreground/50 line-through font-medium">৳{formatNumber(course.price)}</span>
+                          <span className="text-2xl font-extrabold text-orange-500">৳{formatNumber(course.discountPrice)}</span>
+                        </>
+                      ) : (
+                        <span className="text-2xl font-extrabold text-gray-900 dark:text-white">৳{formatNumber(course.price || 0)}</span>
+                      )}
+                    </div>
+
+                    <Link 
+                      href={`/courses/${course.id}`}
+                      className="px-5 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-md hover:shadow-orange-500/30 hover:-translate-y-0.5"
+                    >
+                      <span>{locale === 'bn' ? 'কোর্সটি দেখুন' : 'View Course'}</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+
+                </div>
+
               </div>
-              <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors text-gray-900 dark:text-white line-clamp-2">{course.title}</h3>
-              <p className="text-gray-600 dark:text-foreground/60 text-sm mb-4 line-clamp-2 flex-1">{course.subtitle || t('defaultSubtitle')}</p>
-              <div className="flex justify-between items-center text-sm font-medium mt-auto pt-2 border-t border-gray-100 dark:border-foreground/10">
-                <span className="text-gray-500 dark:text-foreground/50">{course.totalVideoLessons || 0} {t('lessons')}</span>
-                <span className="text-primary font-bold">{t('continueBtn')}</span>
-              </div>
-            </Link>
-          ))}
+            );
+          })}
           {recommendedCourses.length === 0 && (
             <div className="col-span-full py-10 text-center text-gray-500">
               {t('noRecommended')}

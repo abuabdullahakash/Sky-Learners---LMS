@@ -47,6 +47,7 @@ export default function Navbar() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [currentCourseTitle, setCurrentCourseTitle] = useState('');
+  const [currentCourseData, setCurrentCourseData] = useState<{ title?: string; thumbnailUrl?: string; category?: string } | null>(null);
 
   const courseId = params?.courseId as string;
 
@@ -62,7 +63,7 @@ export default function Navbar() {
   const isStudentCourseDashboard = isStudentDashboard && coursesIndex !== -1 && parts.length > coursesIndex + 1;
   const isCourseDashboard = isTeacherCourseDashboard || isStudentCourseDashboard;
 
-  // Fetch course title for course dashboard header in drawer
+  // Fetch course details (title, thumbnail, category) for course dashboard header in drawer
   useEffect(() => {
     if (courseId && isCourseDashboard) {
       const fetchTitle = async () => {
@@ -70,10 +71,16 @@ export default function Navbar() {
           const docRef = doc(db, 'courses', courseId);
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
-            setCurrentCourseTitle(docSnap.data().title || '');
+            const data = docSnap.data();
+            setCurrentCourseData({
+              title: data.title,
+              thumbnailUrl: data.thumbnailUrl,
+              category: data.category,
+            });
+            setCurrentCourseTitle(data.title || '');
           }
         } catch (err) {
-          console.error("Error fetching course title for navbar drawer", err);
+          console.error("Error fetching course data for navbar drawer", err);
         }
       };
       fetchTitle();
@@ -105,12 +112,11 @@ export default function Navbar() {
 
   const isTeacher = userData?.role === 'teacher';
 
-  // Dashboard Nav Links
+  // Dashboard Nav Links (Account Settings is handled in the bottom profile popup menu)
   const studentDashboardLinks = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { name: 'My Courses', href: '/dashboard/courses', icon: BookOpen },
     { name: 'Daily Exams', href: '/dashboard/exams', icon: GraduationCap },
-    { name: 'Account Settings', href: '/dashboard/settings', icon: Settings },
   ];
 
   const teacherDashboardLinks = [
@@ -118,7 +124,6 @@ export default function Navbar() {
     { name: 'My Courses', href: '/teacher-dashboard/courses', icon: Video },
     { name: 'Students', href: '/teacher-dashboard/students', icon: Users },
     { name: 'Earnings', href: '/teacher-dashboard/earnings', icon: DollarSign },
-    { name: 'Account Settings', href: '/teacher-dashboard/settings', icon: Settings },
   ];
 
   // Course Specific Links
@@ -259,11 +264,16 @@ export default function Navbar() {
 
                 {/* Course Header */}
                 <div className="p-3 rounded-2xl bg-foreground/5 border border-foreground/10">
-                  <h4 className="font-bold text-sm text-foreground line-clamp-2" title={currentCourseTitle}>
-                    {currentCourseTitle || 'Course Management'}
+                  {currentCourseData?.thumbnailUrl && (
+                    <div className="w-full h-24 relative rounded-xl overflow-hidden mb-2.5 border border-foreground/10">
+                      <Image src={currentCourseData.thumbnailUrl} alt={currentCourseData.title || 'Course'} fill className="object-cover" />
+                    </div>
+                  )}
+                  <h4 className="font-bold text-sm text-foreground line-clamp-2" title={currentCourseData?.title || currentCourseTitle}>
+                    {currentCourseData?.title || currentCourseTitle || 'Course Management'}
                   </h4>
-                  <span className="inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full font-extrabold bg-primary/10 text-primary uppercase">
-                    {isTeacherCourseDashboard ? 'Teacher View' : 'Student Learning'}
+                  <span className="inline-block mt-1.5 text-[10px] px-2 py-0.5 rounded-full font-extrabold bg-primary/10 text-primary uppercase tracking-wider">
+                    {currentCourseData?.category || (isTeacherCourseDashboard ? 'Teacher View' : 'Student Learning')}
                   </span>
                 </div>
 

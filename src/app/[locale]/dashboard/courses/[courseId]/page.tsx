@@ -5,7 +5,7 @@ import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { useParams } from 'next/navigation';
-import { Clock, CheckCircle2, PlayCircle, Trophy, BookOpen, AlertCircle, Calendar, Video, UserCircle, ExternalLink, HelpCircle, Globe } from 'lucide-react';
+import { Clock, CheckCircle2, PlayCircle, Trophy, BookOpen, AlertCircle, Calendar, Video, UserCircle, ExternalLink, HelpCircle, Globe, ArrowLeft, GraduationCap } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { useTranslations, useLocale } from 'next-intl';
 
@@ -155,9 +155,31 @@ export default function StudentCourseOverview() {
       
       {/* Left Column (Main Content) */}
       <div className="xl:col-span-2 space-y-8">
+        
+        {/* Back Button & Premium Hero Banner Header */}
         <div>
-          <h1 className="text-3xl font-extrabold mb-2 text-gray-900 dark:text-white">{t('welcome')} {course.title}</h1>
-          <p className="text-gray-600 dark:text-foreground/70">{t('summary')}</p>
+          <Link 
+            href="/dashboard/courses" 
+            className="inline-flex items-center gap-2 text-xs font-bold text-orange-500 hover:text-orange-600 bg-orange-500/10 px-3.5 py-2 rounded-xl mb-4 transition-all hover:-translate-x-1"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>{locale === 'bn' ? 'আমার কোর্সসমূহে ফিরে যান' : 'Back to My Courses'}</span>
+          </Link>
+
+          <div className="relative overflow-hidden rounded-3xl p-6 md:p-8 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white shadow-xl border border-white/10">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+            <div className="relative z-10 space-y-3">
+              <span className="inline-block px-3 py-1 bg-orange-500/20 text-orange-400 text-xs font-bold rounded-full uppercase tracking-wider border border-orange-500/30">
+                {course.category || 'Online Course'}
+              </span>
+              <h1 className="text-2xl md:text-4xl font-black text-white leading-tight">
+                {t('welcome')} {course.title}
+              </h1>
+              <p className="text-sm md:text-base text-gray-300 max-w-2xl leading-relaxed">
+                {t('summary')}
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Progress Cards */}

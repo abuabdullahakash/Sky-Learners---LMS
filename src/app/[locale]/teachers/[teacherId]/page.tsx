@@ -68,11 +68,11 @@ export default function TeacherProfilePage({ params }: { params: Promise<{ teach
             </div>
 
             {/* Title & Headline */}
-            <div className="flex items-center gap-2 mb-1">
-              <h1 className="text-3xl md:text-4xl font-extrabold text-foreground">{profileData.displayName || (profileData.type === 'individual' ? 'Teacher Name' : 'Institution Name')}</h1>
+            <div className="flex items-center gap-2 mb-2">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground leading-tight">{profileData.displayName || (profileData.type === 'individual' ? 'Teacher Name' : 'Institution Name')}</h1>
               <CheckCircle2 className="w-6 h-6 text-blue-500 shrink-0" />
             </div>
-            <p className="text-primary font-semibold text-lg mb-6">{profileData.headline || 'Instructor'}</p>
+            <p className="text-primary font-semibold text-base md:text-lg mb-7 leading-relaxed">{profileData.headline || 'Instructor'}</p>
 
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-3 gap-4 md:gap-8 mb-10 py-6 border-y border-foreground/10 bg-foreground/5 dark:bg-foreground/[0.02] rounded-2xl px-6">

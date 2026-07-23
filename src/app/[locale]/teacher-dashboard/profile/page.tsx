@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { uploadImageToImgBB } from '@/lib/imgbb';
-import { User, Camera, Link as LinkIcon, Save, CheckCircle2, Globe, GraduationCap, BookOpen, Presentation, Eye, Upload, Loader2, Image as ImageIcon, Plus, X, Trash2 } from 'lucide-react';
+import { User, Camera, Link as LinkIcon, Save, CheckCircle2, Globe, GraduationCap, BookOpen, Presentation, Eye, Upload, Loader2, Image as ImageIcon, Plus, X, Trash2, Sparkles, ChevronDown, ShieldCheck, Building2 } from 'lucide-react';
 
 export default function ProfileBuilderPage() {
   const { user } = useAuth();
@@ -13,6 +13,7 @@ export default function ProfileBuilderPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
   
   const [uploadingProfilePhoto, setUploadingProfilePhoto] = useState(false);
   const [uploadingCoverPhoto, setUploadingCoverPhoto] = useState(false);
@@ -212,56 +213,223 @@ export default function ProfileBuilderPage() {
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-300">
       
-      {/* Hero Header Banner (0px border radius / rounded-none) */}
-      <div className="relative rounded-none p-6 md:p-8 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white shadow-xl border-b border-white/10 -mx-4 -mt-4 mb-6">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl -mr-16 -mt-16"></div>
-        </div>
-        <div className="relative z-10 space-y-1">
-          <span className="inline-block px-3 py-1 bg-orange-500/20 text-orange-400 text-xs font-bold rounded-full uppercase tracking-wider border border-orange-500/30">
-            Profile Management
-          </span>
-          <h1 className="text-2xl md:text-4xl font-black text-white leading-tight">
-            My Profile Builder
+      {/* Hero Header Banner */}
+      <div className="relative overflow-hidden rounded-2xl md:rounded-3xl p-6 md:p-9 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white shadow-2xl border border-white/10 mb-8">
+        {/* Ambient Glowing Orbs */}
+        <div className="absolute top-0 right-0 w-72 h-72 bg-orange-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl -ml-16 -mb-16 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+
+        <div className="relative z-10 space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-400 text-xs font-bold rounded-full uppercase tracking-wider border border-orange-500/30 shadow-xs">
+              <Sparkles className="w-3.5 h-3.5 text-orange-400 animate-pulse" /> Profile Management
+            </span>
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/10 text-white/80 text-xs font-semibold rounded-full border border-white/10">
+              <CheckCircle2 className="w-3.5 h-3.5 text-green-400" /> Public Ready
+            </span>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight">
+            My Profile <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500">Builder</span>
           </h1>
-          <p className="text-sm md:text-base text-gray-300 max-w-2xl leading-relaxed">
-            Customize your public academic profile & institution branding details.
+
+          <p className="text-sm md:text-base text-gray-300 max-w-2xl leading-relaxed font-medium pt-1">
+            Customize your public academic profile & institution branding details. Stand out to students with a clean, high-converting instructor profile.
           </p>
+
+          <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-semibold text-gray-400">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+              <span>Live Sync to Public Directory</span>
+            </div>
+            <span className="hidden sm:inline text-white/20">•</span>
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-orange-400" />
+              <span>Verified Instructor Profile</span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Profile Form */}
-      <form onSubmit={handleSave} className="space-y-6">
+      <form onSubmit={handleSave} className="space-y-8">
 
-        {/* SECTION 1: Profile Type */}
-        <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-4 sm:p-6 shadow-sm">
-          <h2 className="text-base sm:text-lg font-bold mb-3 flex items-center gap-2 text-foreground border-b border-foreground/10 pb-3">
-            <User className="w-5 h-5 text-orange-500" /> 1. Account Profile Type
-          </h2>
+        {/* SECTION 1: Account Profile Type Selector */}
+        <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-5 sm:p-7 shadow-sm space-y-4">
+          <div className="border-b border-foreground/10 pb-3.5">
+            <h2 className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground">
+              <User className="w-5 h-5 text-orange-500 shrink-0" /> 1. Account Profile Type
+            </h2>
+            <p className="text-xs sm:text-sm text-foreground/70 font-medium mt-1">
+              Select how your account is structured and presented to students across the portal.
+            </p>
+          </div>
+
+          {/* Custom Dropdown Trigger Box (Mobile & Desktop Friendly) */}
           <div className="relative">
-            <select 
-              value={profileData.type}
-              onChange={(e) => setProfileData({...profileData, type: e.target.value as 'individual' | 'institution'})}
-              className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 appearance-none focus:outline-none focus:border-orange-500 transition-colors cursor-pointer font-semibold text-sm"
+            <button
+              type="button"
+              onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
+              className="w-full bg-background dark:bg-slate-900/60 border border-foreground/20 hover:border-orange-500/50 rounded-xl p-3.5 sm:p-4 text-left transition-all flex items-center justify-between gap-3 shadow-xs group"
             >
-              <option value="individual" className="bg-slate-900 text-white font-medium py-2.5">Individual Teacher - Single instructor profile</option>
-              <option value="institution" className="bg-slate-900 text-white font-medium py-2.5">Institution / Academy - Coaching center or school with multiple teachers</option>
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-              <svg className="w-4 h-4 text-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-            </div>
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="p-2.5 rounded-xl bg-orange-500/10 text-orange-500 border border-orange-500/20 shrink-0 group-hover:scale-105 transition-transform">
+                  {profileData.type === 'individual' ? <User className="w-5 h-5" /> : <Building2 className="w-5 h-5" />}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-extrabold text-sm sm:text-base text-foreground">
+                      {profileData.type === 'individual' ? 'Individual Teacher' : 'Institution / Academy'}
+                    </p>
+                    <span className="px-2 py-0.5 bg-orange-500/10 text-orange-500 text-[10px] font-bold uppercase rounded-full shrink-0 border border-orange-500/20">
+                      Active Type
+                    </span>
+                  </div>
+                  <p className="text-xs text-foreground/70 font-medium leading-relaxed mt-1 break-words">
+                    {profileData.type === 'individual' 
+                      ? 'Single instructor profile for independent tutors and teachers' 
+                      : 'Coaching center, school, or organization with multiple teachers'}
+                  </p>
+                </div>
+              </div>
+              <div className="p-2 rounded-lg bg-foreground/5 text-foreground/60 group-hover:text-orange-500 shrink-0 transition-colors">
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isTypeDropdownOpen ? 'rotate-180' : ''}`} />
+              </div>
+            </button>
+
+            {/* Custom Floating Dropdown Popup Overlay */}
+            {isTypeDropdownOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs transition-opacity" 
+                  onClick={() => setIsTypeDropdownOpen(false)}
+                />
+                
+                <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-background dark:bg-slate-900 border border-foreground/15 rounded-2xl shadow-2xl overflow-hidden p-2 space-y-2 animate-in fade-in zoom-in-95 duration-200">
+                  <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-foreground/50 border-b border-foreground/10 flex items-center justify-between">
+                    <span>Select Profile Structure</span>
+                    <span className="text-[10px] text-orange-500 font-semibold">Clean Text Wrap</span>
+                  </div>
+
+                  {/* Option 1: Individual */}
+                  <div
+                    onClick={() => {
+                      setProfileData({...profileData, type: 'individual'});
+                      setIsTypeDropdownOpen(false);
+                    }}
+                    className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3.5 ${
+                      profileData.type === 'individual'
+                        ? 'bg-orange-500/10 border-orange-500/50 shadow-xs'
+                        : 'bg-background hover:bg-foreground/5 border-foreground/10'
+                    }`}
+                  >
+                    <div className={`p-2.5 rounded-xl shrink-0 mt-0.5 ${
+                      profileData.type === 'individual' ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' : 'bg-foreground/10 text-foreground/70'
+                    }`}>
+                      <User className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <h4 className="font-bold text-sm sm:text-base text-foreground leading-snug">Individual Teacher</h4>
+                        {profileData.type === 'individual' && (
+                          <CheckCircle2 className="w-5 h-5 text-orange-500 shrink-0" />
+                        )}
+                      </div>
+                      <p className="text-xs text-foreground/70 leading-relaxed font-medium mt-1 break-words">
+                        Single instructor profile for independent tutors, school teachers, and private educators.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Option 2: Institution */}
+                  <div
+                    onClick={() => {
+                      setProfileData({...profileData, type: 'institution'});
+                      setIsTypeDropdownOpen(false);
+                    }}
+                    className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3.5 ${
+                      profileData.type === 'institution'
+                        ? 'bg-orange-500/10 border-orange-500/50 shadow-xs'
+                        : 'bg-background hover:bg-foreground/5 border-foreground/10'
+                    }`}
+                  >
+                    <div className={`p-2.5 rounded-xl shrink-0 mt-0.5 ${
+                      profileData.type === 'institution' ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' : 'bg-foreground/10 text-foreground/70'
+                    }`}>
+                      <Building2 className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <h4 className="font-bold text-sm sm:text-base text-foreground leading-snug">Institution / Academy</h4>
+                        {profileData.type === 'institution' && (
+                          <CheckCircle2 className="w-5 h-5 text-orange-500 shrink-0" />
+                        )}
+                      </div>
+                      <p className="text-xs text-foreground/70 leading-relaxed font-medium mt-1 break-words">
+                        Coaching center, school, or educational institution with multiple teachers roster and team branding.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Quick Choice Interactive Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setProfileData({...profileData, type: 'individual'})}
+              className={`p-4 rounded-xl border text-left transition-all flex items-start gap-3 ${
+                profileData.type === 'individual'
+                  ? 'bg-orange-500/10 border-orange-500 ring-2 ring-orange-500/30 shadow-xs'
+                  : 'bg-background hover:bg-foreground/5 border-foreground/10'
+              }`}
+            >
+              <div className={`p-2 rounded-lg shrink-0 ${profileData.type === 'individual' ? 'bg-orange-500 text-white' : 'bg-foreground/10 text-foreground/60'}`}>
+                <User className="w-4 h-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-xs sm:text-sm text-foreground">Individual Teacher</p>
+                <p className="text-[11px] text-foreground/70 leading-relaxed mt-0.5 break-words">Single instructor profile</p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setProfileData({...profileData, type: 'institution'})}
+              className={`p-4 rounded-xl border text-left transition-all flex items-start gap-3 ${
+                profileData.type === 'institution'
+                  ? 'bg-orange-500/10 border-orange-500 ring-2 ring-orange-500/30 shadow-xs'
+                  : 'bg-background hover:bg-foreground/5 border-foreground/10'
+              }`}
+            >
+              <div className={`p-2 rounded-lg shrink-0 ${profileData.type === 'institution' ? 'bg-orange-500 text-white' : 'bg-foreground/10 text-foreground/60'}`}>
+                <Building2 className="w-4 h-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-xs sm:text-sm text-foreground">Institution / Academy</p>
+                <p className="text-[11px] text-foreground/70 leading-relaxed mt-0.5 break-words">Coaching center or school</p>
+              </div>
+            </button>
           </div>
         </div>
 
         {/* SECTION 2: Profile & Cover Branding Images */}
-        <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-4 sm:p-6 shadow-sm space-y-6">
-          <h2 className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground border-b border-foreground/10 pb-3">
-            <ImageIcon className="w-5 h-5 text-orange-500" /> 2. Profile Branding & Media
-          </h2>
+        <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-5 sm:p-7 shadow-sm space-y-6">
+          <div className="border-b border-foreground/10 pb-3.5">
+            <h2 className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground">
+              <ImageIcon className="w-5 h-5 text-orange-500 shrink-0" /> 2. Profile Branding & Media
+            </h2>
+            <p className="text-xs sm:text-sm text-foreground/70 font-medium mt-1">
+              Upload high-quality cover banners and your main instructor portrait or institution logo.
+            </p>
+          </div>
 
           {/* Cover Photo Upload */}
-          <div className="space-y-2">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <div className="space-y-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-1">
               <label className="text-sm font-bold text-foreground">Cover Banner Photo</label>
               <span className="text-xs text-foreground/60 font-medium">Recommended size: 1200 × 400px</span>
             </div>
@@ -291,12 +459,16 @@ export default function ProfileBuilderPage() {
             </div>
           </div>
 
-          {/* Profile Photo / Logo Upload - Image & Upload Button Side-by-Side in 1 Row on Mobile */}
-          <div className="space-y-2 pt-2">
-            <label className="text-sm font-bold text-foreground block">
-              {profileData.type === 'individual' ? 'Profile Picture' : 'Institution Logo'}
-            </label>
-            <div className="flex flex-row items-center gap-3 sm:gap-5 p-3.5 sm:p-5 bg-foreground/5 rounded-2xl border border-foreground/10">
+          {/* Profile Photo / Logo Upload */}
+          <div className="space-y-2.5 pt-3 border-t border-foreground/10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
+              <label className="text-sm font-bold text-foreground block">
+                {profileData.type === 'individual' ? 'Profile Picture' : 'Institution Logo'}
+              </label>
+              <span className="text-xs text-foreground/60 font-medium">Square avatar or badge under 5MB</span>
+            </div>
+
+            <div className="flex flex-row items-center gap-3.5 sm:gap-5 p-4 sm:p-5 bg-foreground/5 rounded-2xl border border-foreground/10">
               <div className={`w-16 h-16 sm:w-20 sm:h-20 overflow-hidden bg-foreground/10 border-2 border-orange-500/30 shrink-0 shadow-md ${profileData.type === 'institution' ? 'rounded-2xl' : 'rounded-full'}`}>
                 <img 
                   src={profileData.profilePhoto} 
@@ -304,10 +476,10 @@ export default function ProfileBuilderPage() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="flex-1 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <div className="flex-1 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
                 <div>
                   <p className="text-xs font-bold text-foreground">{profileData.type === 'individual' ? 'Instructor Photo' : 'Brand Logo'}</p>
-                  <p className="text-[11px] text-foreground/60 font-medium">PNG or JPG under 5MB</p>
+                  <p className="text-[11px] text-foreground/60 font-medium mt-0.5">PNG or JPG under 5MB</p>
                 </div>
                 <label className="px-3.5 sm:px-4 py-2 sm:py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs sm:text-sm rounded-xl cursor-pointer transition-all shadow-md shadow-orange-500/20 whitespace-nowrap flex items-center gap-1.5 shrink-0">
                   {uploadingProfilePhoto ? (
@@ -329,54 +501,64 @@ export default function ProfileBuilderPage() {
         </div>
 
         {/* SECTION 3: Basic Information */}
-        <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
-          <h2 className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground border-b border-foreground/10 pb-3">
-            <BookOpen className="w-5 h-5 text-orange-500" /> 3. Basic Information
-          </h2>
+        <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-5 sm:p-7 shadow-sm space-y-6">
+          <div className="border-b border-foreground/10 pb-3.5">
+            <h2 className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground">
+              <BookOpen className="w-5 h-5 text-orange-500 shrink-0" /> 3. Basic Information
+            </h2>
+            <p className="text-xs sm:text-sm text-foreground/70 font-medium mt-1">
+              Enter your full display name, professional headline, and academic background details.
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-foreground/80">
+              <label className="text-sm font-bold text-foreground/90 block mb-1">
                 {profileData.type === 'individual' ? 'Full Name' : 'Institution Name'} <span className="text-red-500">*</span>
               </label>
               <input 
                 type="text" 
                 value={profileData.displayName}
                 onChange={(e) => setProfileData({...profileData, displayName: e.target.value})}
-                className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 transition-colors font-medium"
+                className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition-colors font-medium"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-foreground/80">Headline / Designation</label>
+              <label className="text-sm font-bold text-foreground/90 block mb-1">Headline / Designation</label>
               <input 
                 type="text" 
                 value={profileData.headline}
                 onChange={(e) => setProfileData({...profileData, headline: e.target.value})}
-                className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 transition-colors font-medium"
+                className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition-colors font-medium"
                 placeholder={profileData.type === 'individual' ? "e.g. Senior Physics Lecturer" : "e.g. Premier Coaching Center in Dhaka"}
                 maxLength={80}
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-foreground/80">About / Biography</label>
+          <div className="space-y-2 pt-1">
+            <label className="text-sm font-bold text-foreground/90 block mb-1">About / Biography</label>
             <textarea 
               value={profileData.bio}
               onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
-              className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 transition-colors min-h-[120px] resize-y font-medium"
+              className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition-colors min-h-[130px] resize-y font-medium leading-relaxed"
               placeholder="Write a clear biography describing educational background, achievements and mission..."
             />
           </div>
         </div>
 
         {/* SECTION 4: Academic Profile */}
-        <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-4 sm:p-6 shadow-sm space-y-6">
-          <h2 className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground border-b border-foreground/10 pb-3">
-            <GraduationCap className="w-5 h-5 text-orange-500" /> 4. Academic Profile & Classes
-          </h2>
+        <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-5 sm:p-7 shadow-sm space-y-7">
+          <div className="border-b border-foreground/10 pb-3.5">
+            <h2 className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground">
+              <GraduationCap className="w-5 h-5 text-orange-500 shrink-0" /> 4. Academic Profile & Classes
+            </h2>
+            <p className="text-xs sm:text-sm text-foreground/70 font-medium mt-1">
+              Specify your target education levels, subject expertise, and teaching experience or team roster.
+            </p>
+          </div>
           
           {/* Education Levels - Orange Badges when Selected */}
           <div className="space-y-3">
@@ -576,21 +758,26 @@ export default function ProfileBuilderPage() {
         </div>
 
         {/* SECTION 5: Social Links & Custom Links */}
-        <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
-          <div className="flex items-center justify-between gap-2 border-b border-foreground/10 pb-3">
-            <h2 className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground">
-              <LinkIcon className="w-5 h-5 text-orange-500" /> 5. Social Links & Website
-            </h2>
+        <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-5 sm:p-7 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-foreground/10 pb-3.5">
+            <div>
+              <h2 className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground">
+                <LinkIcon className="w-5 h-5 text-orange-500 shrink-0" /> 5. Social Links & Website
+              </h2>
+              <p className="text-xs sm:text-sm text-foreground/70 font-medium mt-1">
+                Connect your website, social media handles, and custom external links.
+              </p>
+            </div>
             <button 
               type="button" 
               onClick={addCustomSocialLink}
-              className="px-3 py-1.5 bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white font-bold text-xs rounded-xl transition-all flex items-center gap-1 shrink-0"
+              className="px-3.5 py-2 bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0 border border-orange-500/20 shadow-xs"
             >
-              <Plus className="w-3.5 h-3.5" /> Add Link
+              <Plus className="w-4 h-4" /> Add Custom Link
             </button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
             <div className="relative">
               <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
               <input 

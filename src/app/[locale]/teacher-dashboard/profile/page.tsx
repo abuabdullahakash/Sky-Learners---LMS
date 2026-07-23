@@ -213,8 +213,8 @@ export default function ProfileBuilderPage() {
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-300">
       
-      {/* Hero Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl md:rounded-3xl p-6 md:p-9 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white shadow-2xl border border-white/10 mb-8">
+      {/* Hero Header Banner (0px border radius / rounded-none) */}
+      <div className="relative overflow-hidden rounded-none p-6 md:p-9 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white shadow-2xl border-b border-white/10 -mx-4 -mt-4 sm:-mx-6 sm:-mt-6 md:-mx-8 md:-mt-8 mb-8">
         {/* Ambient Glowing Orbs */}
         <div className="absolute top-0 right-0 w-72 h-72 bg-orange-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl -ml-16 -mb-16 pointer-events-none"></div>
@@ -561,11 +561,11 @@ export default function ProfileBuilderPage() {
           </div>
           
           {/* Education Levels - Orange Badges when Selected */}
-          <div className="space-y-3">
-            <label className="text-sm font-bold text-foreground">
+          <div className="space-y-4">
+            <label className="text-sm font-bold text-foreground block mb-1">
               {profileData.type === 'individual' ? 'Education Levels You Teach' : 'Education Levels Covered'}
             </label>
-            <div className="flex flex-wrap gap-2 sm:gap-2.5">
+            <div className="flex flex-wrap gap-2.5 sm:gap-3">
               {educationLevelOptions.map(level => {
                 const isSelected = profileData.educationLevels.includes(level);
                 return (
@@ -588,8 +588,8 @@ export default function ProfileBuilderPage() {
 
           {/* Individual Specific Classes */}
           {profileData.type === 'individual' && (
-            <div className="space-y-3 pt-2">
-              <label className="text-sm font-bold text-foreground">Specific Subjects / Batches</label>
+            <div className="space-y-3.5 pt-3 border-t border-foreground/10">
+              <label className="text-sm font-bold text-foreground block mb-1">Specific Subjects / Batches</label>
               <div className="flex gap-2">
                 <input 
                   type="text" 
@@ -620,7 +620,7 @@ export default function ProfileBuilderPage() {
 
           {/* Individual Specific Experiences */}
           {profileData.type === 'individual' && (
-            <div className="space-y-3 pt-2 border-t border-foreground/10">
+            <div className="space-y-4 pt-3 border-t border-foreground/10">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-bold text-foreground">Teaching Experience / Workplaces</label>
                 <button type="button" onClick={addExperience} className="text-xs text-orange-500 font-bold hover:underline flex items-center gap-1">
@@ -628,10 +628,10 @@ export default function ProfileBuilderPage() {
                 </button>
               </div>
               
-              <div className="space-y-3">
+              <div className="space-y-3.5">
                 {profileData.experiences.map((exp) => (
                   <div key={exp.id} className="flex flex-col sm:flex-row gap-3 p-4 bg-background border border-foreground/10 rounded-xl relative">
-                    <div className="flex-1 space-y-2">
+                    <div className="flex-1 space-y-2.5">
                       <input 
                         type="text" placeholder="Role/Designation (e.g. Lecturer of Physics)" 
                         value={exp.role} onChange={(e) => updateExperience(exp.id, 'role', e.target.value)}
@@ -658,22 +658,22 @@ export default function ProfileBuilderPage() {
 
           {/* Institution Specific Teachers Roster (Responsive Layout) */}
           {profileData.type === 'institution' && (
-            <div className="space-y-4 pt-2 border-t border-foreground/10">
+            <div className="space-y-5 pt-3 border-t border-foreground/10">
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <label className="text-sm font-bold text-foreground block">Teachers Roster</label>
-                  <p className="text-xs text-foreground/60">Add teachers and their subjects/classes.</p>
+                  <p className="text-xs text-foreground/60 mt-0.5">Add teachers and their subjects/classes.</p>
                 </div>
-                <button type="button" onClick={addTeacherRoster} className="px-3 py-1.5 bg-orange-500 text-white font-bold text-xs rounded-xl hover:bg-orange-600 transition-colors flex items-center gap-1 shrink-0 shadow-sm">
+                <button type="button" onClick={addTeacherRoster} className="px-3.5 py-2 bg-orange-500 text-white font-bold text-xs rounded-xl hover:bg-orange-600 transition-colors flex items-center gap-1 shrink-0 shadow-sm">
                   <Plus className="w-3.5 h-3.5" /> Add Teacher
                 </button>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {profileData.teachersRoster.map((teacher) => (
-                  <div key={teacher.id} className="p-4 bg-background border border-foreground/10 rounded-2xl relative space-y-4 shadow-sm">
+                  <div key={teacher.id} className="p-5 sm:p-6 bg-background border border-foreground/10 rounded-2xl relative space-y-5 shadow-xs">
                     {/* Header with Remove button */}
-                    <div className="flex items-center justify-between pb-2 border-b border-foreground/10">
+                    <div className="flex items-center justify-between pb-3 border-b border-foreground/10">
                       <span className="text-xs font-bold text-orange-500 uppercase tracking-wider">Teacher Entry</span>
                       <button 
                         type="button" 
@@ -685,8 +685,8 @@ export default function ProfileBuilderPage() {
                     </div>
 
                     {/* Teacher Photo */}
-                    <div className="space-y-1">
-                      <span className="text-[11px] text-foreground/50 font-bold uppercase tracking-wider">Teacher Photo</span>
+                    <div className="space-y-2">
+                      <span className="text-[11px] text-foreground/50 font-bold uppercase tracking-wider block mb-1">Teacher Photo</span>
                       <div className="flex items-center gap-3 mt-1 flex-wrap">
                         <div className="w-12 h-12 rounded-full overflow-hidden bg-foreground/10 border border-foreground/10 shrink-0">
                           {teacher.image ? (
@@ -695,7 +695,7 @@ export default function ProfileBuilderPage() {
                             <User className="w-6 h-6 m-3 text-foreground/40" />
                           )}
                         </div>
-                        <label className={`px-3 py-2 bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 rounded-xl cursor-pointer transition-colors text-xs font-bold flex items-center gap-1.5 ${uploadingTeacherImageId === teacher.id ? 'opacity-50 pointer-events-none' : ''}`}>
+                        <label className={`px-3.5 py-2 bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 rounded-xl cursor-pointer transition-colors text-xs font-bold flex items-center gap-1.5 ${uploadingTeacherImageId === teacher.id ? 'opacity-50 pointer-events-none' : ''}`}>
                           {uploadingTeacherImageId === teacher.id ? (
                             <><Loader2 className="w-3.5 h-3.5 animate-spin text-orange-500" /> Uploading...</>
                           ) : (
@@ -716,37 +716,37 @@ export default function ProfileBuilderPage() {
                     </div>
 
                     {/* Responsive Grid Inputs */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <span className="text-[11px] text-foreground/60 font-bold uppercase">Teacher Name</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                      <div className="space-y-2">
+                        <span className="text-[11px] text-foreground/70 font-bold uppercase block mb-1">Teacher Name</span>
                         <input 
                           type="text" placeholder="e.g. Rahim Sir" 
                           value={teacher.name} onChange={(e) => updateTeacherRoster(teacher.id, 'name', e.target.value)}
-                          className="w-full bg-foreground/5 border border-foreground/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange-500 transition-colors font-medium"
+                          className="w-full bg-foreground/5 border border-foreground/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 transition-colors font-medium"
                         />
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-[11px] text-foreground/60 font-bold uppercase">University / Degree</span>
+                      <div className="space-y-2">
+                        <span className="text-[11px] text-foreground/70 font-bold uppercase block mb-1">University / Degree</span>
                         <input 
                           type="text" placeholder="e.g. Dhaka University" 
                           value={teacher.university || ''} onChange={(e) => updateTeacherRoster(teacher.id, 'university', e.target.value)}
-                          className="w-full bg-foreground/5 border border-foreground/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange-500 transition-colors font-medium"
+                          className="w-full bg-foreground/5 border border-foreground/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 transition-colors font-medium"
                         />
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-[11px] text-foreground/60 font-bold uppercase">Subjects</span>
+                      <div className="space-y-2">
+                        <span className="text-[11px] text-foreground/70 font-bold uppercase block mb-1">Subjects</span>
                         <input 
                           type="text" placeholder="e.g. Physics, Higher Math" 
                           value={teacher.subjects} onChange={(e) => updateTeacherRoster(teacher.id, 'subjects', e.target.value)}
-                          className="w-full bg-foreground/5 border border-foreground/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange-500 transition-colors font-medium"
+                          className="w-full bg-foreground/5 border border-foreground/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 transition-colors font-medium"
                         />
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-[11px] text-foreground/60 font-bold uppercase">Classes</span>
+                      <div className="space-y-2">
+                        <span className="text-[11px] text-foreground/70 font-bold uppercase block mb-1">Classes</span>
                         <input 
                           type="text" placeholder="e.g. HSC, Admission" 
                           value={teacher.classes} onChange={(e) => updateTeacherRoster(teacher.id, 'classes', e.target.value)}
-                          className="w-full bg-foreground/5 border border-foreground/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange-500 transition-colors font-medium"
+                          className="w-full bg-foreground/5 border border-foreground/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 transition-colors font-medium"
                         />
                       </div>
                     </div>

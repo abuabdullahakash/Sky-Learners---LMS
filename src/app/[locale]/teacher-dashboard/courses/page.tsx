@@ -175,14 +175,31 @@ export default function CoursesListPage() {
             </Link>
           </div>
         </div>
+      </div>
 
-        {/* Popover Overlay for Search */}
-        {showSearchModal && (
-          <div className="relative z-50 mt-4 p-4 bg-slate-900 border border-white/20 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200">
-            <div className="flex items-center justify-between gap-3 mb-2">
-              <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">Search Courses</span>
-              <button onClick={() => setShowSearchModal(false)} className="text-white/60 hover:text-white"><X className="w-4 h-4" /></button>
+      {/* Floating Modal Popup for Search */}
+      {showSearchModal && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setShowSearchModal(false)}
+        >
+          <div 
+            className="bg-slate-900 text-white border border-white/20 rounded-2xl p-6 w-full max-w-lg shadow-2xl space-y-4 animate-in zoom-in-95 duration-200 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <Search className="w-5 h-5 text-orange-400" />
+                <h3 className="font-extrabold text-base text-white">Search Courses</h3>
+              </div>
+              <button 
+                onClick={() => setShowSearchModal(false)}
+                className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
+
             <div className="relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
               <input 
@@ -191,43 +208,86 @@ export default function CoursesListPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
-                className="w-full pl-10 pr-10 py-2.5 bg-white/10 text-white placeholder-white/40 border border-white/20 rounded-xl focus:outline-none focus:border-orange-500 text-sm"
+                className="w-full pl-10 pr-10 py-3 bg-white/10 text-white placeholder-white/40 border border-white/20 rounded-xl focus:outline-none focus:border-orange-500 text-sm font-medium"
               />
               {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white text-xs font-bold bg-white/10 rounded-full w-5 h-5 flex items-center justify-center">✕</button>
+                <button 
+                  onClick={() => setSearchQuery('')} 
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/60 hover:text-white text-xs font-bold bg-white/10 rounded-full w-5 h-5 flex items-center justify-center"
+                >
+                  ✕
+                </button>
               )}
             </div>
-          </div>
-        )}
 
-        {/* Popover Overlay for Status Filter */}
-        {showFilterModal && (
-          <div className="relative z-20 mt-4 p-4 bg-slate-900/95 border border-white/20 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200">
-            <div className="flex items-center justify-between gap-3 mb-3">
-              <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">Filter by Status</span>
-              <button onClick={() => setShowFilterModal(false)} className="text-white/60 hover:text-white"><X className="w-4 h-4" /></button>
-            </div>
-            <div className="flex gap-2">
-              {(['all', 'published', 'draft'] as const).map((st) => (
-                <button 
-                  key={st}
-                  onClick={() => {
-                    setStatusFilter(st);
-                    setShowFilterModal(false);
-                  }}
-                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold capitalize transition-all border ${
-                    statusFilter === st 
-                      ? 'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-500/30' 
-                      : 'bg-white/10 text-white/80 border-white/10 hover:bg-white/20'
-                  }`}
-                >
-                  {st === 'all' ? 'All Status' : st}
-                </button>
-              ))}
+            <div className="flex justify-end pt-2">
+              <button 
+                onClick={() => setShowSearchModal(false)}
+                className="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-orange-500/30 transition-all"
+              >
+                Done
+              </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Floating Modal Popup for Status Filter */}
+      {showFilterModal && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setShowFilterModal(false)}
+        >
+          <div 
+            className="bg-slate-900 text-white border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4 animate-in zoom-in-95 duration-200 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="w-5 h-5 text-orange-400" />
+                <h3 className="font-extrabold text-base text-white">Filter Courses</h3>
+              </div>
+              <button 
+                onClick={() => setShowFilterModal(false)}
+                className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-300 uppercase tracking-wider">Select Status</label>
+              <div className="grid grid-cols-3 gap-2">
+                {(['all', 'published', 'draft'] as const).map((st) => (
+                  <button 
+                    key={st}
+                    onClick={() => {
+                      setStatusFilter(st);
+                      setShowFilterModal(false);
+                    }}
+                    className={`py-2.5 px-3 rounded-xl text-xs font-bold capitalize transition-all border ${
+                      statusFilter === st 
+                        ? 'bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/30' 
+                        : 'bg-white/10 text-white/80 border-white/10 hover:bg-white/20'
+                    }`}
+                  >
+                    {st === 'all' ? 'All Status' : st}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button 
+                onClick={() => setShowFilterModal(false)}
+                className="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-orange-500/30 transition-all"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Active Filter Bar if applied */}
       {(searchQuery || statusFilter !== 'all') && (

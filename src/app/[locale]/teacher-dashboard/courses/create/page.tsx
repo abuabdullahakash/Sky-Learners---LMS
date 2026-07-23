@@ -508,17 +508,17 @@ export default function CreateCoursePage() {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-foreground/10 flex justify-end gap-3">
+          <div className="pt-6 border-t border-foreground/10 flex flex-col-reverse sm:flex-row justify-end items-stretch sm:items-center gap-3">
             <Link 
               href="/teacher-dashboard"
-              className="px-6 py-3 bg-foreground/5 hover:bg-foreground/10 text-foreground rounded-xl font-semibold transition-colors"
+              className="w-full sm:w-auto px-6 py-3 bg-foreground/5 hover:bg-foreground/10 text-foreground rounded-xl font-semibold transition-colors text-center text-sm sm:text-base"
             >
               Cancel
             </Link>
             <button 
               type="submit" 
               disabled={isLoading}
-              className="px-8 py-3 bg-orange-500 text-white hover:bg-orange-600 rounded-xl font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 flex items-center gap-2"
+              className="w-full sm:w-auto px-8 py-3 bg-orange-500 text-white hover:bg-orange-600 rounded-xl font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 flex items-center justify-center gap-2 text-sm sm:text-base"
             >
               {isLoading ? (
                 <><Loader2 className="w-5 h-5 animate-spin" /> Creating...</>

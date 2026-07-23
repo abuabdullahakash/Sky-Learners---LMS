@@ -163,8 +163,10 @@ export default function EarningsPage() {
     <div className="space-y-6 pb-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
       
       {/* Hero Header Banner (0px border radius / rounded-none) */}
-      <div className="relative overflow-hidden rounded-none p-6 md:p-8 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white shadow-xl border-b border-white/10 -mx-4 -mt-4 mb-6">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+      <div className="relative rounded-none p-6 md:p-8 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white shadow-xl border-b border-white/10 -mx-4 -mt-4 mb-6 z-20">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl -mr-16 -mt-16"></div>
+        </div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <span className="inline-block px-3 py-1 bg-orange-500/20 text-orange-400 text-xs font-bold rounded-full uppercase tracking-wider border border-orange-500/30">
@@ -179,7 +181,7 @@ export default function EarningsPage() {
           </div>
           
           {/* Time Filter Icon Button */}
-          <div className="relative">
+          <div className="relative z-30">
             <button 
               onClick={() => setShowFilterModal(!showFilterModal)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all text-sm font-bold ${
@@ -195,7 +197,7 @@ export default function EarningsPage() {
 
             {/* Filter Popover Modal */}
             {showFilterModal && (
-              <div className="absolute right-0 mt-2 w-56 p-3 bg-slate-900/95 border border-white/20 rounded-2xl shadow-2xl z-30 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="absolute right-0 mt-2 w-56 p-3 bg-slate-900 border border-white/20 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-white/10">
                   <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">Select Range</span>
                   <button onClick={() => setShowFilterModal(false)} className="text-white/60 hover:text-white"><X className="w-3.5 h-3.5" /></button>

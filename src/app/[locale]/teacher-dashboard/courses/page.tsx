@@ -113,8 +113,10 @@ export default function CoursesListPage() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
       
       {/* Hero Header Banner (0px border radius / rounded-none) */}
-      <div className="relative overflow-hidden rounded-none p-6 md:p-8 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white shadow-xl border-b border-white/10 -mx-4 -mt-4 mb-6">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+      <div className="relative rounded-none p-6 md:p-8 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white shadow-xl border-b border-white/10 -mx-4 -mt-4 mb-6 z-20">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl -mr-16 -mt-16"></div>
+        </div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <span className="inline-block px-3 py-1 bg-orange-500/20 text-orange-400 text-xs font-bold rounded-full uppercase tracking-wider border border-orange-500/30">
@@ -176,7 +178,7 @@ export default function CoursesListPage() {
 
         {/* Popover Overlay for Search */}
         {showSearchModal && (
-          <div className="relative z-20 mt-4 p-4 bg-slate-900/95 border border-white/20 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="relative z-50 mt-4 p-4 bg-slate-900 border border-white/20 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="flex items-center justify-between gap-3 mb-2">
               <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">Search Courses</span>
               <button onClick={() => setShowSearchModal(false)} className="text-white/60 hover:text-white"><X className="w-4 h-4" /></button>

@@ -170,45 +170,51 @@ export default function CourseEnrollmentsPage() {
           ) : (
             <div className="divide-y divide-foreground/10">
               {filteredEnrollments.map((enrollment) => (
-                <div key={enrollment.id} className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-foreground/[0.02] transition-colors">
+                <div key={enrollment.id} className="p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-foreground/[0.02] transition-colors">
                   
-                  <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <p className="text-xs text-foreground/50 mb-1">Student Name</p>
-                      <p className="font-semibold">{enrollment.studentName}</p>
+                  {/* Left Metadata - Compact Layout */}
+                  <div className="flex-1 space-y-1">
+                    <div className="flex items-center justify-between sm:justify-start gap-3 flex-wrap">
+                      <p className="font-bold text-sm sm:text-base text-foreground">
+                        {enrollment.studentName || 'Student'}
+                      </p>
+                      {activeTab === 'approved' && (
+                        <span className="sm:hidden flex items-center gap-1 text-green-500 bg-green-500/10 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Approved
+                        </span>
+                      )}
                     </div>
-                    <div>
-                      <p className="text-xs text-foreground/50 mb-1">Sender Number</p>
-                      <p className="font-semibold text-primary">{enrollment.senderNumber}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-foreground/50 mb-1">TrxID</p>
-                      <p className="font-mono text-sm bg-foreground/10 px-2 py-0.5 rounded inline-block">{enrollment.trxId || 'N/A'}</p>
+
+                    <div className="flex items-center gap-4 text-xs text-foreground/70 flex-wrap">
+                      <span><span className="text-foreground/40 font-medium">Number:</span> <strong className="text-primary font-semibold">{enrollment.senderNumber}</strong></span>
+                      <span className="border-l border-foreground/10 pl-4"><span className="text-foreground/40 font-medium">TrxID:</span> <code className="font-mono bg-foreground/10 px-1.5 py-0.5 rounded text-[11px] font-bold">{enrollment.trxId || 'N/A'}</code></span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 md:border-l md:border-foreground/10 md:pl-6">
+                  {/* Right Actions */}
+                  <div className="flex items-center justify-end gap-2 pt-2 sm:pt-0 sm:border-l sm:border-foreground/10 sm:pl-4">
                     {activeTab === 'pending' ? (
                       <>
                         <button 
                           onClick={() => handleReject(enrollment.id)}
-                          className="px-4 py-2 text-sm font-bold text-red-500 bg-red-500/10 hover:bg-red-500/20 rounded-xl transition-colors flex items-center gap-2"
+                          className="px-3 py-1.5 text-xs font-bold text-red-500 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-colors flex items-center gap-1.5"
                         >
-                          <XCircle className="w-4 h-4" /> Reject
+                          <XCircle className="w-3.5 h-3.5" /> Reject
                         </button>
                         <button 
                           onClick={() => handleApprove(enrollment.id)}
-                          className="px-4 py-2 text-sm font-bold text-white bg-green-500 hover:bg-green-600 shadow hover:shadow-lg hover:-translate-y-0.5 rounded-xl transition-all flex items-center gap-2"
+                          className="px-3.5 py-1.5 text-xs font-bold text-white bg-green-500 hover:bg-green-600 shadow rounded-lg transition-all flex items-center gap-1.5"
                         >
-                          <CheckCircle2 className="w-4 h-4" /> Approve
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Approve
                         </button>
                       </>
                     ) : (
-                      <span className="flex items-center gap-2 text-green-500 bg-green-500/10 px-4 py-2 rounded-xl text-sm font-bold">
+                      <span className="hidden sm:flex items-center gap-1.5 text-green-500 bg-green-500/10 px-3.5 py-1.5 rounded-xl text-xs font-bold">
                         <CheckCircle2 className="w-4 h-4" /> Approved
                       </span>
                     )}
                   </div>
+
                 </div>
               ))}
             </div>

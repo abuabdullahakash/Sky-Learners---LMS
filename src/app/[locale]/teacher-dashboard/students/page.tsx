@@ -198,73 +198,78 @@ export default function StudentsPage() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Students</h1>
-        <p className="text-foreground/60">Manage and track your enrolled students' progress across your courses.</p>
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+      
+      {/* Hero Header Banner (0px border radius / rounded-none) */}
+      <div className="relative overflow-hidden rounded-none p-6 md:p-8 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white shadow-xl border-b border-white/10 -mx-4 -mt-4 mb-6">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+        <div className="relative z-10 space-y-1">
+          <span className="inline-block px-3 py-1 bg-orange-500/20 text-orange-400 text-xs font-bold rounded-full uppercase tracking-wider border border-orange-500/30">
+            Student Management
+          </span>
+          <h1 className="text-2xl md:text-4xl font-black text-white leading-tight">
+            Students
+          </h1>
+          <p className="text-sm md:text-base text-gray-300 max-w-2xl leading-relaxed">
+            Manage and track your enrolled students&apos; progress across your courses.
+          </p>
+        </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-foreground/5 border border-foreground/10 rounded-2xl p-6 flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center">
-            <Users className="w-7 h-7" />
+      {/* Stats Cards - 2 Columns on Mobile (grid-cols-2) */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+        <div className="bg-foreground/5 border border-foreground/10 rounded-2xl p-3.5 sm:p-6 flex flex-col items-center justify-center text-center">
+          <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center mb-2 sm:mb-3">
+            <Users className="w-5 h-5 sm:w-7 sm:h-7" />
           </div>
-          <div>
-            <p className="text-foreground/60 text-sm font-medium">Total Students</p>
-            <h3 className="text-2xl font-bold">{stats.totalStudents}</h3>
-          </div>
+          <p className="text-foreground/60 text-xs sm:text-sm font-medium">Total Students</p>
+          <h3 className="text-xl sm:text-3xl font-extrabold text-foreground">{stats.totalStudents}</h3>
         </div>
         
-        <div className="bg-foreground/5 border border-foreground/10 rounded-2xl p-6 flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center">
-            <UserCheck className="w-7 h-7" />
+        <div className="bg-foreground/5 border border-foreground/10 rounded-2xl p-3.5 sm:p-6 flex flex-col items-center justify-center text-center">
+          <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center mb-2 sm:mb-3">
+            <UserCheck className="w-5 h-5 sm:w-7 sm:h-7" />
           </div>
-          <div>
-            <p className="text-foreground/60 text-sm font-medium">Active Students</p>
-            <h3 className="text-2xl font-bold">{stats.activeStudents}</h3>
-          </div>
+          <p className="text-foreground/60 text-xs sm:text-sm font-medium">Active Students</p>
+          <h3 className="text-xl sm:text-3xl font-extrabold text-foreground">{stats.activeStudents}</h3>
         </div>
 
-        <div className="bg-foreground/5 border border-foreground/10 rounded-2xl p-6 flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center">
-            <UserPlus className="w-7 h-7" />
+        <div className="bg-foreground/5 border border-foreground/10 rounded-2xl p-3.5 sm:p-6 flex flex-col items-center justify-center text-center col-span-2 lg:col-span-1">
+          <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center mb-2 sm:mb-3">
+            <UserPlus className="w-5 h-5 sm:w-7 sm:h-7" />
           </div>
-          <div>
-            <p className="text-foreground/60 text-sm font-medium">New Enrollments</p>
-            <h3 className="text-2xl font-bold">{stats.newThisMonth}</h3>
-          </div>
+          <p className="text-foreground/60 text-xs sm:text-sm font-medium">New Enrollments</p>
+          <h3 className="text-xl sm:text-3xl font-extrabold text-foreground">{stats.newThisMonth}</h3>
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="bg-foreground/5 border border-foreground/10 rounded-2xl overflow-hidden">
-        {/* Toolbar */}
-        <div className="p-6 border-b border-foreground/10 flex flex-col sm:flex-row gap-4 justify-between items-center bg-background/50">
-          <div className="relative w-full sm:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40" />
-            <input 
-              type="text" 
-              placeholder="Search by name, email or phone..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-background border border-foreground/20 rounded-xl py-2.5 pl-10 pr-4 focus:outline-none focus:border-primary transition-colors"
-            />
-          </div>
-          
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <div className="relative flex-1 sm:flex-none">
-              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+      <div className="bg-foreground/5 border border-foreground/10 rounded-2xl overflow-hidden shadow-sm">
+        {/* Toolbar - Search & Filter in 1 Row on Mobile */}
+        <div className="p-3.5 sm:p-4 border-b border-foreground/10 bg-background/50">
+          <div className="flex flex-row gap-2 w-full items-center">
+            <div className="relative flex-[1.6] min-w-0">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+              <input 
+                type="text" 
+                placeholder="Search name, email or phone..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-background border border-foreground/20 rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none focus:border-orange-500 transition-colors"
+              />
+            </div>
+            
+            <div className="relative flex-[1] min-w-0">
+              <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground/40 pointer-events-none" />
               <select 
                 value={filterCourseId}
                 onChange={(e) => setFilterCourseId(e.target.value)}
-                className="w-full sm:w-56 bg-background border border-foreground/20 rounded-xl py-2.5 pl-9 pr-4 appearance-none focus:outline-none focus:border-primary transition-colors cursor-pointer"
+                className="w-full bg-background border border-foreground/20 rounded-xl py-2 pl-8 pr-2 text-xs sm:text-sm appearance-none focus:outline-none focus:border-orange-500 transition-colors cursor-pointer truncate"
               >
                 <option value="All">All Courses</option>
                 {courses.map(course => (
                   <option key={course.id} value={course.id}>
-                    {course.title.length > 25 ? course.title.substring(0, 25) + '...' : course.title}
+                    {course.title.length > 20 ? course.title.substring(0, 20) + '...' : course.title}
                   </option>
                 ))}
               </select>
@@ -272,72 +277,69 @@ export default function StudentsPage() {
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[800px]">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[700px]">
             <thead>
-              <tr className="bg-foreground/5 text-foreground/60 text-sm uppercase tracking-wider">
-                <th className="px-6 py-4 font-medium">Student</th>
-                <th className="px-6 py-4 font-medium">Course Enrolled</th>
-                <th className="px-6 py-4 font-medium">Enroll Date</th>
-                <th className="px-6 py-4 font-medium text-right">Actions</th>
+              <tr className="bg-foreground/5 text-foreground/60 text-xs font-bold uppercase tracking-wider">
+                <th className="px-6 py-3.5">Student</th>
+                <th className="px-6 py-3.5">Course Enrolled</th>
+                <th className="px-6 py-3.5">Enroll Date</th>
+                <th className="px-6 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-foreground/10">
+            <tbody className="divide-y divide-foreground/10 text-sm">
               {courses.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-6 py-12 text-center text-foreground/50">
-                    You haven't created any courses yet.
+                    You haven&apos;t created any courses yet.
                   </td>
                 </tr>
               ) : displayedStudents.length > 0 ? (
                 displayedStudents.map((student) => (
                   <tr key={student.id} className="hover:bg-foreground/5 transition-colors">
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-3.5">
                       <div className="flex items-center gap-3">
                         <img 
                           src={student.avatar} 
                           alt={student.name} 
-                          className="w-10 h-10 rounded-full object-cover border border-foreground/10"
+                          className="w-9 h-9 rounded-full object-cover border border-foreground/10"
                         />
                         <div>
-                          <p className="font-semibold">{student.name}</p>
+                          <p className="font-bold text-foreground">{student.name}</p>
                           <p className="text-xs text-foreground/60">
                             {student.hasEmail ? student.email : student.phone}
                           </p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="inline-block px-3 py-1 bg-foreground/10 rounded-full text-sm font-medium">
+                    <td className="px-6 py-3.5">
+                      <span className="inline-block px-3 py-1 bg-orange-500/10 text-orange-600 rounded-full text-xs font-bold">
                         {student.courseTitle}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-foreground/70">
+                    <td className="px-6 py-3.5 text-xs text-foreground/70 font-medium">
                       {student.enrollDate}
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-3.5 text-right">
                       <div className="flex items-center justify-end gap-2">
                         {student.hasEmail ? (
                           <a 
                             href={`mailto:${student.email}`}
-                            className="p-2 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors tooltip-trigger" 
+                            className="p-2 hover:bg-orange-500/10 hover:text-orange-500 rounded-lg transition-colors" 
                             title="Email Student"
                           >
-                            <Mail className="w-5 h-5" />
+                            <Mail className="w-4 h-4" />
                           </a>
                         ) : (
                           <a 
                             href={`tel:${student.phone}`}
-                            className="p-2 hover:bg-green-500/10 hover:text-green-500 rounded-lg transition-colors tooltip-trigger" 
+                            className="p-2 hover:bg-green-500/10 hover:text-green-500 rounded-lg transition-colors" 
                             title="Call Student"
                           >
-                            <Phone className="w-5 h-5" />
+                            <Phone className="w-4 h-4" />
                           </a>
                         )}
-                        {/* <button className="p-2 hover:bg-blue-500/10 hover:text-blue-500 rounded-lg transition-colors tooltip-trigger" title="View Profile">
-                          <Eye className="w-5 h-5" />
-                        </button> */}
                       </div>
                     </td>
                   </tr>
@@ -352,17 +354,74 @@ export default function StudentsPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile List View (Shows All Columns Cleanly without Overflow) */}
+        <div className="block md:hidden divide-y divide-foreground/10">
+          {courses.length === 0 ? (
+            <div className="p-8 text-center text-xs text-foreground/50">You haven&apos;t created any courses yet.</div>
+          ) : displayedStudents.length > 0 ? (
+            displayedStudents.map((student) => (
+              <div key={student.id} className="p-3.5 flex flex-col gap-2 hover:bg-foreground/5 transition-colors">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                    <img 
+                      src={student.avatar} 
+                      alt={student.name} 
+                      className="w-9 h-9 rounded-full object-cover border border-foreground/10 shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-xs truncate text-foreground">{student.name}</p>
+                      <p className="text-[11px] text-foreground/60 truncate">
+                        {student.hasEmail ? student.email : student.phone}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="shrink-0">
+                    {student.hasEmail ? (
+                      <a 
+                        href={`mailto:${student.email}`}
+                        className="p-1.5 bg-orange-500/10 text-orange-500 rounded-lg inline-flex items-center justify-center" 
+                        title="Email Student"
+                      >
+                        <Mail className="w-4 h-4" />
+                      </a>
+                    ) : (
+                      <a 
+                        href={`tel:${student.phone}`}
+                        className="p-1.5 bg-green-500/10 text-green-500 rounded-lg inline-flex items-center justify-center" 
+                        title="Call Student"
+                      >
+                        <Phone className="w-4 h-4" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between gap-2 text-[11px] text-foreground/60 pt-1 border-t border-foreground/5">
+                  <span className="inline-block px-2.5 py-0.5 bg-orange-500/10 text-orange-600 font-bold rounded-full truncate max-w-[200px]">
+                    {student.courseTitle}
+                  </span>
+                  <span className="font-medium shrink-0 text-[10px] text-foreground/50">
+                    {student.enrollDate}
+                  </span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="p-8 text-center text-xs text-foreground/50">No students found matching your criteria.</div>
+          )}
+        </div>
         
         {/* Load More Section */}
         {filteredStudents.length > 0 && (
-          <div className="p-6 border-t border-foreground/10 flex flex-col items-center justify-center gap-4 bg-background/50">
-            <p className="text-sm text-foreground/60">
+          <div className="p-4 border-t border-foreground/10 flex flex-col items-center justify-center gap-3 bg-background/50">
+            <p className="text-xs text-foreground/60">
               Showing {displayedStudents.length} of {filteredStudents.length} enrollments
             </p>
             {visibleCount < filteredStudents.length && (
               <button 
                 onClick={() => setVisibleCount(prev => prev + 50)}
-                className="px-8 py-2.5 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-medium transition-all duration-300 hover:shadow-[0_0_15px_rgba(249,115,22,0.4)] hover:-translate-y-0.5 active:scale-95"
+                className="px-6 py-2 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs transition-all shadow-md hover:shadow-orange-500/30"
               >
                 Load More
               </button>

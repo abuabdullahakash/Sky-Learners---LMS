@@ -156,19 +156,19 @@ export default function StudentCourseOverview() {
       {/* Left Column (Main Content) */}
       <div className="xl:col-span-2 space-y-8">
         
-        {/* Back Button & Premium Hero Banner Header */}
-        <div>
-          <Link 
-            href="/dashboard/courses" 
-            className="inline-flex items-center gap-2 text-xs font-bold text-orange-500 hover:text-orange-600 bg-orange-500/10 px-3.5 py-2 rounded-xl mb-4 transition-all hover:-translate-x-1"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>{locale === 'bn' ? 'আমার কোর্সসমূহে ফিরে যান' : 'Back to My Courses'}</span>
-          </Link>
+        {/* Back Button & Premium Hero Banner Header (Border Radius 0px / rounded-none) */}
+        <div className="relative overflow-hidden rounded-none p-6 md:p-8 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white shadow-xl border-b border-white/10 -mx-2 md:-mx-4 -mt-2 md:-mt-4 mb-6">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+          <div className="relative z-10 space-y-4">
+            <Link 
+              href="/dashboard/courses" 
+              className="inline-flex items-center gap-2 text-xs font-bold text-orange-400 hover:text-orange-300 bg-orange-500/20 px-3.5 py-2 rounded-xl transition-all hover:-translate-x-1 border border-orange-500/30 backdrop-blur-sm"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>{locale === 'bn' ? 'আমার কোর্সসমূহে ফিরে যান' : 'Back to My Courses'}</span>
+            </Link>
 
-          <div className="relative overflow-hidden rounded-3xl p-6 md:p-8 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white shadow-xl border border-white/10">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
-            <div className="relative z-10 space-y-3">
+            <div className="space-y-2">
               <span className="inline-block px-3 py-1 bg-orange-500/20 text-orange-400 text-xs font-bold rounded-full uppercase tracking-wider border border-orange-500/30">
                 {course.category || 'Online Course'}
               </span>

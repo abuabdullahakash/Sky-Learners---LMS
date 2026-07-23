@@ -143,10 +143,20 @@ export default function StudentCoursesPage() {
   return (
     <div className="w-full space-y-10 animate-in fade-in duration-500">
       
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-3">{t('title')}</h1>
-        <p className="text-foreground/70 text-lg">{t('subtitle')}</p>
+      {/* Premium Hero Banner Header */}
+      <div className="relative overflow-hidden rounded-3xl p-6 md:p-10 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white shadow-2xl border border-white/10">
+        <div className="absolute top-0 right-0 w-72 h-72 bg-orange-500/15 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+        <div className="relative z-10 space-y-3">
+          <span className="inline-block px-3 py-1 bg-orange-500/20 text-orange-400 text-xs font-bold rounded-full uppercase tracking-wider border border-orange-500/30">
+            {locale === 'bn' ? 'লার্নিং পোর্টাল' : 'Learning Portal'}
+          </span>
+          <h1 className="text-3xl md:text-4xl font-black text-white leading-tight">
+            {t('title')}
+          </h1>
+          <p className="text-gray-300 text-sm md:text-base max-w-2xl leading-relaxed">
+            {t('subtitle')}
+          </p>
+        </div>
       </div>
 
       {courses.length === 0 ? (

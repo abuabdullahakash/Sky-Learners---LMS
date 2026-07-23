@@ -141,15 +141,30 @@ export default function CreateCoursePage() {
   return (
     <div className="max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
       
-      <div className="mb-8">
-        <Link href="/teacher-dashboard" className="inline-flex items-center gap-2 text-foreground/60 hover:text-foreground transition-colors mb-4">
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-        </Link>
-        <h1 className="text-3xl font-extrabold mb-2">Create a New Course</h1>
-        <p className="text-foreground/70">Start by giving your course a name and basic details. You can add videos and curriculum later.</p>
+      {/* Hero Header Banner (0px border radius / rounded-none) */}
+      <div className="relative overflow-hidden rounded-none p-6 md:p-8 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white shadow-xl border-b border-white/10 -mx-4 -mt-4 mb-6">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+        <div className="relative z-10 space-y-3">
+          <Link 
+            href="/teacher-dashboard" 
+            className="inline-flex items-center gap-2 text-xs font-bold text-orange-400 hover:text-orange-300 bg-orange-500/20 px-3.5 py-2 rounded-xl transition-all hover:-translate-x-1 border border-orange-500/30 backdrop-blur-sm"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Dashboard</span>
+          </Link>
+          <div className="space-y-1">
+            <h1 className="text-2xl md:text-4xl font-black text-white leading-tight">
+              Create a New Course
+            </h1>
+            <p className="text-sm md:text-base text-gray-300 max-w-2xl leading-relaxed">
+              Start by giving your course a name and basic details. You can add videos and curriculum later.
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="bg-background/40 backdrop-blur-md border border-foreground/10 rounded-3xl p-8 shadow-xl">
+      {/* Form Outer Container with Reduced Padding (p-4 sm:p-6) */}
+      <div className="bg-background/40 backdrop-blur-md border border-foreground/10 rounded-2xl p-4 sm:p-6 shadow-xl">
         {error && (
           <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl text-red-500 text-sm">
             {error}
@@ -172,16 +187,17 @@ export default function CreateCoursePage() {
                 />
               </div>
 
+              {/* Course Type in 1 Row (2 Columns) */}
               <div>
                 <label className="block text-sm font-medium mb-1 text-foreground/80">Course Type <span className="text-red-500">*</span></label>
-                <div className="flex gap-4 flex-col sm:flex-row">
-                  <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${courseType === 'individual' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
-                    <input type="radio" name="courseType" value="individual" checked={courseType === 'individual'} onChange={() => setCourseType('individual')} className="accent-orange-500 w-4 h-4" />
-                    <span className="text-sm font-medium">Individual Teacher</span>
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                  <label className={`flex items-center gap-2 cursor-pointer p-2.5 sm:p-3 rounded-xl border transition-all ${courseType === 'individual' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
+                    <input type="radio" name="courseType" value="individual" checked={courseType === 'individual'} onChange={() => setCourseType('individual')} className="accent-orange-500 w-4 h-4 shrink-0" />
+                    <span className="text-xs sm:text-sm font-bold truncate">Individual Teacher</span>
                   </label>
-                  <label className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-xl flex-1 border transition-all ${courseType === 'coaching' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
-                    <input type="radio" name="courseType" value="coaching" checked={courseType === 'coaching'} onChange={() => setCourseType('coaching')} className="accent-orange-500 w-4 h-4" />
-                    <span className="text-sm font-medium">Coaching Center</span>
+                  <label className={`flex items-center gap-2 cursor-pointer p-2.5 sm:p-3 rounded-xl border transition-all ${courseType === 'coaching' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
+                    <input type="radio" name="courseType" value="coaching" checked={courseType === 'coaching'} onChange={() => setCourseType('coaching')} className="accent-orange-500 w-4 h-4 shrink-0" />
+                    <span className="text-xs sm:text-sm font-bold truncate">Coaching Center</span>
                   </label>
                 </div>
               </div>
@@ -320,7 +336,7 @@ export default function CreateCoursePage() {
 
 
             {category && category !== 'skills' && (
-              <div className="bg-foreground/5 p-5 rounded-2xl border border-foreground/10 space-y-4">
+              <div className="bg-foreground/5 p-4 sm:p-5 rounded-2xl border border-foreground/10 space-y-4">
                 <div className="flex justify-between items-center">
                   <label className="block text-sm font-medium text-foreground/80">Course Subjects & Class Distribution <span className="text-red-500">*</span></label>
                   <button type="button" onClick={handleAddSubject} className="px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-lg hover:bg-primary/20 transition-colors">
@@ -361,92 +377,99 @@ export default function CreateCoursePage() {
               </div>
             )}
 
-            <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
-              <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">Marketing Stats & Features</h3>
+            {/* Marketing Stats & Features Section */}
+            <div className="space-y-4 p-4 sm:p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+              <h3 className="font-bold text-base sm:text-lg border-b border-foreground/10 pb-2 mb-3">Marketing Stats & Features</h3>
               
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Total Live Classes</label>
-                  <input type="number" value={totalLiveClasses} onChange={e => setTotalLiveClasses(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
+                  <label className="block text-xs sm:text-sm font-medium mb-1 truncate">Total Live Classes</label>
+                  <input type="number" value={totalLiveClasses} onChange={e => setTotalLiveClasses(e.target.value)} className="w-full px-3.5 py-2.5 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Total Videos</label>
-                  <input type="number" value={totalVideoLessons} onChange={e => setTotalVideoLessons(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
+                  <label className="block text-xs sm:text-sm font-medium mb-1 truncate">Total Videos</label>
+                  <input type="number" value={totalVideoLessons} onChange={e => setTotalVideoLessons(e.target.value)} className="w-full px-3.5 py-2.5 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Total Exams</label>
-                  <input type="number" value={totalExams} onChange={e => setTotalExams(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
+                  <label className="block text-xs sm:text-sm font-medium mb-1 truncate">Total Exams</label>
+                  <input type="number" value={totalExams} onChange={e => setTotalExams(e.target.value)} className="w-full px-3.5 py-2.5 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Total Notes/PDFs</label>
-                  <input type="number" value={totalPdfs} onChange={e => setTotalPdfs(e.target.value)} className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500" />
+                  <label className="block text-xs sm:text-sm font-medium mb-1 truncate">Total Notes/PDFs</label>
+                  <input type="number" value={totalPdfs} onChange={e => setTotalPdfs(e.target.value)} className="w-full px-3.5 py-2.5 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 text-sm" />
                 </div>
               </div>
               
-              <div className="mt-4 flex items-center gap-3">
+              <div className="mt-3 flex items-center gap-3">
                 <input 
                   type="checkbox" 
                   id="doubtSolving" 
                   checked={hasDoubtSolving} 
                   onChange={e => setHasDoubtSolving(e.target.checked)} 
-                  className="w-5 h-5 accent-orange-500"
+                  className="w-4 h-4 accent-orange-500 shrink-0"
                 />
-                <label htmlFor="doubtSolving" className="text-sm font-medium cursor-pointer">
+                <label htmlFor="doubtSolving" className="text-xs sm:text-sm font-medium cursor-pointer">
                   Includes 24/7 Doubt Solving Support / Group
                 </label>
               </div>
             </div>
 
-            <div className="space-y-4 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
-              <h3 className="font-bold text-lg border-b border-foreground/10 pb-2 mb-4">Pricing, Dates & Contact</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Pricing, Dates & Contact Section */}
+            <div className="space-y-4 p-4 sm:p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+              <h3 className="font-bold text-base sm:text-lg border-b border-foreground/10 pb-2 mb-3">Pricing, Dates & Contact</h3>
+              
+              {/* Regular Price & Discount Price in 1 Row (2 Columns) */}
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Regular Price (BDT) <span className="text-red-500">*</span></label>
+                  <label className="block text-xs sm:text-sm font-medium mb-1 truncate">Regular Price (BDT) <span className="text-red-500">*</span></label>
                   <input 
                     type="number" value={price} onChange={e => setPrice(e.target.value)}
-                    className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                    className="w-full px-3.5 py-2.5 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors text-sm"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Discount Price (Optional)</label>
+                  <label className="block text-xs sm:text-sm font-medium mb-1 truncate">Discount Price (Optional)</label>
                   <input 
                     type="number" value={discountPrice} onChange={e => setDiscountPrice(e.target.value)}
-                    className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Discount Valid Until</label>
-                  <input 
-                    type="date" value={discountValidUntil} onChange={e => setDiscountValidUntil(e.target.value)}
-                    className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                    className="w-full px-3.5 py-2.5 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors text-sm"
                   />
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Class Start Date</label>
+                  <label className="block text-xs sm:text-sm font-medium mb-1">Discount Valid Until</label>
                   <input 
-                    type="date" value={classStartDate} onChange={e => setClassStartDate(e.target.value)}
-                    className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                    type="date" value={discountValidUntil} onChange={e => setDiscountValidUntil(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Course Validity</label>
+                  <label className="block text-xs sm:text-sm font-medium mb-1">Class Start Date</label>
                   <input 
-                    type="text" value={courseValidity} onChange={e => setCourseValidity(e.target.value)} placeholder="e.g. 6 Months, Till Admission Test"
-                    className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
+                    type="date" value={classStartDate} onChange={e => setClassStartDate(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors text-sm"
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Contact Number (For Inquiries)</label>
-                <input 
-                  type="text" value={contactNumber} onChange={e => setContactNumber(e.target.value)}
-                  placeholder="e.g. 16910 or 017XXXXXXX"
-                  className="w-full px-4 py-3 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors"
-                />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium mb-1">Course Validity</label>
+                  <input 
+                    type="text" value={courseValidity} onChange={e => setCourseValidity(e.target.value)} placeholder="e.g. 6 Months, Till Admission"
+                    className="w-full px-3.5 py-2.5 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium mb-1">Contact Number (For Inquiries)</label>
+                  <input 
+                    type="text" value={contactNumber} onChange={e => setContactNumber(e.target.value)}
+                    placeholder="e.g. 017XXXXXXX"
+                    className="w-full px-3.5 py-2.5 bg-background border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors text-sm"
+                  />
+                </div>
               </div>
             </div>
 

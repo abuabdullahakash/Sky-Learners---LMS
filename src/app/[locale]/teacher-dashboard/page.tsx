@@ -136,21 +136,17 @@ export default function TeacherDashboard() {
         </div>
       </div>
 
-      {/* Stats Grid - 2 Columns on Mobile (grid-cols-2) */}
+      {/* Stats Grid - 2 Columns on Mobile (grid-cols-2), Content Centered */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {stats.map((stat, i) => {
           const Icon = stat.icon;
           return (
-            <div key={i} className="bg-foreground/5 p-3.5 sm:p-6 rounded-2xl border border-foreground/10 hover:border-foreground/20 transition-colors">
-              <div className="flex items-start justify-between mb-2 sm:mb-4">
-                <div className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl ${stat.bg} ${stat.color}`}>
-                  <Icon className="w-4 h-4 sm:w-6 sm:h-6" />
-                </div>
+            <div key={i} className="bg-foreground/5 p-3.5 sm:p-6 rounded-2xl border border-foreground/10 hover:border-foreground/20 transition-colors flex flex-col items-center justify-center text-center">
+              <div className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl ${stat.bg} ${stat.color} mb-2 sm:mb-3`}>
+                <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <div>
-                <h3 className="text-foreground/60 text-xs sm:text-sm font-medium mb-0.5 truncate">{stat.title}</h3>
-                <p className="text-xl sm:text-3xl font-extrabold text-foreground">{stat.value}</p>
-              </div>
+              <h3 className="text-foreground/60 text-xs sm:text-sm font-medium mb-0.5 truncate w-full">{stat.title}</h3>
+              <p className="text-xl sm:text-3xl font-extrabold text-foreground">{stat.value}</p>
             </div>
           );
         })}
@@ -159,12 +155,12 @@ export default function TeacherDashboard() {
       {/* Enrollments Activity Widget */}
       <div className="bg-foreground/5 rounded-2xl border border-foreground/10 overflow-hidden">
         
-        <div className="p-3.5 sm:p-4 border-b border-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-3 bg-background/50">
+        <div className="p-3.5 sm:p-4 border-b border-foreground/10 flex items-center justify-between gap-3 bg-background/50">
           {/* Tabs with Orange Active Color */}
-          <div className="flex gap-1.5 p-1 bg-foreground/5 rounded-xl w-full sm:w-auto">
+          <div className="flex gap-1.5 p-1 bg-foreground/5 rounded-xl w-full">
             <button 
               onClick={() => setActiveTab('pending')}
-              className={`flex-1 sm:flex-none px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 ${
+              className={`flex-1 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 ${
                 activeTab === 'pending' 
                   ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' 
                   : 'text-foreground/70 hover:text-foreground hover:bg-foreground/5'
@@ -177,7 +173,7 @@ export default function TeacherDashboard() {
             </button>
             <button 
               onClick={() => setActiveTab('recent')}
-              className={`flex-1 sm:flex-none px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center justify-center ${
+              className={`flex-1 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center justify-center ${
                 activeTab === 'recent' 
                   ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' 
                   : 'text-foreground/70 hover:text-foreground hover:bg-foreground/5'
@@ -186,7 +182,6 @@ export default function TeacherDashboard() {
               <span>Recent Enrollments</span>
             </button>
           </div>
-          <Link href="/teacher-dashboard/students" className="text-xs sm:text-sm text-orange-500 hover:underline font-bold self-end sm:self-center">View All Students →</Link>
         </div>
         
         {/* Compact List Rendering */}
@@ -252,6 +247,18 @@ export default function TeacherDashboard() {
             )
           )}
         </div>
+
+        {/* View All Students Button in Widget Footer */}
+        <div className="p-3 border-t border-foreground/10 text-center bg-background/30">
+          <Link 
+            href="/teacher-dashboard/students" 
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-orange-500 hover:text-orange-600 hover:underline font-extrabold transition-all hover:translate-x-1"
+          >
+            <span>View All Students</span>
+            <span>→</span>
+          </Link>
+        </div>
+
       </div>
 
     </div>

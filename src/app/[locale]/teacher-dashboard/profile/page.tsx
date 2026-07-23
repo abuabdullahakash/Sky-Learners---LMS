@@ -212,10 +212,22 @@ export default function ProfileBuilderPage() {
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-300">
       
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-black mb-1">My Profile Builder</h1>
-        <p className="text-sm text-foreground/60">Customize your public academic profile & institution branding details.</p>
+      {/* Hero Header Banner (0px border radius / rounded-none) */}
+      <div className="relative rounded-none p-6 md:p-8 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white shadow-xl border-b border-white/10 -mx-4 -mt-4 mb-6">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl -mr-16 -mt-16"></div>
+        </div>
+        <div className="relative z-10 space-y-1">
+          <span className="inline-block px-3 py-1 bg-orange-500/20 text-orange-400 text-xs font-bold rounded-full uppercase tracking-wider border border-orange-500/30">
+            Profile Management
+          </span>
+          <h1 className="text-2xl md:text-4xl font-black text-white leading-tight">
+            My Profile Builder
+          </h1>
+          <p className="text-sm md:text-base text-gray-300 max-w-2xl leading-relaxed">
+            Customize your public academic profile & institution branding details.
+          </p>
+        </div>
       </div>
 
       {/* Profile Form */}
@@ -223,7 +235,7 @@ export default function ProfileBuilderPage() {
 
         {/* SECTION 1: Profile Type */}
         <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-4 sm:p-6 shadow-sm">
-          <h2 className="text-base sm:text-lg font-bold mb-4 flex items-center gap-2 text-foreground border-b border-foreground/10 pb-3">
+          <h2 className="text-base sm:text-lg font-bold mb-3 flex items-center gap-2 text-foreground border-b border-foreground/10 pb-3">
             <User className="w-5 h-5 text-orange-500" /> 1. Account Profile Type
           </h2>
           <div className="relative">
@@ -232,8 +244,8 @@ export default function ProfileBuilderPage() {
               onChange={(e) => setProfileData({...profileData, type: e.target.value as 'individual' | 'institution'})}
               className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 appearance-none focus:outline-none focus:border-orange-500 transition-colors cursor-pointer font-semibold text-sm"
             >
-              <option value="individual" className="bg-slate-900 text-white font-medium py-2">Individual Teacher - Single instructor profile</option>
-              <option value="institution" className="bg-slate-900 text-white font-medium py-2">Institution / Academy - Coaching center or school with multiple teachers</option>
+              <option value="individual" className="bg-slate-900 text-white font-medium py-2.5">Individual Teacher - Single instructor profile</option>
+              <option value="institution" className="bg-slate-900 text-white font-medium py-2.5">Institution / Academy - Coaching center or school with multiple teachers</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
               <svg className="w-4 h-4 text-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -248,7 +260,7 @@ export default function ProfileBuilderPage() {
           </h2>
 
           {/* Cover Photo Upload */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
               <label className="text-sm font-bold text-foreground">Cover Banner Photo</label>
               <span className="text-xs text-foreground/60 font-medium">Recommended size: 1200 × 400px</span>
@@ -279,25 +291,29 @@ export default function ProfileBuilderPage() {
             </div>
           </div>
 
-          {/* Profile Photo / Logo Upload */}
-          <div className="space-y-3">
-            <label className="text-sm font-bold text-foreground">
+          {/* Profile Photo / Logo Upload - Image & Upload Button Side-by-Side in 1 Row on Mobile */}
+          <div className="space-y-2 pt-2">
+            <label className="text-sm font-bold text-foreground block">
               {profileData.type === 'individual' ? 'Profile Picture' : 'Institution Logo'}
             </label>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 sm:p-5 bg-foreground/5 rounded-2xl border border-foreground/10">
-              <div className={`w-20 h-20 overflow-hidden bg-foreground/10 border-2 border-orange-500/30 shrink-0 shadow-md ${profileData.type === 'institution' ? 'rounded-2xl' : 'rounded-full'}`}>
+            <div className="flex flex-row items-center gap-3 sm:gap-5 p-3.5 sm:p-5 bg-foreground/5 rounded-2xl border border-foreground/10">
+              <div className={`w-16 h-16 sm:w-20 sm:h-20 overflow-hidden bg-foreground/10 border-2 border-orange-500/30 shrink-0 shadow-md ${profileData.type === 'institution' ? 'rounded-2xl' : 'rounded-full'}`}>
                 <img 
                   src={profileData.profilePhoto} 
                   alt="Profile Logo" 
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="inline-flex items-center gap-2 px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs sm:text-sm rounded-xl cursor-pointer transition-all shadow-md shadow-orange-500/20">
+              <div className="flex-1 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <div>
+                  <p className="text-xs font-bold text-foreground">{profileData.type === 'individual' ? 'Instructor Photo' : 'Brand Logo'}</p>
+                  <p className="text-[11px] text-foreground/60 font-medium">PNG or JPG under 5MB</p>
+                </div>
+                <label className="px-3.5 sm:px-4 py-2 sm:py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs sm:text-sm rounded-xl cursor-pointer transition-all shadow-md shadow-orange-500/20 whitespace-nowrap flex items-center gap-1.5 shrink-0">
                   {uploadingProfilePhoto ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Uploading...</>
+                    <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading...</>
                   ) : (
-                    <><Camera className="w-4 h-4" /> Upload {profileData.type === 'individual' ? 'Photo' : 'Logo'}</>
+                    <><Camera className="w-3.5 h-3.5" /> Upload {profileData.type === 'individual' ? 'Photo' : 'Logo'}</>
                   )}
                   <input 
                     type="file" 
@@ -307,7 +323,6 @@ export default function ProfileBuilderPage() {
                     className="hidden" 
                   />
                 </label>
-                <p className="text-xs text-foreground/60 font-medium">PNG or JPG under 5MB</p>
               </div>
             </div>
           </div>

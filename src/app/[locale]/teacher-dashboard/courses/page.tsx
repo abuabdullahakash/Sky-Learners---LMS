@@ -149,9 +149,9 @@ export default function CoursesListPage() {
                 )}
               </button>
 
-              {/* Dropdown Popover directly under button */}
+              {/* Dropdown Popover directly under Search button */}
               {showSearchModal && (
-                <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 p-3 bg-slate-900 border border-white/20 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute left-0 top-full mt-2 w-[calc(100vw-32px)] max-w-xs sm:w-80 p-3 bg-slate-900 border border-white/20 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="flex items-center justify-between gap-3 mb-2">
                     <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">Search Courses</span>
                     <button onClick={() => setShowSearchModal(false)} className="text-white/60 hover:text-white"><X className="w-4 h-4" /></button>
@@ -192,9 +192,9 @@ export default function CoursesListPage() {
                 )}
               </button>
 
-              {/* Dropdown Popover directly under button */}
+              {/* Dropdown Popover directly under Filter button */}
               {showFilterModal && (
-                <div className="absolute right-0 top-full mt-2 w-56 p-3 bg-slate-900 border border-white/20 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute left-0 top-full mt-2 w-56 max-w-[calc(100vw-32px)] p-3 bg-slate-900 border border-white/20 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="flex items-center justify-between gap-3 mb-2">
                     <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">Filter Status</span>
                     <button onClick={() => setShowFilterModal(false)} className="text-white/60 hover:text-white"><X className="w-4 h-4" /></button>

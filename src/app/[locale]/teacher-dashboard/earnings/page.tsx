@@ -197,7 +197,7 @@ export default function EarningsPage() {
 
             {/* Dropdown Popover directly under button */}
             {showFilterModal && (
-              <div className="absolute right-0 top-full mt-2 w-56 p-3 bg-slate-900 border border-white/20 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="absolute right-0 top-full mt-2 w-56 max-w-[calc(100vw-32px)] p-3 bg-slate-900 border border-white/20 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-white/10">
                   <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">Select Range</span>
                   <button onClick={() => setShowFilterModal(false)} className="text-white/60 hover:text-white"><X className="w-3.5 h-3.5" /></button>

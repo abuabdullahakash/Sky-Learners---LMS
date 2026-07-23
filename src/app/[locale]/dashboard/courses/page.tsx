@@ -7,14 +7,15 @@ import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firesto
 import { Link } from '@/i18n/routing';
 import { BookOpen, Clock, CheckCircle2, PlayCircle, AlertCircle, Loader2 } from 'lucide-react';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 type EnrolledCourse = {
   enrollmentId: string;
   courseId: string;
   status: 'pending' | 'approved';
   enrolledAt: Date;
-  courseDetails: any; 
+  courseDetails: any;
+  progressPercentage?: number;
 };
 
 export default function StudentCoursesPage() {
@@ -22,6 +23,11 @@ export default function StudentCoursesPage() {
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const t = useTranslations('Dashboard.myCourses');
+  const locale = useLocale();
+
+  const formatNumber = (num: number) => {
+    return new Intl.NumberFormat(locale === 'bn' ? 'bn-BD' : 'en-US').format(num);
+  };
 
   useEffect(() => {
     const fetchMyCourses = async () => {
@@ -33,17 +39,67 @@ export default function StudentCoursesPage() {
           where('studentId', '==', user.uid)
         );
         const querySnapshot = await getDocs(q);
+
+        // Fetch completed lessons and completed exams for this student
+        const completedLessonsQuery = query(
+          collection(db, 'completed_lessons'),
+          where('studentId', '==', user.uid)
+        );
+        const completedExamsQuery = query(
+          collection(db, 'completed_exams'),
+          where('studentId', '==', user.uid)
+        );
+
+        const [completedLessonsSnap, completedExamsSnap] = await Promise.all([
+          getDocs(completedLessonsQuery),
+          getDocs(completedExamsQuery),
+        ]);
+
+        const completedLessonsByCourse: Record<string, number> = {};
+        completedLessonsSnap.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (data.courseId) {
+            completedLessonsByCourse[data.courseId] = (completedLessonsByCourse[data.courseId] || 0) + 1;
+          }
+        });
+
+        const completedExamsByCourse: Record<string, number> = {};
+        completedExamsSnap.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (data.courseId) {
+            completedExamsByCourse[data.courseId] = (completedExamsByCourse[data.courseId] || 0) + 1;
+          }
+        });
         
         const enrollmentsPromises = querySnapshot.docs.map(async (enrollmentDoc) => {
           const enrollmentData = enrollmentDoc.data();
           const courseId = enrollmentData.courseId;
           
           let courseDetails = null;
+          let progressPercentage = 0;
+
           if (courseId) {
             const courseRef = doc(db, 'courses', courseId);
             const courseSnap = await getDoc(courseRef);
             if (courseSnap.exists()) {
-              courseDetails = { id: courseSnap.id, ...courseSnap.data() };
+              const cData = courseSnap.data();
+              courseDetails = { id: courseSnap.id, ...cData };
+
+              const actualUploadedLessons = (cData.modules || []).reduce(
+                (sum: number, mod: any) => sum + (mod.lessons?.length || 0),
+                0
+              );
+              const promisedVideos = Number(cData.totalVideoLessons) || actualUploadedLessons;
+              const promisedExams = Number(cData.totalExams) || (cData.exams?.length || 0);
+
+              const totalCourseItems = promisedVideos + promisedExams;
+              const completedCount = completedLessonsByCourse[courseId] || 0;
+              const completedExamsCount = completedExamsByCourse[courseId] || 0;
+              const totalCompletedItems = completedCount + completedExamsCount;
+
+              progressPercentage = totalCourseItems > 0
+                ? Math.min(100, Math.round((totalCompletedItems / totalCourseItems) * 100))
+                : 0;
             }
           }
 
@@ -53,6 +109,7 @@ export default function StudentCoursesPage() {
             status: enrollmentData.status,
             enrolledAt: enrollmentData.createdAt?.toDate() || new Date(),
             courseDetails,
+            progressPercentage,
           } as EnrolledCourse;
         });
 
@@ -118,7 +175,7 @@ export default function StudentCoursesPage() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {pendingCourses.map((item) => (
-                  <CourseCard key={item.enrollmentId} item={item} t={t} />
+                  <CourseCard key={item.enrollmentId} item={item} t={t} formatNumber={formatNumber} />
                 ))}
               </div>
             </div>
@@ -133,7 +190,7 @@ export default function StudentCoursesPage() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {approvedCourses.map((item) => (
-                  <CourseCard key={item.enrollmentId} item={item} t={t} />
+                  <CourseCard key={item.enrollmentId} item={item} t={t} formatNumber={formatNumber} />
                 ))}
               </div>
             </div>
@@ -145,7 +202,7 @@ export default function StudentCoursesPage() {
   );
 }
 
-function CourseCard({ item, t }: { item: EnrolledCourse; t: any }) {
+function CourseCard({ item, t, formatNumber }: { item: EnrolledCourse; t: any; formatNumber: (n: number) => string }) {
   const course = item.courseDetails;
   
   if (!course) {
@@ -174,6 +231,8 @@ function CourseCard({ item, t }: { item: EnrolledCourse; t: any }) {
   const shadowClass = colorSet[2];
   const textColorClass = colorSet[3];
   const bgColorClass = colorSet[4];
+
+  const pct = item.progressPercentage || 0;
 
   return (
     <div className="group relative bg-white dark:bg-slate-900/80 rounded-[2rem] border border-gray-100 dark:border-white/10 overflow-hidden hover:border-transparent transition-all duration-500 flex flex-col h-full shadow-lg hover:shadow-2xl hover:-translate-y-2 z-10">
@@ -214,15 +273,18 @@ function CourseCard({ item, t }: { item: EnrolledCourse; t: any }) {
         </div>
         <h3 className="text-xl font-bold mb-3 line-clamp-2 text-gray-900 dark:text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 dark:group-hover:from-blue-400 dark:group-hover:to-purple-400 transition-colors duration-300">{course.title}</h3>
         
-        {/* Progress (Mocked for active courses) */}
+        {/* Dynamic Progress Bar */}
         {!isPending && (
           <div className="mt-auto pt-4 mb-5">
              <div className="flex justify-between text-xs font-bold mb-2">
                 <span className="text-gray-600 dark:text-gray-300">{t('progress')}</span>
-                <span className={textColorClass}>0%</span>
+                <span className={textColorClass}>{formatNumber(pct)}%</span>
               </div>
               <div className="w-full bg-gray-100 dark:bg-white/5 rounded-full h-2.5 overflow-hidden shadow-inner">
-                <div className={`bg-gradient-to-r ${gradientClass} h-full rounded-full w-[0%] relative`}>
+                <div 
+                  className={`bg-gradient-to-r ${gradientClass} h-full rounded-full relative transition-all duration-500`}
+                  style={{ width: `${pct}%` }}
+                >
                   <div className="absolute top-0 right-0 bottom-0 w-4 bg-white/30 blur-[2px]"></div>
                 </div>
               </div>

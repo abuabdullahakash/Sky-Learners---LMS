@@ -264,12 +264,12 @@ export default function StudentsPage() {
               <select 
                 value={filterCourseId}
                 onChange={(e) => setFilterCourseId(e.target.value)}
-                className="w-full bg-background border border-foreground/20 rounded-xl py-2 pl-8 pr-2 text-xs sm:text-sm appearance-none focus:outline-none focus:border-orange-500 transition-colors cursor-pointer truncate"
+                className="w-full bg-background border border-foreground/20 rounded-xl py-2 pl-8 pr-2 text-xs sm:text-sm appearance-none focus:outline-none focus:border-orange-500 transition-colors cursor-pointer truncate font-semibold"
               >
-                <option value="All">All Courses</option>
+                <option value="All" className="bg-slate-900 text-white font-bold py-2">All Courses</option>
                 {courses.map(course => (
-                  <option key={course.id} value={course.id}>
-                    {course.title.length > 20 ? course.title.substring(0, 20) + '...' : course.title}
+                  <option key={course.id} value={course.id} className="bg-slate-900 text-white font-medium py-2">
+                    {course.title.length > 25 ? course.title.substring(0, 25) + '...' : course.title}
                   </option>
                 ))}
               </select>

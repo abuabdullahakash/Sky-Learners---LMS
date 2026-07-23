@@ -21,6 +21,7 @@ type Course = {
   courseValidity?: string;
   discountPrice?: number;
   discountValidUntil?: any;
+  enrolledStudents?: number;
 };
 
 export default function CoursesListPage() {
@@ -28,19 +29,44 @@ export default function CoursesListPage() {
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
 
   useEffect(() => {
     const fetchCourses = async () => {
       if (!user) return;
       try {
-        const q = query(
+        const coursesQuery = query(
           collection(db, 'courses'),
           where('teacherId', '==', user.uid)
         );
-        const querySnapshot = await getDocs(q);
+        const enrollmentsQuery = query(
+          collection(db, 'enrollments'),
+          where('teacherId', '==', user.uid),
+          where('status', '==', 'approved')
+        );
+
+        const [coursesSnap, enrollmentsSnap] = await Promise.all([
+          getDocs(coursesQuery),
+          getDocs(enrollmentsQuery),
+        ]);
+
+        const enrollmentCounts: Record<string, number> = {};
+        enrollmentsSnap.forEach((doc) => {
+          const data = doc.data();
+          if (data.courseId) {
+            enrollmentCounts[data.courseId] = (enrollmentCounts[data.courseId] || 0) + 1;
+          }
+        });
+
         const fetchedCourses: Course[] = [];
-        querySnapshot.forEach((doc) => {
-          fetchedCourses.push({ id: doc.id, ...doc.data() } as Course);
+        coursesSnap.forEach((doc) => {
+          const data = doc.data();
+          fetchedCourses.push({
+            id: doc.id,
+            ...data,
+            enrolledStudents: enrollmentCounts[doc.id] || data.enrolledStudents || 0,
+          } as Course);
         });
         
         // Sort in memory to avoid needing a composite index in Firestore immediately
@@ -60,6 +86,21 @@ export default function CoursesListPage() {
 
     fetchCourses();
   }, [user]);
+
+  const filteredCourses = courses.filter((course) => {
+    const q = searchQuery.trim().toLowerCase();
+    const matchesSearch =
+      !q ||
+      (course.title && course.title.toLowerCase().includes(q)) ||
+      (course.category && course.category.toLowerCase().includes(q));
+
+    const matchesStatus =
+      statusFilter === 'all' ||
+      (statusFilter === 'published' && course.isPublished) ||
+      (statusFilter === 'draft' && !course.isPublished);
+
+    return matchesSearch && matchesStatus;
+  });
 
   if (isLoading) {
     return <div className="flex justify-center items-center h-64">Loading courses...</div>;
@@ -90,11 +131,17 @@ export default function CoursesListPage() {
           <input 
             type="text" 
             placeholder="Search courses..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-12 pr-4 py-2.5 bg-background border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 transition-colors"
           />
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
-          <select className="w-full sm:w-auto px-4 py-2.5 bg-background border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 appearance-none">
+          <select 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as 'all' | 'published' | 'draft')}
+            className="w-full sm:w-auto px-4 py-2.5 bg-background border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 appearance-none cursor-pointer"
+          >
             <option value="all">All Status</option>
             <option value="published">Published</option>
             <option value="draft">Drafts</option>
@@ -117,9 +164,26 @@ export default function CoursesListPage() {
             Create Your First Course
           </Link>
         </div>
+      ) : filteredCourses.length === 0 ? (
+        <div className="bg-foreground/5 rounded-3xl border border-foreground/10 p-12 text-center flex flex-col items-center">
+          <div className="w-16 h-16 bg-orange-500/10 text-orange-500 rounded-full flex items-center justify-center mb-4">
+            <Search className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-bold mb-2">No Courses Found</h2>
+          <p className="text-foreground/60 max-w-md mb-6">No courses matched your search or status filter criteria.</p>
+          <button
+            onClick={() => {
+              setSearchQuery('');
+              setStatusFilter('all');
+            }}
+            className="px-6 py-2.5 bg-foreground/10 hover:bg-orange-500 hover:text-white font-semibold rounded-xl transition-all"
+          >
+            Reset Filters
+          </button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map((course) => (
+          {filteredCourses.map((course) => (
             <div 
               key={course.id} 
               onClick={() => router.push(`/teacher-dashboard/courses/${course.id}`)}
@@ -140,11 +204,11 @@ export default function CoursesListPage() {
               </div>
 
               <div className="p-6">
-                <div className="text-sm font-medium text-orange-500 mb-2">{course.category.toUpperCase()}</div>
+                <div className="text-sm font-medium text-orange-500 mb-2">{(course.category || '').toUpperCase()}</div>
                 <h3 className="text-xl font-bold mb-2 line-clamp-2" title={course.title}>{course.title}</h3>
                 
                 <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3 mb-6 text-xs text-foreground/60 font-medium">
-                  <div className="flex items-center gap-1.5" title="Enrolled Students"><Users className="w-4 h-4" /> 0</div>
+                  <div className="flex items-center gap-1.5" title="Enrolled Students"><Users className="w-4 h-4" /> {course.enrolledStudents || 0}</div>
                   <div className="flex items-center gap-1.5" title="Total Videos"><Video className="w-4 h-4" /> {course.totalVideoLessons || 0}</div>
                   <div className="flex items-center gap-1.5" title="Total Exams"><CheckSquare className="w-4 h-4" /> {course.totalExams || 0}</div>
                   <div className="flex items-center gap-1.5" title="Validity"><Calendar className="w-4 h-4" /> {course.courseValidity || 'N/A'}</div>

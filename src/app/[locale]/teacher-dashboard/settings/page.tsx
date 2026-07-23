@@ -3,22 +3,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { 
   ShieldCheck, CreditCard, Bell, Save, AlertCircle, CheckCircle2, ChevronRight, ChevronLeft, Loader2,
-  Sparkles, Eye, EyeOff, Lock, Key, Laptop, Smartphone, Tablet, Globe, LogOut, X, MapPin, Clock
+  Sparkles, Eye, EyeOff, Lock
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { db, auth } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
-
-interface SessionItem {
-  id: string;
-  deviceName: string;
-  location: string;
-  ip: string;
-  lastActive: string;
-  isCurrent: boolean;
-  type: 'desktop' | 'mobile' | 'tablet';
-}
 
 export default function TeacherSettingsPage() {
   const { user } = useAuth();
@@ -29,7 +19,7 @@ export default function TeacherSettingsPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Form States
+  // Payment Form States
   const [paymentData, setPaymentData] = useState({
     bkash: '',
     nagad: '',
@@ -55,13 +45,6 @@ export default function TeacherSettingsPage() {
     show: false,
     type: 'success',
     title: '',
-    message: ''
-  });
-
-  // Active Sessions States
-  const [sessions, setSessions] = useState<SessionItem[]>([]);
-  const [sessionStatusModal, setSessionStatusModal] = useState({
-    show: false,
     message: ''
   });
 
@@ -97,56 +80,6 @@ export default function TeacherSettingsPage() {
     };
     fetchSettings();
   }, [user]);
-
-  // Detect current device for active sessions
-  useEffect(() => {
-    const ua = typeof window !== 'undefined' ? navigator.userAgent : '';
-    let os = 'Windows PC';
-    let deviceType: 'desktop' | 'mobile' | 'tablet' = 'desktop';
-
-    if (ua.includes('Win')) os = 'Windows PC';
-    else if (ua.includes('Mac')) os = 'MacBook Pro';
-    else if (ua.includes('iPhone')) { os = 'iPhone'; deviceType = 'mobile'; }
-    else if (ua.includes('iPad')) { os = 'iPad'; deviceType = 'tablet'; }
-    else if (ua.includes('Android')) { os = 'Android Phone'; deviceType = 'mobile'; }
-
-    let browser = 'Chrome';
-    if (ua.includes('Firefox')) browser = 'Firefox';
-    else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari';
-    else if (ua.includes('Edg')) browser = 'Edge';
-
-    const currentDeviceName = `${os} - ${browser}`;
-
-    setSessions([
-      {
-        id: 'session-current',
-        deviceName: currentDeviceName,
-        location: 'Dhaka, Bangladesh',
-        ip: '192.168.1.1',
-        lastActive: 'Active Now',
-        isCurrent: true,
-        type: deviceType
-      },
-      {
-        id: 'session-2',
-        deviceName: 'Windows PC - Firefox',
-        location: 'Chittagong, Bangladesh',
-        ip: '103.24.12.4',
-        lastActive: '2 days ago',
-        isCurrent: false,
-        type: 'desktop'
-      },
-      {
-        id: 'session-3',
-        deviceName: 'iPhone 14 - Safari',
-        location: 'Sylhet, Bangladesh',
-        ip: '182.16.44.8',
-        lastActive: '5 days ago',
-        isCurrent: false,
-        type: 'mobile'
-      }
-    ]);
-  }, []);
 
   // Save General Settings
   const handleSave = async (e: React.FormEvent) => {
@@ -245,15 +178,6 @@ export default function TeacherSettingsPage() {
     }
   };
 
-  // Terminate Active Session Handler
-  const handleLogoutSession = (sessionId: string) => {
-    setSessions(prev => prev.filter(s => s.id !== sessionId));
-    setSessionStatusModal({
-      show: true,
-      message: 'The selected device session has been logged out successfully.'
-    });
-  };
-
   const scrollTabs = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const scrollAmount = 200;
@@ -303,7 +227,7 @@ export default function TeacherSettingsPage() {
           </h1>
 
           <p className="text-sm md:text-base text-gray-300 max-w-2xl leading-relaxed font-medium pt-1">
-            Manage your manual payment receiving numbers, change account passwords, monitor active login sessions, and configure notifications.
+            Manage your manual payment receiving numbers, update account passwords, and configure notification preferences.
           </p>
         </div>
       </div>
@@ -433,11 +357,11 @@ export default function TeacherSettingsPage() {
                 <div className="border-b border-foreground/10 pb-3.5">
                   <h2 className="text-xl font-extrabold">Security & Password</h2>
                   <p className="text-xs sm:text-sm text-foreground/60 mt-1">
-                    Keep your account secure by updating passwords and monitoring login devices.
+                    Keep your account secure by updating passwords regularly.
                   </p>
                 </div>
                 
-                {/* Change Password Section */}
+                {/* Change Password Section (100% Real Firebase Password Update) */}
                 <div className="bg-background rounded-2xl p-4 sm:p-6 border border-foreground/10 shadow-sm space-y-5">
                   <div className="border-b border-foreground/10 pb-3">
                     <h3 className="font-extrabold text-base sm:text-lg flex items-center gap-2 text-foreground">
@@ -530,114 +454,6 @@ export default function TeacherSettingsPage() {
                         )}
                       </button>
                     </div>
-                  </div>
-                </div>
-
-                {/* Two-Factor Authentication (UI Only) */}
-                <div className="bg-background rounded-2xl p-4 sm:p-6 border border-foreground/10 shadow-sm">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div>
-                      <h3 className="font-bold text-base sm:text-lg mb-1 flex items-center gap-2">
-                        Two-Factor Authentication (2FA)
-                        <span className="bg-orange-500/10 text-orange-500 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Recommended</span>
-                      </h3>
-                      <p className="text-xs sm:text-sm text-foreground/60 max-w-xl leading-relaxed">
-                        Add an extra layer of security to your account. We will ask for a verification code when you sign in from a new device.
-                      </p>
-                    </div>
-                    <button type="button" className="w-full sm:w-auto shrink-0 px-6 py-2.5 bg-foreground/5 hover:bg-foreground/10 rounded-xl font-bold text-xs sm:text-sm transition-colors border border-foreground/10">
-                      Enable 2FA
-                    </button>
-                  </div>
-                </div>
-
-                {/* Active Login Sessions */}
-                <div className="bg-background rounded-2xl p-4 sm:p-6 border border-foreground/10 shadow-sm space-y-4 w-full max-w-full overflow-hidden">
-                  <div className="border-b border-foreground/10 pb-3">
-                    <h3 className="font-extrabold text-base sm:text-lg flex items-center gap-2 text-foreground">
-                      <Laptop className="w-5 h-5 text-orange-500 shrink-0" />
-                      Active Login Sessions
-                    </h3>
-                    <p className="text-xs sm:text-sm text-foreground/60 mt-1 leading-relaxed">
-                      Devices currently logged into your account. Terminate any unfamiliar sessions immediately.
-                    </p>
-                  </div>
-
-                  <div className="space-y-3.5 pt-1 w-full max-w-full overflow-hidden">
-                    {sessions.map((session) => (
-                      <div 
-                        key={session.id} 
-                        className={`p-3.5 sm:p-4.5 rounded-2xl border transition-all space-y-3 w-full max-w-full overflow-hidden ${
-                          session.isCurrent 
-                            ? 'bg-emerald-500/5 border-emerald-500/30 shadow-xs' 
-                            : 'bg-background dark:bg-foreground/5 border-foreground/10 hover:border-foreground/20'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-3 w-full max-w-full overflow-hidden">
-                          <div className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
-                            <div className={`p-2.5 rounded-xl shrink-0 ${
-                              session.isCurrent ? 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/30' : 'bg-foreground/10 text-foreground/60'
-                            }`}>
-                              {session.type === 'mobile' ? <Smartphone className="w-5 h-5" /> : session.type === 'tablet' ? <Tablet className="w-5 h-5" /> : <Laptop className="w-5 h-5" />}
-                            </div>
-                            
-                            <div className="min-w-0 flex-1 overflow-hidden">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <h4 className="font-extrabold text-xs sm:text-sm text-foreground leading-snug break-words">
-                                  {session.deviceName}
-                                </h4>
-                                {session.isCurrent && (
-                                  <span className="px-2 py-0.5 bg-emerald-500 text-white text-[10px] font-bold rounded-md uppercase tracking-wider shadow-xs shrink-0">
-                                    Active Now
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          {!session.isCurrent && (
-                            <button 
-                              type="button" 
-                              onClick={() => handleLogoutSession(session.id)}
-                              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white font-bold text-xs rounded-xl transition-all border border-red-500/20 shrink-0 cursor-pointer"
-                            >
-                              <LogOut className="w-3.5 h-3.5" /> Log Out
-                            </button>
-                          )}
-                        </div>
-
-                        {/* Location, IP, and Last Active Metadata - Vertical stack on mobile with MapPin, Globe, Clock icons */}
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4 text-xs text-foreground/70 font-medium pt-2.5 border-t border-foreground/10 w-full overflow-hidden">
-                          <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
-                            <MapPin className="w-3.5 h-3.5 text-orange-500 shrink-0" />
-                            <span className="break-words">{session.location}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
-                            <Globe className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                            <span className="break-all">IP: {session.ip}</span>
-                          </div>
-                          {!session.isCurrent && (
-                            <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
-                              <Clock className="w-3.5 h-3.5 text-foreground/50 shrink-0" />
-                              <span className="break-words font-semibold text-foreground/90">Last active: {session.lastActive}</span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Mobile Log Out Button */}
-                        {!session.isCurrent && (
-                          <div className="sm:hidden pt-2 border-t border-foreground/10 flex justify-end">
-                            <button 
-                              type="button" 
-                              onClick={() => handleLogoutSession(session.id)}
-                              className="w-full py-2.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 border border-red-500/20 cursor-pointer"
-                            >
-                              <LogOut className="w-3.5 h-3.5" /> Log Out Device
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ))}
                   </div>
                 </div>
 
@@ -752,33 +568,6 @@ export default function TeacherSettingsPage() {
               }`}
             >
               OK, Got it
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Active Session Logout Confirmation Modal */}
-      {sessionStatusModal.show && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-xs" onClick={() => setSessionStatusModal({ show: false, message: '' })} />
-          <div className="relative w-full max-w-sm bg-background border border-foreground/15 rounded-2xl shadow-2xl p-6 text-center space-y-4 z-10 animate-in zoom-in-95">
-            <div className="w-14 h-14 bg-orange-500/10 text-orange-500 rounded-full flex items-center justify-center mx-auto border border-orange-500/30 shadow-md">
-              <LogOut className="w-7 h-7" />
-            </div>
-
-            <div className="space-y-1">
-              <h3 className="font-extrabold text-lg text-foreground">Session Logged Out</h3>
-              <p className="text-xs sm:text-sm text-foreground/75 leading-relaxed font-medium">
-                {sessionStatusModal.message}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setSessionStatusModal({ show: false, message: '' })}
-              className="w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md shadow-orange-500/20 cursor-pointer"
-            >
-              Close
             </button>
           </div>
         </div>

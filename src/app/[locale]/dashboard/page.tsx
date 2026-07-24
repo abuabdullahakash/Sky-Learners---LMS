@@ -355,49 +355,55 @@ export default function DashboardOverview() {
     <div ref={containerRef} className="w-full space-y-10">
       
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 p-8 md:p-12">
-        <div className="absolute top-0 right-0 p-8 opacity-20 pointer-events-none">
-          <Sparkles className="w-32 h-32 text-primary animate-pulse" />
+      <div className="relative overflow-hidden rounded-[2rem] sm:rounded-3xl bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-purple-500/10 dark:from-orange-500/20 dark:via-purple-500/15 dark:to-blue-500/20 border border-orange-500/20 dark:border-white/10 p-6 sm:p-8 md:p-12 shadow-lg backdrop-blur-xl">
+        <div className="absolute top-0 right-0 p-4 sm:p-8 opacity-15 pointer-events-none">
+          <Sparkles className="w-24 h-24 sm:w-36 sm:h-36 text-orange-500 animate-pulse" />
         </div>
-        <div className="absolute -bottom-20 -right-20 w-96 h-96 opacity-30 pointer-events-none rounded-full" style={{ background: 'radial-gradient(circle, var(--color-primary) 0%, transparent 70%)' }}></div>
-        <div className="absolute top-[-50px] left-[-50px] w-64 h-64 opacity-20 pointer-events-none rounded-full" style={{ background: 'radial-gradient(circle, var(--color-accent) 0%, transparent 70%)' }}></div>
+        <div className="absolute -bottom-20 -right-20 w-80 sm:w-96 h-80 sm:h-96 opacity-30 pointer-events-none rounded-full" style={{ background: 'radial-gradient(circle, var(--color-primary) 0%, transparent 70%)' }}></div>
+        <div className="absolute top-[-50px] left-[-50px] w-56 sm:w-64 h-56 sm:h-64 opacity-20 pointer-events-none rounded-full" style={{ background: 'radial-gradient(circle, #f97316 0%, transparent 70%)' }}></div>
 
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 sm:gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-orange-500/15 to-amber-500/15 border border-orange-500/30 text-orange-600 dark:text-orange-400 text-xs sm:text-sm font-extrabold shadow-sm backdrop-blur-md mb-3 sm:mb-4">
               <Flame className="w-4 h-4 text-orange-500 animate-pulse" />
               <span>{new Intl.NumberFormat(locale === 'bn' ? 'bn-BD' : 'en-US').format(streakDays)} {locale === 'bn' ? 'দিনের স্ট্রীক!' : 'Day Streak!'}</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-3 tracking-tight text-gray-900 dark:text-white">
-              {t('welcome')}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">{user?.displayName?.split(' ')[0] || 'Student'}</span>! 👋
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-black mb-2 sm:mb-3 tracking-tight text-gray-900 dark:text-white leading-tight">
+              {t('welcome')}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-amber-500 to-purple-500">{user?.displayName?.split(' ')[0] || 'Student'}</span>! 👋
             </h1>
-            <p className="text-foreground/80 dark:text-foreground/70 text-lg max-w-xl leading-relaxed">
+            <p className="text-foreground/80 dark:text-foreground/70 text-xs sm:text-base max-w-xl leading-relaxed">
               {t('subtitle')} {t('newModules')}
             </p>
           </div>
           
-          <button className="px-6 py-3 bg-primary text-primary-foreground font-bold rounded-xl shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 group">
+          <button className="px-5 py-2.5 sm:px-6 sm:py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold rounded-2xl shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 text-xs sm:text-sm group w-full sm:w-auto">
             {t('resumeLearning')}
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Stats Grid - 2 Columns on Mobile */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
+          const isLastItemOnMobile = index === 2;
           return (
-            <div key={index} className="group relative bg-white dark:bg-foreground/5 rounded-3xl p-6 border border-gray-200 dark:border-foreground/10 hover:border-primary/30 dark:hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-xl dark:shadow-none dark:hover:bg-foreground/10 overflow-hidden cursor-default">
-              <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${stat.color} opacity-10 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-500`}></div>
+            <div 
+              key={index} 
+              className={`group relative bg-white dark:bg-foreground/5 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border border-gray-200/80 dark:border-foreground/10 hover:border-primary/30 dark:hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-xl dark:shadow-none dark:hover:bg-foreground/10 overflow-hidden cursor-default ${
+                isLastItemOnMobile ? 'col-span-2 md:col-span-1 sm:col-span-1' : 'col-span-1'
+              }`}
+            >
+              <div className={`absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-gradient-to-br ${stat.color} opacity-10 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-500`}></div>
               
-              <div className="flex items-center gap-5 relative z-10">
-                <div className={`bg-gradient-to-br ${stat.color} p-4 rounded-2xl text-white shadow-lg ${stat.shadow} transform group-hover:rotate-6 transition-transform duration-300`}>
-                  <Icon className="w-7 h-7" />
+              <div className="flex items-center gap-3 sm:gap-5 relative z-10">
+                <div className={`bg-gradient-to-br ${stat.color} p-2.5 sm:p-4 rounded-xl sm:rounded-2xl text-white shadow-md ${stat.shadow} transform group-hover:rotate-6 transition-transform duration-300 flex-shrink-0`}>
+                  <Icon className="w-5 h-5 sm:w-7 sm:h-7" />
                 </div>
-                <div>
-                  <p className="text-foreground/60 font-medium text-sm uppercase tracking-wider mb-1">{stat.title}</p>
-                  <h3 className="text-4xl font-black tracking-tight">{stat.value}</h3>
+                <div className="min-w-0 flex-1">
+                  <p className="text-foreground/60 font-semibold text-[10px] sm:text-xs uppercase tracking-wider mb-0.5 sm:mb-1 truncate">{stat.title}</p>
+                  <h3 className="text-xl sm:text-4xl font-black tracking-tight text-gray-900 dark:text-white">{stat.value}</h3>
                 </div>
               </div>
             </div>
@@ -419,48 +425,55 @@ export default function DashboardOverview() {
           
           {lastAccessed ? (
             <Link href={`/dashboard/courses/${lastAccessed.courseId}/recorded-classes/${lastAccessed.lessonId}`} className="block">
-              <div className="bg-white dark:bg-foreground/5 rounded-3xl p-3 border border-gray-200 dark:border-foreground/10 flex flex-col sm:flex-row items-stretch gap-4 group hover:border-primary/40 transition-all duration-300 shadow-md hover:shadow-2xl dark:shadow-none dark:hover:shadow-primary/5 cursor-pointer relative overflow-hidden">
+              <div className="bg-white dark:bg-white/[0.04] rounded-2xl sm:rounded-3xl p-3 sm:p-4 border border-gray-200/80 dark:border-white/10 flex flex-row items-center gap-3 sm:gap-5 group hover:border-primary/40 transition-all duration-300 shadow-sm hover:shadow-xl dark:shadow-none cursor-pointer relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
-                <div className="w-full sm:w-56 h-48 sm:h-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl relative overflow-hidden flex-shrink-0 group-hover:scale-[1.02] transition-transform duration-500 shadow-inner">
+                {/* Compact Thumbnail Image List view on Mobile */}
+                <div className="w-28 sm:w-52 h-24 sm:h-36 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl sm:rounded-2xl relative overflow-hidden flex-shrink-0 group-hover:scale-[1.02] transition-transform duration-500 shadow-md">
                   {lastAccessed.thumbnailUrl ? (
                     <img src={lastAccessed.thumbnailUrl} alt={lastAccessed.courseTitle} className="w-full h-full object-cover" />
                   ) : (
                     <>
                       <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent"></div>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white">
-                        <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-xl">
-                          <PlayCircle className="w-8 h-8 text-white fill-white/20" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center text-white">
+                        <div className="w-9 h-9 sm:w-14 sm:h-14 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform duration-300 shadow-xl">
+                          <PlayCircle className="w-5 h-5 sm:w-8 sm:h-8 text-white fill-white/20" />
                         </div>
-                        <span className="font-bold tracking-widest text-white/90 line-clamp-2">{lastAccessed.courseTitle}</span>
+                        <span className="font-bold text-[10px] sm:text-xs tracking-wider text-white/90 line-clamp-1">{lastAccessed.courseTitle}</span>
                       </div>
                     </>
                   )}
                   {lastAccessed.thumbnailUrl && (
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <PlayCircle className="w-12 h-12 text-white drop-shadow-lg" />
+                      <PlayCircle className="w-8 h-8 sm:w-12 sm:h-12 text-white drop-shadow-lg" />
                     </div>
                   )}
                 </div>
                 
-                <div className="flex-1 p-4 sm:p-5 flex flex-col justify-center">
+                {/* Text Content List view */}
+                <div className="flex-1 min-w-0 py-0.5 sm:py-1 flex flex-col justify-between h-full">
                   <div>
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="text-xs font-bold text-gray-800 dark:text-gray-100 bg-gray-200/50 dark:bg-white/10 px-3 py-1 rounded-full uppercase tracking-wider border border-gray-300 dark:border-white/20 shadow-sm">{getCategoryTranslation(lastAccessed.category)}</span>
-                      <span className="flex items-center gap-1 text-foreground/70 dark:text-foreground/60 text-sm font-semibold bg-gray-100 dark:bg-foreground/5 px-2 py-1 rounded-lg">
-                        <Clock className="w-4 h-4 text-primary" />
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="text-[10px] sm:text-xs font-extrabold text-primary bg-primary/10 px-2 sm:px-3 py-0.5 rounded-md uppercase tracking-wider border border-primary/20 truncate">
+                        {getCategoryTranslation(lastAccessed.category)}
+                      </span>
+                      <span className="flex items-center gap-1 text-foreground/70 dark:text-foreground/60 text-[10px] sm:text-xs font-semibold bg-gray-100 dark:bg-white/5 px-2 py-0.5 rounded-md flex-shrink-0">
+                        <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                         {formatTimeAgo(lastAccessed.timestamp)}
                       </span>
                     </div>
-                    <h3 className="text-2xl font-bold mt-3 group-hover:text-primary transition-colors text-gray-900 dark:text-white line-clamp-2">{lastAccessed.lessonTitle}</h3>
-                    <p className="text-foreground/70 dark:text-foreground/60 mt-2 line-clamp-2 leading-relaxed">
+
+                    <h3 className="text-sm sm:text-xl font-bold group-hover:text-primary transition-colors text-gray-900 dark:text-white line-clamp-1 sm:line-clamp-2 leading-tight">
+                      {lastAccessed.lessonTitle}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-foreground/60 mt-0.5 sm:mt-1 truncate font-medium">
                       {lastAccessed.courseTitle}
                     </p>
                   </div>
                   
-                  <div className="mt-6 flex items-center justify-between">
-                    <span className="text-sm font-bold text-primary flex items-center gap-1">
-                      {t('resumeAction')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <div className="mt-2 sm:mt-3 flex items-center justify-between">
+                    <span className="text-xs sm:text-sm font-bold text-primary flex items-center gap-1">
+                      {t('resumeAction')} <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
                     </span>
                   </div>
                 </div>

@@ -227,13 +227,13 @@ export default function Navbar() {
 
       {/* Mobile Off-Canvas Drawer Menu */}
       <div 
-        className={`fixed inset-0 z-40 md:hidden transition-all duration-300 ${
+        className={`fixed inset-0 z-[100] md:hidden transition-all duration-300 ${
           isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
         {/* Backdrop Overlay */}
         <div 
-          className={`absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300 ${
+          className={`absolute inset-0 bg-black/75 backdrop-blur-md transition-opacity duration-300 ${
             isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
           }`}
           onClick={() => {
@@ -244,44 +244,62 @@ export default function Navbar() {
 
         {/* Drawer Content Panel */}
         <div 
-          className={`absolute top-20 right-0 bottom-0 w-[85%] max-w-[340px] bg-background/95 dark:bg-slate-900/95 backdrop-blur-xl border-l border-foreground/10 shadow-2xl flex flex-col justify-between p-5 transition-transform duration-300 ease-out overflow-y-auto ${
+          className={`fixed top-0 right-0 bottom-0 w-[85%] max-w-[340px] z-[101] bg-background/98 dark:bg-slate-950/98 backdrop-blur-2xl border-l border-foreground/15 shadow-[-12px_0_40px_rgba(0,0,0,0.4)] flex flex-col justify-between transition-transform duration-300 ease-out overflow-hidden ${
             isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
-          {/* Top Main Navigation Body */}
-          <div className="space-y-5 flex-1 overflow-y-auto pr-1">
+          {/* Drawer Top Header Bar */}
+          <div className="flex items-center justify-between p-4 border-b border-foreground/10 bg-foreground/[0.03]">
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <LanguageToggle />
+            </div>
+            <button
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                setShowProfileMenu(false);
+              }}
+              className="p-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-foreground transition-all"
+              aria-label="Close menu"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Main Navigation Scroll Area */}
+          <div className="space-y-5 flex-1 overflow-y-auto p-4 custom-scrollbar">
 
             {/* CASE 1: Inside Specific Course Dashboard */}
             {isCourseDashboard ? (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {/* Back Button */}
                 <Link
                   href={isTeacherCourseDashboard ? "/teacher-dashboard/courses" : "/dashboard/courses"}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="inline-flex items-center gap-2 text-xs font-bold text-orange-500 hover:text-orange-600 bg-orange-500/10 px-3 py-2 rounded-xl transition-colors"
+                  className="inline-flex items-center gap-2 text-xs font-bold text-orange-500 hover:text-orange-600 bg-orange-500/10 border border-orange-500/20 px-3.5 py-2 rounded-xl transition-all shadow-sm"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>{isTeacherCourseDashboard ? 'Back to All Courses' : 'Back to My Courses'}</span>
                 </Link>
 
-                {/* Course Header */}
-                <div className="p-3 rounded-2xl bg-foreground/5 border border-foreground/10">
+                {/* Course Header Card */}
+                <div className="p-3.5 rounded-2xl bg-foreground/[0.03] border border-foreground/10 shadow-sm space-y-2">
                   {currentCourseData?.thumbnailUrl && (
-                    <div className="w-full h-24 relative rounded-xl overflow-hidden mb-2.5 border border-foreground/10">
+                    <div className="w-full h-24 relative rounded-xl overflow-hidden border border-foreground/10">
                       <Image src={currentCourseData.thumbnailUrl} alt={currentCourseData.title || 'Course'} fill className="object-cover" />
                     </div>
                   )}
                   <h4 className="font-bold text-sm text-foreground line-clamp-2" title={currentCourseData?.title || currentCourseTitle}>
                     {currentCourseData?.title || currentCourseTitle || 'Course Management'}
                   </h4>
-                  <span className="inline-block mt-1.5 text-[10px] px-2 py-0.5 rounded-full font-extrabold bg-primary/10 text-primary uppercase tracking-wider">
+                  <span className="inline-block text-[10px] px-2.5 py-0.5 rounded-full font-extrabold bg-primary/10 text-primary border border-primary/20 uppercase tracking-wider">
                     {currentCourseData?.category || (isTeacherCourseDashboard ? 'Teacher View' : 'Student Learning')}
                   </span>
                 </div>
 
                 {/* Course Navigation Items */}
-                <div className="space-y-1 pt-2">
-                  <div className="text-[10px] font-extrabold uppercase tracking-wider text-foreground/40 px-3 mb-1">
+                <div className="space-y-1 pt-1">
+                  <div className="text-[10px] font-extrabold uppercase tracking-wider text-foreground/40 px-3 mb-2">
                     Course Menu
                   </div>
                   {(isTeacherCourseDashboard ? teacherCourseLinks : studentCourseLinks).map((item) => {
@@ -292,10 +310,10 @@ export default function Navbar() {
                         key={item.href}
                         href={item.href}
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-colors ${
+                        className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all border ${
                           isActive 
-                            ? 'bg-orange-500 text-white font-bold shadow-md' 
-                            : 'hover:bg-foreground/5 text-foreground/80'
+                            ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold shadow-md shadow-orange-500/20 border-orange-400/30' 
+                            : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
                         }`}
                       >
                         <Icon className="w-4 h-4" />
@@ -307,44 +325,47 @@ export default function Navbar() {
               </div>
             ) : isDashboard ? (
               /* CASE 2: Inside Main Dashboard (Student or Teacher) */
-              <div className="space-y-2">
-                <div className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/40 px-3 mb-2 flex items-center gap-1.5">
+              <div className="space-y-3">
+                <div className="text-[11px] font-extrabold uppercase tracking-wider text-orange-500/90 px-3 py-1 bg-orange-500/10 rounded-full w-fit border border-orange-500/20 flex items-center gap-1.5 shadow-sm">
                   <Sparkles className="w-3.5 h-3.5 text-orange-500" />
-                  {isTeacherDashboard ? 'Teacher Dashboard' : 'Student Dashboard'}
+                  <span>{isTeacherDashboard ? 'Teacher Dashboard' : 'Student Dashboard'}</span>
                 </div>
-                {(isTeacherDashboard ? teacherDashboardLinks : studentDashboardLinks).map((item) => {
-                  const isActive = pathname === item.href;
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-colors ${
-                        isActive
-                          ? isTeacherDashboard 
-                            ? 'bg-orange-500 text-white font-bold shadow-md' 
-                            : 'bg-primary text-white font-bold shadow-md'
-                          : 'hover:bg-foreground/5 text-foreground/80'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4" />
-                      <span className="flex-1">{item.name}</span>
-                    </Link>
-                  );
-                })}
+                
+                <div className="space-y-1.5 pt-1">
+                  {(isTeacherDashboard ? teacherDashboardLinks : studentDashboardLinks).map((item) => {
+                    const isActive = pathname === item.href;
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all border ${
+                          isActive
+                            ? isTeacherDashboard 
+                              ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold shadow-md shadow-orange-500/20 border-orange-400/30' 
+                              : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-md shadow-blue-500/20 border-blue-400/30'
+                            : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span className="flex-1">{item.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
             ) : (
               /* CASE 3: Public Site Pages (Home, Courses, About) */
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <div className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/40 px-3 mb-2">
                   Navigation
                 </div>
                 <Link
                   href="/"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-medium text-sm transition-colors ${
-                    pathname === '/' ? 'bg-primary text-white font-bold' : 'hover:bg-foreground/5 text-foreground/80'
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-medium text-sm transition-all border ${
+                    pathname === '/' ? 'bg-primary text-white font-bold shadow-md border-primary/30' : 'hover:bg-foreground/5 text-foreground/80 border-transparent hover:border-foreground/10'
                   }`}
                 >
                   <span>{t('home')}</span>
@@ -353,8 +374,8 @@ export default function Navbar() {
                 <Link
                   href="/courses"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-medium text-sm transition-colors ${
-                    pathname === '/courses' ? 'bg-primary text-white font-bold' : 'hover:bg-foreground/5 text-foreground/80'
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-medium text-sm transition-all border ${
+                    pathname === '/courses' ? 'bg-primary text-white font-bold shadow-md border-primary/30' : 'hover:bg-foreground/5 text-foreground/80 border-transparent hover:border-foreground/10'
                   }`}
                 >
                   <span>{t('courses')}</span>
@@ -363,8 +384,8 @@ export default function Navbar() {
                 <Link
                   href="/about"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-medium text-sm transition-colors ${
-                    pathname === '/about' ? 'bg-primary text-white font-bold' : 'hover:bg-foreground/5 text-foreground/80'
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-medium text-sm transition-all border ${
+                    pathname === '/about' ? 'bg-primary text-white font-bold shadow-md border-primary/30' : 'hover:bg-foreground/5 text-foreground/80 border-transparent hover:border-foreground/10'
                   }`}
                 >
                   <span>About</span>
@@ -375,7 +396,7 @@ export default function Navbar() {
                   <Link
                     href={isTeacher ? '/teacher-dashboard' : '/dashboard'}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-4 py-3 mt-3 rounded-xl font-bold text-sm bg-primary/10 text-primary border border-primary/20 transition-colors"
+                    className="flex items-center justify-between px-4 py-3 mt-3 rounded-xl font-bold text-sm bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 transition-all shadow-sm"
                   >
                     <span className="flex items-center gap-2">
                       <LayoutDashboard className="w-4 h-4" />
@@ -389,13 +410,13 @@ export default function Navbar() {
 
           </div>
 
-          {/* Bottom Fixed User Profile Card (Matching Desktop Sidebar) */}
-          <div className="pt-4 mt-4 border-t border-foreground/10 relative">
+          {/* Bottom Fixed User Profile Card */}
+          <div className="p-4 border-t border-foreground/10 bg-foreground/[0.02] relative">
             {user ? (
               <>
                 {/* Popover Menu on Click / Hover */}
                 {showProfileMenu && (
-                  <div className="absolute bottom-full left-0 right-0 mb-3 bg-background border border-foreground/10 rounded-2xl shadow-2xl p-2 space-y-1 animate-in slide-in-from-bottom-2 duration-200 z-50">
+                  <div className="absolute bottom-full left-4 right-4 mb-3 bg-background border border-foreground/10 rounded-2xl shadow-2xl p-2 space-y-1 animate-in slide-in-from-bottom-2 duration-200 z-50">
                     {isTeacher && (
                       <Link 
                         href="/teacher-dashboard/profile"
@@ -431,13 +452,13 @@ export default function Navbar() {
                 {/* Profile Card Button */}
                 <div 
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-3 w-full p-3 rounded-2xl bg-foreground/[0.03] hover:bg-foreground/10 border border-foreground/10 transition-all cursor-pointer select-none"
+                  className="flex items-center gap-3 w-full p-3 rounded-2xl bg-background hover:bg-foreground/5 border border-foreground/10 hover:border-orange-500/30 transition-all cursor-pointer select-none shadow-sm"
                 >
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden shrink-0 ring-2 ring-primary/20">
+                  <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center overflow-hidden shrink-0 ring-2 ring-orange-500/20">
                     {user.photoURL ? (
                       <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
-                      <UserIcon className="w-5 h-5 text-primary" />
+                      <UserIcon className="w-5 h-5 text-orange-500" />
                     )}
                   </div>
                   <div className="flex-1 overflow-hidden">

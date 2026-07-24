@@ -207,11 +207,21 @@ export default function DashboardOverview() {
 
         setRecommendedCourses(coursesData);
 
-        // Helper to parse Live Class Date & Time safely
+        // Helper to parse Live Class Date & Time safely in local timezone
         const parseLiveClassTimestamp = (dateStr?: string, timeStr?: string): number => {
           if (!dateStr) return Date.now();
           try {
-            const dateObj = new Date(dateStr);
+            const dateParts = dateStr.split('-');
+            let dateObj: Date;
+            if (dateParts.length === 3) {
+              const year = parseInt(dateParts[0], 10);
+              const month = parseInt(dateParts[1], 10) - 1;
+              const day = parseInt(dateParts[2], 10);
+              dateObj = new Date(year, month, day);
+            } else {
+              dateObj = new Date(dateStr);
+            }
+
             if (isNaN(dateObj.getTime())) return Date.now();
 
             if (timeStr) {
@@ -219,11 +229,11 @@ export default function DashboardOverview() {
               const isPm = timeLower.includes('pm');
               const isAm = timeLower.includes('am');
               const cleanTime = timeLower.replace(/am|pm/g, '').trim();
-              const parts = cleanTime.split(':');
+              const timeParts = cleanTime.split(':');
 
-              if (parts.length >= 2) {
-                let hours = parseInt(parts[0], 10) || 0;
-                const minutes = parseInt(parts[1], 10) || 0;
+              if (timeParts.length >= 2) {
+                let hours = parseInt(timeParts[0], 10) || 0;
+                const minutes = parseInt(timeParts[1], 10) || 0;
                 if (isPm && hours < 12) hours += 12;
                 if (isAm && hours === 12) hours = 0;
                 dateObj.setHours(hours, minutes, 0, 0);
@@ -235,7 +245,7 @@ export default function DashboardOverview() {
           }
         };
 
-        // 7. Fetch Activity Feed Items across enrolled courses (Limit to latest 4 total)
+        // 7. Fetch Activity Feed Items across enrolled courses (Global Top 3)
         if (enrolledCourseIds.length > 0) {
           const feedItems: ActivityFeedItem[] = [];
 
@@ -248,7 +258,7 @@ export default function DashboardOverview() {
                   const courseTitle = cData.title || 'Enrolled Course';
 
                   if (cData.notices && Array.isArray(cData.notices)) {
-                    cData.notices.slice(0, 3).forEach((n: any) => {
+                    cData.notices.forEach((n: any) => {
                       feedItems.push({
                         id: `notice-${n.id}`,
                         type: 'notice',
@@ -264,7 +274,7 @@ export default function DashboardOverview() {
                   }
 
                   if (cData.liveClasses && Array.isArray(cData.liveClasses)) {
-                    cData.liveClasses.slice(0, 3).forEach((lc: any) => {
+                    cData.liveClasses.forEach((lc: any) => {
                       const lcTime = parseLiveClassTimestamp(lc.date, lc.time);
                       const creationTime = Number(lc.createdAt) || (Number(lc.id) > 1000000000000 ? Number(lc.id) : 0);
                       const bestTime = Math.max(lcTime, creationTime);
@@ -285,7 +295,7 @@ export default function DashboardOverview() {
                   }
 
                   if (cData.exams && Array.isArray(cData.exams)) {
-                    cData.exams.slice(0, 3).forEach((ex: any) => {
+                    cData.exams.forEach((ex: any) => {
                       if (ex.isPublished !== false) {
                         feedItems.push({
                           id: `exam-${ex.id}`,

@@ -439,7 +439,7 @@ export default function CourseCurriculumPage() {
                 <Search className="w-5 h-5" />
               </button>
               {showSearch && (
-                <div className="absolute right-0 top-[calc(100%+8px)] w-64 bg-background border border-foreground/10 p-2 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 z-50">
+                <div className="absolute left-0 sm:left-auto sm:right-0 top-[calc(100%+8px)] w-[calc(100vw-48px)] max-w-xs sm:w-72 bg-background border border-foreground/10 p-2 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 z-50">
                    <div className="relative">
                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40" />
                      <input 

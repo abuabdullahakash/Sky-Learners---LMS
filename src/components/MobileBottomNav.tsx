@@ -2,12 +2,9 @@
 
 import { usePathname, Link } from '@/i18n/routing';
 import { 
-  LayoutDashboard, 
+  Home, 
   BookOpen, 
-  GraduationCap, 
-  Settings, 
-  Users, 
-  DollarSign
+  Info 
 } from 'lucide-react';
 
 interface MobileBottomNavProps {
@@ -17,30 +14,28 @@ interface MobileBottomNavProps {
 export default function MobileBottomNav({ role = 'student' }: MobileBottomNavProps) {
   const pathname = usePathname();
 
-  // Define WhatsApp support URL
-  const whatsappNumber = "8801700000000"; // Can be updated to official support number
+  // Define WhatsApp support URL (WhatsApp number can be updated anytime later)
+  const whatsappNumber = "8801700000000";
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=Hello%20SkyLearners%20Support`;
 
-  const studentItems = [
+  const navItems = [
     {
       name: 'Home',
-      href: '/dashboard',
-      icon: LayoutDashboard,
+      href: '/',
+      icon: Home,
+      exact: true,
     },
     {
       name: 'Courses',
-      href: '/dashboard/courses',
+      href: '/courses',
       icon: BookOpen,
+      exact: false,
     },
     {
-      name: 'Exams',
-      href: '/dashboard/exams',
-      icon: GraduationCap,
-    },
-    {
-      name: 'Settings',
-      href: '/dashboard/settings',
-      icon: Settings,
+      name: 'About',
+      href: '/about',
+      icon: Info,
+      exact: false,
     },
     {
       name: 'WhatsApp',
@@ -50,36 +45,6 @@ export default function MobileBottomNav({ role = 'student' }: MobileBottomNavPro
     },
   ];
 
-  const teacherItems = [
-    {
-      name: 'Overview',
-      href: '/teacher-dashboard',
-      icon: LayoutDashboard,
-    },
-    {
-      name: 'Courses',
-      href: '/teacher-dashboard/courses',
-      icon: BookOpen,
-    },
-    {
-      name: 'Students',
-      href: '/teacher-dashboard/students',
-      icon: Users,
-    },
-    {
-      name: 'Earnings',
-      href: '/teacher-dashboard/earnings',
-      icon: DollarSign,
-    },
-    {
-      name: 'WhatsApp',
-      href: whatsappUrl,
-      isExternal: true,
-      icon: WhatsAppIcon,
-    },
-  ];
-
-  const items = role === 'teacher' ? teacherItems : studentItems;
   const activeColorClass = role === 'teacher' ? 'text-orange-500' : 'text-primary';
   const activeBgClass = role === 'teacher' ? 'bg-orange-500/10' : 'bg-primary/10';
   const activeGlowClass = role === 'teacher' ? 'shadow-[0_0_12px_rgba(249,115,22,0.4)]' : 'shadow-[0_0_12px_rgba(59,130,246,0.4)]';
@@ -91,19 +56,21 @@ export default function MobileBottomNav({ role = 'student' }: MobileBottomNavPro
         {/* Subtle glow background highlight */}
         <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-32 h-10 bg-primary/20 blur-2xl rounded-full pointer-events-none"></div>
 
-        {items.map((item) => {
+        {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = !item.isExternal && (
-            pathname === item.href || (item.href !== '/dashboard' && item.href !== '/teacher-dashboard' && pathname.startsWith(item.href))
+            item.exact 
+              ? pathname === item.href 
+              : pathname === item.href || pathname.startsWith(`${item.href}/`)
           );
 
           const content = (
-            <div className={`relative flex flex-col items-center justify-center py-1.5 px-2.5 rounded-xl transition-all duration-300 group ${
+            <div className={`relative flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-all duration-300 group ${
               isActive 
                 ? `${activeBgClass} ${activeColorClass} scale-105 font-semibold` 
                 : 'text-foreground/60 hover:text-foreground hover:scale-105'
             }`}>
-              {/* Active indicator dot/bar */}
+              {/* Active indicator bar */}
               {isActive && (
                 <span className={`absolute -top-1 w-5 h-1 rounded-full ${role === 'teacher' ? 'bg-orange-500' : 'bg-primary'} ${activeGlowClass} animate-in fade-in zoom-in-75 duration-200`} />
               )}
@@ -112,7 +79,7 @@ export default function MobileBottomNav({ role = 'student' }: MobileBottomNavPro
                 isActive ? `${activeColorClass}` : 'group-hover:text-foreground'
               }`} />
 
-              <span className="text-[10px] sm:text-[11px] mt-0.5 tracking-tight font-medium">
+              <span className="text-[11px] mt-0.5 tracking-tight font-medium">
                 {item.name}
               </span>
             </div>

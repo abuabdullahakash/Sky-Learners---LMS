@@ -137,8 +137,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-10">
-      <div ref={formRef} className="max-w-md w-full bg-foreground/5 p-8 rounded-2xl border border-foreground/10 backdrop-blur-md">
+    <div className="min-h-screen flex items-center justify-center px-4 pt-24 sm:pt-28 pb-12">
+      <div ref={formRef} className="max-w-md w-full bg-foreground/5 p-6 sm:p-8 rounded-3xl border border-foreground/10 backdrop-blur-xl shadow-2xl">
         
         {isSuccess ? (
           <div className="text-center py-8">
@@ -151,17 +151,17 @@ export default function LoginPage() {
             </div>
             <h2 className="text-2xl font-bold mb-4 text-green-500">Login Successful!</h2>
             <p className="text-foreground/70 mb-6">Redirecting you to your account...</p>
-            <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <div className="w-6 h-6 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
           </div>
         ) : (
           <>
-            <h2 className="text-3xl font-bold text-center mb-6">{t('title')}</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-center mb-6 text-foreground">{t('title')}</h2>
         
-        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
+        {error && <p className="text-red-500 text-sm mb-4 text-center font-medium bg-red-500/10 p-3 rounded-xl border border-red-500/20">{error}</p>}
         
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">{t('emailLabel')}</label>
+            <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">{t('emailLabel')}</label>
             <input 
               type="email" 
               name="email"
@@ -169,12 +169,12 @@ export default function LoginPage() {
               placeholder={t('emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/15 text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-foreground"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">{t('passwordLabel')}</label>
+            <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">{t('passwordLabel')}</label>
             <div className="relative">
               <input 
                 type={showPassword ? "text" : "password"} 
@@ -183,36 +183,36 @@ export default function LoginPage() {
                 placeholder={t('passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 pr-10 rounded-lg bg-background border border-foreground/20 focus:outline-none focus:border-primary transition-colors"
+                className="w-full px-4 py-3 pr-10 rounded-xl bg-background border border-foreground/15 text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-foreground"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground/80 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground/80 transition-colors p-1"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
           </div>
           
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-xs sm:text-sm">
             <label className="flex items-center gap-2 cursor-pointer">
               <input 
                 type="checkbox" 
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-foreground/30 text-primary focus:ring-primary bg-background"
+                className="w-4 h-4 rounded border-foreground/30 text-orange-500 focus:ring-orange-500 bg-background"
               />
               <span className="text-foreground/80">{t('rememberMe')}</span>
             </label>
             
-            <Link href="/forgot-password" className="text-primary hover:underline font-medium">
+            <Link href="/forgot-password" className="text-orange-500 hover:text-orange-600 font-bold transition-colors">
               {t('forgotPassword')}
             </Link>
           </div>
           
-          <button type="submit" className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors mt-2">
+          <button type="submit" className="w-full py-3.5 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white font-bold text-sm sm:text-base rounded-xl hover:from-orange-600 hover:to-amber-600 transition-all hover:-translate-y-0.5 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 mt-2">
             {t('submitButton')}
           </button>
         </form>

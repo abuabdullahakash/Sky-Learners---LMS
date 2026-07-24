@@ -266,6 +266,8 @@ export default function DashboardOverview() {
                   if (cData.liveClasses && Array.isArray(cData.liveClasses)) {
                     cData.liveClasses.slice(0, 3).forEach((lc: any) => {
                       const lcTime = parseLiveClassTimestamp(lc.date, lc.time);
+                      const creationTime = Number(lc.createdAt) || (Number(lc.id) > 1000000000000 ? Number(lc.id) : 0);
+                      const bestTime = Math.max(lcTime, creationTime);
                       const isLiveNow = Boolean(lc.isLive);
                       feedItems.push({
                         id: `live-${lc.id}`,
@@ -277,7 +279,7 @@ export default function DashboardOverview() {
                         courseId,
                         isLive: isLiveNow,
                         link: `/dashboard/courses/${courseId}/live-classes`,
-                        timestamp: isLiveNow ? Date.now() + 1000000000 : lcTime
+                        timestamp: isLiveNow ? Date.now() + 1000000000 : bestTime
                       });
                     });
                   }
@@ -311,7 +313,7 @@ export default function DashboardOverview() {
             if (!a.isLive && b.isLive) return 1;
             return b.timestamp - a.timestamp;
           });
-          setActivityFeed(feedItems.slice(0, 4));
+          setActivityFeed(feedItems.slice(0, 3));
         }
       } catch (error) {
         console.error("Error fetching dashboard data:", error);

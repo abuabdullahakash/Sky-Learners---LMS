@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, addDoc, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { 
@@ -30,6 +30,9 @@ export default function StudentHelpDeskPage() {
   const [course, setCourse] = useState<any>(null);
   const [issues, setIssues] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Tab Filter State
+  const [filter, setFilter] = useState<'all' | 'open' | 'solved'>('all');
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,14 +61,32 @@ export default function StudentHelpDeskPage() {
         where('studentId', '==', user.uid)
       );
       const querySnapshot = await getDocs(q);
-      const userIssues = querySnapshot.docs.map(docSnap => ({
-        id: docSnap.id,
-        ...docSnap.data()
-      }));
+      const validIssues = [];
+      const now = new Date().getTime();
+      const ONE_DAY = 24 * 60 * 60 * 1000;
+
+      for (let issueDoc of querySnapshot.docs) {
+        const data = issueDoc.data();
+        if (data.status === 'solved') {
+          const age = now - new Date(data.createdAt).getTime();
+          if (age > ONE_DAY) {
+            try {
+              await deleteDoc(issueDoc.ref);
+              continue; // Skip adding to validIssues
+            } catch (e) {
+              console.error("Failed to auto-delete old issue", e);
+            }
+          }
+        }
+        validIssues.push({
+          id: issueDoc.id,
+          ...data
+        });
+      }
 
       // Sort by newest first
-      userIssues.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      setIssues(userIssues);
+      validIssues.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setIssues(validIssues);
     } catch (error) {
       console.error("Error fetching student help desk data:", error);
     } finally {
@@ -124,6 +145,13 @@ export default function StudentHelpDeskPage() {
     }
   };
 
+  const filteredIssues = issues.filter(issue => {
+    const isSolved = issue.status === 'solved' || Boolean(issue.replyText);
+    if (filter === 'open') return !isSolved;
+    if (filter === 'solved') return isSolved;
+    return true;
+  });
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -135,8 +163,8 @@ export default function StudentHelpDeskPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       
-      {/* Hero Banner Header */}
-      <div className="relative w-full shadow-lg rounded-2xl overflow-hidden bg-[#111827]">
+      {/* Hero Banner Header (border-radius 0px) */}
+      <div className="relative w-full shadow-lg rounded-none overflow-hidden bg-[#111827]">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 30%, #111827 60%, #0f172a 100%)' }} />
           <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 15% 60%, rgba(249,115,22,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 20%, rgba(239,68,68,0.2) 0%, transparent 40%)' }} />
@@ -163,30 +191,51 @@ export default function StudentHelpDeskPage() {
         </div>
       </div>
 
-      {/* Submitted Questions & Doubts List */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between px-1">
-          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-orange-500" />
-            আপনার পাঠানো প্রশ্ন ও সমাধানসমূহ ({issues.length})
-          </h2>
-        </div>
+      {/* Tab Filtering Options */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-1">
+        <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+          <MessageSquare className="w-5 h-5 text-orange-500" />
+          আপনার পাঠানো প্রশ্ন ও সমাধানসমূহ ({filteredIssues.length})
+        </h2>
 
-        {issues.length === 0 ? (
+        <div className="flex bg-foreground/5 p-1 rounded-xl w-full sm:w-auto border border-foreground/10">
+          {[
+            { id: 'all', label: `সব (${issues.length})` },
+            { id: 'open', label: `অপেক্ষমাণ (${issues.filter(i => i.status !== 'solved' && !i.replyText).length})` },
+            { id: 'solved', label: `উত্তর পাওয়া গেছে (${issues.filter(i => i.status === 'solved' || i.replyText).length})` }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setFilter(tab.id as any)}
+              className={`flex-1 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+                filter === tab.id
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-foreground/60 hover:text-foreground hover:bg-foreground/5'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {filteredIssues.length === 0 ? (
           <div className="bg-foreground/5 rounded-3xl p-12 text-center border border-foreground/10 space-y-4">
             <div className="w-16 h-16 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto text-orange-500">
               <HelpCircle className="w-8 h-8" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-foreground mb-1">এখনো কোনো প্রশ্ন করেননি!</h3>
+              <h3 className="text-lg font-bold text-foreground mb-1">কোনো প্রশ্ন পাওয়া যায়নি!</h3>
               <p className="text-sm text-foreground/60 max-w-md mx-auto">
-                পড়াশোনায় কোনো সমস্যা থাকলে বা কিছু না বুঝলে উপরের <strong className="text-orange-500">"নতুন প্রশ্ন / সাহায্য চান"</strong> বাটনে ক্লিক করে স্যারকে জানান।
+                {filter === 'all' 
+                  ? 'পড়াশোনায় কোনো সমস্যা থাকলে বা কিছু না বুঝলে উপরের "নতুন প্রশ্ন / সাহায্য চান" বাটনে ক্লিক করে স্যারকে জানান।'
+                  : 'এই ক্যাটাগরিতে কোনো প্রশ্ন নেই।'}
               </p>
             </div>
           </div>
         ) : (
           <div className="space-y-4">
-            {issues.map(issue => {
+            {filteredIssues.map(issue => {
               const screenshots: string[] = issue.screenshotUrls?.length > 0 
                 ? issue.screenshotUrls 
                 : issue.screenshotUrl ? [issue.screenshotUrl] : [];
@@ -280,7 +329,6 @@ export default function StudentHelpDeskPage() {
             })}
           </div>
         )}
-      </div>
 
       {/* --- Ask Question / Help Modal --- */}
       {isModalOpen && (

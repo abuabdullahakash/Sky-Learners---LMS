@@ -7,6 +7,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { Video, Plus, Trash2, Calendar, Clock, Link as LinkIcon, Save, Edit, PlayCircle, StopCircle, ChevronDown, ChevronRight, GripVertical, Filter } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
+import toast from 'react-hot-toast';
 
 type LiveClass = {
   id: string;
@@ -89,8 +90,10 @@ export default function CourseLiveClassesPage() {
     const updatedModules = [...liveModules, newModule];
     try {
       setLiveModules(updatedModules);
+      setModuleOrder(prev => [...prev, newId]);
       await updateDoc(doc(db, 'courses', courseId), { liveModules: updatedModules });
-      setExpandedModules([...expandedModules, newId]);
+      setExpandedModules(prev => [...prev, newId]);
+      toast.success("নতুন মডিউল যুক্ত করা হয়েছে!");
     } catch (err) {
       console.error(err);
       alert('Failed to add module');
@@ -123,6 +126,7 @@ export default function CourseLiveClassesPage() {
       if (classesUpdated) updates.liveClasses = updatedClasses;
       await updateDoc(doc(db, 'courses', courseId), updates);
       setLiveModules(updatedModules);
+      setModuleOrder(prev => prev.filter(id => id !== moduleId));
       if (classesUpdated) setLiveClasses(updatedClasses);
     } catch (err) {
       console.error(err);
@@ -412,7 +416,7 @@ export default function CourseLiveClassesPage() {
                       <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-orange-300" />
                     </button>
                     {showFilterMenu && (
-                      <div className="absolute right-0 top-[calc(100%+8px)] bg-background border border-foreground/10 rounded-xl shadow-2xl z-[100] min-w-[230px] py-1 animate-in fade-in slide-in-from-top-2 duration-150">
+                      <div className="absolute left-0 sm:right-0 sm:left-auto top-[calc(100%+8px)] bg-background border border-foreground/10 rounded-xl shadow-2xl z-[100] min-w-[210px] sm:min-w-[230px] py-1 animate-in fade-in slide-in-from-top-2 duration-150">
                         <div className="px-3 py-2 text-xs font-bold text-foreground/40 uppercase tracking-widest border-b border-foreground/10">Jump to Module</div>
                         {liveModules.map((m, i) => (
                           <button

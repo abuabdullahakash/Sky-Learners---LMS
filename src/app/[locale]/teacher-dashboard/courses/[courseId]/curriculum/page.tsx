@@ -483,72 +483,83 @@ export default function CourseCurriculumPage() {
         {filteredModules?.map((module: any, mIndex: number) => {
           const isExpanded = expandedModules.includes(module.id) || searchQuery !== '';
           return (
-            <div key={module.id} className="bg-background rounded-2xl border border-foreground/10 overflow-hidden shadow-sm transition-all duration-300">
-              <div className="bg-foreground/5 p-2 flex items-center gap-3 border-b border-foreground/10 hover:bg-foreground/10 transition-colors">
+            <div key={module.id} className="bg-background rounded-lg border border-foreground/10 overflow-hidden shadow-sm transition-all duration-300">
+              <div className="bg-foreground/5 p-2.5 sm:p-3 flex items-center justify-between gap-2 border-b border-foreground/10 hover:bg-foreground/10 transition-colors rounded-t-lg">
                 <button 
                   onClick={() => toggleModule(module.id)}
-                  className="p-2 hover:bg-foreground/10 rounded-lg transition-colors flex items-center justify-center text-foreground/50"
+                  className="p-1.5 hover:bg-foreground/10 rounded-md transition-colors flex items-center justify-center text-foreground/60 shrink-0"
                 >
                   {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                 </button>
-                <GripVertical className="text-foreground/30 cursor-move hidden sm:block" />
-                <span className="font-bold text-orange-500 whitespace-nowrap hidden sm:block">Module {course.modules.findIndex((m:any) => m.id === module.id) + 1}:</span>
+                <GripVertical className="text-foreground/30 cursor-move hidden sm:block shrink-0" />
+                <span className="font-bold text-orange-500 whitespace-nowrap text-xs sm:text-base shrink-0">
+                  Module {course.modules.findIndex((m:any) => m.id === module.id) + 1}:
+                </span>
                 <input 
                   type="text" value={module.title}
                   onChange={(e) => handleUpdateModule(module.id, e.target.value)}
-                  className="flex-1 bg-transparent font-bold focus:outline-none border-b border-transparent focus:border-orange-500/50 py-1"
+                  className="flex-1 min-w-0 bg-transparent font-bold text-xs sm:text-base focus:outline-none border-b border-transparent focus:border-orange-500/50 py-1"
                 />
-                <button onClick={() => openLessonModal(module.id)} className="text-sm px-3 py-1.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-bold transition-colors shadow-sm ml-2 whitespace-nowrap flex items-center gap-1">
-                  <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Add Lesson</span>
-                </button>
-                <button onClick={() => handleRemoveModule(module.id)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors ml-1" title="Delete Module">
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button 
+                    onClick={() => openLessonModal(module.id)} 
+                    className="text-xs px-2.5 py-1.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-bold transition-all shadow-sm flex items-center gap-1 active:scale-95 shrink-0"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> <span>Add Lesson</span>
+                  </button>
+                  <button 
+                    onClick={() => handleRemoveModule(module.id)} 
+                    className="p-1.5 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors shrink-0" 
+                    title="Delete Module"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               
               {isExpanded && (
-                <div className="p-4 space-y-3">
+                <div className="p-3 sm:p-4 space-y-3">
                   {module.lessons?.length === 0 ? (
                     <div className="text-center p-4 text-foreground/40 text-sm">No lessons added yet.</div>
                   ) : (
                     module.lessons?.map((lesson: any, lIndex: number) => (
-                      <div key={lesson.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-foreground/5 rounded-xl border border-foreground/10 hover:border-orange-500/30 transition-colors group">
-                        <div className="flex items-center gap-4 flex-1">
+                      <div key={lesson.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 sm:p-4 bg-foreground/5 rounded-lg border border-foreground/10 hover:border-orange-500/30 transition-colors group">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
                           {lesson.thumbnailUrl ? (
-                            <img src={lesson.thumbnailUrl} alt="Thumbnail" className="w-20 h-12 object-cover rounded-lg border border-foreground/10 flex-shrink-0" />
+                            <img src={lesson.thumbnailUrl} alt="Thumbnail" className="w-16 h-10 sm:w-20 sm:h-12 object-cover rounded-md border border-foreground/10 flex-shrink-0" />
                           ) : (
-                            <div className="w-20 h-12 bg-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                              <VideoIcon className="w-6 h-6 text-foreground/30" />
+                            <div className="w-16 h-10 sm:w-20 sm:h-12 bg-foreground/10 rounded-md flex items-center justify-center flex-shrink-0">
+                              <VideoIcon className="w-5 h-5 text-foreground/30" />
                             </div>
                           )}
                           
-                          <div>
-                            <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
-                              <span className="text-orange-500">Lesson {lIndex + 1}:</span> {lesson.title}
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-bold text-foreground text-xs sm:text-sm flex items-center gap-2 flex-wrap">
+                              <span className="text-orange-500">Lesson {lIndex + 1}:</span> <span className="truncate">{lesson.title}</span>
                               {lesson.isFreePreview && (
-                                <span className="text-[10px] bg-green-500/10 text-green-500 px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">Free Preview</span>
+                                <span className="text-[9px] bg-green-500/10 text-green-500 px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">Free Preview</span>
                               )}
                             </h4>
-                            <div className="flex items-center gap-3 mt-1.5 text-xs text-foreground/60">
+                            <div className="flex items-center gap-2 sm:gap-3 mt-1 text-[11px] sm:text-xs text-foreground/60 flex-wrap">
                               {lesson.subject && (
-                                <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> {lesson.subject}</span>
+                                <span className="flex items-center gap-1 truncate"><BookOpen className="w-3 h-3 text-orange-500" /> {lesson.subject}</span>
                               )}
                               {lesson.instructor && (
-                                <span className="flex items-center gap-1"><User className="w-3 h-3" /> {lesson.instructor}</span>
+                                <span className="flex items-center gap-1 truncate"><User className="w-3 h-3 text-blue-500" /> {lesson.instructor}</span>
                               )}
                               {lesson.uploadDate && (
-                                <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(lesson.uploadDate).toLocaleDateString()}</span>
+                                <span className="flex items-center gap-1"><Calendar className="w-3 h-3 text-foreground/40" /> {new Date(lesson.uploadDate).toLocaleDateString()}</span>
                               )}
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2 mt-2 sm:mt-0 w-full sm:w-auto justify-end">
-                          <button onClick={() => openLessonModal(module.id, lesson)} className="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors opacity-100 sm:opacity-0 group-hover:opacity-100" title="Edit Lesson">
-                            <Edit2 className="w-4 h-4" />
+                        <div className="flex items-center gap-1.5 self-end sm:self-center shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-foreground/10 w-full sm:w-auto justify-end">
+                          <button onClick={() => openLessonModal(module.id, lesson)} className="p-1.5 sm:p-2 text-blue-500 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors flex items-center gap-1 text-xs font-bold" title="Edit Lesson">
+                            <Edit2 className="w-3.5 h-3.5" /> <span className="sm:hidden">Edit</span>
                           </button>
-                          <button onClick={() => handleRemoveLesson(module.id, lesson.id)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors opacity-100 sm:opacity-0 group-hover:opacity-100" title="Delete Lesson">
-                            <Trash2 className="w-4 h-4" />
+                          <button onClick={() => handleRemoveLesson(module.id, lesson.id)} className="p-1.5 sm:p-2 text-red-500 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-colors flex items-center gap-1 text-xs font-bold" title="Delete Lesson">
+                            <Trash2 className="w-3.5 h-3.5" /> <span className="sm:hidden">Delete</span>
                           </button>
                         </div>
                       </div>
@@ -561,7 +572,7 @@ export default function CourseCurriculumPage() {
         })}
         
         {course.modules?.length === 0 && (
-          <div className="text-center p-12 border-2 border-dashed border-foreground/10 rounded-3xl bg-background/50">
+          <div className="text-center p-12 border-2 border-dashed border-foreground/10 rounded-2xl bg-background/50">
             <p className="text-foreground/50 font-medium text-lg">Your curriculum is empty.</p>
             <p className="text-foreground/40 text-sm mt-1">Start by adding a module to organize your video lessons.</p>
           </div>
@@ -755,8 +766,8 @@ export default function CourseCurriculumPage() {
 
       {/* --- Subject Settings Modal --- */}
       {isSubjectModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-background rounded-3xl p-6 w-full max-w-md shadow-2xl relative">
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-[100] flex items-center justify-center p-3 sm:p-4 pb-20 md:pb-4">
+          <div className="bg-background rounded-3xl p-6 w-full max-w-md shadow-2xl relative my-auto">
             <button onClick={() => setIsSubjectModalOpen(false)} className="absolute top-4 right-4 p-2 hover:bg-foreground/5 rounded-full transition-colors">
               <X className="w-5 h-5 text-foreground/50" />
             </button>
@@ -795,10 +806,10 @@ export default function CourseCurriculumPage() {
 
       {/* --- Add/Edit Lesson Modal --- */}
       {isLessonModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-background rounded-3xl w-full max-w-2xl shadow-2xl relative max-h-[90vh] flex flex-col">
-            <div className="bg-background/95 backdrop-blur-sm z-10 p-6 border-b border-foreground/10 flex justify-between items-center rounded-t-3xl flex-shrink-0">
-              <h2 className="text-xl font-bold flex items-center gap-2">
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-[100] flex items-center justify-center p-3 sm:p-4 pb-20 md:pb-4">
+          <div className="bg-background rounded-3xl w-full max-w-2xl shadow-2xl relative max-h-[82vh] md:max-h-[88vh] flex flex-col my-auto">
+            <div className="bg-background/95 backdrop-blur-sm z-10 p-5 sm:p-6 border-b border-foreground/10 flex justify-between items-center rounded-t-3xl flex-shrink-0">
+              <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
                 <VideoIcon className="w-5 h-5 text-orange-500" /> 
                 {editingLessonId ? 'Edit Lesson' : 'Upload Lesson'}
               </h2>
@@ -807,7 +818,7 @@ export default function CourseCurriculumPage() {
               </button>
             </div>
             
-            <div className="overflow-y-auto custom-scrollbar p-6">
+            <div className="overflow-y-auto custom-scrollbar p-4 sm:p-6">
               <form id="lesson-form" onSubmit={handleSaveLesson} className="space-y-5">
                 
                 <div className="space-y-1.5">
@@ -991,7 +1002,7 @@ export default function CourseCurriculumPage() {
               </form>
             </div>
             
-            <div className="bg-background p-4 border-t border-foreground/10 rounded-b-3xl flex-shrink-0">
+            <div className="bg-background p-4 border-t border-foreground/10 rounded-b-3xl flex-shrink-0 sticky bottom-0 z-20">
               <button 
                 type="submit" 
                 form="lesson-form"

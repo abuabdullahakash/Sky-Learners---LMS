@@ -153,14 +153,14 @@ export default function StudentRecordedClasses() {
             <p className="text-gray-300 text-sm font-medium">{tHero('recordedClassesSubtitle')}</p>
           </div>
           
-          <div className="flex flex-wrap items-center gap-3 relative z-20">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 relative z-20">
             {/* Search Popup */}
             <div className="relative">
               <button onClick={() => { setShowSearch(!showSearch); setShowModuleFilter(false); setShowSubjectFilter(false); }} className="p-2.5 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50" title="Search">
                 <Search className="w-5 h-5" />
               </button>
               {showSearch && (
-                <div className="absolute right-0 top-[calc(100%+8px)] w-64 bg-background border border-foreground/10 p-2 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 z-50">
+                <div className="absolute left-0 sm:left-auto sm:right-0 top-[calc(100%+8px)] w-64 max-w-[calc(100vw-48px)] bg-background border border-foreground/10 p-2 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 z-50">
                    <div className="relative">
                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40" />
                      <input 
@@ -183,7 +183,7 @@ export default function StudentRecordedClasses() {
                 {selectedModule !== 'All' && <span className="w-2 h-2 rounded-full bg-orange-500"></span>}
               </button>
               {showModuleFilter && (
-                <div className="absolute right-0 top-[calc(100%+8px)] w-56 bg-background border border-foreground/10 p-2 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 flex flex-col gap-1 max-h-60 overflow-y-auto z-50">
+                <div className="absolute left-0 sm:left-auto sm:right-0 top-[calc(100%+8px)] w-56 max-w-[calc(100vw-48px)] bg-background border border-foreground/10 p-2 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 flex flex-col gap-1 max-h-60 overflow-y-auto z-50">
                    <button onClick={() => {setSelectedModule('All'); setShowModuleFilter(false);}} className={`text-left px-3 py-2 text-sm rounded-lg hover:bg-orange-500/10 transition-colors ${selectedModule === 'All' ? 'text-orange-500 bg-orange-500/10 font-bold' : 'text-foreground'}`}>All Modules</button>
                    {availableModules.map((mod: any, idx: number) => (
                      <button key={mod.id} onClick={() => {setSelectedModule(mod.id); setShowModuleFilter(false);}} className={`text-left px-3 py-2 text-sm rounded-lg hover:bg-orange-500/10 transition-colors ${selectedModule === mod.id ? 'text-orange-500 bg-orange-500/10 font-bold' : 'text-foreground'}`}>Module {idx + 1}: {mod.title}</button>
@@ -200,7 +200,7 @@ export default function StudentRecordedClasses() {
                   {selectedSubject !== 'All' && <span className="w-2 h-2 rounded-full bg-orange-500"></span>}
                 </button>
                 {showSubjectFilter && (
-                  <div className="absolute right-0 top-[calc(100%+8px)] w-48 bg-background border border-foreground/10 p-2 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 flex flex-col gap-1 max-h-60 overflow-y-auto z-50">
+                  <div className="absolute left-0 sm:left-auto sm:right-0 top-[calc(100%+8px)] w-48 max-w-[calc(100vw-48px)] bg-background border border-foreground/10 p-2 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 flex flex-col gap-1 max-h-60 overflow-y-auto z-50">
                      <button onClick={() => {setSelectedSubject('All'); setShowSubjectFilter(false);}} className={`text-left px-3 py-2 text-sm rounded-lg hover:bg-orange-500/10 transition-colors ${selectedSubject === 'All' ? 'text-orange-500 bg-orange-500/10 font-bold' : 'text-foreground'}`}>All Subjects</button>
                      {availableSubjects.map((sub: string) => (
                        <button key={sub} onClick={() => {setSelectedSubject(sub); setShowSubjectFilter(false);}} className={`text-left px-3 py-2 text-sm rounded-lg hover:bg-orange-500/10 transition-colors ${selectedSubject === sub ? 'text-orange-500 bg-orange-500/10 font-bold' : 'text-foreground'}`}>{sub}</button>

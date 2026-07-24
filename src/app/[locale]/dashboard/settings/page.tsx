@@ -759,9 +759,21 @@ export default function SettingsPage() {
       {/* Digital Money Receipt Modal */}
       {selectedReceipt && (
         <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200 overflow-y-auto">
-          {/* Dedicated Print Style so ONLY this receipt box is printed/downloaded as PDF */}
+          {/* Dedicated Print Style so ONLY this receipt box is printed/downloaded on 1 clean page */}
           <style jsx global>{`
             @media print {
+              @page {
+                size: A4 portrait;
+                margin: 0mm !important;
+              }
+              html, body {
+                height: 100% !important;
+                max-height: 100% !important;
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+              }
               body * {
                 visibility: hidden !important;
               }
@@ -769,19 +781,21 @@ export default function SettingsPage() {
                 visibility: visible !important;
               }
               #printable-receipt {
-                position: absolute !important;
+                position: fixed !important;
                 left: 50% !important;
                 top: 50% !important;
                 transform: translate(-50%, -50%) !important;
-                width: 100% !important;
-                max-width: 500px !important;
-                margin: 0 !important;
-                padding: 24px !important;
+                width: 90% !important;
+                max-width: 450px !important;
+                margin: 0 auto !important;
+                padding: 20px 24px !important;
                 box-shadow: none !important;
-                border: 1px solid #d1d5db !important;
-                border-radius: 16px !important;
-                background: white !important;
-                color: black !important;
+                border: 2px solid #e5e7eb !important;
+                border-radius: 20px !important;
+                background: #ffffff !important;
+                color: #0f172a !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
               }
               .print-hide {
                 display: none !important;

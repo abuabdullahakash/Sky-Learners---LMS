@@ -16,6 +16,8 @@ const YoutubeIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
 );
 
+import FlyingBookLoader from '@/components/ui/FlyingBookLoader';
+
 interface CommunityLink {
   id: string;
   platform: string;
@@ -27,6 +29,7 @@ interface CourseNotice {
   title: string;
   content: string;
   imageUrl?: string;
+  images?: string[];
   createdAt: string;
   teacherName?: string;
 }
@@ -86,14 +89,14 @@ export default function StudentCommunity() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      <div className="flex flex-col items-center justify-center py-20">
+        <FlyingBookLoader />
       </div>
     );
   }
 
   return (
-    <div className="w-full space-y-8">
+    <div className="w-full space-y-6 sm:space-y-8 animate-in fade-in duration-500">
       
       {/* Hero Section */}
       <div className="relative w-full shadow-lg rounded-none overflow-hidden">
@@ -107,70 +110,86 @@ export default function StudentCommunity() {
           <MessageSquare className="w-32 h-32 text-orange-500 animate-pulse" />
         </div>
 
-        <div className="relative z-10 px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="relative z-10 px-6 sm:px-8 py-6 sm:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-2 sm:mb-3">
               <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">{tHero('badge')}</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm flex items-center gap-3">
-              <MessageSquare className="w-8 h-8 md:w-10 md:h-10 text-orange-400" />
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-white mb-1.5 sm:mb-2 drop-shadow-sm flex items-center gap-3">
+              <MessageSquare className="w-7 h-7 sm:w-10 sm:h-10 text-orange-400" />
               {tHero('communityTitle')}
             </h1>
-            <p className="text-gray-300 text-sm font-medium">{tHero('communitySubtitle')}</p>
+            <p className="text-gray-300 text-xs sm:text-sm font-medium">{tHero('communitySubtitle')}</p>
           </div>
         </div>
       </div>
 
       {/* 📢 Course Notices Section */}
-      <div className="bg-white dark:bg-foreground/5 rounded-3xl p-6 border border-gray-200 dark:border-foreground/10 space-y-4">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <Megaphone className="w-5 h-5 text-orange-500" />
-          Teacher Announcements & Notices (নোটিশ বোর্ড)
+      <div className="bg-white dark:bg-foreground/5 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border border-gray-200 dark:border-foreground/10 space-y-4">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
+          <Megaphone className="w-6 h-6 sm:w-7 sm:h-7 text-orange-500 shrink-0 animate-bounce" />
+          <span>Teacher Announcements & Notices (নোটিশ বোর্ড)</span>
         </h2>
         
         {notices.length === 0 ? (
           <div className="p-6 text-center border border-dashed border-gray-200 dark:border-foreground/10 rounded-2xl">
             <Bell className="w-8 h-8 mx-auto text-gray-400 mb-2" />
-            <p className="text-gray-500 dark:text-foreground/60 text-sm font-medium">No teacher notices posted for this course yet.</p>
+            <p className="text-gray-500 dark:text-foreground/60 text-xs sm:text-sm font-medium">No teacher notices posted for this course yet.</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {notices.map((notice) => (
-              <div key={notice.id} className="p-5 bg-orange-500/5 dark:bg-foreground/5 rounded-2xl border border-orange-500/20 space-y-2">
-                <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <span className="px-2.5 py-0.5 bg-orange-500/10 text-orange-500 text-xs font-bold rounded-full uppercase tracking-wider">Announcement</span>
-                  <span className="text-xs text-foreground/50">{new Date(notice.createdAt).toLocaleString()}</span>
-                </div>
-                <h3 className="font-bold text-lg text-gray-900 dark:text-white">{notice.title}</h3>
-                <p className="text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed">{notice.content}</p>
-                {notice.imageUrl && (
-                  <div 
-                    className="mt-3 relative group inline-block max-w-xs sm:max-w-sm rounded-xl overflow-hidden border border-foreground/15 bg-black/5 cursor-pointer shadow-sm"
-                    onClick={() => setActiveLightboxImage(notice.imageUrl!)}
-                  >
-                    <img 
-                      src={notice.imageUrl} 
-                      alt={notice.title} 
-                      className="max-h-48 w-auto object-cover rounded-xl transition-all duration-300 group-hover:scale-105 group-hover:brightness-90" 
-                    />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white font-bold text-xs">
-                      <ZoomIn className="w-4 h-4 text-orange-400" />
-                      <span>Click to Zoom</span>
-                    </div>
+            {notices.map((notice) => {
+              const imageList = notice.images && notice.images.length > 0 
+                ? notice.images 
+                : notice.imageUrl 
+                  ? [notice.imageUrl] 
+                  : [];
+
+              return (
+                <div key={notice.id} className="p-4 sm:p-5 bg-orange-500/5 dark:bg-foreground/5 rounded-xl sm:rounded-2xl border border-orange-500/20 space-y-2">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <span className="px-2.5 py-0.5 bg-orange-500/10 text-orange-500 text-[10px] sm:text-xs font-bold rounded-full uppercase tracking-wider">Announcement</span>
+                    <span className="text-[10px] sm:text-xs text-foreground/50">{new Date(notice.createdAt).toLocaleString()}</span>
                   </div>
-                )}
-                {notice.teacherName && (
-                  <p className="text-xs font-semibold text-primary pt-1">— {notice.teacherName}</p>
-                )}
-              </div>
-            ))}
+                  <h3 className="font-bold text-base sm:text-lg text-gray-900 dark:text-white">{notice.title}</h3>
+                  <p className="text-xs sm:text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed">{notice.content}</p>
+                  
+                  {/* Notice Images Thumbnails Grid */}
+                  {imageList.length > 0 && (
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      {imageList.map((imgUrl, imgIdx) => (
+                        <div 
+                          key={imgIdx}
+                          className="relative group w-20 h-20 sm:w-28 sm:h-28 rounded-xl overflow-hidden border border-foreground/15 bg-black/5 cursor-pointer shadow-sm shrink-0"
+                          onClick={() => setActiveLightboxImage(imgUrl)}
+                        >
+                          <img 
+                            src={imgUrl} 
+                            alt={`Notice image ${imgIdx + 1}`} 
+                            className="w-full h-full object-cover rounded-xl transition-all duration-300 group-hover:scale-105 group-hover:brightness-90" 
+                          />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 text-white font-bold text-[10px] sm:text-xs">
+                            <ZoomIn className="w-4 h-4 text-orange-400" />
+                            <span>Zoom</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {notice.teacherName && (
+                    <p className="text-xs font-semibold text-primary pt-1">— {notice.teacherName}</p>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
 
       {/* 🔗 Community Links Section */}
       <div className="space-y-4">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <LinkIcon className="w-5 h-5 text-primary" />
           Community Groups
         </h2>
@@ -193,18 +212,18 @@ export default function StudentCommunity() {
                   href={link.url} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className={`flex items-center justify-between p-5 rounded-2xl border transition-all duration-300 group ${info.colorClass}`}
+                  className={`flex items-center justify-between p-4 sm:p-5 rounded-xl sm:rounded-2xl border transition-all duration-300 group ${info.colorClass}`}
                 >
-                  <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-xl shadow-sm ${info.iconBg}`}>
-                      <Icon className="w-6 h-6" />
+                  <div className="flex items-center gap-3.5">
+                    <div className={`p-2.5 sm:p-3 rounded-xl shadow-sm ${info.iconBg}`}>
+                      <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg text-foreground">{t(`platforms.${link.platform}`)}</h3>
-                      <p className="text-sm opacity-80 mt-1">{t('clickToJoin')}</p>
+                      <h3 className="font-bold text-base sm:text-lg text-foreground">{t(`platforms.${link.platform}`)}</h3>
+                      <p className="text-xs sm:text-sm opacity-80 mt-0.5">{t('clickToJoin')}</p>
                     </div>
                   </div>
-                  <ExternalLink className="w-5 h-5 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </Link>
               );
             })}

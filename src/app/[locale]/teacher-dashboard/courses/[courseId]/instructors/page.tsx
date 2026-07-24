@@ -207,44 +207,48 @@ export default function CourseInstructorsPage() {
     <div className="space-y-6 animate-in fade-in duration-500">
 
       {/* Hero Section */}
-      <div className="relative w-full mb-4 shadow-lg">
-        <div className="absolute inset-0 overflow-hidden rounded">
+      <div className="relative w-full mb-6 shadow-lg rounded-none overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-[#111827]"/>
           <div className="absolute inset-0" style={{background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 30%, #111827 60%, #0f172a 100%)'}} />
           <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 15% 60%, rgba(249,115,22,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 20%, rgba(239,68,68,0.2) 0%, transparent 40%)'}} />
           <div className="absolute top-0 right-0 w-80 h-80 opacity-[0.04]" style={{background: 'repeating-linear-gradient(45deg, #f97316 0px, #f97316 1px, transparent 1px, transparent 14px)'}} />
           <div className="absolute bottom-0 left-0 w-40 h-40 opacity-[0.06]" style={{background: 'radial-gradient(circle, #f97316 0%, transparent 70%)'}} />
         </div>
-        <div className="relative z-10 px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="relative z-10 px-4 sm:px-8 py-6 sm:py-8 flex flex-row items-center justify-between gap-3">
           <div>
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-2 sm:mb-3">
               <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">Teacher Dashboard</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">Instructors</h1>
-            <p className="text-gray-300 text-sm font-medium">Add teachers, guest lecturers, or doubt solving assistants for this course.</p>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-1 sm:mb-2 drop-shadow-sm">Instructors</h1>
+            <p className="text-gray-300 text-xs sm:text-sm font-medium">Add teachers, guest lecturers, or doubt solving assistants for this course.</p>
           </div>
           {!isAdding && (
-            <button onClick={() => { resetForm(); setIsAdding(true); }} className="px-5 py-2.5 bg-orange-500 text-white rounded font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center gap-2 whitespace-nowrap shrink-0">
-              <Plus className="w-5 h-5" /> Add Instructor
+            <button 
+              onClick={() => { resetForm(); setIsAdding(true); }} 
+              className="px-3 sm:px-5 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center justify-center gap-2 whitespace-nowrap text-sm shrink-0 z-20"
+              title="Add Instructor"
+            >
+              <Plus className="w-5 h-5" /> 
+              <span className="hidden sm:inline">Add Instructor</span>
             </button>
           )}
         </div>
       </div>
 
-
       {isAdding && (
-        <form onSubmit={handleSaveInstructor} className="bg-background border border-foreground/10 p-6 rounded-3xl shadow-sm space-y-6">
+        <form onSubmit={handleSaveInstructor} className="bg-background border border-foreground/10 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm space-y-6">
           <div className="flex justify-between items-center mb-2">
-            <h2 className="text-lg font-bold">{editingInstructorId ? 'Edit Instructor' : 'Add New Instructor'}</h2>
-            <button type="button" onClick={resetForm} className="text-sm text-foreground/50 hover:text-foreground">Cancel</button>
+            <h2 className="text-base sm:text-lg font-bold">{editingInstructorId ? 'Edit Instructor' : 'Add New Instructor'}</h2>
+            <button type="button" onClick={resetForm} className="text-xs sm:text-sm text-foreground/50 hover:text-foreground">Cancel</button>
           </div>
           
           {error && <div className="p-3 bg-red-500/10 text-red-500 rounded-xl text-sm font-medium">{error}</div>}
 
-          <div className="flex flex-col md:flex-row gap-8">
+          <div className="flex flex-col md:flex-row gap-6 sm:gap-8">
             <div className="shrink-0 flex flex-col items-center">
               <label className="block text-sm font-medium mb-1 text-center">Profile Photo <span className="text-red-500">*</span></label>
-              <div className="relative w-32 h-32 rounded-full border-2 border-dashed border-foreground/20 bg-foreground/5 hover:border-orange-500/50 flex flex-col items-center justify-center cursor-pointer overflow-hidden group">
+              <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full border-2 border-dashed border-foreground/20 bg-foreground/5 hover:border-orange-500/50 flex flex-col items-center justify-center cursor-pointer overflow-hidden group">
                 <input 
                   type="file" accept="image/*" onChange={handleImageChange}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
@@ -254,8 +258,8 @@ export default function CourseInstructorsPage() {
                   <Image src={photoPreview} alt="Preview" fill className="object-cover" />
                 ) : (
                   <>
-                    <ImagePlus className="w-8 h-8 text-foreground/40 group-hover:text-orange-500 mb-1" />
-                    <span className="text-xs text-foreground/50 font-medium">Upload Photo</span>
+                    <ImagePlus className="w-6 h-6 sm:w-8 sm:h-8 text-foreground/40 group-hover:text-orange-500 mb-1" />
+                    <span className="text-[11px] sm:text-xs text-foreground/50 font-medium">Upload Photo</span>
                   </>
                 )}
                 {photoPreview && (
@@ -269,7 +273,7 @@ export default function CourseInstructorsPage() {
             
             <div className="shrink-0 flex flex-col items-center">
               <label className="block text-sm font-medium mb-1 text-center">Cover Photo</label>
-              <div className="relative w-48 h-32 rounded-2xl border-2 border-dashed border-foreground/20 bg-foreground/5 hover:border-orange-500/50 flex flex-col items-center justify-center cursor-pointer overflow-hidden group">
+              <div className="relative w-40 sm:w-48 h-28 sm:h-32 rounded-2xl border-2 border-dashed border-foreground/20 bg-foreground/5 hover:border-orange-500/50 flex flex-col items-center justify-center cursor-pointer overflow-hidden group">
                 <input 
                   type="file" accept="image/*" onChange={handleCoverChange}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
@@ -278,8 +282,8 @@ export default function CourseInstructorsPage() {
                   <Image src={coverPreview} alt="Cover Preview" fill className="object-cover" />
                 ) : (
                   <>
-                    <ImagePlus className="w-8 h-8 text-foreground/40 group-hover:text-orange-500 mb-1" />
-                    <span className="text-xs text-foreground/50 font-medium text-center px-2">Upload Cover<br/>(Optional)</span>
+                    <ImagePlus className="w-6 h-6 sm:w-8 sm:h-8 text-foreground/40 group-hover:text-orange-500 mb-1" />
+                    <span className="text-[11px] sm:text-xs text-foreground/50 font-medium text-center px-2">Upload Cover<br/>(Optional)</span>
                   </>
                 )}
                 {coverPreview && (
@@ -293,15 +297,15 @@ export default function CourseInstructorsPage() {
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium mb-1">Full Name <span className="text-red-500">*</span></label>
-                <input type="text" value={newName} onChange={e => setNewName(e.target.value)} placeholder="e.g. Ayman Sadiq" className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" required />
+                <input type="text" value={newName} onChange={e => setNewName(e.target.value)} placeholder="e.g. Ayman Sadiq" className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 text-sm" required />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Background / University <span className="text-red-500">*</span></label>
-                <input type="text" value={newBackground} onChange={e => setNewBackground(e.target.value)} placeholder="e.g. BSc in EEE, BUET" className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" required />
+                <input type="text" value={newBackground} onChange={e => setNewBackground(e.target.value)} placeholder="e.g. BSc in EEE, BUET" className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 text-sm" required />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Role <span className="text-red-500">*</span></label>
-                <input type="text" value={newRole} onChange={e => setNewRole(e.target.value)} placeholder="e.g. Lead Instructor, Math Expert" className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" required />
+                <label className="block text-sm font-medium mb-1">Role / Designation <span className="text-red-500">*</span></label>
+                <input type="text" value={newRole} onChange={e => setNewRole(e.target.value)} placeholder="e.g. Lead Physics Instructor" className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 text-sm" required />
               </div>
             </div>
           </div>

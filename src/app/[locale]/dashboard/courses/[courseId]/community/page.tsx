@@ -26,6 +26,7 @@ interface CourseNotice {
   id: string;
   title: string;
   content: string;
+  imageUrl?: string;
   createdAt: string;
   teacherName?: string;
 }
@@ -141,6 +142,11 @@ export default function StudentCommunity() {
                 </div>
                 <h3 className="font-bold text-lg text-gray-900 dark:text-white">{notice.title}</h3>
                 <p className="text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed">{notice.content}</p>
+                {notice.imageUrl && (
+                  <div className="mt-3">
+                    <img src={notice.imageUrl} alt={notice.title} className="max-h-72 w-full object-contain rounded-xl border border-foreground/10 bg-background shadow-sm" />
+                  </div>
+                )}
                 {notice.teacherName && (
                   <p className="text-xs font-semibold text-primary pt-1">— {notice.teacherName}</p>
                 )}

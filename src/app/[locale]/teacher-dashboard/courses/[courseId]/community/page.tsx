@@ -5,8 +5,9 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Save, MessageSquare, Plus, Trash2, Link as LinkIcon, Bell, Megaphone } from 'lucide-react';
+import { Save, MessageSquare, Plus, Trash2, Link as LinkIcon, Bell, Megaphone, ImagePlus, Loader2, Image as ImageIcon } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
+import { uploadImageToImgBB } from '@/lib/imgbb';
 
 interface CommunityLink {
   id: string;
@@ -18,6 +19,7 @@ export interface CourseNotice {
   id: string;
   title: string;
   content: string;
+  imageUrl?: string;
   createdAt: string;
   teacherName?: string;
 }
@@ -48,6 +50,9 @@ export default function CourseCommunityPage() {
   const [isAddingNotice, setIsAddingNotice] = useState(false);
   const [noticeTitle, setNoticeTitle] = useState('');
   const [noticeContent, setNoticeContent] = useState('');
+  const [noticeImage, setNoticeImage] = useState<File | null>(null);
+  const [noticeImagePreview, setNoticeImagePreview] = useState<string>('');
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [noticeError, setNoticeError] = useState('');
 
   useEffect(() => {
@@ -82,6 +87,41 @@ export default function CourseCommunityPage() {
     fetchCourse();
   }, [user, courseId, router]);
 
+  const handleNoticeImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setNoticeImage(file);
+      setNoticeImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const getPastedImageFile = (e: React.ClipboardEvent): File | null => {
+    if (e.clipboardData?.files && e.clipboardData.files.length > 0) {
+      for (let i = 0; i < e.clipboardData.files.length; i++) {
+        const file = e.clipboardData.files[i];
+        if (file.type.startsWith('image/')) return file;
+      }
+    }
+    if (e.clipboardData?.items && e.clipboardData.items.length > 0) {
+      for (let i = 0; i < e.clipboardData.items.length; i++) {
+        const item = e.clipboardData.items[i];
+        if (item.type.startsWith('image/')) {
+          const file = item.getAsFile();
+          if (file) return file;
+        }
+      }
+    }
+    return null;
+  };
+
+  const handleNoticePaste = (e: React.ClipboardEvent) => {
+    const file = getPastedImageFile(e);
+    if (file) {
+      setNoticeImage(file);
+      setNoticeImagePreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSaveLinks = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -113,23 +153,32 @@ export default function CourseCommunityPage() {
     setIsSaving(true);
     setNoticeError('');
 
-    const newNotice: CourseNotice = {
-      id: Date.now().toString(),
-      title: noticeTitle.trim(),
-      content: noticeContent.trim(),
-      createdAt: new Date().toISOString(),
-      teacherName: userData?.fullName || user?.displayName || 'Teacher'
-    };
-
-    const updatedNotices = [newNotice, ...notices];
-
     try {
+      let imageUrl = '';
+      if (noticeImage) {
+        setIsUploadingImage(true);
+        imageUrl = await uploadImageToImgBB(noticeImage);
+      }
+
+      const newNotice: CourseNotice = {
+        id: Date.now().toString(),
+        title: noticeTitle.trim(),
+        content: noticeContent.trim(),
+        ...(imageUrl ? { imageUrl } : {}),
+        createdAt: new Date().toISOString(),
+        teacherName: userData?.fullName || user?.displayName || 'Teacher'
+      };
+
+      const updatedNotices = [newNotice, ...notices];
+
       await updateDoc(doc(db, 'courses', courseId), {
         notices: updatedNotices
       });
       setNotices(updatedNotices);
       setNoticeTitle('');
       setNoticeContent('');
+      setNoticeImage(null);
+      setNoticeImagePreview('');
       setIsAddingNotice(false);
       setMessage('Notice published successfully!');
       setTimeout(() => setMessage(''), 3000);
@@ -138,6 +187,7 @@ export default function CourseCommunityPage() {
       setNoticeError('Failed to publish notice. Please try again.');
     } finally {
       setIsSaving(false);
+      setIsUploadingImage(false);
     }
   };
 
@@ -174,18 +224,18 @@ export default function CourseCommunityPage() {
   if (isLoading) return <div className="flex justify-center items-center h-64 text-foreground/60 font-bold">Loading...</div>;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500">
       
-      {/* Hero Section */}
-      <div className="relative overflow-hidden rounded p-8 text-white shadow-md" style={{background: 'linear-gradient(135deg, #f97316 0%, #ef4444 60%, #dc2626 100%)'}}>
+      {/* Header Banner */}
+      <div className="relative overflow-hidden rounded-none p-6 sm:p-8 text-white shadow-md" style={{background: 'linear-gradient(135deg, #f97316 0%, #ef4444 60%, #dc2626 100%)'}}>
         <div className="absolute inset-0 opacity-20" style={{backgroundImage: 'radial-gradient(circle at 80% 20%, #fff 0%, transparent 50%)'}}></div>
         <div className="relative z-10 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
-              <MessageSquare className="w-6 h-6" />
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center gap-2">
+              <MessageSquare className="w-6 h-6 sm:w-7 sm:h-7" />
               Community & Announcements
             </h1>
-            <p className="text-white/80 max-w-lg text-sm">
+            <p className="text-white/80 max-w-lg text-xs sm:text-sm">
               Post important announcements for students enrolled in this course and manage external community group links.
             </p>
           </div>
@@ -198,14 +248,14 @@ export default function CourseCommunityPage() {
       {message && <div className="p-4 bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400 rounded-xl font-bold">{message}</div>}
 
       {/* 📢 Notice Board Section */}
-      <div className="bg-background p-6 rounded-2xl border border-foreground/10 space-y-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-background p-4 sm:p-6 rounded-2xl border border-foreground/10 space-y-4 sm:space-y-6 shadow-sm">
+        <div className="flex flex-row items-center justify-between gap-3">
           <div>
-            <h2 className="text-xl font-bold flex items-center gap-2">
-              <Megaphone className="w-5 h-5 text-orange-500" />
-              Course Notice Board (নোটিশ বোর্ড)
+            <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
+              <Megaphone className="w-5 h-5 text-orange-500 shrink-0" />
+              <span>Course Notice Board (নোটিশ বোর্ড)</span>
             </h2>
-            <p className="text-sm text-foreground/60 mt-1">
+            <p className="text-xs sm:text-sm text-foreground/60 mt-0.5 hidden sm:block">
               Publish announcements that appear on the student dashboard activity feed for enrolled students.
             </p>
           </div>
@@ -213,16 +263,18 @@ export default function CourseCommunityPage() {
             <button 
               type="button" 
               onClick={() => setIsAddingNotice(true)}
-              className="px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-colors flex items-center gap-2 shadow-sm text-sm whitespace-nowrap"
+              className="px-3 sm:px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm text-sm shrink-0 z-10"
+              title="Post New Notice"
             >
-              <Plus className="w-4 h-4" /> Post New Notice
+              <Plus className="w-5 h-5" /> 
+              <span className="hidden sm:inline">Post New Notice</span>
             </button>
           )}
         </div>
 
         {isAddingNotice && (
-          <form onSubmit={handleAddNotice} className="p-5 bg-foreground/5 rounded-2xl border border-orange-500/30 space-y-4">
-            <h3 className="font-bold text-base flex items-center gap-2">
+          <form onSubmit={handleAddNotice} className="p-4 sm:p-5 bg-foreground/5 rounded-2xl border border-orange-500/30 space-y-4">
+            <h3 className="font-bold text-sm sm:text-base flex items-center gap-2">
               <Bell className="w-4 h-4 text-orange-500" /> Write Announcement / Notice
             </h3>
             
@@ -245,26 +297,54 @@ export default function CourseCommunityPage() {
               <textarea 
                 value={noticeContent}
                 onChange={e => setNoticeContent(e.target.value)}
-                placeholder="Write full notice details for your students..."
+                onPaste={handleNoticePaste}
+                placeholder="Write full notice details for your students... (বা স্ক্রিনশট নিয়া সরাসরি Ctrl+V পেস্ট করুন)"
                 className="w-full px-4 py-2.5 bg-background border border-foreground/10 rounded-xl text-sm focus:border-orange-500 focus:outline-none min-h-[100px]"
                 required
               />
             </div>
 
+            {/* Notice Image Upload */}
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-foreground/60 mb-1 ml-1">Notice Image (Optional)</label>
+              <div className="flex items-center gap-3 flex-wrap">
+                <label className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-bold rounded-xl border border-orange-500/20 transition-colors">
+                  <ImageIcon className="w-4 h-4 text-orange-500" />
+                  <span>{noticeImagePreview ? 'ছবি পরিবর্তন করুন (Ctrl+V)' : '📷 নোটিশের ছবি আপলোড / Ctrl+V পেস্ট'}</span>
+                  <input type="file" accept="image/*" onChange={handleNoticeImageChange} className="hidden" />
+                </label>
+                {noticeImagePreview && (
+                  <button 
+                    type="button" 
+                    onClick={() => { setNoticeImage(null); setNoticeImagePreview(''); }}
+                    className="text-xs text-red-500 hover:underline font-bold"
+                  >
+                    ছবি রিমুভ করুন
+                  </button>
+                )}
+              </div>
+              {noticeImagePreview && (
+                <div className="mt-3 relative w-fit">
+                  <img src={noticeImagePreview} alt="Notice Preview" className="max-h-48 rounded-xl border border-foreground/10 object-contain bg-background shadow-sm" />
+                </div>
+              )}
+            </div>
+
             <div className="flex justify-end gap-3 pt-2">
               <button 
                 type="button" 
-                onClick={() => { setIsAddingNotice(false); setNoticeError(''); }}
+                onClick={() => { setIsAddingNotice(false); setNoticeError(''); setNoticeImage(null); setNoticeImagePreview(''); }}
                 className="px-4 py-2 text-sm font-bold text-foreground/60 hover:text-foreground"
               >
                 Cancel
               </button>
               <button 
                 type="submit" 
-                disabled={isSaving}
-                className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm rounded-xl transition-all shadow-md"
+                disabled={isSaving || isUploadingImage}
+                className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm rounded-xl transition-all shadow-md flex items-center gap-2"
               >
-                {isSaving ? 'Publishing...' : 'Publish Notice'}
+                {isUploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                <span>{isSaving ? 'Publishing...' : 'Publish Notice'}</span>
               </button>
             </div>
           </form>
@@ -281,17 +361,22 @@ export default function CourseCommunityPage() {
           <div className="space-y-3">
             {notices.map((notice) => (
               <div key={notice.id} className="p-4 bg-background rounded-xl border border-foreground/10 flex items-start justify-between gap-4 hover:border-orange-500/30 transition-all shadow-sm">
-                <div className="flex-1 space-y-1">
+                <div className="flex-1 space-y-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="px-2 py-0.5 bg-orange-500/10 text-orange-500 text-xs font-bold rounded-full uppercase tracking-wider">Notice</span>
                     <span className="text-xs text-foreground/40">{new Date(notice.createdAt).toLocaleString()}</span>
                   </div>
-                  <h4 className="font-bold text-base text-foreground">{notice.title}</h4>
+                  <h4 className="font-bold text-base text-foreground truncate">{notice.title}</h4>
                   <p className="text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">{notice.content}</p>
+                  {notice.imageUrl && (
+                    <div className="mt-2.5">
+                      <img src={notice.imageUrl} alt={notice.title} className="max-h-64 rounded-xl border border-foreground/10 object-contain bg-background shadow-sm" />
+                    </div>
+                  )}
                 </div>
                 <button 
                   onClick={() => handleDeleteNotice(notice.id)}
-                  className="p-2 text-foreground/40 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                  className="p-2 text-foreground/40 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors shrink-0"
                   title="Delete Notice"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -303,23 +388,25 @@ export default function CourseCommunityPage() {
       </div>
 
       {/* 🔗 Community Links Section */}
-      <div className="bg-background p-6 rounded-2xl border border-foreground/10 space-y-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+      <div className="bg-background p-4 sm:p-6 rounded-2xl border border-foreground/10 space-y-4 sm:space-y-6 shadow-sm">
+        <div className="flex flex-row items-center justify-between gap-3 mb-2">
           <div>
-            <h2 className="text-xl font-bold mb-1 flex items-center gap-2">
-              <LinkIcon className="w-5 h-5 text-orange-500" />
-              Community Links (কমিউনিটি লিঙ্কসমূহ)
+            <h2 className="text-lg sm:text-xl font-bold mb-0.5 flex items-center gap-2">
+              <LinkIcon className="w-5 h-5 text-orange-500 shrink-0" />
+              <span>Community Links (কমিউনিটি লিঙ্কসমূহ)</span>
             </h2>
-            <p className="text-sm text-foreground/60">
+            <p className="text-xs sm:text-sm text-foreground/60 hidden sm:block">
               Add links to your community groups (Facebook, WhatsApp, Telegram, etc.) where students can discuss topics.
             </p>
           </div>
           <button 
             type="button" 
             onClick={addLink}
-            className="px-4 py-2 bg-primary/10 text-primary font-bold rounded-xl hover:bg-primary/20 transition-colors flex items-center gap-2 text-sm whitespace-nowrap"
+            className="px-3 sm:px-4 py-2 bg-primary/10 text-primary font-bold rounded-xl hover:bg-primary/20 transition-colors flex items-center justify-center gap-1.5 text-sm whitespace-nowrap shrink-0 z-10"
+            title="Add Link"
           >
-            <Plus className="w-4 h-4" /> Add Link
+            <Plus className="w-5 h-5" /> 
+            <span className="hidden sm:inline">Add Link</span>
           </button>
         </div>
 
@@ -375,7 +462,7 @@ export default function CourseCommunityPage() {
           )}
           
           <div className="flex justify-end pt-6 border-t border-foreground/10">
-            <button type="submit" disabled={isSaving} className="px-6 py-2.5 font-bold rounded-xl flex items-center gap-2 text-white transition-all shadow-md hover:shadow-lg hover:opacity-90 disabled:opacity-60" style={{background: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)'}}>
+            <button type="submit" disabled={isSaving} className="px-6 py-2.5 font-bold rounded-xl flex items-center gap-2 text-white transition-all shadow-md hover:shadow-lg hover:opacity-90 disabled:opacity-60 text-sm" style={{background: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)'}}>
               <Save className="w-4 h-4" /> {isSaving ? 'Saving...' : 'Save Links'}
             </button>
           </div>

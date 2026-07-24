@@ -554,7 +554,7 @@ export default function CourseCurriculumPage() {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-foreground/10 w-full sm:w-auto justify-start sm:justify-end">
+                        <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-foreground/10 w-full sm:w-auto">
                           <button onClick={() => openLessonModal(module.id, lesson)} className="p-1.5 sm:p-2 text-blue-500 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors flex items-center gap-1 text-xs font-bold" title="Edit Lesson">
                             <Edit2 className="w-3.5 h-3.5" /> <span>Edit</span>
                           </button>
@@ -581,13 +581,13 @@ export default function CourseCurriculumPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Main Content: Outline */}
-          <div className="lg:col-span-8 bg-background rounded-2xl p-6 shadow-sm border border-foreground/10 space-y-6">
+          <div className="lg:col-span-8 bg-background rounded-2xl p-4 sm:p-6 shadow-sm border border-foreground/10 space-y-6">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-xl text-foreground flex items-center gap-2">
-                <BookOpen className="w-6 h-6 text-orange-500" /> Syllabus Outline
+              <h3 className="font-bold text-lg sm:text-xl text-foreground flex items-center gap-2">
+                <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" /> Syllabus Outline
               </h3>
-              <button onClick={handleAddSyllabusModule} className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition-colors flex items-center gap-2 shadow-sm">
-                <Plus className="w-5 h-5" /> Add Module
+              <button onClick={handleAddSyllabusModule} className="px-3 py-2 sm:px-4 sm:py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition-colors flex items-center gap-1.5 sm:gap-2 shadow-sm text-xs sm:text-sm">
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5" /> Add Module
               </button>
             </div>
 
@@ -596,115 +596,140 @@ export default function CourseCurriculumPage() {
                 No syllabus modules added. Click "Add Module" to start building your course outline.
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {syllabusModules.map((module: any, mIndex: number) => (
                   <div key={module.id} className="border border-foreground/10 rounded-2xl overflow-hidden shadow-sm bg-background transition-colors focus-within:border-orange-500/30">
-                    <div className="bg-foreground/[0.02] p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 border-b border-foreground/10">
+                    <div className="bg-foreground/[0.02] p-3 sm:p-4 flex flex-col gap-3 border-b border-foreground/10">
                       
-                      <div 
-                        className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 bg-background border-2 border-dashed border-foreground/20 rounded-xl overflow-hidden group cursor-pointer hover:border-orange-500 transition-colors flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
-                        onClick={() => document.getElementById(`syllabus-img-${module.id}`)?.click()}
-                        onPaste={(e) => {
-                          const file = e.clipboardData.files[0];
-                          if (file) handleSyllabusImageUpload(module.id, file);
-                        }}
-                        tabIndex={0}
-                        title="Click to browse or paste an image"
-                      >
-                        <input 
-                          type="file" 
-                          id={`syllabus-img-${module.id}`}
-                          className="hidden" 
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) handleSyllabusImageUpload(module.id, file);
-                          }}
-                        />
-                        {uploadingModuleImage === module.id ? (
-                          <Loader2 className="w-6 h-6 text-orange-500 animate-spin" />
-                        ) : module.imageUrl ? (
-                          <>
-                            <img src={module.imageUrl} alt="Module Icon" className="w-full h-full object-cover" />
-                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <Upload className="w-5 h-5 text-white" />
-                            </div>
-                          </>
-                        ) : (
-                          <div className="text-center p-2">
-                            <ImageIcon className="w-5 h-5 text-foreground/40 mx-auto mb-1 group-hover:text-orange-500 transition-colors" />
-                            <span className="text-[10px] text-foreground/40 font-bold uppercase group-hover:text-orange-500 transition-colors">Upload</span>
+                      {/* Top Header Row: Icon, Module Title Badge & Action Buttons */}
+                      <div className="flex items-center justify-between gap-3 w-full">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div 
+                            className="relative w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0 bg-background border-2 border-dashed border-foreground/20 rounded-xl overflow-hidden group cursor-pointer hover:border-orange-500 transition-colors flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+                            onClick={() => document.getElementById(`syllabus-img-${module.id}`)?.click()}
+                            onPaste={(e) => {
+                              const file = e.clipboardData.files[0];
+                              if (file) handleSyllabusImageUpload(module.id, file);
+                            }}
+                            tabIndex={0}
+                            title="Click to browse or paste an image"
+                          >
+                            <input 
+                              type="file" 
+                              id={`syllabus-img-${module.id}`}
+                              className="hidden" 
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleSyllabusImageUpload(module.id, file);
+                              }}
+                            />
+                            {uploadingModuleImage === module.id ? (
+                              <Loader2 className="w-5 h-5 text-orange-500 animate-spin" />
+                            ) : module.imageUrl ? (
+                              <>
+                                <img src={module.imageUrl} alt="Module Icon" className="w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                  <Upload className="w-4 h-4 text-white" />
+                                </div>
+                              </>
+                            ) : (
+                              <div className="text-center p-1">
+                                <ImageIcon className="w-4 h-4 text-foreground/40 mx-auto mb-0.5 group-hover:text-orange-500 transition-colors" />
+                                <span className="text-[9px] text-foreground/40 font-bold uppercase group-hover:text-orange-500 transition-colors block">Upload</span>
+                              </div>
+                            )}
                           </div>
-                        )}
+
+                          <div>
+                            <div className="font-bold text-orange-500 text-xs sm:text-sm uppercase tracking-wider">MODULE {mIndex + 1}</div>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons: Add Topic & Delete (Icon only on mobile) */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button 
+                            onClick={() => handleAddSyllabusLesson(module.id)} 
+                            className="px-2.5 py-1.5 sm:px-4 sm:py-2 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded-lg hover:bg-orange-500/20 font-bold transition-colors flex items-center gap-1.5 text-xs sm:text-sm"
+                            title="Add Topic"
+                          >
+                            <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Add Topic</span>
+                          </button>
+                          <button 
+                            onClick={() => handleRemoveSyllabusModule(module.id)} 
+                            className="p-1.5 sm:p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors flex items-center justify-center" 
+                            title="Delete Module"
+                          >
+                            <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                          </button>
+                        </div>
                       </div>
 
-                      <div className="flex-1 w-full space-y-2">
-                        <div className="font-bold text-orange-500 text-sm">MODULE {mIndex + 1}</div>
+                      {/* Second Row: Full-Width Subject Name Input */}
+                      <div className="w-full">
                         <input 
                           type="text" 
                           value={module.title}
                           onChange={(e) => handleUpdateSyllabusModule(module.id, 'title', e.target.value)}
                           placeholder="Module Title (e.g. English, Math)"
-                          className="w-full bg-background border-b-2 border-foreground/10 px-2 py-1.5 text-lg font-bold focus:outline-none focus:border-orange-500 transition-colors"
+                          className="w-full bg-background border-b-2 border-foreground/10 px-2 py-1.5 text-base sm:text-lg font-bold focus:outline-none focus:border-orange-500 transition-colors"
                         />
-                      </div>
-
-                      <div className="flex flex-col sm:flex-row items-center gap-2 self-end sm:self-center w-full sm:w-auto mt-4 sm:mt-0 justify-end">
-                        <button onClick={() => handleAddSyllabusLesson(module.id)} className="w-full sm:w-auto px-4 py-2 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded-lg hover:bg-orange-500/20 font-bold transition-colors whitespace-nowrap flex items-center justify-center gap-2">
-                          <Plus className="w-4 h-4" /> Add Topic
-                        </button>
-                        <button onClick={() => handleRemoveSyllabusModule(module.id)} className="w-full sm:w-auto p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors flex justify-center" title="Delete Module">
-                          <Trash2 className="w-5 h-5" />
-                        </button>
                       </div>
                     </div>
                     
-                    <div className="p-4 space-y-3 bg-background">
+                    {/* Topics List */}
+                    <div className="p-3 sm:p-4 space-y-3 bg-background">
                       {(!module.lessons || module.lessons.length === 0) ? (
-                        <div className="text-center p-6 border-2 border-dashed border-foreground/10 rounded-xl bg-foreground/5 text-foreground/40 text-sm">No topics added to this module yet.</div>
+                        <div className="text-center p-4 sm:p-6 border-2 border-dashed border-foreground/10 rounded-xl bg-foreground/5 text-foreground/40 text-xs sm:text-sm">No topics added to this module yet.</div>
                       ) : (
                         module.lessons.map((lesson: any, lIndex: number) => (
-                          <div key={lesson.id} className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 bg-foreground/[0.02] rounded-xl border border-foreground/10 focus-within:border-orange-500/30 transition-colors group">
-                            <span className="text-sm font-bold text-foreground/30 hidden sm:block w-6 text-center">{lIndex + 1}.</span>
-                            <div className="flex-1 w-full">
+                          <div key={lesson.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 sm:p-4 bg-foreground/[0.02] rounded-xl border border-foreground/10 focus-within:border-orange-500/30 transition-colors">
+                            {/* Topic Title Input */}
+                            <div className="flex items-center gap-2 w-full flex-1">
+                              <span className="text-xs font-bold text-foreground/40 shrink-0 w-5 text-center">{lIndex + 1}.</span>
                               <input 
                                 type="text" 
                                 value={lesson.title}
                                 onChange={(e) => handleUpdateSyllabusLesson(module.id, lesson.id, 'title', e.target.value)}
                                 placeholder="Topic Title (e.g. Lesson 18: Make Your Snacks)"
-                                className="w-full bg-background border border-foreground/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-orange-500 transition-colors"
+                                className="w-full bg-background border border-foreground/10 rounded-lg px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-orange-500 transition-colors"
                               />
                             </div>
-                            <div className="flex items-center gap-4 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
-                              <div className="flex items-center gap-2 bg-background border border-foreground/10 rounded-lg px-3 py-1.5 focus-within:border-orange-500 transition-colors">
-                                <VideoIcon className="w-4 h-4 text-blue-500" />
-                                <input 
-                                  type="number" min="0"
-                                  value={lesson.videoCount}
-                                  onChange={(e) => handleUpdateSyllabusLesson(module.id, lesson.id, 'videoCount', parseInt(e.target.value) || 0)}
-                                  className="w-12 bg-transparent text-sm font-bold text-center focus:outline-none"
-                                />
+
+                            {/* Counter Badges (Video, Exam, Note) & Delete Icon */}
+                            <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-foreground/10">
+                              <div className="flex items-center gap-2 flex-1 sm:flex-initial justify-start">
+                                <div className="flex items-center gap-1.5 bg-background border border-foreground/10 rounded-lg px-2.5 py-1.5 focus-within:border-orange-500 transition-colors">
+                                  <VideoIcon className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                                  <input 
+                                    type="number" min="0"
+                                    value={lesson.videoCount}
+                                    onChange={(e) => handleUpdateSyllabusLesson(module.id, lesson.id, 'videoCount', parseInt(e.target.value) || 0)}
+                                    className="w-8 sm:w-10 bg-transparent text-xs font-bold text-center focus:outline-none"
+                                  />
+                                </div>
+                                <div className="flex items-center gap-1.5 bg-background border border-foreground/10 rounded-lg px-2.5 py-1.5 focus-within:border-orange-500 transition-colors">
+                                  <FileText className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                                  <input 
+                                    type="number" min="0"
+                                    value={lesson.examCount}
+                                    onChange={(e) => handleUpdateSyllabusLesson(module.id, lesson.id, 'examCount', parseInt(e.target.value) || 0)}
+                                    className="w-8 sm:w-10 bg-transparent text-xs font-bold text-center focus:outline-none"
+                                  />
+                                </div>
+                                <div className="flex items-center gap-1.5 bg-background border border-foreground/10 rounded-lg px-2.5 py-1.5 focus-within:border-orange-500 transition-colors">
+                                  <BookOpen className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                                  <input 
+                                    type="number" min="0"
+                                    value={lesson.noteCount}
+                                    onChange={(e) => handleUpdateSyllabusLesson(module.id, lesson.id, 'noteCount', parseInt(e.target.value) || 0)}
+                                    className="w-8 sm:w-10 bg-transparent text-xs font-bold text-center focus:outline-none"
+                                  />
+                                </div>
                               </div>
-                              <div className="flex items-center gap-2 bg-background border border-foreground/10 rounded-lg px-3 py-1.5 focus-within:border-orange-500 transition-colors">
-                                <FileText className="w-4 h-4 text-purple-500" />
-                                <input 
-                                  type="number" min="0"
-                                  value={lesson.examCount}
-                                  onChange={(e) => handleUpdateSyllabusLesson(module.id, lesson.id, 'examCount', parseInt(e.target.value) || 0)}
-                                  className="w-12 bg-transparent text-sm font-bold text-center focus:outline-none"
-                                />
-                              </div>
-                              <div className="flex items-center gap-2 bg-background border border-foreground/10 rounded-lg px-3 py-1.5 focus-within:border-orange-500 transition-colors">
-                                <BookOpen className="w-4 h-4 text-green-500" />
-                                <input 
-                                  type="number" min="0"
-                                  value={lesson.noteCount}
-                                  onChange={(e) => handleUpdateSyllabusLesson(module.id, lesson.id, 'noteCount', parseInt(e.target.value) || 0)}
-                                  className="w-12 bg-transparent text-sm font-bold text-center focus:outline-none"
-                                />
-                              </div>
-                              <button onClick={() => handleRemoveSyllabusLesson(module.id, lesson.id)} className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors ml-auto md:ml-0" title="Delete Topic">
-                                <X className="w-5 h-5" />
+
+                              <button onClick={() => handleRemoveSyllabusLesson(module.id, lesson.id)} className="p-1.5 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors shrink-0" title="Delete Topic">
+                                <X className="w-4 h-4" />
                               </button>
                             </div>
                           </div>

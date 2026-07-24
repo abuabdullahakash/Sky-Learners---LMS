@@ -302,9 +302,9 @@ export default function StudentHelpDeskPage() {
                   </div>
 
                   {/* Teacher Reply Section */}
-                  {issue.replyText ? (
+                  {issue.replyText || issue.replyImageUrl ? (
                     <div className="mt-5 pt-4 border-t border-foreground/10">
-                      <div className="bg-green-500/10 border border-green-500/25 rounded-2xl p-4 space-y-2">
+                      <div className="bg-green-500/10 border border-green-500/25 rounded-2xl p-4 space-y-3">
                         <div className="flex items-center justify-between text-xs font-bold text-green-600 dark:text-green-400">
                           <span className="flex items-center gap-1.5 text-sm">
                             <UserCheck className="w-4 h-4 text-green-500" />
@@ -312,9 +312,27 @@ export default function StudentHelpDeskPage() {
                           </span>
                           {issue.repliedAt && <span>{new Date(issue.repliedAt).toLocaleString()}</span>}
                         </div>
-                        <p className="text-sm text-foreground/90 font-medium whitespace-pre-wrap leading-relaxed pl-1">
-                          {issue.replyText}
-                        </p>
+                        {issue.replyText && (
+                          <p className="text-sm text-foreground/90 font-medium whitespace-pre-wrap leading-relaxed pl-1">
+                            {issue.replyText}
+                          </p>
+                        )}
+                        {issue.replyImageUrl && (
+                          <div className="pt-1">
+                            <span className="text-xs font-bold text-green-600 dark:text-green-400 uppercase tracking-wider block mb-1.5">
+                              স্যারের পাঠানো সমাধানের ছবি (Solution Sheet):
+                            </span>
+                            <div 
+                              onClick={() => setSelectedPreviewImage(issue.replyImageUrl)}
+                              className="relative w-32 h-32 sm:w-44 sm:h-44 rounded-xl border border-green-500/30 overflow-hidden bg-background group cursor-pointer shadow-md hover:border-green-500 transition-all"
+                            >
+                              <img src={issue.replyImageUrl} alt="Teacher Solution Sheet" className="w-full h-full object-cover" />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1.5">
+                                <ImageIcon className="w-4 h-4" /> ক্লিক করে বড় করে দেখুন
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ) : (

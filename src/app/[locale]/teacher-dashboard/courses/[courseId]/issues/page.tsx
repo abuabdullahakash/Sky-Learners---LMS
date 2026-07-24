@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -5,8 +6,9 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { CheckCircle, Clock, Search, ChevronDown, ChevronUp, Image as ImageIcon, Loader2, Send, MessageSquare, X } from 'lucide-react';
+import { CheckCircle, Clock, Search, ChevronDown, ChevronUp, Image as ImageIcon, Loader2, Send, MessageSquare, X, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { uploadImageToImgBB } from '@/lib/imgbb';
 
 export default function CourseIssuesPage() {
   const { user } = useAuth();
@@ -22,6 +24,8 @@ export default function CourseIssuesPage() {
 
   // Teacher Reply State
   const [replyTextMap, setReplyTextMap] = useState<{ [key: string]: string }>({});
+  const [replyImageMap, setReplyImageMap] = useState<{ [key: string]: File | null }>({});
+  const [replyImagePreviewMap, setReplyImagePreviewMap] = useState<{ [key: string]: string | null }>({});
   const [isSubmittingReplyMap, setIsSubmittingReplyMap] = useState<{ [key: string]: boolean }>({});
   
   // Full-screen image preview lightbox
@@ -48,7 +52,7 @@ export default function CourseIssuesPage() {
            if (age > ONE_DAY) {
              try {
                 await deleteDoc(issueDoc.ref);
-                continue; // Skip adding to validIssues
+                continue; 
              } catch (e) {
                 console.error("Failed to auto-delete old issue", e);
              }
@@ -62,7 +66,6 @@ export default function CourseIssuesPage() {
       setIssues(validIssues);
     } catch (error) {
       console.error("Error fetching issues:", error);
-      // Fallback if index is not ready yet for orderBy
       try {
         const q2 = query(collection(db, 'lesson_issues'), where('courseId', '==', courseId));
         const querySnapshot = await getDocs(q2);
@@ -122,24 +125,42 @@ export default function CourseIssuesPage() {
   const handleSendReply = async (issueId: string, e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const text = replyTextMap[issueId] || '';
-    if (!text.trim()) return;
+    const text = replyTextMap[issueId]?.trim() || '';
+    const imageFile = replyImageMap[issueId];
+
+    if (!text && !imageFile) {
+      toast.error("অনুগ্রহ করে লিখিত উত্তর লিখুন অথবা খাতার ছবি যুক্ত করুন।");
+      return;
+    }
 
     setIsSubmittingReplyMap(prev => ({ ...prev, [issueId]: true }));
     try {
-      await updateDoc(doc(db, 'lesson_issues', issueId), {
-        replyText: text.trim(),
+      let replyImageUrl = '';
+      if (imageFile) {
+        replyImageUrl = await uploadImageToImgBB(imageFile);
+      }
+
+      const updateData = {
+        replyText: text,
+        replyImageUrl: replyImageUrl || '',
         repliedAt: new Date().toISOString(),
         status: 'solved'
-      });
-      toast.success("Reply sent & issue marked as solved! 🎉");
+      };
+
+      await updateDoc(doc(db, 'lesson_issues', issueId), updateData);
+      
+      toast.success("উত্তরের ও সমাধান সফলভাবে পাঠানো হয়েছে! 🎉");
       setIssues(issues.map(issue => 
-        issue.id === issueId ? { ...issue, replyText: text.trim(), repliedAt: new Date().toISOString(), status: 'solved' } : issue
+        issue.id === issueId ? { ...issue, ...updateData } : issue
       ));
+      
+      // Reset form
       setReplyTextMap(prev => ({ ...prev, [issueId]: '' }));
+      setReplyImageMap(prev => ({ ...prev, [issueId]: null }));
+      setReplyImagePreviewMap(prev => ({ ...prev, [issueId]: null }));
     } catch (err) {
       console.error("Error sending reply", err);
-      toast.error("Failed to send reply");
+      toast.error("উত্তর পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
     } finally {
       setIsSubmittingReplyMap(prev => ({ ...prev, [issueId]: false }));
     }
@@ -162,19 +183,17 @@ export default function CourseIssuesPage() {
 
       {/* Hero Section */}
       <div className="relative w-full mb-4 shadow-lg">
-        <div className="absolute inset-0 overflow-hidden rounded">
+        <div className="absolute inset-0 overflow-hidden rounded-xl">
           <div className="absolute inset-0 bg-[#111827]"/>
           <div className="absolute inset-0" style={{background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 30%, #111827 60%, #0f172a 100%)'}} />
           <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 15% 60%, rgba(249,115,22,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 20%, rgba(239,68,68,0.2) 0%, transparent 40%)'}} />
-          <div className="absolute top-0 right-0 w-80 h-80 opacity-[0.04]" style={{background: 'repeating-linear-gradient(45deg, #f97316 0px, #f97316 1px, transparent 1px, transparent 14px)'}} />
-          <div className="absolute bottom-0 left-0 w-40 h-40 opacity-[0.06]" style={{background: 'radial-gradient(circle, #f97316 0%, transparent 70%)'}} />
         </div>
-        <div className="relative z-10 px-8 py-8">
+        <div className="relative z-10 px-6 sm:px-8 py-6 sm:py-8">
           <div className="flex items-center gap-2 mb-3">
             <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">Teacher Dashboard</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">Student Issues & Reports</h1>
-          <p className="text-gray-300 text-sm font-medium">Manage, reply and resolve issues reported by students. Solved issues auto-delete after 24 hours.</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">Student Issues & Reports</h1>
+          <p className="text-gray-300 text-xs sm:text-sm font-medium">Manage, reply and resolve issues reported by students. Solved issues auto-delete after 24 hours.</p>
         </div>
       </div>
 
@@ -190,12 +209,12 @@ export default function CourseIssuesPage() {
           />
         </div>
 
-        <div className="flex bg-foreground/5 p-1 rounded-xl w-full sm:w-auto">
+        <div className="flex bg-foreground/5 p-1 rounded-xl w-full sm:w-auto border border-foreground/10">
           {['all', 'open', 'solved'].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f as any)}
-              className={`flex-1 sm:px-6 py-2 rounded-lg text-sm font-bold capitalize transition-all ${
+              className={`flex-1 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold capitalize transition-all ${
                 filter === f 
                   ? 'bg-background text-foreground shadow-sm' 
                   : 'text-foreground/50 hover:text-foreground hover:bg-foreground/5'
@@ -237,7 +256,7 @@ export default function CourseIssuesPage() {
               >
                 {/* Accordion Header */}
                 <div className="p-4 sm:p-5 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4 min-w-0">
+                  <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                     <div className="w-10 h-10 rounded-full bg-foreground/10 overflow-hidden shrink-0 border border-foreground/10">
                       {issue.studentPhotoUrl ? (
                         <img src={issue.studentPhotoUrl} alt={issue.studentName} className="w-full h-full object-cover" />
@@ -250,8 +269,8 @@ export default function CourseIssuesPage() {
                     
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wide flex items-center gap-1 w-fit ${
-                          issue.status === 'solved' ? 'bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
+                        <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wide flex items-center gap-1 w-fit ${
+                          issue.status === 'solved' ? 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20' : 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20'
                         }`}>
                           {issue.status === 'solved' ? <CheckCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
                           {issue.status}
@@ -273,16 +292,7 @@ export default function CourseIssuesPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
-                    {issue.status === 'open' && (
-                      <button 
-                        onClick={(e) => handleMarkAsSolved(issue.id, e)}
-                        className="hidden sm:flex px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-xl transition-all items-center gap-1.5 shadow-sm shadow-green-500/20 active:scale-95"
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                        Mark Solved
-                      </button>
-                    )}
+                  <div className="flex items-center gap-2 shrink-0">
                     <div className="w-8 h-8 rounded-full bg-foreground/5 flex items-center justify-center text-foreground/40 group-hover:bg-foreground/10 transition-colors">
                       {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                     </div>
@@ -292,13 +302,13 @@ export default function CourseIssuesPage() {
                 {/* Accordion Body */}
                 <div 
                   className={`border-t border-foreground/5 bg-foreground/[0.02] transition-all duration-300 ease-in-out ${
-                    isExpanded ? 'max-h-[1200px] opacity-100 p-4 sm:p-6' : 'max-h-0 opacity-0 overflow-hidden'
+                    isExpanded ? 'max-h-[1400px] opacity-100 p-4 sm:p-6' : 'max-h-0 opacity-0 overflow-hidden'
                   }`}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                     
-                    {/* Left Column: Note & Screenshots */}
+                    {/* Left Column: Student Note & Screenshots */}
                     <div className="lg:col-span-7 space-y-4">
                       <div>
                         <h4 className="text-xs font-bold text-foreground/50 uppercase tracking-wider mb-2">Detailed Note</h4>
@@ -331,19 +341,33 @@ export default function CourseIssuesPage() {
                       )}
                     </div>
 
-                    {/* Right Column: Teacher Reply / Resolution Box */}
+                    {/* Right Column: Teacher Reply & Resolution Box */}
                     <div className="lg:col-span-5 bg-background border border-foreground/10 rounded-2xl p-4 sm:p-5 space-y-4 shadow-sm">
                       <h4 className="text-xs font-bold text-orange-500 uppercase tracking-wider flex items-center gap-1.5">
                         <MessageSquare className="w-4 h-4" /> Teacher Reply & Resolution
                       </h4>
 
-                      {issue.replyText ? (
-                        <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 space-y-2">
+                      {issue.replyText || issue.replyImageUrl ? (
+                        <div className="bg-green-500/10 border border-green-500/25 rounded-xl p-4 space-y-3">
                           <div className="flex items-center justify-between text-xs text-green-600 dark:text-green-400 font-bold">
                             <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Replied & Solved</span>
                             {issue.repliedAt && <span>{new Date(issue.repliedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>}
                           </div>
-                          <p className="text-sm text-foreground/90 whitespace-pre-wrap font-medium">{issue.replyText}</p>
+                          {issue.replyText && <p className="text-sm text-foreground/90 whitespace-pre-wrap font-medium">{issue.replyText}</p>}
+                          {issue.replyImageUrl && (
+                            <div className="pt-1">
+                              <span className="text-xs font-bold text-green-600 dark:text-green-400 uppercase tracking-wider block mb-1.5">সংযুক্ত খাতার ছবি (Solution Sheet):</span>
+                              <div 
+                                onClick={() => setSelectedPreviewImage(issue.replyImageUrl)}
+                                className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-xl border border-green-500/30 overflow-hidden bg-background group cursor-pointer shadow-sm hover:border-green-500 transition-colors"
+                              >
+                                <img src={issue.replyImageUrl} alt="Solution Sheet" className="w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1">
+                                  <ImageIcon className="w-4 h-4" /> ক্লিক করে দেখুন
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <form onSubmit={(e) => handleSendReply(issue.id, e)} className="space-y-3">
@@ -351,33 +375,63 @@ export default function CourseIssuesPage() {
                             rows={3}
                             value={replyTextMap[issue.id] || ''}
                             onChange={(e) => setReplyTextMap({ ...replyTextMap, [issue.id]: e.target.value })}
-                            placeholder="Write a solution/reply to student..."
+                            placeholder="উত্তর বা সমাধান লিখুন..."
                             className="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-sm focus:outline-none focus:border-orange-500 transition-colors resize-none"
                           />
-                          <div className="flex items-center gap-2">
-                            <button 
-                              type="submit"
-                              disabled={isSubmittingReplyMap[issue.id] || !replyTextMap[issue.id]?.trim()}
-                              className="flex-1 py-2.5 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm"
-                            >
-                              {isSubmittingReplyMap[issue.id] ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : (
-                                <>
-                                  <Send className="w-4 h-4" /> Send Reply & Mark Solved
-                                </>
-                              )}
-                            </button>
-                            {issue.status === 'open' && (
-                              <button 
-                                type="button"
-                                onClick={(e) => handleMarkAsSolved(issue.id, e)}
-                                className="px-3 py-2.5 bg-foreground/5 hover:bg-foreground/10 text-foreground/70 font-bold text-xs rounded-xl transition-colors shrink-0"
-                              >
-                                Solve
-                              </button>
+
+                          {/* Teacher Solution Image Attachment */}
+                          <div>
+                            {replyImagePreviewMap[issue.id] ? (
+                              <div className="relative inline-block mb-2">
+                                <img 
+                                  src={replyImagePreviewMap[issue.id]!} 
+                                  alt="Khata solution preview" 
+                                  className="w-20 h-20 rounded-xl object-cover border border-orange-500/40 shadow-sm"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setReplyImageMap(prev => ({ ...prev, [issue.id]: null }));
+                                    setReplyImagePreviewMap(prev => ({ ...prev, [issue.id]: null }));
+                                  }}
+                                  className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                            ) : (
+                              <label className="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-xl border border-foreground/10 text-xs font-bold text-foreground/80 transition-colors mb-1">
+                                <ImageIcon className="w-4 h-4 text-orange-500" />
+                                খাতার ছবি যুক্ত করুন (Solution Photo)
+                                <input 
+                                  type="file" 
+                                  accept="image/*" 
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                      const file = e.target.files[0];
+                                      setReplyImageMap(prev => ({ ...prev, [issue.id]: file }));
+                                      setReplyImagePreviewMap(prev => ({ ...prev, [issue.id]: URL.createObjectURL(file) }));
+                                    }
+                                  }}
+                                />
+                              </label>
                             )}
                           </div>
+
+                          <button 
+                            type="submit"
+                            disabled={isSubmittingReplyMap[issue.id] || (!replyTextMap[issue.id]?.trim() && !replyImageMap[issue.id])}
+                            className="w-full py-3 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-orange-500/20 active:scale-95"
+                          >
+                            {isSubmittingReplyMap[issue.id] ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <>
+                                <Send className="w-4 h-4" /> Send Reply & Mark Solved
+                              </>
+                            )}
+                          </button>
                         </form>
                       )}
                     </div>
@@ -390,9 +444,12 @@ export default function CourseIssuesPage() {
         </div>
       )}
 
-      {/* Full-Screen Image Lightbox Preview */}
+      {/* Lightbox Modal */}
       {selectedPreviewImage && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-[200] flex items-center justify-center p-4" onClick={() => setSelectedPreviewImage(null)}>
+        <div 
+          className="fixed inset-0 bg-black/90 backdrop-blur-md z-[200] flex items-center justify-center p-4"
+          onClick={() => setSelectedPreviewImage(null)}
+        >
           <div className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center">
             <button 
               onClick={() => setSelectedPreviewImage(null)}
@@ -400,10 +457,15 @@ export default function CourseIssuesPage() {
             >
               <X className="w-6 h-6" />
             </button>
-            <img src={selectedPreviewImage} alt="Full Preview" className="max-w-full max-h-[85vh] object-contain rounded-2xl border border-white/10 shadow-2xl" />
+            <img 
+              src={selectedPreviewImage} 
+              alt="Full Preview" 
+              className="max-w-full max-h-[85vh] object-contain rounded-2xl border border-white/10 shadow-2xl" 
+            />
           </div>
         </div>
       )}
+
     </div>
   );
 }

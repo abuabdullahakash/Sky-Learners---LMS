@@ -199,7 +199,7 @@ export default function EditCoursePage() {
     <div className="space-y-6 pb-12 animate-in fade-in duration-300">
       
       {/* Hero Header Banner (0px border radius / rounded-none) */}
-      <div className="relative overflow-hidden rounded-none p-6 md:p-9 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white shadow-2xl border-b border-white/10 -mx-4 -mt-4 sm:-mx-6 sm:-mt-6 md:-mx-8 md:-mt-8 mb-8">
+      <div className="relative overflow-hidden rounded-none p-4 sm:p-6 md:p-9 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white shadow-2xl border-b border-white/10 -mx-2 -mt-2 sm:-mx-4 sm:-mt-4 md:-mx-8 md:-mt-8 mb-6">
         <div className="absolute top-0 right-0 w-72 h-72 bg-orange-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl -ml-16 -mb-16 pointer-events-none"></div>
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
@@ -230,8 +230,8 @@ export default function EditCoursePage() {
         </div>
       </div>
 
-      {/* Main Form Container (Compact Padding on Mobile: p-4 sm:p-6 md:p-8) */}
-      <div className="bg-foreground/5 border border-foreground/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl">
+      {/* Main Form Container (Compact Padding on Mobile: p-2.5 sm:p-6 md:p-8) */}
+      <div className="bg-foreground/5 border border-foreground/10 rounded-2xl sm:rounded-3xl p-2.5 sm:p-6 md:p-8 shadow-xl">
         {error && (
           <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl text-red-500 text-sm font-medium">
             {error}
@@ -408,7 +408,7 @@ export default function EditCoursePage() {
 
             {/* Course Subjects & Class Distribution (Enhanced Mobile UI & Proper Remove Button) */}
             {category && category !== 'skills' && (
-              <div className="bg-foreground/5 p-3.5 sm:p-5 rounded-2xl border border-foreground/10 space-y-4">
+              <div className="bg-foreground/5 p-2.5 sm:p-5 rounded-2xl border border-foreground/10 space-y-3">
                 <div className="flex justify-between items-center flex-wrap gap-2">
                   <div>
                     <label className="block text-xs sm:text-sm font-bold text-foreground/90">Course Subjects & Class Distribution <span className="text-red-500">*</span></label>
@@ -417,15 +417,15 @@ export default function EditCoursePage() {
                   <button 
                     type="button" 
                     onClick={handleAddSubject} 
-                    className="px-3.5 py-1.5 bg-orange-500/10 hover:bg-orange-500 text-orange-500 hover:text-white text-xs font-bold rounded-xl transition-all border border-orange-500/20 cursor-pointer shadow-xs"
+                    className="px-3 py-1.5 bg-orange-500/10 hover:bg-orange-500 text-orange-500 hover:text-white text-xs font-bold rounded-xl transition-all border border-orange-500/20 cursor-pointer shadow-xs"
                   >
                     + Add Subject
                   </button>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {specificSubjects.map((sub, idx) => (
-                    <div key={idx} className="p-3.5 sm:p-4 bg-background rounded-2xl border border-foreground/10 space-y-3 shadow-xs">
+                    <div key={idx} className="p-2.5 sm:p-4 bg-background rounded-2xl border border-foreground/10 space-y-2.5 shadow-xs">
                       {/* Subject Header Row with Clean Remove Button */}
                       <div className="flex items-center justify-between border-b border-foreground/10 pb-2">
                         <span className="text-xs font-extrabold uppercase tracking-wider text-orange-500 flex items-center gap-1.5">
@@ -512,25 +512,25 @@ export default function EditCoursePage() {
             )}
 
             {/* Marketing Stats & Features */}
-            <div className="space-y-4 p-4 sm:p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+            <div className="space-y-4 p-2.5 sm:p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
               <h3 className="font-bold text-base sm:text-lg border-b border-foreground/10 pb-2 mb-4">Marketing Stats & Features</h3>
               
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
                 <div>
                   <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Total Live Classes</label>
-                  <input type="number" value={totalLiveClasses} onChange={e => setTotalLiveClasses(e.target.value)} className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 text-sm font-medium" />
+                  <input type="number" value={totalLiveClasses} onChange={e => setTotalLiveClasses(e.target.value)} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 text-sm font-medium" />
                 </div>
                 <div>
                   <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Total Videos</label>
-                  <input type="number" value={totalVideoLessons} onChange={e => setTotalVideoLessons(e.target.value)} className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 text-sm font-medium" />
+                  <input type="number" value={totalVideoLessons} onChange={e => setTotalVideoLessons(e.target.value)} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 text-sm font-medium" />
                 </div>
                 <div>
                   <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Total Exams</label>
-                  <input type="number" value={totalExams} onChange={e => setTotalExams(e.target.value)} className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 text-sm font-medium" />
+                  <input type="number" value={totalExams} onChange={e => setTotalExams(e.target.value)} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 text-sm font-medium" />
                 </div>
                 <div>
                   <label className="block text-xs sm:text-sm font-bold text-foreground/80 mb-1">Total Notes/PDFs</label>
-                  <input type="number" value={totalPdfs} onChange={e => setTotalPdfs(e.target.value)} className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 text-sm font-medium" />
+                  <input type="number" value={totalPdfs} onChange={e => setTotalPdfs(e.target.value)} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-background border border-foreground/15 rounded-xl focus:border-orange-500 text-sm font-medium" />
                 </div>
               </div>
               
@@ -549,7 +549,7 @@ export default function EditCoursePage() {
             </div>
 
             {/* Pricing, Dates & Contact Section */}
-            <div className="space-y-4 p-4 sm:p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+            <div className="space-y-4 p-2.5 sm:p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
               <h3 className="font-bold text-base sm:text-lg border-b border-foreground/10 pb-2 mb-4">Pricing, Dates & Contact</h3>
               
               {/* Regular Price & Discount Price in 1 Row on Mobile (grid grid-cols-2) */}

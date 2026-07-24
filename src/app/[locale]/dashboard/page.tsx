@@ -207,7 +207,35 @@ export default function DashboardOverview() {
 
         setRecommendedCourses(coursesData);
 
-        // 7. Fetch Activity Feed Items across enrolled courses (Limit to latest 3 total)
+        // Helper to parse Live Class Date & Time safely
+        const parseLiveClassTimestamp = (dateStr?: string, timeStr?: string): number => {
+          if (!dateStr) return Date.now();
+          try {
+            const dateObj = new Date(dateStr);
+            if (isNaN(dateObj.getTime())) return Date.now();
+
+            if (timeStr) {
+              const timeLower = timeStr.toLowerCase().trim();
+              const isPm = timeLower.includes('pm');
+              const isAm = timeLower.includes('am');
+              const cleanTime = timeLower.replace(/am|pm/g, '').trim();
+              const parts = cleanTime.split(':');
+
+              if (parts.length >= 2) {
+                let hours = parseInt(parts[0], 10) || 0;
+                const minutes = parseInt(parts[1], 10) || 0;
+                if (isPm && hours < 12) hours += 12;
+                if (isAm && hours === 12) hours = 0;
+                dateObj.setHours(hours, minutes, 0, 0);
+              }
+            }
+            return dateObj.getTime();
+          } catch {
+            return Date.now();
+          }
+        };
+
+        // 7. Fetch Activity Feed Items across enrolled courses (Limit to latest 4 total)
         if (enrolledCourseIds.length > 0) {
           const feedItems: ActivityFeedItem[] = [];
 
@@ -220,7 +248,7 @@ export default function DashboardOverview() {
                   const courseTitle = cData.title || 'Enrolled Course';
 
                   if (cData.notices && Array.isArray(cData.notices)) {
-                    cData.notices.slice(0, 2).forEach((n: any) => {
+                    cData.notices.slice(0, 3).forEach((n: any) => {
                       feedItems.push({
                         id: `notice-${n.id}`,
                         type: 'notice',
@@ -236,31 +264,32 @@ export default function DashboardOverview() {
                   }
 
                   if (cData.liveClasses && Array.isArray(cData.liveClasses)) {
-                    cData.liveClasses.slice(0, 2).forEach((lc: any) => {
-                      const lcTime = new Date(`${lc.date}T${lc.time}`).getTime() || Date.now();
+                    cData.liveClasses.slice(0, 3).forEach((lc: any) => {
+                      const lcTime = parseLiveClassTimestamp(lc.date, lc.time);
+                      const isLiveNow = Boolean(lc.isLive);
                       feedItems.push({
                         id: `live-${lc.id}`,
                         type: 'live_class',
                         title: lc.title,
-                        subtitle: lc.isLive ? '🔴 Live Now! (লাইভ ক্লাস শুরু হয়েছে)' : `${lc.date} • ${lc.time}`,
-                        dateStr: lc.date,
+                        subtitle: isLiveNow ? '🔴 Live Now! (লাইভ ক্লাস শুরু হয়েছে)' : (lc.date ? `${lc.date}${lc.time ? ' • ' + lc.time : ''}` : 'সিডিউলড লাইভ ক্লাস'),
+                        dateStr: lc.date || '',
                         courseTitle,
                         courseId,
-                        isLive: lc.isLive,
+                        isLive: isLiveNow,
                         link: `/dashboard/courses/${courseId}/live-classes`,
-                        timestamp: lc.isLive ? Date.now() + 100000000 : lcTime
+                        timestamp: isLiveNow ? Date.now() + 1000000000 : lcTime
                       });
                     });
                   }
 
                   if (cData.exams && Array.isArray(cData.exams)) {
-                    cData.exams.slice(0, 2).forEach((ex: any) => {
+                    cData.exams.slice(0, 3).forEach((ex: any) => {
                       if (ex.isPublished !== false) {
                         feedItems.push({
                           id: `exam-${ex.id}`,
                           type: 'exam',
                           title: ex.title,
-                          subtitle: ex.endTime ? `Deadline: ${new Date(ex.endTime).toLocaleDateString()}` : `${ex.totalMarks} Marks • ${ex.durationMinutes} mins`,
+                          subtitle: ex.endTime ? `Deadline: ${new Date(ex.endTime).toLocaleDateString()}` : `${ex.totalMarks || 0} Marks • ${ex.durationMinutes || 0} mins`,
                           dateStr: ex.durationMinutes ? `${ex.durationMinutes}m` : '',
                           courseTitle,
                           courseId,
@@ -277,8 +306,12 @@ export default function DashboardOverview() {
             })
           );
 
-          feedItems.sort((a, b) => b.timestamp - a.timestamp);
-          setActivityFeed(feedItems.slice(0, 3));
+          feedItems.sort((a, b) => {
+            if (a.isLive && !b.isLive) return -1;
+            if (!a.isLive && b.isLive) return 1;
+            return b.timestamp - a.timestamp;
+          });
+          setActivityFeed(feedItems.slice(0, 4));
         }
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -490,8 +523,8 @@ export default function DashboardOverview() {
                       <div className="flex-1 min-w-0">
                         {/* Course Tag & Type Badges */}
                         <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
-                          <span className="px-2.5 py-0.5 text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 rounded-md truncate max-w-[130px]" title={item.courseTitle}>
-                            {item.courseTitle}
+                          <span className="px-2.5 py-0.5 text-[10px] font-extrabold bg-primary/10 text-primary border border-primary/25 rounded-md truncate max-w-[140px] sm:max-w-[220px]" title={item.courseTitle}>
+                            📚 {item.courseTitle}
                           </span>
                           {item.type === 'notice' && (
                             <span className="px-2 py-0.5 text-[10px] font-extrabold text-amber-500 bg-amber-500/10 rounded-md">

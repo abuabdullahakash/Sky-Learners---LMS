@@ -191,7 +191,7 @@ export default function StudentCommunity() {
       <div className="space-y-4">
         <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <LinkIcon className="w-5 h-5 text-primary" />
-          Community Groups
+          {t('groupsTitle')}
         </h2>
 
         {links.length === 0 ? (
@@ -240,10 +240,10 @@ export default function StudentCommunity() {
           <button 
             type="button" 
             onClick={() => setActiveLightboxImage(null)} 
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-30"
+            className="absolute top-3 right-3 sm:top-5 sm:right-5 p-2 sm:p-2.5 bg-white/20 hover:bg-white/30 text-white rounded-full transition-colors z-30 shadow-lg"
             title="Close"
           >
-            <X className="w-6 h-6" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
           <div 
             className="relative max-w-5xl max-h-[90vh] flex items-center justify-center"

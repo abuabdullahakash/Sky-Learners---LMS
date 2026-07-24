@@ -291,7 +291,7 @@ export default function CoursesListPage() {
             <div 
               key={course.id} 
               onClick={() => router.push(`/teacher-dashboard/courses/${course.id}`)}
-              className="cursor-pointer group bg-foreground/5 rounded-2xl border border-foreground/10 overflow-hidden hover:border-orange-500/30 hover:shadow-xl hover:shadow-orange-500/5 transition-all flex flex-col"
+              className="cursor-pointer group bg-foreground/5 rounded-2xl border border-orange-500/30 md:border-foreground/10 hover:border-orange-500/60 active:border-orange-500 shadow-md hover:shadow-xl hover:shadow-orange-500/10 active:scale-[0.99] transition-all duration-300 flex flex-col"
             >
               
               <div className="relative aspect-[16/9] w-full bg-foreground/10">
@@ -352,7 +352,7 @@ export default function CoursesListPage() {
                       e.stopPropagation();
                       router.push(`/teacher-dashboard/courses/${course.id}/edit`);
                     }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground/10 hover:bg-orange-500 hover:text-white rounded-lg font-bold text-xs transition-colors"
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white rounded-xl font-bold text-xs shadow-md shadow-orange-500/25 active:scale-95 transition-all duration-200"
                   >
                     <Edit className="w-3.5 h-3.5" /> Edit Course
                   </button>

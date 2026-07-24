@@ -121,7 +121,7 @@ export default function CoursesPage() {
               const isFree = activePrice === 0;
 
               return (
-                <div key={course.id} className="bg-background rounded-[14px] border border-foreground/10 hover:border-orange-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-orange-500/10 hover:-translate-y-2 overflow-hidden group flex flex-col relative">
+                <div key={course.id} className="bg-background rounded-[14px] border border-orange-500/30 md:border-foreground/10 hover:border-orange-500/50 active:border-orange-500 transition-all duration-300 shadow-md hover:shadow-2xl hover:shadow-orange-500/10 active:scale-[0.99] overflow-hidden group flex flex-col relative">
                   
                   {isDiscountValid && (
                     <div className="absolute top-0 left-0 w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white text-[10px] font-bold py-1 px-4 text-center z-20 uppercase tracking-widest shadow-md">
@@ -218,7 +218,7 @@ export default function CoursesPage() {
                       </div>
                       <button 
                         onClick={() => router.push(`/courses/${course.id}`)}
-                        className="px-6 py-3 bg-foreground/5 hover:bg-gradient-to-r hover:from-orange-500 hover:to-rose-500 text-foreground hover:text-white font-bold rounded-xl transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-orange-500/20 active:scale-95"
+                        className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-rose-500 text-white font-bold rounded-xl transition-all duration-300 shadow-md shadow-orange-500/20 active:scale-95"
                       >
                         বিস্তারিত
                       </button>

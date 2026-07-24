@@ -526,10 +526,10 @@ export default function CourseCurriculumPage() {
                       <div key={lesson.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 sm:p-4 bg-foreground/5 rounded-lg border border-foreground/10 hover:border-orange-500/30 transition-colors group">
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                           {lesson.thumbnailUrl ? (
-                            <img src={lesson.thumbnailUrl} alt="Thumbnail" className="w-16 h-10 sm:w-20 sm:h-12 object-cover rounded-md border border-foreground/10 flex-shrink-0" />
+                            <img src={lesson.thumbnailUrl} alt="Thumbnail" className="w-20 h-14 sm:w-24 sm:h-16 object-cover rounded-md border border-foreground/10 shrink-0" />
                           ) : (
-                            <div className="w-16 h-10 sm:w-20 sm:h-12 bg-foreground/10 rounded-md flex items-center justify-center flex-shrink-0">
-                              <VideoIcon className="w-5 h-5 text-foreground/30" />
+                            <div className="w-20 h-14 sm:w-24 sm:h-16 bg-foreground/10 rounded-md flex items-center justify-center shrink-0">
+                              <VideoIcon className="w-6 h-6 text-foreground/30" />
                             </div>
                           )}
                           
@@ -554,12 +554,12 @@ export default function CourseCurriculumPage() {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5 self-end sm:self-center shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-foreground/10 w-full sm:w-auto justify-end">
+                        <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-foreground/10 w-full sm:w-auto justify-start sm:justify-end">
                           <button onClick={() => openLessonModal(module.id, lesson)} className="p-1.5 sm:p-2 text-blue-500 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors flex items-center gap-1 text-xs font-bold" title="Edit Lesson">
-                            <Edit2 className="w-3.5 h-3.5" /> <span className="sm:hidden">Edit</span>
+                            <Edit2 className="w-3.5 h-3.5" /> <span>Edit</span>
                           </button>
                           <button onClick={() => handleRemoveLesson(module.id, lesson.id)} className="p-1.5 sm:p-2 text-red-500 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-colors flex items-center gap-1 text-xs font-bold" title="Delete Lesson">
-                            <Trash2 className="w-3.5 h-3.5" /> <span className="sm:hidden">Delete</span>
+                            <Trash2 className="w-3.5 h-3.5" /> <span>Delete</span>
                           </button>
                         </div>
                       </div>
@@ -806,8 +806,8 @@ export default function CourseCurriculumPage() {
 
       {/* --- Add/Edit Lesson Modal --- */}
       {isLessonModalOpen && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-[100] flex items-center justify-center p-3 sm:p-4 pb-20 md:pb-4">
-          <div className="bg-background rounded-3xl w-full max-w-2xl shadow-2xl relative max-h-[82vh] md:max-h-[88vh] flex flex-col my-auto">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-2.5 sm:p-4 pb-4 md:pb-4">
+          <div className="bg-background rounded-3xl w-full max-w-2xl shadow-2xl relative max-h-[92vh] md:max-h-[90vh] flex flex-col my-auto border border-foreground/10">
             <div className="bg-background/95 backdrop-blur-sm z-10 p-5 sm:p-6 border-b border-foreground/10 flex justify-between items-center rounded-t-3xl flex-shrink-0">
               <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
                 <VideoIcon className="w-5 h-5 text-orange-500" /> 

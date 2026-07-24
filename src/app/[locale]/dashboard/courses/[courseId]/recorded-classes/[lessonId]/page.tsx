@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, addDoc, collection } from 'firebase/firestore';
 import { useParams, useRouter } from 'next/navigation';
 import { PlayCircle, CheckCircle, ArrowLeft, Loader2, Lock, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';

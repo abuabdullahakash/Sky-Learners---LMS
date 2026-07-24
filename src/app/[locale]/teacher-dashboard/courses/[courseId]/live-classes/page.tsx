@@ -492,13 +492,22 @@ export default function CourseLiveClassesPage() {
               <label className="block text-sm font-medium mb-1">Date <span className="text-red-500">*</span></label>
               <div className="relative flex items-center">
                 <input 
-                  type="date" 
+                  type={newDate ? "date" : "text"} 
                   value={newDate} 
                   onChange={e => setNewDate(e.target.value)} 
+                  onFocus={(e) => {
+                    e.target.type = "date";
+                    try { (e.target as any).showPicker?.(); } catch (err) {}
+                  }}
+                  onBlur={(e) => {
+                    if (!e.target.value) e.target.type = "text";
+                  }}
                   onClick={(e) => {
+                    (e.currentTarget as any).type = "date";
                     try { (e.currentTarget as any).showPicker?.(); } catch (err) {}
                   }}
-                  className="w-full px-4 pr-10 py-2.5 bg-background dark:bg-foreground/5 border border-foreground/15 rounded-xl text-sm font-medium text-foreground focus:outline-none focus:border-orange-500 transition-colors cursor-pointer min-h-[44px] [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer" 
+                  placeholder="mm/dd/yyyy"
+                  className="w-full px-4 pr-10 py-2.5 bg-background dark:bg-foreground/5 border border-foreground/15 rounded-xl text-sm font-medium text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-orange-500 transition-colors cursor-pointer min-h-[44px] appearance-none [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-inner-spin-button]:appearance-none" 
                   required 
                 />
                 <Calendar className="w-5 h-5 absolute right-3.5 text-orange-500 pointer-events-none" />
@@ -523,13 +532,22 @@ export default function CourseLiveClassesPage() {
               </div>
               <div className="relative flex items-center">
                 <input 
-                  type="time" 
+                  type={newTime ? "time" : "text"} 
                   value={newTime} 
                   onChange={e => setNewTime(e.target.value)} 
+                  onFocus={(e) => {
+                    e.target.type = "time";
+                    try { (e.target as any).showPicker?.(); } catch (err) {}
+                  }}
+                  onBlur={(e) => {
+                    if (!e.target.value) e.target.type = "text";
+                  }}
                   onClick={(e) => {
+                    (e.currentTarget as any).type = "time";
                     try { (e.currentTarget as any).showPicker?.(); } catch (err) {}
                   }}
-                  className="w-full px-4 pr-10 py-2.5 bg-background dark:bg-foreground/5 border border-foreground/15 rounded-xl text-sm font-medium text-foreground focus:outline-none focus:border-orange-500 transition-colors cursor-pointer min-h-[44px] [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer" 
+                  placeholder="--:-- --"
+                  className="w-full px-4 pr-10 py-2.5 bg-background dark:bg-foreground/5 border border-foreground/15 rounded-xl text-sm font-medium text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-orange-500 transition-colors cursor-pointer min-h-[44px] appearance-none [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-inner-spin-button]:appearance-none" 
                   required 
                 />
                 <Clock className="w-5 h-5 absolute right-3.5 text-orange-500 pointer-events-none" />

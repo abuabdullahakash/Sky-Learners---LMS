@@ -383,7 +383,7 @@ export default function DashboardOverview() {
         </div>
       </div>
 
-      {/* Stats Grid - 2 Columns on Mobile */}
+      {/* Stats Grid - 2 Columns on Mobile with Centered Content */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
@@ -391,19 +391,19 @@ export default function DashboardOverview() {
           return (
             <div 
               key={index} 
-              className={`group relative bg-white dark:bg-foreground/5 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border border-gray-200/80 dark:border-foreground/10 hover:border-primary/30 dark:hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-xl dark:shadow-none dark:hover:bg-foreground/10 overflow-hidden cursor-default ${
+              className={`group relative bg-white dark:bg-foreground/5 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-gray-200/80 dark:border-foreground/10 hover:border-primary/30 dark:hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-xl dark:shadow-none dark:hover:bg-foreground/10 overflow-hidden cursor-default flex flex-col items-center justify-center text-center ${
                 isLastItemOnMobile ? 'col-span-2 md:col-span-1 sm:col-span-1' : 'col-span-1'
               }`}
             >
               <div className={`absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-gradient-to-br ${stat.color} opacity-10 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-500`}></div>
               
-              <div className="flex items-center gap-3 sm:gap-5 relative z-10">
-                <div className={`bg-gradient-to-br ${stat.color} p-2.5 sm:p-4 rounded-xl sm:rounded-2xl text-white shadow-md ${stat.shadow} transform group-hover:rotate-6 transition-transform duration-300 flex-shrink-0`}>
-                  <Icon className="w-5 h-5 sm:w-7 sm:h-7" />
+              <div className="flex flex-col items-center justify-center text-center gap-2 relative z-10 w-full">
+                <div className={`bg-gradient-to-br ${stat.color} p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl text-white shadow-md ${stat.shadow} transform group-hover:rotate-6 transition-transform duration-300 flex items-center justify-center`}>
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-foreground/60 font-semibold text-[10px] sm:text-xs uppercase tracking-wider mb-0.5 sm:mb-1 truncate">{stat.title}</p>
-                  <h3 className="text-xl sm:text-4xl font-black tracking-tight text-gray-900 dark:text-white">{stat.value}</h3>
+                <div className="w-full text-center">
+                  <p className="text-foreground/60 font-semibold text-[10px] sm:text-xs uppercase tracking-wider mb-0.5 truncate text-center">{stat.title}</p>
+                  <h3 className="text-xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white text-center">{stat.value}</h3>
                 </div>
               </div>
             </div>

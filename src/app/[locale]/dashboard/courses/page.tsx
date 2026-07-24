@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { Link } from '@/i18n/routing';
-import { BookOpen, Clock, CheckCircle2, PlayCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { BookOpen, Clock, CheckCircle2, PlayCircle, AlertCircle, Loader2, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations, useLocale } from 'next-intl';
 
@@ -143,17 +143,25 @@ export default function StudentCoursesPage() {
   return (
     <div className="w-full space-y-10 animate-in fade-in duration-500">
       
-      {/* Premium Hero Banner Header */}
-      <div className="relative overflow-hidden rounded-3xl p-6 md:p-10 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white shadow-2xl border border-white/10">
-        <div className="absolute top-0 right-0 w-72 h-72 bg-orange-500/15 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
-        <div className="relative z-10 space-y-3">
-          <span className="inline-block px-3 py-1 bg-orange-500/20 text-orange-400 text-xs font-bold rounded-full uppercase tracking-wider border border-orange-500/30">
-            {locale === 'bn' ? 'লার্নিং পোর্টাল' : 'Learning Portal'}
-          </span>
-          <h1 className="text-3xl md:text-4xl font-black text-white leading-tight">
+      {/* Premium Hero Banner Header - Larger & Richer */}
+      <div className="relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] p-8 sm:p-12 md:p-14 bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 text-white shadow-2xl border border-white/10 min-h-[220px] sm:min-h-[260px] flex flex-col justify-center">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-orange-500/20 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute top-6 right-6 sm:top-10 sm:right-10 opacity-20 pointer-events-none">
+          <Sparkles className="w-24 h-24 sm:w-36 sm:h-36 text-orange-400 animate-pulse" />
+        </div>
+
+        <div className="relative z-10 space-y-3.5">
+          <div>
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-400 text-xs sm:text-sm font-extrabold rounded-full uppercase tracking-wider border border-orange-500/30 backdrop-blur-md">
+              <Sparkles className="w-4 h-4 text-orange-400" />
+              {locale === 'bn' ? 'লার্নিং পোর্টাল' : 'Learning Portal'}
+            </span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight tracking-tight">
             {t('title')}
           </h1>
-          <p className="text-gray-300 text-sm md:text-base max-w-2xl leading-relaxed">
+          <p className="text-gray-300 text-sm sm:text-base md:text-lg max-w-2xl leading-relaxed">
             {t('subtitle')}
           </p>
         </div>

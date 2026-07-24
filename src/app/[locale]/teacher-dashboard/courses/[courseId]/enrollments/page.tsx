@@ -124,22 +124,22 @@ export default function CourseEnrollmentsPage() {
       <div className="bg-foreground/5 border border-foreground/10 rounded-2xl overflow-hidden">
         
         {/* Tabs & Search */}
-        <div className="p-4 border-b border-foreground/10 flex flex-col sm:flex-row justify-between items-center gap-4 bg-background/50">
-          <div className="flex gap-2 p-1 bg-foreground/5 rounded-xl">
+        <div className="p-3 sm:p-4 border-b border-foreground/10 flex flex-col sm:flex-row justify-between items-center gap-3 bg-background/50">
+          <div className="grid grid-cols-2 gap-1 p-1 bg-foreground/5 rounded-xl w-full sm:w-auto">
             <button 
               onClick={() => setActiveTab('pending')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'pending' ? 'bg-background shadow text-foreground' : 'text-foreground/60 hover:text-foreground'}`}
+              className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-bold transition-colors flex items-center justify-center gap-1.5 ${activeTab === 'pending' ? 'bg-background shadow text-foreground' : 'text-foreground/60 hover:text-foreground'}`}
             >
-              Pending Requests
-              <span className="ml-2 bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full">
+              <span>Pending Requests</span>
+              <span className="bg-orange-500 text-white text-[10px] sm:text-xs px-1.5 py-0.5 rounded-full font-bold">
                 {enrollments.filter(e => e.status === 'pending').length}
               </span>
             </button>
             <button 
               onClick={() => setActiveTab('approved')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'approved' ? 'bg-background shadow text-foreground' : 'text-foreground/60 hover:text-foreground'}`}
+              className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-bold transition-colors flex items-center justify-center gap-1.5 ${activeTab === 'approved' ? 'bg-background shadow text-foreground' : 'text-foreground/60 hover:text-foreground'}`}
             >
-              Approved
+              <span>Approved</span>
             </button>
           </div>
 
@@ -150,7 +150,7 @@ export default function CourseEnrollmentsPage() {
               placeholder="Search TrxID or Number..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-background border border-foreground/20 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-primary transition-colors"
+              className="w-full bg-background border border-foreground/20 rounded-xl py-2 pl-9 pr-4 text-xs sm:text-sm focus:outline-none focus:border-primary transition-colors"
             />
           </div>
         </div>
@@ -165,52 +165,45 @@ export default function CourseEnrollmentsPage() {
           ) : filteredEnrollments.length === 0 ? (
             <div className="p-12 text-center text-foreground/50 flex flex-col items-center">
               <FileText className="w-12 h-12 mb-3 opacity-20" />
-              <p>No {activeTab} enrollments found.</p>
+              <p className="text-sm font-medium">No {activeTab} enrollments found.</p>
             </div>
           ) : (
             <div className="divide-y divide-foreground/10">
               {filteredEnrollments.map((enrollment) => (
-                <div key={enrollment.id} className="p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-foreground/[0.02] transition-colors">
+                <div key={enrollment.id} className="p-3 sm:p-4 flex items-center justify-between gap-2 hover:bg-foreground/[0.02] transition-colors">
                   
-                  {/* Left Metadata - Compact Layout */}
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center justify-between sm:justify-start gap-3 flex-wrap">
-                      <p className="font-bold text-sm sm:text-base text-foreground">
-                        {enrollment.studentName || 'Student'}
-                      </p>
-                      {activeTab === 'approved' && (
-                        <span className="sm:hidden flex items-center gap-1 text-green-500 bg-green-500/10 px-2.5 py-0.5 rounded-full text-xs font-bold">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Approved
-                        </span>
-                      )}
-                    </div>
+                  {/* Single Row Metadata */}
+                  <div className="flex-1 min-w-0 pr-2">
+                    <p className="font-bold text-xs sm:text-base text-foreground truncate mb-0.5">
+                      {enrollment.studentName || 'Student'}
+                    </p>
 
-                    <div className="flex items-center gap-4 text-xs text-foreground/70 flex-wrap">
-                      <span><span className="text-foreground/40 font-medium">Number:</span> <strong className="text-primary font-semibold">{enrollment.senderNumber}</strong></span>
-                      <span className="border-l border-foreground/10 pl-4"><span className="text-foreground/40 font-medium">TrxID:</span> <code className="font-mono bg-foreground/10 px-1.5 py-0.5 rounded text-[11px] font-bold">{enrollment.trxId || 'N/A'}</code></span>
+                    <div className="flex items-center gap-2 sm:gap-4 text-[11px] sm:text-xs text-foreground/70 flex-wrap sm:flex-nowrap">
+                      <span className="truncate"><span className="text-foreground/40 font-medium">Num:</span> <strong className="text-primary font-semibold">{enrollment.senderNumber || 'N/A'}</strong></span>
+                      <span className="border-l border-foreground/10 pl-2 sm:pl-4 truncate"><span className="text-foreground/40 font-medium">TrxID:</span> <code className="font-mono bg-foreground/10 px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-bold">{enrollment.trxId || 'N/A'}</code></span>
                     </div>
                   </div>
 
-                  {/* Right Actions */}
-                  <div className="flex items-center justify-end gap-2 pt-2 sm:pt-0 sm:border-l sm:border-foreground/10 sm:pl-4">
+                  {/* Actions / Status */}
+                  <div className="shrink-0 flex items-center gap-1.5">
                     {activeTab === 'pending' ? (
                       <>
                         <button 
                           onClick={() => handleReject(enrollment.id)}
-                          className="px-3 py-1.5 text-xs font-bold text-red-500 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-colors flex items-center gap-1.5"
+                          className="px-2.5 py-1.5 text-[11px] sm:text-xs font-bold text-red-500 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-colors flex items-center gap-1 border border-red-500/20"
                         >
-                          <XCircle className="w-3.5 h-3.5" /> Reject
+                          <XCircle className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Reject</span>
                         </button>
                         <button 
                           onClick={() => handleApprove(enrollment.id)}
-                          className="px-3.5 py-1.5 text-xs font-bold text-white bg-green-500 hover:bg-green-600 shadow rounded-lg transition-all flex items-center gap-1.5"
+                          className="px-3 py-1.5 text-[11px] sm:text-xs font-bold text-white bg-green-500 hover:bg-green-600 shadow-sm rounded-lg transition-all flex items-center gap-1"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" /> Approve
                         </button>
                       </>
                     ) : (
-                      <span className="hidden sm:flex items-center gap-1.5 text-green-500 bg-green-500/10 px-3.5 py-1.5 rounded-xl text-xs font-bold">
-                        <CheckCircle2 className="w-4 h-4" /> Approved
+                      <span className="flex items-center gap-1 text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-bold border border-emerald-500/20">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Approved
                       </span>
                     )}
                   </div>

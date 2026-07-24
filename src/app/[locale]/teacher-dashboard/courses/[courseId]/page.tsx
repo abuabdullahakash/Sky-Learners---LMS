@@ -64,17 +64,17 @@ export default function CourseOverviewPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-6">
         {stats.map((stat, i) => {
           const Icon = stat.icon;
           return (
-            <div key={i} className="bg-background border border-foreground/10 rounded-3xl p-6 shadow-sm flex items-center gap-4">
-              <div className={`p-4 rounded-2xl ${stat.bg} ${stat.color}`}>
-                <Icon className="w-6 h-6" />
+            <div key={i} className="bg-background border border-foreground/10 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-center text-center sm:text-left justify-center sm:justify-start gap-2 sm:gap-4">
+              <div className={`p-2.5 sm:p-4 rounded-xl sm:rounded-2xl ${stat.bg} ${stat.color} shrink-0`}>
+                <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-foreground/60">{stat.label}</p>
-                <h3 className="text-2xl font-black">{stat.value}</h3>
+              <div className="min-w-0">
+                <p className="text-[11px] sm:text-sm font-medium text-foreground/60 truncate">{stat.label}</p>
+                <h3 className="text-lg sm:text-2xl font-black">{stat.value}</h3>
               </div>
             </div>
           );

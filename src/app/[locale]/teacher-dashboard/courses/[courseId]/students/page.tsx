@@ -130,23 +130,27 @@ export default function CourseStudentsPage() {
 
       {/* Overview Stats */}
       {students.length > 0 && totalCourseLessons > 0 && (
-        <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-bold text-primary">Batch Performance</h3>
-            <p className="text-sm text-foreground/60">Average course completion across all students.</p>
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 text-white p-4 sm:p-6 border border-white/10 shadow-xl flex flex-row items-center justify-between gap-4">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/10 rounded-full blur-2xl pointer-events-none"></div>
+          <div className="relative z-10 space-y-1">
+            <span className="inline-block px-2.5 py-0.5 bg-orange-500/20 text-orange-400 text-[10px] font-bold rounded-full uppercase tracking-wider border border-orange-500/30">
+              Batch Metrics
+            </span>
+            <h3 className="text-base sm:text-lg font-black text-white">Batch Performance</h3>
+            <p className="text-xs text-gray-300 hidden sm:block">Average course completion across all students.</p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-3xl font-black text-gray-900 dark:text-white">
+          <div className="relative z-10 flex items-center gap-3 sm:gap-6 shrink-0">
+            <div className="text-center sm:text-right">
+              <p className="text-2xl sm:text-3xl font-black text-orange-400">
                 {Math.round((Object.values(studentProgress).reduce((a, b) => a + b, 0) / (students.length * totalCourseLessons)) * 100) || 0}%
               </p>
-              <p className="text-xs font-bold text-foreground/50 uppercase tracking-wider">Avg Progress</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Avg Progress</p>
             </div>
-            <div className="text-right pl-4 border-l border-foreground/10">
-              <p className="text-3xl font-black text-gray-900 dark:text-white">
+            <div className="text-center sm:text-right pl-3 sm:pl-6 border-l border-white/10">
+              <p className="text-2xl sm:text-3xl font-black text-emerald-400">
                 {Object.keys(studentProgress).length}
               </p>
-              <p className="text-xs font-bold text-foreground/50 uppercase tracking-wider">Active Students</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Active Students</p>
             </div>
           </div>
         </div>
@@ -154,41 +158,39 @@ export default function CourseStudentsPage() {
 
       <div className="bg-foreground/5 border border-foreground/10 rounded-2xl overflow-hidden">
         
-        {/* Search Bar */}
-        <div className="p-4 border-b border-foreground/10 flex flex-col sm:flex-row justify-between items-center gap-4 bg-background/50">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 text-green-500 rounded-lg font-bold text-sm">
-            <Users className="w-4 h-4" /> Total: {students.length}
+        {/* Header Search & Total Count in 1 Row */}
+        <div className="p-3 sm:p-4 border-b border-foreground/10 flex items-center justify-between gap-2.5 bg-background/50">
+          <div className="flex items-center gap-1.5 px-3 py-2 bg-green-500/10 text-green-500 rounded-xl font-bold text-xs shrink-0 border border-green-500/20">
+            <Users className="w-3.5 h-3.5" /> <span>Total: {students.length}</span>
           </div>
 
-          <div className="flex items-center gap-4 w-full sm:w-auto">
-            <div className="relative w-full sm:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
-              <input 
-                type="text" 
-                placeholder="Search by name, phone, email..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-background border border-foreground/20 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-primary transition-colors"
-              />
-            </div>
-            
-            {/* View Toggle */}
-            <div className="hidden sm:flex items-center bg-background border border-foreground/20 rounded-xl p-1 shrink-0">
-              <button 
-                onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-primary/10 text-primary' : 'text-foreground/40 hover:text-foreground/80'}`}
-                title="Grid View"
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </button>
-              <button 
-                onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-primary/10 text-primary' : 'text-foreground/40 hover:text-foreground/80'}`}
-                title="List View"
-              >
-                <ListIcon className="w-4 h-4" />
-              </button>
-            </div>
+          <div className="relative flex-1 max-w-xs sm:max-w-80">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+            <input 
+              type="text" 
+              placeholder="Search name, phone, email..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-background border border-foreground/20 rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none focus:border-primary transition-colors"
+            />
+          </div>
+          
+          {/* View Toggle */}
+          <div className="hidden sm:flex items-center bg-background border border-foreground/20 rounded-xl p-1 shrink-0">
+            <button 
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-primary/10 text-primary' : 'text-foreground/40 hover:text-foreground/80'}`}
+              title="Grid View"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button 
+              onClick={() => setViewMode('list')}
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-primary/10 text-primary' : 'text-foreground/40 hover:text-foreground/80'}`}
+              title="List View"
+            >
+              <ListIcon className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
@@ -202,90 +204,76 @@ export default function CourseStudentsPage() {
           ) : filteredStudents.length === 0 ? (
             <div className="p-12 text-center text-foreground/50 flex flex-col items-center">
               <Users className="w-12 h-12 mb-3 opacity-20" />
-              <p>No students found.</p>
+              <p className="text-sm font-medium">No students found.</p>
             </div>
           ) : (
-            <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4" : "flex flex-col gap-3 p-4"}>
-              {filteredStudents.map((student) => (
-                <div key={student.id} className={`bg-background border border-foreground/10 rounded-2xl hover:shadow-lg transition-shadow relative group ${viewMode === 'grid' ? 'p-5 flex flex-col' : 'p-4 flex flex-col md:flex-row md:items-center gap-6'}`}>
-                  
-                  {/* User Profile Info & Progress */}
-                  <div className={`flex flex-col gap-3 ${viewMode === 'grid' ? 'mb-4 pb-4 border-b border-foreground/10' : 'md:w-1/3 shrink-0'}`}>
-                    <div className="flex items-center gap-4">
+            <div className="p-2 sm:p-4 space-y-2">
+              {filteredStudents.map((student) => {
+                const pct = totalCourseLessons > 0 ? Math.round(((studentProgress[student.studentId] || 0) / totalCourseLessons) * 100) : 0;
+
+                return (
+                  <div key={student.id} className="bg-background border border-foreground/10 rounded-2xl p-3 sm:p-4 hover:border-primary/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                    
+                    {/* Student Info & Progress */}
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
                       {student.profileImageUrl ? (
-                        <img src={student.profileImageUrl} alt={student.studentName} className={`${viewMode === 'grid' ? 'w-12 h-12' : 'w-14 h-14'} rounded-full object-cover border-2 border-primary/20 shrink-0`} />
+                        <img src={student.profileImageUrl} alt={student.studentName} className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-primary/20 shrink-0" />
                       ) : (
-                        <div className={`${viewMode === 'grid' ? 'w-12 h-12' : 'w-14 h-14'} rounded-full bg-foreground/5 flex items-center justify-center text-foreground/40 border border-foreground/10 shrink-0`}>
-                          <UserCircle className={`${viewMode === 'grid' ? 'w-8 h-8' : 'w-9 h-9'}`} />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-foreground/5 flex items-center justify-center text-foreground/40 border border-foreground/10 shrink-0">
+                          <UserCircle className="w-6 h-6 sm:w-8 sm:h-8" />
                         </div>
                       )}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-lg leading-tight line-clamp-1">{student.studentName}</h3>
-                        <p className="text-xs text-foreground/50 mt-1">Enrolled: {new Date(student.createdAt?.toDate?.() || Date.now()).toLocaleDateString()}</p>
+                      
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between sm:justify-start gap-2">
+                          <h3 className="font-bold text-xs sm:text-base text-foreground truncate">{student.studentName || 'Student'}</h3>
+                          <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full shrink-0">
+                            {pct}% Progress
+                          </span>
+                        </div>
+                        
+                        <p className="text-[10px] sm:text-xs text-foreground/50 truncate mt-0.5">
+                          Enrolled: {new Date(student.createdAt?.toDate?.() || Date.now()).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </p>
+
+                        {/* Progress Bar */}
+                        {totalCourseLessons > 0 && (
+                          <div className="w-full bg-foreground/10 rounded-full h-1.5 mt-1.5 overflow-hidden">
+                            <div className="bg-emerald-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(pct, 100)}%` }}></div>
+                          </div>
+                        )}
                       </div>
                     </div>
-                    
-                    {/* Progress Bar */}
-                    {totalCourseLessons > 0 && (
-                      <div className="w-full mt-2">
-                        <div className="flex justify-between items-center text-[10px] font-bold text-foreground/50 uppercase tracking-wider mb-1.5">
-                          <span>Progress</span>
-                          <span>{Math.round(((studentProgress[student.studentId] || 0) / totalCourseLessons) * 100)}%</span>
-                        </div>
-                        <div className="w-full bg-foreground/10 rounded-full h-1.5 overflow-hidden">
-                          <div 
-                            className="bg-green-500 h-full rounded-full transition-all duration-500"
-                            style={{ width: `${Math.min(((studentProgress[student.studentId] || 0) / totalCourseLessons) * 100, 100)}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    )}
+
+                    {/* Contact Action Icons */}
+                    <div className="flex items-center gap-1.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-foreground/10 shrink-0 flex-wrap">
+                      {student.offlinePhone && (
+                        <a href={`tel:${student.offlinePhone}`} className="inline-flex items-center gap-1 px-2.5 py-1 bg-foreground/5 hover:bg-primary/10 hover:text-primary rounded-lg text-[11px] font-semibold text-foreground/80 transition-colors border border-foreground/10" title={student.offlinePhone}>
+                          <Phone className="w-3 h-3 text-primary" />
+                          <span className="truncate max-w-[100px]">{student.offlinePhone}</span>
+                        </a>
+                      )}
+                      {student.whatsappNumber && (
+                        <a href={`https://wa.me/${student.whatsappNumber.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500 hover:text-white rounded-lg text-[11px] font-semibold text-emerald-500 transition-all border border-emerald-500/20" title={student.whatsappNumber}>
+                          <Phone className="w-3 h-3 text-emerald-500" />
+                          <span className="truncate max-w-[100px]">{student.whatsappNumber}</span>
+                        </a>
+                      )}
+                      {student.contactEmail && (
+                        <a href={`mailto:${student.contactEmail}`} className="inline-flex items-center gap-1 px-2 py-1 bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white rounded-lg text-[11px] font-semibold transition-all border border-orange-500/20" title={student.contactEmail}>
+                          <Mail className="w-3 h-3" />
+                        </a>
+                      )}
+                      {student.facebookUrl && (
+                        <a href={student.facebookUrl.startsWith('http') ? student.facebookUrl : `https://${student.facebookUrl}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white rounded-lg text-[11px] font-semibold transition-all border border-blue-500/20" title="Facebook Profile">
+                          <Link className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+
                   </div>
-
-                  {/* Contact Info */}
-                  <div className={`text-sm flex-1 ${viewMode === 'grid' ? 'space-y-3' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'}`}>
-                    {student.offlinePhone ? (
-                      <div className="flex items-start gap-2">
-                        <Phone className="w-4 h-4 text-foreground/40 shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-xs text-foreground/50">Phone</p>
-                          <a href={`tel:${student.offlinePhone}`} className="font-semibold hover:text-primary transition-colors">{student.offlinePhone}</a>
-                        </div>
-                      </div>
-                    ) : <div className={viewMode === 'list' ? 'hidden lg:block opacity-0' : 'hidden'}></div>}
-
-                    {student.whatsappNumber ? (
-                      <div className="flex items-start gap-2">
-                        <Phone className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-xs text-foreground/50">WhatsApp</p>
-                          <a href={`https://wa.me/${student.whatsappNumber.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="font-semibold text-green-500 hover:underline">{student.whatsappNumber}</a>
-                        </div>
-                      </div>
-                    ) : <div className={viewMode === 'list' ? 'hidden lg:block opacity-0' : 'hidden'}></div>}
-
-                    {student.contactEmail ? (
-                      <div className="flex items-start gap-2">
-                        <Mail className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-                        <div className="min-w-0">
-                          <p className="text-xs text-foreground/50">Email</p>
-                          <a href={`mailto:${student.contactEmail}`} className="font-medium text-foreground/80 hover:text-primary transition-colors truncate block">{student.contactEmail}</a>
-                        </div>
-                      </div>
-                    ) : <div className={viewMode === 'list' ? 'hidden lg:block opacity-0' : 'hidden'}></div>}
-
-                    {student.facebookUrl ? (
-                      <div className="flex items-start gap-2">
-                        <Link className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <div className="min-w-0">
-                          <p className="text-xs text-foreground/50">Facebook</p>
-                          <a href={student.facebookUrl.startsWith('http') ? student.facebookUrl : `https://${student.facebookUrl}`} target="_blank" rel="noopener noreferrer" className="font-medium text-blue-600 hover:underline truncate block">{student.facebookUrl}</a>
-                        </div>
-                      </div>
-                    ) : <div className={viewMode === 'list' ? 'hidden lg:block opacity-0' : 'hidden'}></div>}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

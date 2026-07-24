@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Save, MessageSquare, Plus, Trash2, Link as LinkIcon, Bell, Megaphone, ImagePlus, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Save, MessageSquare, Plus, Trash2, Link as LinkIcon, Bell, Megaphone, ImagePlus, Loader2, Image as ImageIcon, ZoomIn, X } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import { uploadImageToImgBB } from '@/lib/imgbb';
 
@@ -45,6 +45,7 @@ export default function CourseCommunityPage() {
   const [communityLinks, setCommunityLinks] = useState<CommunityLink[]>([]);
   const [notices, setNotices] = useState<CourseNotice[]>([]);
   const [message, setMessage] = useState('');
+  const [activeLightboxImage, setActiveLightboxImage] = useState<string | null>(null);
 
   // Notice Form State
   const [isAddingNotice, setIsAddingNotice] = useState(false);
@@ -369,8 +370,19 @@ export default function CourseCommunityPage() {
                   <h4 className="font-bold text-base text-foreground truncate">{notice.title}</h4>
                   <p className="text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">{notice.content}</p>
                   {notice.imageUrl && (
-                    <div className="mt-2.5">
-                      <img src={notice.imageUrl} alt={notice.title} className="max-h-64 rounded-xl border border-foreground/10 object-contain bg-background shadow-sm" />
+                    <div 
+                      className="mt-3 relative group inline-block max-w-xs sm:max-w-sm rounded-xl overflow-hidden border border-foreground/15 bg-black/5 cursor-pointer shadow-sm"
+                      onClick={() => setActiveLightboxImage(notice.imageUrl!)}
+                    >
+                      <img 
+                        src={notice.imageUrl} 
+                        alt={notice.title} 
+                        className="max-h-48 w-auto object-cover rounded-xl transition-all duration-300 group-hover:scale-105 group-hover:brightness-90" 
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white font-bold text-xs">
+                        <ZoomIn className="w-4 h-4 text-orange-400" />
+                        <span>Click to Zoom</span>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -468,6 +480,33 @@ export default function CourseCommunityPage() {
           </div>
         </form>
       </div>
+
+      {/* Lightbox Modal */}
+      {activeLightboxImage && (
+        <div 
+          className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-8 animate-in fade-in duration-200"
+          onClick={() => setActiveLightboxImage(null)}
+        >
+          <button 
+            type="button" 
+            onClick={() => setActiveLightboxImage(null)} 
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-30"
+            title="Close"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <div 
+            className="relative max-w-5xl max-h-[90vh] flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img 
+              src={activeLightboxImage} 
+              alt="Notice Full Preview" 
+              className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl border border-white/10" 
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -41,7 +41,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange,
   ];
 
   return (
-    <div className="rich-text-editor-container bg-background text-foreground rounded-2xl overflow-hidden border border-foreground/20 [&_.ql-toolbar]:border-b [&_.ql-toolbar]:border-foreground/20 [&_.ql-toolbar]:bg-foreground/5 [&_.ql-container]:border-none [&_.ql-container]:text-foreground [&_.ql-editor]:min-h-[200px] [&_.ql-editor]:text-base [&_.ql-editor]:p-4 [&_.ql-picker-label]:text-foreground [&_.ql-stroke]:stroke-foreground [&_.ql-fill]:fill-foreground [&_.ql-picker-options]:bg-background [&_.ql-picker-options]:border-foreground/20 [&_.ql-picker-item]:text-foreground [&_.ql-picker-item:hover]:text-primary">
+    <div className="rich-text-editor-container bg-background text-foreground rounded-xl sm:rounded-2xl overflow-hidden border border-foreground/20 [&_.ql-toolbar]:border-b [&_.ql-toolbar]:border-foreground/20 [&_.ql-toolbar]:bg-foreground/5 [&_.ql-container]:border-none [&_.ql-container]:text-foreground [&_.ql-editor]:min-h-[160px] sm:[&_.ql-editor]:min-h-[200px] [&_.ql-editor]:p-3 sm:[&_.ql-editor]:p-4 [&_.ql-picker-label]:text-foreground [&_.ql-stroke]:stroke-foreground [&_.ql-fill]:fill-foreground [&_.ql-picker-options]:bg-background [&_.ql-picker-options]:border-foreground/20 [&_.ql-picker-item]:text-foreground [&_.ql-picker-item:hover]:text-primary text-sm sm:text-base">
       <ReactQuill 
         theme="snow" 
         value={value} 

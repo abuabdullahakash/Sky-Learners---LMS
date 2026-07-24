@@ -130,27 +130,29 @@ export default function CourseStudentsPage() {
 
       {/* Overview Stats */}
       {students.length > 0 && totalCourseLessons > 0 && (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 text-white p-4 sm:p-6 border border-white/10 shadow-xl flex flex-row items-center justify-between gap-4">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 text-white p-4 sm:p-6 border border-white/10 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/10 rounded-full blur-2xl pointer-events-none"></div>
-          <div className="relative z-10 space-y-1">
-            <span className="inline-block px-2.5 py-0.5 bg-orange-500/20 text-orange-400 text-[10px] font-bold rounded-full uppercase tracking-wider border border-orange-500/30">
+          
+          <div className="relative z-10 space-y-1.5 w-full sm:w-auto">
+            <span className="inline-block px-2.5 py-0.5 bg-orange-500/20 text-orange-400 text-[10px] font-extrabold rounded-full uppercase tracking-wider border border-orange-500/30">
               Batch Metrics
             </span>
-            <h3 className="text-base sm:text-lg font-black text-white">Batch Performance</h3>
+            <h3 className="text-base sm:text-xl font-black text-white leading-snug">Batch Performance</h3>
             <p className="text-xs text-gray-300 hidden sm:block">Average course completion across all students.</p>
           </div>
-          <div className="relative z-10 flex items-center gap-3 sm:gap-6 shrink-0">
-            <div className="text-center sm:text-right">
+
+          <div className="relative z-10 flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 sm:gap-6 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/10">
+            <div className="text-left sm:text-right flex-1 sm:flex-initial">
               <p className="text-2xl sm:text-3xl font-black text-orange-400">
                 {Math.round((Object.values(studentProgress).reduce((a, b) => a + b, 0) / (students.length * totalCourseLessons)) * 100) || 0}%
               </p>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Avg Progress</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Avg Progress</p>
             </div>
-            <div className="text-center sm:text-right pl-3 sm:pl-6 border-l border-white/10">
+            <div className="text-right flex-1 sm:flex-initial pl-4 sm:pl-6 border-l border-white/10">
               <p className="text-2xl sm:text-3xl font-black text-emerald-400">
                 {Object.keys(studentProgress).length}
               </p>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Active Students</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Active Students</p>
             </div>
           </div>
         </div>
@@ -158,13 +160,13 @@ export default function CourseStudentsPage() {
 
       <div className="bg-foreground/5 border border-foreground/10 rounded-2xl overflow-hidden">
         
-        {/* Header Search & Total Count in 1 Row */}
-        <div className="p-3 sm:p-4 border-b border-foreground/10 flex items-center justify-between gap-2.5 bg-background/50">
+        {/* Header: Total Count & Search Bar Next To It */}
+        <div className="p-3 sm:p-4 border-b border-foreground/10 flex items-center gap-3 bg-background/50">
           <div className="flex items-center gap-1.5 px-3 py-2 bg-green-500/10 text-green-500 rounded-xl font-bold text-xs shrink-0 border border-green-500/20">
             <Users className="w-3.5 h-3.5" /> <span>Total: {students.length}</span>
           </div>
 
-          <div className="relative flex-1 max-w-xs sm:max-w-80">
+          <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
             <input 
               type="text" 
@@ -173,24 +175,6 @@ export default function CourseStudentsPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-background border border-foreground/20 rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none focus:border-primary transition-colors"
             />
-          </div>
-          
-          {/* View Toggle */}
-          <div className="hidden sm:flex items-center bg-background border border-foreground/20 rounded-xl p-1 shrink-0">
-            <button 
-              onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-primary/10 text-primary' : 'text-foreground/40 hover:text-foreground/80'}`}
-              title="Grid View"
-            >
-              <LayoutGrid className="w-4 h-4" />
-            </button>
-            <button 
-              onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-primary/10 text-primary' : 'text-foreground/40 hover:text-foreground/80'}`}
-              title="List View"
-            >
-              <ListIcon className="w-4 h-4" />
-            </button>
           </div>
         </div>
 
@@ -207,66 +191,66 @@ export default function CourseStudentsPage() {
               <p className="text-sm font-medium">No students found.</p>
             </div>
           ) : (
-            <div className="p-2 sm:p-4 space-y-2">
+            <div className="p-2 sm:p-4 space-y-3">
               {filteredStudents.map((student) => {
                 const pct = totalCourseLessons > 0 ? Math.round(((studentProgress[student.studentId] || 0) / totalCourseLessons) * 100) : 0;
 
                 return (
-                  <div key={student.id} className="bg-background border border-foreground/10 rounded-2xl p-3 sm:p-4 hover:border-primary/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                  <div key={student.id} className="bg-background border border-foreground/10 rounded-2xl p-3.5 sm:p-5 hover:border-primary/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
                     
                     {/* Student Info & Progress */}
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
                       {student.profileImageUrl ? (
-                        <img src={student.profileImageUrl} alt={student.studentName} className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-primary/20 shrink-0" />
+                        <img src={student.profileImageUrl} alt={student.studentName} className="w-11 h-11 sm:w-13 sm:h-13 rounded-full object-cover border-2 border-primary/20 shrink-0" />
                       ) : (
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-foreground/5 flex items-center justify-center text-foreground/40 border border-foreground/10 shrink-0">
-                          <UserCircle className="w-6 h-6 sm:w-8 sm:h-8" />
+                        <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-foreground/5 flex items-center justify-center text-foreground/40 border border-foreground/10 shrink-0">
+                          <UserCircle className="w-7 h-7 sm:w-9 sm:h-9" />
                         </div>
                       )}
                       
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between sm:justify-start gap-2">
-                          <h3 className="font-bold text-xs sm:text-base text-foreground truncate">{student.studentName || 'Student'}</h3>
-                          <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full shrink-0">
+                        <div className="flex items-center justify-between sm:justify-start gap-2 mb-1">
+                          <h3 className="font-bold text-sm sm:text-base text-foreground truncate">{student.studentName || 'Student'}</h3>
+                          <span className="text-[11px] font-black text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 shrink-0">
                             {pct}% Progress
                           </span>
                         </div>
                         
-                        <p className="text-[10px] sm:text-xs text-foreground/50 truncate mt-0.5">
+                        <p className="text-[10px] sm:text-xs text-foreground/50 truncate mb-1.5">
                           Enrolled: {new Date(student.createdAt?.toDate?.() || Date.now()).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </p>
 
                         {/* Progress Bar */}
                         {totalCourseLessons > 0 && (
-                          <div className="w-full bg-foreground/10 rounded-full h-1.5 mt-1.5 overflow-hidden">
-                            <div className="bg-emerald-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(pct, 100)}%` }}></div>
+                          <div className="w-full bg-foreground/10 rounded-full h-2 overflow-hidden">
+                            <div className="bg-gradient-to-r from-emerald-500 to-green-400 h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(pct, 100)}%` }}></div>
                           </div>
                         )}
                       </div>
                     </div>
 
                     {/* Contact Action Icons */}
-                    <div className="flex items-center gap-1.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-foreground/10 shrink-0 flex-wrap">
+                    <div className="flex items-center gap-2 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-foreground/10 shrink-0 flex-wrap">
                       {student.offlinePhone && (
-                        <a href={`tel:${student.offlinePhone}`} className="inline-flex items-center gap-1 px-2.5 py-1 bg-foreground/5 hover:bg-primary/10 hover:text-primary rounded-lg text-[11px] font-semibold text-foreground/80 transition-colors border border-foreground/10" title={student.offlinePhone}>
-                          <Phone className="w-3 h-3 text-primary" />
-                          <span className="truncate max-w-[100px]">{student.offlinePhone}</span>
+                        <a href={`tel:${student.offlinePhone}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-foreground/5 hover:bg-primary/10 hover:text-primary rounded-xl text-xs font-semibold text-foreground/80 transition-colors border border-foreground/10" title={student.offlinePhone}>
+                          <Phone className="w-3.5 h-3.5 text-primary" />
+                          <span className="truncate max-w-[110px]">{student.offlinePhone}</span>
                         </a>
                       )}
                       {student.whatsappNumber && (
-                        <a href={`https://wa.me/${student.whatsappNumber.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500 hover:text-white rounded-lg text-[11px] font-semibold text-emerald-500 transition-all border border-emerald-500/20" title={student.whatsappNumber}>
-                          <Phone className="w-3 h-3 text-emerald-500" />
-                          <span className="truncate max-w-[100px]">{student.whatsappNumber}</span>
+                        <a href={`https://wa.me/${student.whatsappNumber.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500 hover:text-white rounded-xl text-xs font-semibold text-emerald-500 transition-all border border-emerald-500/20" title={student.whatsappNumber}>
+                          <Phone className="w-3.5 h-3.5 text-emerald-500" />
+                          <span className="truncate max-w-[110px]">{student.whatsappNumber}</span>
                         </a>
                       )}
                       {student.contactEmail && (
-                        <a href={`mailto:${student.contactEmail}`} className="inline-flex items-center gap-1 px-2 py-1 bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white rounded-lg text-[11px] font-semibold transition-all border border-orange-500/20" title={student.contactEmail}>
-                          <Mail className="w-3 h-3" />
+                        <a href={`mailto:${student.contactEmail}`} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white rounded-xl text-xs font-semibold transition-all border border-orange-500/20" title={student.contactEmail}>
+                          <Mail className="w-3.5 h-3.5" />
                         </a>
                       )}
                       {student.facebookUrl && (
-                        <a href={student.facebookUrl.startsWith('http') ? student.facebookUrl : `https://${student.facebookUrl}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white rounded-lg text-[11px] font-semibold transition-all border border-blue-500/20" title="Facebook Profile">
-                          <Link className="w-3 h-3" />
+                        <a href={student.facebookUrl.startsWith('http') ? student.facebookUrl : `https://${student.facebookUrl}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white rounded-xl text-xs font-semibold transition-all border border-blue-500/20" title="Facebook Profile">
+                          <Link className="w-3.5 h-3.5" />
                         </a>
                       )}
                     </div>

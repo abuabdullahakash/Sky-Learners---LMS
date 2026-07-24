@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import { Clock, CheckCircle2, PlayCircle, Trophy, BookOpen, AlertCircle, Calendar, Video, UserCircle, ExternalLink, HelpCircle, Globe, ArrowLeft, GraduationCap } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { useTranslations, useLocale } from 'next-intl';
+import FlyingBookLoader from '@/components/ui/FlyingBookLoader';
 
 export default function StudentCourseOverview() {
   const params = useParams();
@@ -113,7 +114,11 @@ export default function StudentCourseOverview() {
   };
 
   if (!course) {
-    return <div className="text-center py-20 text-gray-500">Loading course overview...</div>;
+    return (
+      <div className="flex justify-center items-center h-[50vh]">
+        <FlyingBookLoader />
+      </div>
+    );
   }
 
   // Actual uploaded lessons from course modules as fallback

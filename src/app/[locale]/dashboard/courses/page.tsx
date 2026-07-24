@@ -8,6 +8,7 @@ import { Link } from '@/i18n/routing';
 import { BookOpen, Clock, CheckCircle2, PlayCircle, AlertCircle, Loader2, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations, useLocale } from 'next-intl';
+import FlyingBookLoader from '@/components/ui/FlyingBookLoader';
 
 type EnrolledCourse = {
   enrollmentId: string;
@@ -132,7 +133,7 @@ export default function StudentCoursesPage() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-[50vh]">
-        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+        <FlyingBookLoader />
       </div>
     );
   }

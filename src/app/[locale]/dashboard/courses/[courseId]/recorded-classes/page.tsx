@@ -7,6 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { Video as VideoIcon, Loader2, LayoutGrid, List as ListIcon, PlayCircle, Search, Filter, BookOpen, Calendar, User, FileText } from 'lucide-react';
 import { Link } from '@/i18n/routing';
+import FlyingBookLoader from '@/components/ui/FlyingBookLoader';
 
 export default function StudentRecordedClasses() {
   const tHero = useTranslations('Dashboard.studentHero');
@@ -97,7 +98,7 @@ export default function StudentRecordedClasses() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-orange-500" />
+        <FlyingBookLoader />
       </div>
     );
   }

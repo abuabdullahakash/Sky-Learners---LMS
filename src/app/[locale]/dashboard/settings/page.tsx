@@ -2,12 +2,12 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import { useState, useEffect, useRef } from 'react';
-import { User, Shield, Bell, CreditCard, Camera, CheckCircle2, XCircle, Eye, EyeOff, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { User, Shield, Bell, CreditCard, Camera, CheckCircle2, XCircle, Eye, EyeOff, Loader2, ChevronLeft, ChevronRight, Receipt, Printer, FileText, Clock } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { db, auth } from '@/lib/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 import { uploadImageToImgBB } from '@/lib/imgbb';
 
@@ -20,12 +20,47 @@ export default function SettingsPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { user, userData, refreshUserData } = useAuth();
 
+  const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [selectedReceipt, setSelectedReceipt] = useState<any | null>(null);
+
   const scrollTabs = (direction: 'left' | 'right') => {
     if (tabsRef.current) {
       const scrollAmount = direction === 'left' ? -150 : 150;
       tabsRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
+
+  useEffect(() => {
+    const fetchPaymentHistory = async () => {
+      if (!user || activeTab !== 'billing') return;
+      setIsLoadingHistory(true);
+      try {
+        const q = query(
+          collection(db, 'enrollments'),
+          where('studentId', '==', user.uid)
+        );
+        const querySnap = await getDocs(q);
+        const records: any[] = [];
+        querySnap.forEach((docSnap) => {
+          records.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        // Sort by createdAt desc
+        records.sort((a, b) => {
+          const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : new Date(a.createdAt || 0).getTime();
+          const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : new Date(b.createdAt || 0).getTime();
+          return timeB - timeA;
+        });
+        setPaymentHistory(records);
+      } catch (err) {
+        console.error("Error fetching payment history", err);
+      } finally {
+        setIsLoadingHistory(false);
+      }
+    };
+
+    fetchPaymentHistory();
+  }, [user, activeTab]);
   
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -489,37 +524,260 @@ export default function SettingsPage() {
           </div>
         )}
 
-        {/* Billing Tab */}
+        {/* Billing & Payment History Tab */}
         {activeTab === 'billing' && (
-          <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-300">
+          <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
             <div>
-              <h2 className="text-2xl font-bold mb-2">{t('billing.title')}</h2>
-              <p className="text-foreground/60">{t('billing.subtitle')}</p>
+              <h2 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2 text-foreground flex items-center gap-2.5">
+                <Receipt className="w-6 h-6 text-orange-500 shrink-0" />
+                <span>বিলিং ও পেমেন্ট হিস্ট্রি (Payment Statement)</span>
+              </h2>
+              <p className="text-foreground/60 text-xs sm:text-sm">
+                আপনার সাবমিট করা সমস্ত কোর্স পেমেন্ট লেনদেন ও মানি রিসিট স্টেটমেন্ট নিচে দেখুন।
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg border-b border-foreground/10 pb-2">{t('billing.activePlan')}</h3>
-                <div className="p-8 bg-gradient-to-br from-foreground/5 to-foreground/10 rounded-2xl border border-foreground/10 text-center flex flex-col items-center justify-center min-h-[200px]">
-                  <XCircle className="w-12 h-12 text-foreground/30 mb-4" />
-                  <p className="text-foreground/70 mb-4">{t('billing.noPlan')}</p>
-                  <button className="px-6 py-2.5 bg-primary text-primary-foreground rounded-xl font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all hover:-translate-y-0.5">
-                    {t('billing.upgradeBtn')}
-                  </button>
-                </div>
+            {/* Financial Summary Banner */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 bg-foreground/5 p-4 sm:p-6 rounded-2xl border border-foreground/10">
+              <div className="flex flex-col">
+                <span className="text-[10px] sm:text-xs font-bold text-foreground/60 uppercase tracking-wider">মোট পরিশোধিত টাকা</span>
+                <span className="text-xl sm:text-3xl font-black text-orange-500 font-mono mt-0.5">
+                  ৳{paymentHistory.filter(p => p.status === 'approved').reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0).toLocaleString('en-US')}
+                </span>
               </div>
-
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg border-b border-foreground/10 pb-2">{t('billing.history')}</h3>
-                <div className="p-8 bg-foreground/5 rounded-2xl border border-foreground/10 flex flex-col items-center justify-center min-h-[200px]">
-                  <p className="text-foreground/50">{t('billing.noHistory')}</p>
-                </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] sm:text-xs font-bold text-foreground/60 uppercase tracking-wider">মোট পেমেন্ট রেকর্ড</span>
+                <span className="text-xl sm:text-3xl font-black text-foreground font-mono mt-0.5">
+                  {paymentHistory.length} টি
+                </span>
+              </div>
+              <div className="col-span-2 md:col-span-1 flex flex-col justify-center">
+                <span className="text-[10px] sm:text-xs font-bold text-foreground/60 uppercase tracking-wider">অ্যাকাউন্ট স্ট্যাটাস</span>
+                <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-extrabold text-green-500 mt-1">
+                  <CheckCircle2 className="w-4 h-4" /> এক্টিভ স্টুডেন্ট অ্যাকাউন্ট
+                </span>
               </div>
             </div>
+
+            {/* Statement Ledger Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-base sm:text-lg text-foreground flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-blue-500" />
+                  পেমেন্ট লেজার স্টেটমেন্ট (Statement Ledger)
+                </h3>
+                {paymentHistory.length > 0 && (
+                  <span className="text-xs text-foreground/50 font-mono">
+                    {paymentHistory.length} Record(s)
+                  </span>
+                )}
+              </div>
+
+              {isLoadingHistory ? (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 className="w-8 h-8 animate-spin text-orange-500" />
+                </div>
+              ) : paymentHistory.length === 0 ? (
+                <div className="p-8 sm:p-12 text-center border-2 border-dashed border-foreground/10 rounded-2xl bg-background/50">
+                  <Receipt className="w-10 h-10 mx-auto text-foreground/30 mb-3" />
+                  <p className="text-foreground/70 font-bold text-base mb-1">আগের কোনো পেমেন্ট রেকর্ড পাওয়া যায়নি</p>
+                  <p className="text-foreground/50 text-xs sm:text-sm max-w-md mx-auto mb-4">
+                    আপনি যখনই কোনো কোর্সে ভর্তি হতে পেমেন্ট সাবমিট করবেন, তার মানি রিসিট ও স্টেটমেন্ট এখানে রাখা থাকবে।
+                  </p>
+                  <Link 
+                    href="/courses" 
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white font-bold rounded-xl text-xs sm:text-sm hover:bg-orange-600 transition-colors shadow-md"
+                  >
+                    কোর্সসমূহ দেখুন
+                  </Link>
+                </div>
+              ) : (
+                /* Authentic Statement Ledger Table */
+                <div className="border border-foreground/10 rounded-2xl overflow-hidden shadow-sm bg-background">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs sm:text-sm border-collapse">
+                      <thead>
+                        <tr className="bg-foreground/5 border-b border-foreground/10 text-foreground/70 font-bold uppercase tracking-wider">
+                          <th className="py-3.5 px-4">কোর্স ও ট্রানজেকশন</th>
+                          <th className="py-3.5 px-4">পেমেন্ট মেথড ও নম্বর</th>
+                          <th className="py-3.5 px-4">তারিখ</th>
+                          <th className="py-3.5 px-4">পরিমাণ</th>
+                          <th className="py-3.5 px-4">স্ট্যাটাস</th>
+                          <th className="py-3.5 px-4 text-right">রিসিট</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-foreground/10">
+                        {paymentHistory.map((item) => {
+                          const methodLower = (item.paymentMethod || '').toLowerCase();
+                          const isBkash = methodLower.includes('bkash');
+                          const isNagad = methodLower.includes('nagad');
+                          const isRocket = methodLower.includes('rocket');
+
+                          const isApproved = item.status === 'approved';
+                          const isPending = item.status === 'pending';
+
+                          const formattedDate = item.createdAt?.toDate 
+                            ? item.createdAt.toDate().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+                            : item.createdAt ? new Date(item.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+                            : 'N/A';
+
+                          return (
+                            <tr key={item.id} className="hover:bg-foreground/[0.02] transition-colors">
+                              <td className="py-3.5 px-4 min-w-[180px]">
+                                <div className="font-bold text-foreground line-clamp-1">{item.courseTitle || 'Course Enrollment'}</div>
+                                <div className="text-[10px] text-foreground/50 font-mono mt-0.5">TrxID: {item.trxId || 'N/A'}</div>
+                              </td>
+                              <td className="py-3.5 px-4 whitespace-nowrap">
+                                <div className="flex items-center gap-1.5">
+                                  <span className={`px-2 py-0.5 rounded font-black text-[10px] uppercase ${
+                                    isBkash ? 'bg-pink-500/10 text-pink-600 border border-pink-500/30' :
+                                    isNagad ? 'bg-orange-500/10 text-orange-600 border border-orange-500/30' :
+                                    isRocket ? 'bg-purple-500/10 text-purple-600 border border-purple-500/30' :
+                                    'bg-blue-500/10 text-blue-600 border border-blue-500/30'
+                                  }`}>
+                                    {item.paymentMethod || 'Manual'}
+                                  </span>
+                                  <span className="font-mono text-foreground/80">{item.senderNumber || item.offlinePhone || 'N/A'}</span>
+                                </div>
+                              </td>
+                              <td className="py-3.5 px-4 whitespace-nowrap text-foreground/70 text-xs font-mono">
+                                {formattedDate}
+                              </td>
+                              <td className="py-3.5 px-4 whitespace-nowrap font-black font-mono text-sm text-foreground">
+                                ৳{Number(item.amount || 0).toLocaleString('en-US')}
+                              </td>
+                              <td className="py-3.5 px-4 whitespace-nowrap">
+                                {isApproved ? (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/10 text-emerald-600 border border-emerald-500/30">
+                                    <CheckCircle2 className="w-3 h-3" /> অনুমোদিত (Paid)
+                                  </span>
+                                ) : isPending ? (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-amber-500/10 text-amber-600 border border-amber-500/30">
+                                    <Clock className="w-3 h-3" /> অপেক্ষমাণ (Pending)
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-red-500/10 text-red-600 border border-red-500/30">
+                                    <XCircle className="w-3 h-3" /> বাতিল (Rejected)
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-3.5 px-4 whitespace-nowrap text-right">
+                                <button
+                                  onClick={() => setSelectedReceipt(item)}
+                                  className="px-3 py-1.5 bg-foreground/10 hover:bg-orange-500 hover:text-white text-foreground rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 ml-auto border border-foreground/10"
+                                >
+                                  <FileText className="w-3.5 h-3.5" />
+                                  <span>রিসিট</span>
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+
           </div>
         )}
 
       </div>
+
+      {/* Digital Money Receipt Modal */}
+      {selectedReceipt && (
+        <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="relative bg-white dark:bg-slate-900 border border-foreground/15 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl overflow-hidden">
+            
+            {/* Receipt Header */}
+            <div className="flex items-center justify-between border-b border-foreground/10 pb-4 mb-6">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Receipt className="w-6 h-6 text-orange-500" />
+                  <h3 className="font-extrabold text-base sm:text-lg text-foreground">অফিসিয়াল পেমেন্ট স্লিপ / রিসিট</h3>
+                </div>
+                <p className="text-[10px] sm:text-xs text-foreground/50 mt-0.5">SkyLearners Official Payment Receipt</p>
+              </div>
+              <button 
+                onClick={() => setSelectedReceipt(null)}
+                className="p-2 bg-foreground/10 hover:bg-foreground/20 text-foreground rounded-full transition-colors"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Stamp Status */}
+            <div className="flex items-center justify-between bg-orange-500/5 p-4 rounded-2xl border border-orange-500/20 mb-6">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-foreground/50 tracking-wider">রিসিট নম্বর</span>
+                <p className="text-xs sm:text-sm font-mono font-bold text-foreground">#REC-2026-{selectedReceipt.id.slice(0, 6).toUpperCase()}</p>
+              </div>
+              <div>
+                {selectedReceipt.status === 'approved' ? (
+                  <span className="px-3 py-1 bg-emerald-500/20 text-emerald-600 font-black text-xs uppercase tracking-widest rounded-lg border border-emerald-500/40">
+                    ✓ PAID
+                  </span>
+                ) : (
+                  <span className="px-3 py-1 bg-amber-500/20 text-amber-600 font-black text-xs uppercase tracking-widest rounded-lg border border-amber-500/40">
+                    ⏳ PENDING
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Transaction Details Table */}
+            <div className="space-y-3 text-xs sm:text-sm text-foreground/80 mb-6">
+              <div className="flex justify-between border-b border-foreground/5 pb-2">
+                <span className="text-foreground/50">কোর্সের নাম:</span>
+                <span className="font-bold text-foreground text-right max-w-[220px]">{selectedReceipt.courseTitle}</span>
+              </div>
+              <div className="flex justify-between border-b border-foreground/5 pb-2">
+                <span className="text-foreground/50">শিক্ষার্থীর নাম:</span>
+                <span className="font-semibold text-foreground">{selectedReceipt.studentName || user?.displayName}</span>
+              </div>
+              <div className="flex justify-between border-b border-foreground/5 pb-2">
+                <span className="text-foreground/50">ইমেইল:</span>
+                <span className="font-mono text-foreground">{selectedReceipt.studentEmail || user?.email}</span>
+              </div>
+              <div className="flex justify-between border-b border-foreground/5 pb-2">
+                <span className="text-foreground/50">পেমেন্ট মাধ্যম:</span>
+                <span className="font-bold uppercase text-orange-500">{selectedReceipt.paymentMethod}</span>
+              </div>
+              <div className="flex justify-between border-b border-foreground/5 pb-2">
+                <span className="text-foreground/50">প্রেরকের নম্বর:</span>
+                <span className="font-mono text-foreground">{selectedReceipt.senderNumber || selectedReceipt.offlinePhone}</span>
+              </div>
+              <div className="flex justify-between border-b border-foreground/5 pb-2">
+                <span className="text-foreground/50">ট্রানজেকশন আইডি (TrxID):</span>
+                <span className="font-mono font-bold text-foreground">{selectedReceipt.trxId || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between pt-2 text-base sm:text-lg font-black text-foreground">
+                <span>সর্বমোট পরিশোধ:</span>
+                <span className="text-orange-500 font-mono">৳{Number(selectedReceipt.amount || 0).toLocaleString('en-US')}</span>
+              </div>
+            </div>
+
+            {/* Print / Close Actions */}
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => window.print()}
+                className="flex-1 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-colors shadow-md text-xs sm:text-sm flex items-center justify-center gap-2"
+              >
+                <Printer className="w-4 h-4" />
+                <span>প্রিন্ট / সেভ করুন</span>
+              </button>
+              <button 
+                onClick={() => setSelectedReceipt(null)}
+                className="py-3 px-5 bg-foreground/10 text-foreground font-bold rounded-xl hover:bg-foreground/20 transition-colors text-xs sm:text-sm"
+              >
+                বন্ধ করুন
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* Success Modal */}
       {showSuccessModal && (

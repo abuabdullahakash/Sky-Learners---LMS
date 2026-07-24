@@ -490,7 +490,19 @@ export default function CourseLiveClassesPage() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Date <span className="text-red-500">*</span></label>
-              <input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" required />
+              <div className="relative flex items-center">
+                <input 
+                  type="date" 
+                  value={newDate} 
+                  onChange={e => setNewDate(e.target.value)} 
+                  onClick={(e) => {
+                    try { (e.currentTarget as any).showPicker?.(); } catch (err) {}
+                  }}
+                  className="w-full px-4 pr-10 py-2.5 bg-background dark:bg-foreground/5 border border-foreground/15 rounded-xl text-sm font-medium text-foreground focus:outline-none focus:border-orange-500 transition-colors cursor-pointer min-h-[44px] [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer" 
+                  required 
+                />
+                <Calendar className="w-5 h-5 absolute right-3.5 text-orange-500 pointer-events-none" />
+              </div>
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">
@@ -509,7 +521,19 @@ export default function CourseLiveClassesPage() {
                   <input type="checkbox" checked={isAutoStart} onChange={e => setIsAutoStart(e.target.checked)} className="sr-only" />
                 </label>
               </div>
-              <input type="time" value={newTime} onChange={e => setNewTime(e.target.value)} className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500" required />
+              <div className="relative flex items-center">
+                <input 
+                  type="time" 
+                  value={newTime} 
+                  onChange={e => setNewTime(e.target.value)} 
+                  onClick={(e) => {
+                    try { (e.currentTarget as any).showPicker?.(); } catch (err) {}
+                  }}
+                  className="w-full px-4 pr-10 py-2.5 bg-background dark:bg-foreground/5 border border-foreground/15 rounded-xl text-sm font-medium text-foreground focus:outline-none focus:border-orange-500 transition-colors cursor-pointer min-h-[44px] [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer" 
+                  required 
+                />
+                <Clock className="w-5 h-5 absolute right-3.5 text-orange-500 pointer-events-none" />
+              </div>
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium mb-1">Meeting/Live Link (Zoom / Meet / YouTube / FB) <span className="text-red-500">*</span></label>

@@ -29,11 +29,43 @@ export default function RegisterPage() {
   useEffect(() => {
     if (formRef.current) {
       gsap.fromTo(formRef.current, 
-        { opacity: 0, y: 30 }, 
-        { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }
+        { opacity: 0, scale: 0.94, y: 15 }, 
+        { opacity: 1, scale: 1, y: 0, duration: 0.35, ease: "power3.out" }
       );
     }
   }, []);
+
+  const handleClose = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (formRef.current) {
+      gsap.to(formRef.current, {
+        opacity: 0,
+        scale: 0.94,
+        y: 15,
+        duration: 0.25,
+        ease: "power2.in",
+        onComplete: () => router.push('/')
+      });
+    } else {
+      router.push('/');
+    }
+  };
+
+  const handleSwitchTab = (path: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (formRef.current) {
+      gsap.to(formRef.current, {
+        opacity: 0,
+        scale: 0.96,
+        y: 8,
+        duration: 0.18,
+        ease: "power2.in",
+        onComplete: () => router.push(path)
+      });
+    } else {
+      router.push(path);
+    }
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,7 +136,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-3 sm:px-6 pt-24 sm:pt-28 pb-12">
-      <div ref={formRef} className="max-w-md w-full bg-foreground/5 p-5 sm:p-8 rounded-3xl border border-foreground/10 backdrop-blur-xl shadow-2xl">
+      <div ref={formRef} className="max-w-md w-full bg-foreground/5 p-5 sm:p-8 rounded-3xl border border-foreground/10 backdrop-blur-xl shadow-2xl opacity-0">
         
         {isSuccess ? (
           <div className="text-center py-8">
@@ -115,35 +147,38 @@ export default function RegisterPage() {
             <div className="w-6 h-6 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
           </div>
         ) : (
-          <div className="animate-in slide-in-from-right-8 duration-300">
+          <div>
             
             {/* Header with Login vs Register Tab Switcher & Close Button */}
             <div className="space-y-4 mb-6">
               <div className="flex items-center justify-between gap-2 border-b border-foreground/10 pb-3">
                 {/* Auth Mode Tabs */}
                 <div className="flex items-center gap-1.5 bg-foreground/5 p-1 rounded-2xl border border-foreground/10">
-                  <Link 
-                    href="/login" 
+                  <button 
+                    type="button"
+                    onClick={handleSwitchTab('/login')} 
                     className="px-4 py-1.5 rounded-xl font-bold text-xs sm:text-sm text-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all"
                   >
                     {t('loginTab')}
-                  </Link>
-                  <Link 
-                    href="/register" 
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={handleSwitchTab('/register')} 
                     className="px-4 py-1.5 rounded-xl font-extrabold text-xs sm:text-sm bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20"
                   >
                     {t('registerTab')}
-                  </Link>
+                  </button>
                 </div>
 
                 {/* Close Button */}
-                <Link 
-                  href="/" 
+                <button 
+                  type="button"
+                  onClick={handleClose} 
                   className="p-2 rounded-full bg-foreground/5 hover:bg-foreground/10 text-foreground/70 hover:text-foreground border border-foreground/10 transition-colors"
                   title={locale === 'bn' ? 'বন্ধ করুন' : 'Close'}
                 >
                   <X className="w-4 h-4" />
-                </Link>
+                </button>
               </div>
 
               {/* Title & Subtitle */}

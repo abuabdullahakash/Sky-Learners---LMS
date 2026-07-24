@@ -233,70 +233,72 @@ export default function StudentRecordedClasses() {
         </div>
       ) : viewMode === 'list' ? (
         // --- LIST VIEW ---
-        <div className="space-y-4 w-[96%] mx-auto">
+        <div className="space-y-3 sm:space-y-4 w-full sm:w-[96%] mx-auto">
           {filteredLessons.map((lesson: any, index: number) => (
             <Link 
               href={`/dashboard/courses/${courseId}/recorded-classes/${lesson.id}`} 
               key={lesson.id}
-              className="group flex flex-col sm:flex-row gap-5 p-4 bg-background border border-foreground/10 rounded-2xl hover:border-orange-500/50 hover:shadow-lg hover:shadow-orange-500/5 transition-all duration-300 relative overflow-hidden"
+              className="group flex flex-row items-center gap-3 sm:gap-5 p-2.5 sm:p-4 bg-background border border-foreground/10 dark:border-white/10 rounded-xl sm:rounded-2xl hover:border-orange-500/50 hover:shadow-lg hover:shadow-orange-500/5 transition-all duration-300 relative overflow-hidden"
             >
               {/* Highlight bar on hover */}
               <div className="absolute left-0 top-0 bottom-0 w-1 bg-orange-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
               
               {/* Thumbnail */}
-              <div className="relative w-full sm:w-64 h-40 sm:h-36 rounded-xl overflow-hidden flex-shrink-0">
+              <div className="relative w-28 sm:w-64 h-24 sm:h-36 rounded-lg sm:rounded-xl overflow-hidden flex-shrink-0">
                 {lesson.thumbnailUrl ? (
                   <img src={lesson.thumbnailUrl} alt={lesson.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 ) : (
                   <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br ${getRandomGradient(index)} opacity-90 group-hover:opacity-100 transition-opacity`}>
-                    <VideoIcon className="w-12 h-12 text-white/50" />
+                    <VideoIcon className="w-8 h-8 sm:w-12 sm:h-12 text-white/50" />
                   </div>
                 )}
                 <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                  <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <PlayCircle className="w-8 h-8 text-white drop-shadow-lg" />
+                  <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <PlayCircle className="w-5 h-5 sm:w-8 sm:h-8 text-white drop-shadow-lg" />
                   </div>
                 </div>
                 {/* Lesson Badge */}
-                <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-white text-xs font-bold px-2 py-1 rounded-md">
+                <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 bg-black/70 backdrop-blur-md text-white text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded">
                   Lesson {lesson.lessonIndex}
                 </div>
               </div>
 
               {/* Content */}
-              <div className="flex flex-col justify-center flex-1 py-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs font-bold text-orange-500 uppercase tracking-wider bg-orange-500/10 px-2 py-1 rounded-md">
-                    Mod {lesson.moduleIndex}
-                  </span>
-                  <span className="text-xs font-semibold text-foreground/60 line-clamp-1">
-                    {lesson.moduleTitle}
-                  </span>
+              <div className="flex flex-col justify-between flex-1 min-w-0 py-0.5 sm:py-1">
+                <div>
+                  <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                    <span className="text-[10px] sm:text-xs font-bold text-orange-500 uppercase tracking-wider bg-orange-500/10 px-2 py-0.5 rounded">
+                      Mod {lesson.moduleIndex}
+                    </span>
+                    <span className="text-[10px] sm:text-xs font-semibold text-foreground/60 truncate max-w-[140px] sm:max-w-[250px]">
+                      {lesson.moduleTitle}
+                    </span>
+                  </div>
+                  
+                  <h3 className="text-xs sm:text-xl font-bold text-foreground group-hover:text-orange-500 transition-colors line-clamp-1 sm:line-clamp-2 leading-snug mb-1 sm:mb-3">
+                    {lesson.title}
+                  </h3>
                 </div>
                 
-                <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-orange-500 transition-colors line-clamp-2 leading-tight">
-                  {lesson.title}
-                </h3>
-                
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-auto text-xs font-medium text-foreground/70">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-4 mt-auto text-[10px] sm:text-xs font-medium text-foreground/70">
                   {lesson.subject && (
-                    <span className="flex items-center gap-1.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2.5 py-1 rounded-full">
-                      <BookOpen className="w-3.5 h-3.5" /> {lesson.subject}
+                    <span className="flex items-center gap-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full">
+                      <BookOpen className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> {lesson.subject}
                     </span>
                   )}
                   {lesson.instructor && (
-                    <span className="flex items-center gap-1.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2.5 py-1 rounded-full">
+                    <span className="hidden sm:flex items-center gap-1.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2.5 py-1 rounded-full">
                       <User className="w-3.5 h-3.5" /> {lesson.instructor}
                     </span>
                   )}
                   {lesson.uploadDate && (
-                    <span className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full">
+                    <span className="hidden sm:flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full">
                       <Calendar className="w-3.5 h-3.5" /> {new Date(lesson.uploadDate).toLocaleDateString()}
                     </span>
                   )}
                   {lesson.noteUrl && (
-                    <span className="flex items-center gap-1.5 bg-rose-500/10 text-rose-600 dark:text-rose-400 px-2.5 py-1 rounded-full ml-auto">
-                      <FileText className="w-3.5 h-3.5" /> Class Note
+                    <span className="flex items-center gap-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full ml-auto">
+                      <FileText className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Class Note
                     </span>
                   )}
                 </div>
@@ -306,12 +308,12 @@ export default function StudentRecordedClasses() {
         </div>
       ) : (
         // --- GRID VIEW ---
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-[96%] mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full sm:w-[96%] mx-auto">
           {filteredLessons.map((lesson: any, index: number) => (
             <Link 
               href={`/dashboard/courses/${courseId}/recorded-classes/${lesson.id}`} 
               key={lesson.id}
-              className="group flex flex-col bg-background border border-foreground/10 rounded-2xl hover:border-orange-500/50 hover:shadow-xl hover:shadow-orange-500/5 transition-all duration-300 overflow-hidden"
+              className="group flex flex-col bg-background border border-foreground/10 rounded-xl sm:rounded-2xl hover:border-orange-500/50 hover:shadow-xl hover:shadow-orange-500/5 transition-all duration-300 overflow-hidden"
             >
               <div className="relative w-full aspect-video overflow-hidden bg-foreground/5">
                 {lesson.thumbnailUrl ? (
@@ -322,20 +324,20 @@ export default function StudentRecordedClasses() {
                   </div>
                 )}
                 <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                  <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <PlayCircle className="w-10 h-10 text-white drop-shadow-lg" />
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <PlayCircle className="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-lg" />
                   </div>
                 </div>
-                <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-white text-xs font-bold px-2.5 py-1 rounded-md">
+                <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 bg-black/60 backdrop-blur-md text-white text-xs font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded">
                   Lesson {lesson.lessonIndex}
                 </div>
               </div>
 
-              <div className="p-5 flex flex-col flex-1 relative">
+              <div className="p-4 sm:p-5 flex flex-col flex-1 relative">
                 {/* Decorative top border on content */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-400 to-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-2 sm:mb-3">
                   <span className="text-[10px] font-bold text-orange-500 uppercase tracking-wider bg-orange-500/10 px-2 py-0.5 rounded">
                     Mod {lesson.moduleIndex}
                   </span>
@@ -344,7 +346,7 @@ export default function StudentRecordedClasses() {
                   </span>
                 </div>
                 
-                <h3 className="text-lg font-bold text-foreground mb-4 group-hover:text-orange-500 transition-colors line-clamp-2 leading-tight">
+                <h3 className="text-sm sm:text-lg font-bold text-foreground mb-3 sm:mb-4 group-hover:text-orange-500 transition-colors line-clamp-2 leading-tight">
                   {lesson.title}
                 </h3>
                 
@@ -352,19 +354,19 @@ export default function StudentRecordedClasses() {
                   {(lesson.subject || lesson.instructor) && (
                     <div className="flex flex-wrap items-center gap-2">
                       {lesson.subject && (
-                        <span className="flex items-center gap-1 text-[11px] font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full">
+                        <span className="flex items-center gap-1 text-[10px] sm:text-[11px] font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full">
                           <BookOpen className="w-3 h-3" /> {lesson.subject}
                         </span>
                       )}
                       {lesson.instructor && (
-                        <span className="flex items-center gap-1 text-[11px] font-medium bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded-full">
+                        <span className="flex items-center gap-1 text-[10px] sm:text-[11px] font-medium bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded-full">
                           <User className="w-3 h-3" /> {lesson.instructor}
                         </span>
                       )}
                     </div>
                   )}
                   
-                  <div className="flex items-center justify-between pt-3 border-t border-foreground/5 text-[11px] font-medium">
+                  <div className="flex items-center justify-between pt-2.5 sm:pt-3 border-t border-foreground/5 text-[10px] sm:text-[11px] font-medium">
                     {lesson.uploadDate ? (
                       <span className="flex items-center gap-1 text-foreground/60">
                         <Calendar className="w-3 h-3" /> {new Date(lesson.uploadDate).toLocaleDateString()}

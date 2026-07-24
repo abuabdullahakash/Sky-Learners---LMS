@@ -8,7 +8,7 @@ import { Link, useRouter } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import gsap from 'gsap';
-import { CheckCircle2, GraduationCap, Presentation, Eye, EyeOff } from 'lucide-react';
+import { CheckCircle2, GraduationCap, Presentation, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 export default function RegisterPage() {
@@ -103,8 +103,8 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 pt-24 sm:pt-28 pb-12">
-      <div ref={formRef} className="max-w-md w-full bg-foreground/5 p-6 sm:p-8 rounded-3xl border border-foreground/10 backdrop-blur-xl shadow-2xl">
+    <div className="min-h-screen flex items-center justify-center px-3 sm:px-6 pt-24 sm:pt-28 pb-12">
+      <div ref={formRef} className="max-w-md w-full bg-foreground/5 p-5 sm:p-8 rounded-3xl border border-foreground/10 backdrop-blur-xl shadow-2xl">
         
         {isSuccess ? (
           <div className="text-center py-8">
@@ -119,13 +119,29 @@ export default function RegisterPage() {
           </div>
         ) : (
           <div className="animate-in slide-in-from-right-8 duration-300">
-            <div className="flex items-center justify-between gap-2 mb-6 pb-2 border-b border-foreground/5">
-              <Link href="/login" className="text-xs font-bold text-foreground/60 hover:text-orange-500 transition-colors bg-foreground/5 hover:bg-foreground/10 px-3 py-1.5 rounded-xl border border-foreground/10">
-                ← Back to Login
-              </Link>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-right text-foreground">
-                Create an Account
-              </h2>
+            {/* Fully Responsive Header Block */}
+            <div className="space-y-3 mb-6 pb-4 border-b border-foreground/10">
+              <div className="flex items-center justify-between gap-2">
+                <Link 
+                  href="/login" 
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-foreground/70 hover:text-orange-500 transition-colors bg-foreground/5 hover:bg-foreground/10 px-3 py-1.5 rounded-xl border border-foreground/10"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Back to Login</span>
+                </Link>
+                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-orange-500 bg-orange-500/10 px-2.5 py-1 rounded-full border border-orange-500/20">
+                  Register
+                </span>
+              </div>
+              
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
+                  Create an Account
+                </h2>
+                <p className="text-xs sm:text-sm text-foreground/60 mt-1">
+                  Join SkyLearners to start learning today
+                </p>
+              </div>
             </div>
             
             {error && <p className="text-red-500 text-sm mb-4 text-center font-medium bg-red-500/10 p-3 rounded-xl border border-red-500/20">{error}</p>}

@@ -32,8 +32,8 @@ export default function LessonVideoPage() {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [reportSubject, setReportSubject] = useState('');
   const [reportNote, setReportNote] = useState('');
-  const [reportScreenshot, setReportScreenshot] = useState<File | null>(null);
-  const [reportScreenshotUrl, setReportScreenshotUrl] = useState('');
+  const [reportScreenshots, setReportScreenshots] = useState<File[]>([]);
+  const [reportScreenshotUrls, setReportScreenshotUrls] = useState<string[]>([]);
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
   useEffect(() => {
     const initializeTracking = async (lesson: any, courseData: any) => {
@@ -72,16 +72,21 @@ export default function LessonVideoPage() {
           
           // Find the specific lesson
           let foundLesson = null;
+          let foundModuleTitle = '';
           if (data.modules) {
             for (const module of data.modules) {
               if (module.lessons) {
                 const lesson = module.lessons.find((l: any) => l.id === lessonId);
                 if (lesson) {
                   foundLesson = lesson;
+                  foundModuleTitle = module.title || '';
                   break;
                 }
               }
             }
+          }
+          if (foundLesson) {
+            foundLesson.moduleTitle = foundModuleTitle;
           }
           setActiveLesson(foundLesson);
           if (foundLesson) {
@@ -198,111 +203,94 @@ export default function LessonVideoPage() {
             }
             
             // Otherwise fallback to iframe (e.g. Google Drive, unknown, or if ReactPlayer fails)
-            const fallbackUrl = currentSource === 'youtube' 
-              ? finalVideoUrl.replace('watch?v=', 'embed/')
-              : activeLesson.videoUrl;
-              
             return (
-              <iframe 
-                src={fallbackUrl} 
-                className="w-full h-full absolute inset-0 border-0"
+              <iframe
+                src={activeLesson.videoUrl.includes('drive.google.com') ? activeLesson.videoUrl.replace(/\/view.*$/, '/preview') : activeLesson.videoUrl}
+                className="w-full h-full border-0 absolute top-0 left-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                title={activeLesson.title}
               ></iframe>
             );
           })()
         ) : (
-          <div className="text-center text-white/50 p-6 absolute inset-0 flex flex-col items-center justify-center">
-            <PlayCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
-            <p>No video available for this lesson.</p>
-          </div>
+          <div className="text-white/50 text-sm">No video URL available for this lesson.</div>
         )}
       </div>
 
-      <div className="bg-white dark:bg-foreground/5 rounded-3xl p-6 md:p-8 border border-gray-200 dark:border-foreground/10 shadow-sm dark:shadow-none">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Class Note</h2>
-        {activeLesson.noteUrl ? (
-          <div className="bg-gray-50 dark:bg-black/20 rounded-xl p-4 flex items-start gap-4 border border-gray-100 dark:border-foreground/10">
-            <div className="bg-blue-100 dark:bg-blue-500/20 text-blue-500 p-3 rounded-xl flex-shrink-0">
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-900 dark:text-white mb-1">Download Class Note</h3>
-              <p className="text-sm text-gray-500 dark:text-foreground/60 mb-3">Get the PDF notes for this class from Google Drive.</p>
-              <a href={activeLesson.noteUrl} target="_blank" rel="noopener noreferrer" className="inline-block px-5 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold rounded-lg transition-colors">
-                View PDF Note
-              </a>
-            </div>
-          </div>
-        ) : (
-          <p className="text-gray-500 italic">No class notes have been provided for this lesson.</p>
-        )}
-        
-        <div className="mt-8 pt-6 border-t border-gray-100 dark:border-foreground/10">
-          <div className="flex items-center justify-end">
-            <button 
-              disabled={isCompleted || isCompleting}
-              onClick={async () => {
-                if (!user || isCompleted) return;
-                setIsCompleting(true);
-                try {
-                  await setDoc(doc(db, 'completed_lessons', `${user.uid}_${courseId}_${lessonId}`), {
-                    studentId: user.uid,
-                    courseId,
-                    lessonId,
-                    courseTitle: course?.title || '',
-                    lessonTitle: activeLesson.title || '',
-                    timestamp: new Date().toISOString()
-                  });
-                  setIsCompleted(true);
-                  toast.success("Lesson marked as completed!");
-                } catch (error) {
-                  console.error("Error marking as completed", error);
-                  toast.error("Failed to mark as completed. Please try again.");
-                } finally {
-                  setIsCompleting(false);
-                }
-              }}
-              className={`px-6 py-2.5 font-bold rounded-xl transition-all flex items-center gap-2 shadow-lg 
-                ${isCompleted ? 'bg-green-500 text-white shadow-green-500/20' 
-                : 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/20 hover:shadow-orange-500/40 hover:scale-105 active:scale-95'}
-              `}
-            >
-              {isCompleting ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" /> Saving...
-                </>
-              ) : isCompleted ? (
-                <>
-                  <CheckCircle className="w-5 h-5" /> Completed
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="w-5 h-5" /> Mark as Completed
-                </>
-              )}
-            </button>
-          </div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gray-50 dark:bg-foreground/5 p-6 rounded-2xl border border-gray-100 dark:border-foreground/10">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Lesson Progress</h2>
+          <p className="text-sm text-gray-500 dark:text-foreground/60">Mark this lesson as completed to track your overall course progress.</p>
         </div>
+        <button
+          disabled={isCompleting}
+          onClick={async () => {
+            if (!user) return;
+            setIsCompleting(true);
+            try {
+              const docId = `${user.uid}_${courseId}_${lessonId}`;
+              if (isCompleted) {
+                await deleteDoc(doc(db, 'completed_lessons', docId));
+                setIsCompleted(false);
+                toast.success('Marked as incomplete');
+              } else {
+                await setDoc(doc(db, 'completed_lessons', docId), {
+                  userId: user.uid,
+                  courseId,
+                  lessonId,
+                  completedAt: new Date().toISOString()
+                });
+                setIsCompleted(true);
+                toast.success('Lesson completed! 🎉');
+              }
+            } catch (err) {
+              console.error("Error toggling completion", err);
+              toast.error('Failed to update progress');
+            } finally {
+              setIsCompleting(false);
+            }
+          }}
+          className={`px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 shrink-0 ${
+            isCompleted 
+              ? 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 hover:bg-green-500/20' 
+              : 'bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20'
+          }`}
+        >
+          {isCompleting ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : isCompleted ? (
+            <>
+              <CheckCircle className="w-5 h-5 text-green-500" />
+              Completed
+            </>
+          ) : (
+            <>
+              <CheckCircle className="w-5 h-5" />
+              Mark as Complete
+            </>
+          )}
+        </button>
       </div>
 
-      {/* Report Issue Modal */}
+      {/* --- Issue Report Modal --- */}
       {isReportModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-background w-full max-w-lg rounded-3xl p-6 shadow-2xl relative border border-foreground/10 animate-in zoom-in duration-300">
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+          <div className="bg-background rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-2xl relative border border-foreground/10 max-h-[90vh] overflow-y-auto">
             <button 
               onClick={() => setIsReportModalOpen(false)}
-              className="absolute right-4 top-4 p-2 bg-foreground/5 hover:bg-foreground/10 rounded-full transition-colors text-foreground/60"
+              className="absolute top-4 right-4 p-2 hover:bg-foreground/5 rounded-full transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 text-foreground/50" />
             </button>
             
             <h2 className="text-2xl font-bold mb-1 flex items-center gap-2">
               <AlertCircle className="w-6 h-6 text-red-500" />
               {t('reportIssue')}
             </h2>
-            <p className="text-foreground/60 text-sm mb-6">Lesson: {activeLesson.title}</p>
+            <div className="text-foreground/60 text-xs sm:text-sm mb-6 space-y-0.5">
+              {activeLesson.moduleTitle && <p className="font-semibold text-orange-500">{activeLesson.moduleTitle}</p>}
+              <p className="font-bold text-foreground">Lesson: {activeLesson.title}</p>
+            </div>
             
             <form onSubmit={async (e) => {
               e.preventDefault();
@@ -310,21 +298,24 @@ export default function LessonVideoPage() {
               setIsSubmittingReport(true);
               
               try {
-                let imgUrl = '';
-                if (reportScreenshot) {
-                  imgUrl = await uploadImageToImgBB(reportScreenshot);
+                let imgUrls: string[] = [];
+                if (reportScreenshots.length > 0) {
+                  imgUrls = await Promise.all(reportScreenshots.map(file => uploadImageToImgBB(file)));
                 }
                 
                 await addDoc(collection(db, 'lesson_issues'), {
                   courseId,
                   lessonId,
-                  lessonTitle: activeLesson.title,
+                  lessonTitle: activeLesson.title || '',
+                  moduleTitle: activeLesson.moduleTitle || '',
+                  subject: activeLesson.subject || '',
                   studentId: user.uid,
                   studentName: profile?.fullName || user.displayName || 'Student',
                   studentPhotoUrl: profile?.photoUrl || user.photoURL || '',
-                  subject: reportSubject,
+                  subjectTitle: reportSubject,
                   note: reportNote,
-                  screenshotUrl: imgUrl,
+                  screenshotUrl: imgUrls[0] || '',
+                  screenshotUrls: imgUrls,
                   status: 'open',
                   createdAt: new Date().toISOString()
                 });
@@ -333,8 +324,8 @@ export default function LessonVideoPage() {
                 setIsReportModalOpen(false);
                 setReportSubject('');
                 setReportNote('');
-                setReportScreenshot(null);
-                setReportScreenshotUrl('');
+                setReportScreenshots([]);
+                setReportScreenshotUrls([]);
               } catch (error) {
                 console.error("Error submitting report", error);
                 toast.error("Failed to submit report. Please try again.");
@@ -359,37 +350,48 @@ export default function LessonVideoPage() {
                   required rows={4}
                   value={reportNote} onChange={(e) => setReportNote(e.target.value)}
                   placeholder={t('issueNotePlaceholder')}
-                  className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 focus:outline-none focus:border-red-500 mt-1 resize-none"
+                  className="w-full bg-foreground/5 px-4 py-3 rounded-xl border border-foreground/10 focus:outline-none focus:border-red-500 mt-1 resize-none text-sm"
                 ></textarea>
               </div>
 
               <div>
-                <label className="text-sm font-bold text-foreground/80 mb-2 block">{t('issueScreenshot')}</label>
-                {reportScreenshotUrl ? (
-                  <div className="relative inline-block">
-                    <img src={reportScreenshotUrl} alt="Preview" className="h-24 rounded-lg object-cover border border-foreground/20" />
-                    <button 
-                      type="button"
-                      onClick={() => {
-                        setReportScreenshot(null);
-                        setReportScreenshotUrl('');
-                      }}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
+                <label className="text-sm font-bold text-foreground/80 mb-2 block">
+                  {t('issueScreenshot')} (Up to 4 Screenshots)
+                </label>
+                
+                {reportScreenshotUrls.length > 0 && (
+                  <div className="flex flex-wrap gap-3 mb-3">
+                    {reportScreenshotUrls.map((url, index) => (
+                      <div key={index} className="relative inline-block">
+                        <img src={url} alt={`Preview ${index + 1}`} className="h-20 w-20 rounded-xl object-cover border border-foreground/20" />
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            setReportScreenshots(prev => prev.filter((_, i) => i !== index));
+                            setReportScreenshotUrls(prev => prev.filter((_, i) => i !== index));
+                          }}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ) : (
+                )}
+
+                {reportScreenshotUrls.length < 4 && (
                   <div className="flex items-center gap-4">
                     <label className="cursor-pointer bg-foreground/5 hover:bg-foreground/10 px-4 py-2.5 rounded-xl border border-foreground/10 flex items-center gap-2 text-sm font-bold transition-colors">
                       <ImageIcon className="w-4 h-4 text-foreground/60" />
-                      Upload Image
+                      Add Screenshot ({reportScreenshotUrls.length}/4)
                       <input 
-                        type="file" className="hidden" accept="image/*"
+                        type="file" className="hidden" accept="image/*" multiple
                         onChange={(e) => {
-                          if (e.target.files && e.target.files[0]) {
-                            setReportScreenshot(e.target.files[0]);
-                            setReportScreenshotUrl(URL.createObjectURL(e.target.files[0]));
+                          if (e.target.files) {
+                            const newFiles = Array.from(e.target.files);
+                            const combinedFiles = [...reportScreenshots, ...newFiles].slice(0, 4);
+                            setReportScreenshots(combinedFiles);
+                            setReportScreenshotUrls(combinedFiles.map(file => URL.createObjectURL(file)));
                           }
                         }}
                       />

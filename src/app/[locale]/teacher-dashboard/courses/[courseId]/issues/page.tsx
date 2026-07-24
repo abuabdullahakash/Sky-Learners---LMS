@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { CheckCircle, Clock, Search, ChevronDown, ChevronUp, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { CheckCircle, Clock, Search, ChevronDown, ChevronUp, Image as ImageIcon, Loader2, Send, MessageSquare, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function CourseIssuesPage() {
@@ -19,6 +19,13 @@ export default function CourseIssuesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<'all' | 'open' | 'solved'>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Teacher Reply State
+  const [replyTextMap, setReplyTextMap] = useState<{ [key: string]: string }>({});
+  const [isSubmittingReplyMap, setIsSubmittingReplyMap] = useState<{ [key: string]: boolean }>({});
+  
+  // Full-screen image preview lightbox
+  const [selectedPreviewImage, setSelectedPreviewImage] = useState<string | null>(null);
 
   const fetchIssues = async () => {
     if (!user || !courseId) return;
@@ -112,12 +119,39 @@ export default function CourseIssuesPage() {
     }
   };
 
+  const handleSendReply = async (issueId: string, e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const text = replyTextMap[issueId] || '';
+    if (!text.trim()) return;
+
+    setIsSubmittingReplyMap(prev => ({ ...prev, [issueId]: true }));
+    try {
+      await updateDoc(doc(db, 'lesson_issues', issueId), {
+        replyText: text.trim(),
+        repliedAt: new Date().toISOString(),
+        status: 'solved'
+      });
+      toast.success("Reply sent & issue marked as solved! 🎉");
+      setIssues(issues.map(issue => 
+        issue.id === issueId ? { ...issue, replyText: text.trim(), repliedAt: new Date().toISOString(), status: 'solved' } : issue
+      ));
+      setReplyTextMap(prev => ({ ...prev, [issueId]: '' }));
+    } catch (err) {
+      console.error("Error sending reply", err);
+      toast.error("Failed to send reply");
+    } finally {
+      setIsSubmittingReplyMap(prev => ({ ...prev, [issueId]: false }));
+    }
+  };
+
   const filteredIssues = issues.filter(issue => {
     const matchesFilter = filter === 'all' || issue.status === filter;
     const matchesSearch = 
-      (issue.subject || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (issue.subjectTitle || issue.subject || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (issue.studentName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (issue.lessonTitle || '').toLowerCase().includes(searchTerm.toLowerCase());
+      (issue.lessonTitle || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (issue.moduleTitle || '').toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
@@ -140,7 +174,7 @@ export default function CourseIssuesPage() {
             <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">Teacher Dashboard</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">Student Issues & Reports</h1>
-          <p className="text-gray-300 text-sm font-medium">Manage and resolve issues reported by students. Solved issues auto-delete after 24 hours.</p>
+          <p className="text-gray-300 text-sm font-medium">Manage, reply and resolve issues reported by students. Solved issues auto-delete after 24 hours.</p>
         </div>
       </div>
 
@@ -184,9 +218,13 @@ export default function CourseIssuesPage() {
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {filteredIssues.map(issue => {
             const isExpanded = expandedId === issue.id;
+            const screenshots: string[] = issue.screenshotUrls?.length > 0 
+              ? issue.screenshotUrls 
+              : issue.screenshotUrl ? [issue.screenshotUrl] : [];
+
             return (
               <div 
                 key={issue.id} 
@@ -211,29 +249,35 @@ export default function CourseIssuesPage() {
                     </div>
                     
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
+                      <div className="flex flex-wrap items-center gap-2 mb-0.5">
                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wide flex items-center gap-1 w-fit ${
                           issue.status === 'solved' ? 'bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
                         }`}>
                           {issue.status === 'solved' ? <CheckCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
                           {issue.status}
                         </span>
-                        <span className="text-xs text-foreground/40 whitespace-nowrap hidden sm:inline-block">
+                        <span className="text-xs text-foreground/40 whitespace-nowrap">
                           {new Date(issue.createdAt).toLocaleString()}
                         </span>
                       </div>
-                      <h3 className="font-bold text-foreground truncate">{issue.subject}</h3>
-                      <p className="text-xs text-foreground/60 truncate">
-                        <span className="font-medium text-foreground/80">{issue.studentName}</span> reported on <span className="font-medium">{issue.lessonTitle}</span>
-                      </p>
+                      <h3 className="font-bold text-foreground text-base sm:text-lg truncate">{issue.subjectTitle || issue.subject}</h3>
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-foreground/60">
+                        <span className="font-bold text-foreground/90">{issue.studentName}</span>
+                        {issue.moduleTitle && (
+                          <span className="text-orange-500 font-semibold">• {issue.moduleTitle}</span>
+                        )}
+                        {issue.lessonTitle && (
+                          <span>• {issue.lessonTitle}</span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 shrink-0">
+                  <div className="flex items-center gap-3 shrink-0">
                     {issue.status === 'open' && (
                       <button 
                         onClick={(e) => handleMarkAsSolved(issue.id, e)}
-                        className="hidden sm:flex px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-bold rounded-xl transition-all items-center gap-2 shadow-sm shadow-green-500/20 active:scale-95"
+                        className="hidden sm:flex px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-xl transition-all items-center gap-1.5 shadow-sm shadow-green-500/20 active:scale-95"
                       >
                         <CheckCircle className="w-4 h-4" />
                         Mark Solved
@@ -248,51 +292,116 @@ export default function CourseIssuesPage() {
                 {/* Accordion Body */}
                 <div 
                   className={`border-t border-foreground/5 bg-foreground/[0.02] transition-all duration-300 ease-in-out ${
-                    isExpanded ? 'max-h-[800px] opacity-100 p-4 sm:p-5' : 'max-h-0 opacity-0 overflow-hidden'
+                    isExpanded ? 'max-h-[1200px] opacity-100 p-4 sm:p-6' : 'max-h-0 opacity-0 overflow-hidden'
                   }`}
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="flex flex-col md:flex-row gap-6">
-                    <div className="flex-1">
-                      <h4 className="text-sm font-bold text-foreground/80 mb-2 uppercase tracking-wide">Detailed Note</h4>
-                      <div className="bg-background border border-foreground/10 rounded-xl p-4 text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                        {issue.note}
-                      </div>
-
-                      {issue.status === 'open' && (
-                        <button 
-                          onClick={(e) => handleMarkAsSolved(issue.id, e)}
-                          className="sm:hidden mt-4 w-full py-2.5 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-all flex justify-center items-center gap-2 shadow-sm shadow-green-500/20 active:scale-95"
-                        >
-                          <CheckCircle className="w-4 h-4" />
-                          Mark as Solved
-                        </button>
-                      )}
-                    </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                     
-                    {issue.screenshotUrl && (
-                      <div className="md:w-64 shrink-0">
-                        <h4 className="text-sm font-bold text-foreground/80 mb-2 uppercase tracking-wide">Screenshot</h4>
-                        <div className="border border-foreground/10 rounded-xl overflow-hidden group relative bg-background p-1">
-                          <img src={issue.screenshotUrl} alt="Screenshot" className="w-full h-auto aspect-video object-cover rounded-lg" />
-                          <a 
-                            href={issue.screenshotUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            onClick={(e) => e.stopPropagation()}
-                            className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg m-1 backdrop-blur-sm"
-                          >
-                            <span className="bg-white text-black text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-xl hover:scale-105 transition-transform">
-                              <ImageIcon className="w-3 h-3" /> View Full Image
-                            </span>
-                          </a>
+                    {/* Left Column: Note & Screenshots */}
+                    <div className="lg:col-span-7 space-y-4">
+                      <div>
+                        <h4 className="text-xs font-bold text-foreground/50 uppercase tracking-wider mb-2">Detailed Note</h4>
+                        <div className="bg-background border border-foreground/10 rounded-2xl p-4 text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap shadow-sm">
+                          {issue.note}
                         </div>
                       </div>
-                    )}
+
+                      {/* Multiple Screenshots Gallery */}
+                      {screenshots.length > 0 && (
+                        <div>
+                          <h4 className="text-xs font-bold text-foreground/50 uppercase tracking-wider mb-2">
+                            Screenshots ({screenshots.length})
+                          </h4>
+                          <div className="flex flex-wrap gap-3">
+                            {screenshots.map((url, idx) => (
+                              <div 
+                                key={idx} 
+                                className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl border border-foreground/10 overflow-hidden bg-background group cursor-pointer shadow-sm hover:border-orange-500 transition-colors"
+                                onClick={() => setSelectedPreviewImage(url)}
+                              >
+                                <img src={url} alt={`Screenshot ${idx + 1}`} className="w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                  <ImageIcon className="w-5 h-5 text-white" />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right Column: Teacher Reply / Resolution Box */}
+                    <div className="lg:col-span-5 bg-background border border-foreground/10 rounded-2xl p-4 sm:p-5 space-y-4 shadow-sm">
+                      <h4 className="text-xs font-bold text-orange-500 uppercase tracking-wider flex items-center gap-1.5">
+                        <MessageSquare className="w-4 h-4" /> Teacher Reply & Resolution
+                      </h4>
+
+                      {issue.replyText ? (
+                        <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 space-y-2">
+                          <div className="flex items-center justify-between text-xs text-green-600 dark:text-green-400 font-bold">
+                            <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Replied & Solved</span>
+                            {issue.repliedAt && <span>{new Date(issue.repliedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>}
+                          </div>
+                          <p className="text-sm text-foreground/90 whitespace-pre-wrap font-medium">{issue.replyText}</p>
+                        </div>
+                      ) : (
+                        <form onSubmit={(e) => handleSendReply(issue.id, e)} className="space-y-3">
+                          <textarea 
+                            rows={3}
+                            value={replyTextMap[issue.id] || ''}
+                            onChange={(e) => setReplyTextMap({ ...replyTextMap, [issue.id]: e.target.value })}
+                            placeholder="Write a solution/reply to student..."
+                            className="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-sm focus:outline-none focus:border-orange-500 transition-colors resize-none"
+                          />
+                          <div className="flex items-center gap-2">
+                            <button 
+                              type="submit"
+                              disabled={isSubmittingReplyMap[issue.id] || !replyTextMap[issue.id]?.trim()}
+                              className="flex-1 py-2.5 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm"
+                            >
+                              {isSubmittingReplyMap[issue.id] ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <>
+                                  <Send className="w-4 h-4" /> Send Reply & Mark Solved
+                                </>
+                              )}
+                            </button>
+                            {issue.status === 'open' && (
+                              <button 
+                                type="button"
+                                onClick={(e) => handleMarkAsSolved(issue.id, e)}
+                                className="px-3 py-2.5 bg-foreground/5 hover:bg-foreground/10 text-foreground/70 font-bold text-xs rounded-xl transition-colors shrink-0"
+                              >
+                                Solve
+                              </button>
+                            )}
+                          </div>
+                        </form>
+                      )}
+                    </div>
+
                   </div>
                 </div>
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Full-Screen Image Lightbox Preview */}
+      {selectedPreviewImage && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-[200] flex items-center justify-center p-4" onClick={() => setSelectedPreviewImage(null)}>
+          <div className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center">
+            <button 
+              onClick={() => setSelectedPreviewImage(null)}
+              className="absolute -top-12 right-0 p-2 text-white/80 hover:text-white bg-white/10 rounded-full transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <img src={selectedPreviewImage} alt="Full Preview" className="max-w-full max-h-[85vh] object-contain rounded-2xl border border-white/10 shadow-2xl" />
+          </div>
         </div>
       )}
     </div>

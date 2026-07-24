@@ -458,5 +458,30 @@
       "youtube": "ইউটিউব চ্যানেল",
       "other": "কমিউনিটি লিংক"
     }
+  },
+  "Auth": {
+    "loginTab": "লগইন",
+    "registerTab": "রেজিস্ট্রেশন",
+    "loginTitle": "অ্যাকাউন্টে লগইন করুন",
+    "loginSubtitle": "আপনার ইমেইল ও পাসওয়ার্ড দিয়ে প্রবেশ করুন",
+    "registerTitle": "নতুন অ্যাকাউন্ট তৈরি করুন",
+    "registerSubtitle": "স্কাই লার্নার্সে যুক্ত হয়ে আজই আপনার পড়াশোনা শুরু করুন",
+    "nameLabel": "আপনার নাম",
+    "namePlaceholder": "আপনার পুরো নাম লিখুন",
+    "emailLabel": "ইমেইল অ্যাড্রেস",
+    "emailPlaceholder": "আপনার ইমেইল ঠিকানা লিখুন",
+    "passwordLabel": "পাসওয়ার্ড",
+    "passwordPlaceholder": "পাসওয়ার্ড লিখুন",
+    "rememberMe": "পাসওয়ার্ড মনে রাখুন",
+    "forgotPassword": "পাসওয়ার্ড ভুলে গেছেন?",
+    "loginSubmit": "লগইন করুন",
+    "registerSubmit": "ইমেইল দিয়ে রেজিস্ট্রেশন করুন",
+    "orText": "অথবা",
+    "continueGoogle": "Google দিয়ে এগিয়ে যান",
+    "continueFacebook": "Facebook দিয়ে এগিয়ে যান",
+    "emailAlreadyInUse": "এই ইমেইল দিয়ে আগে থেকেই একটি অ্যাকাউন্ট আছে। অনুগ্রহ করে লগইন করুন।",
+    "invalidCredentials": "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।",
+    "loginSuccess": "লগইন সফল হয়েছে! রিডাইরেক্ট করা হচ্ছে...",
+    "registerSuccess": "রেজিস্ট্রেশন সফল হয়েছে! রিডাইরেক্ট করা হচ্ছে..."
   }
 }

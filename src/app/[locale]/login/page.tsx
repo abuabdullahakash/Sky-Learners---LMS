@@ -7,11 +7,12 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { Link, useRouter } from '@/i18n/routing';
 import { useAuth } from '@/context/AuthContext';
 import gsap from 'gsap';
-import { useTranslations } from 'next-intl';
-import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, X } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function LoginPage() {
-  const t = useTranslations('Auth.login');
+  const t = useTranslations('Auth');
+  const locale = useLocale();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -61,7 +62,7 @@ export default function LoginPage() {
         }
       }, 1000);
     } catch (err: any) {
-      setError('Invalid email or password');
+      setError(t('invalidCredentials'));
     } finally {
       if (!isSuccess) setIsLoading(false);
     }
@@ -149,33 +150,47 @@ export default function LoginPage() {
                 </svg>
               </div>
             </div>
-            <h2 className="text-2xl font-bold mb-4 text-green-500">Login Successful!</h2>
-            <p className="text-foreground/70 mb-6">Redirecting you to your account...</p>
+            <h2 className="text-2xl font-bold mb-4 text-green-500">{t('loginSuccess')}</h2>
             <div className="w-6 h-6 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
           </div>
         ) : (
           <>
-            {/* Fully Responsive Header Block */}
-            <div className="space-y-3 mb-6 pb-4 border-b border-foreground/10">
-              <div className="flex items-center justify-between gap-2">
+            {/* Header with Login vs Register Tab Switcher & Close Button */}
+            <div className="space-y-4 mb-6">
+              <div className="flex items-center justify-between gap-2 border-b border-foreground/10 pb-3">
+                {/* Auth Mode Tabs */}
+                <div className="flex items-center gap-1.5 bg-foreground/5 p-1 rounded-2xl border border-foreground/10">
+                  <Link 
+                    href="/login" 
+                    className="px-4 py-1.5 rounded-xl font-extrabold text-xs sm:text-sm bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20"
+                  >
+                    {t('loginTab')}
+                  </Link>
+                  <Link 
+                    href="/register" 
+                    className="px-4 py-1.5 rounded-xl font-bold text-xs sm:text-sm text-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all"
+                  >
+                    {t('registerTab')}
+                  </Link>
+                </div>
+
+                {/* Close Button */}
                 <Link 
                   href="/" 
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-foreground/70 hover:text-orange-500 transition-colors bg-foreground/5 hover:bg-foreground/10 px-3 py-1.5 rounded-xl border border-foreground/10"
+                  className="p-2 rounded-full bg-foreground/5 hover:bg-foreground/10 text-foreground/70 hover:text-foreground border border-foreground/10 transition-colors"
+                  title={locale === 'bn' ? 'বন্ধ করুন' : 'Close'}
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Back to Home</span>
+                  <X className="w-4 h-4" />
                 </Link>
-                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-orange-500 bg-orange-500/10 px-2.5 py-1 rounded-full border border-orange-500/20">
-                  Login
-                </span>
               </div>
-              
+
+              {/* Title & Subtitle */}
               <div>
                 <h2 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
-                  {t('title')}
+                  {t('loginTitle')}
                 </h2>
                 <p className="text-xs sm:text-sm text-foreground/60 mt-1">
-                  Enter your credentials to access your account
+                  {t('loginSubtitle')}
                 </p>
               </div>
             </div>
@@ -236,18 +251,18 @@ export default function LoginPage() {
           </div>
           
           <button type="submit" className="w-full py-3.5 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white font-bold text-sm sm:text-base rounded-xl hover:from-orange-600 hover:to-amber-600 transition-all hover:-translate-y-0.5 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 mt-2">
-            {t('submitButton')}
+            {t('loginSubmit')}
           </button>
         </form>
 
         <div className="my-6 flex items-center">
           <div className="flex-1 border-t border-foreground/10"></div>
-          <span className="px-3 text-foreground/50 text-sm">{t('orText')}</span>
+          <span className="px-3 text-foreground/50 text-xs font-semibold uppercase">{t('orText')}</span>
           <div className="flex-1 border-t border-foreground/10"></div>
         </div>
 
         <div className="space-y-3">
-          <button onClick={handleGoogleLogin} className="w-full py-3 bg-background border border-foreground/20 font-bold rounded-lg hover:bg-foreground/5 transition-colors flex items-center justify-center gap-2">
+          <button type="button" onClick={handleGoogleLogin} className="w-full py-3 bg-background border border-foreground/15 text-foreground font-semibold rounded-xl hover:bg-foreground/5 transition-colors text-sm flex items-center justify-center gap-2 shadow-sm">
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
               <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -257,7 +272,7 @@ export default function LoginPage() {
             {t('continueGoogle')}
           </button>
 
-          <button onClick={handleFacebookLogin} className="w-full py-3 bg-[#1877F2] text-white font-bold rounded-lg hover:bg-[#1877F2]/90 transition-colors flex items-center justify-center gap-2">
+          <button type="button" onClick={handleFacebookLogin} className="w-full py-3 bg-[#1877F2] text-white font-semibold rounded-xl hover:bg-[#166fe5] transition-colors text-sm flex items-center justify-center gap-2 shadow-sm">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
             </svg>

@@ -458,5 +458,30 @@
       "youtube": "YouTube Channel",
       "other": "Community Link"
     }
+  },
+  "Auth": {
+    "loginTab": "Login",
+    "registerTab": "Register",
+    "loginTitle": "Welcome Back",
+    "loginSubtitle": "Enter your credentials to access your account",
+    "registerTitle": "Create an Account",
+    "registerSubtitle": "Join SkyLearners to start learning today",
+    "nameLabel": "Full Name",
+    "namePlaceholder": "Enter your full name",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "Enter your email address",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "loginSubmit": "Login to Account",
+    "registerSubmit": "Register with Email",
+    "orText": "OR",
+    "continueGoogle": "Continue with Google",
+    "continueFacebook": "Continue with Facebook",
+    "emailAlreadyInUse": "An account already exists with this email. Please login.",
+    "invalidCredentials": "Invalid email or password.",
+    "loginSuccess": "Login successful! Redirecting...",
+    "registerSuccess": "Registration successful! Redirecting..."
   }
 }

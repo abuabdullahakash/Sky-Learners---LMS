@@ -8,12 +8,12 @@ import { Link, useRouter } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import gsap from 'gsap';
-import { CheckCircle2, GraduationCap, Presentation, Eye, EyeOff, ArrowLeft } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { CheckCircle2, GraduationCap, Presentation, Eye, EyeOff, ArrowLeft, X } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function RegisterPage() {
-  const t = useTranslations('Auth.register');
-  const tLogin = useTranslations('Auth.login');
+  const t = useTranslations('Auth');
+  const locale = useLocale();
   
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -59,7 +59,7 @@ export default function RegisterPage() {
       }, 3000);
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
-        setError('এই ইমেইল দিয়ে আগে থেকেই একটি অ্যাকাউন্ট আছে। অনুগ্রহ করে লগইন করুন।');
+        setError(t('emailAlreadyInUse'));
       } else {
         setError(err.message || 'Failed to register');
       }
@@ -111,35 +111,48 @@ export default function RegisterPage() {
             <div className="flex justify-center mb-4">
               <CheckCircle2 className="w-16 h-16 text-green-500 animate-bounce" />
             </div>
-            <h2 className="text-2xl font-bold mb-4 text-green-500">{t('successTitle')}</h2>
-            <p className="text-foreground/70 mb-6 leading-relaxed">
-              Registration successful! Please complete your profile by clicking 'My Account' in the header...
-            </p>
+            <h2 className="text-2xl font-bold mb-4 text-green-500">{t('registerSuccess')}</h2>
             <div className="w-6 h-6 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
           </div>
         ) : (
           <div className="animate-in slide-in-from-right-8 duration-300">
-            {/* Fully Responsive Header Block */}
-            <div className="space-y-3 mb-6 pb-4 border-b border-foreground/10">
-              <div className="flex items-center justify-between gap-2">
+            
+            {/* Header with Login vs Register Tab Switcher & Close Button */}
+            <div className="space-y-4 mb-6">
+              <div className="flex items-center justify-between gap-2 border-b border-foreground/10 pb-3">
+                {/* Auth Mode Tabs */}
+                <div className="flex items-center gap-1.5 bg-foreground/5 p-1 rounded-2xl border border-foreground/10">
+                  <Link 
+                    href="/login" 
+                    className="px-4 py-1.5 rounded-xl font-bold text-xs sm:text-sm text-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all"
+                  >
+                    {t('loginTab')}
+                  </Link>
+                  <Link 
+                    href="/register" 
+                    className="px-4 py-1.5 rounded-xl font-extrabold text-xs sm:text-sm bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20"
+                  >
+                    {t('registerTab')}
+                  </Link>
+                </div>
+
+                {/* Close Button */}
                 <Link 
-                  href="/login" 
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-foreground/70 hover:text-orange-500 transition-colors bg-foreground/5 hover:bg-foreground/10 px-3 py-1.5 rounded-xl border border-foreground/10"
+                  href="/" 
+                  className="p-2 rounded-full bg-foreground/5 hover:bg-foreground/10 text-foreground/70 hover:text-foreground border border-foreground/10 transition-colors"
+                  title={locale === 'bn' ? 'বন্ধ করুন' : 'Close'}
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Back to Login</span>
+                  <X className="w-4 h-4" />
                 </Link>
-                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-orange-500 bg-orange-500/10 px-2.5 py-1 rounded-full border border-orange-500/20">
-                  Register
-                </span>
               </div>
-              
+
+              {/* Title & Subtitle */}
               <div>
                 <h2 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
-                  Create an Account
+                  {t('registerTitle')}
                 </h2>
                 <p className="text-xs sm:text-sm text-foreground/60 mt-1">
-                  Join SkyLearners to start learning today
+                  {t('registerSubtitle')}
                 </p>
               </div>
             </div>
@@ -153,6 +166,7 @@ export default function RegisterPage() {
                   type="text" 
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  placeholder={t('namePlaceholder')}
                   className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/15 text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-foreground"
                   required
                 />
@@ -163,6 +177,7 @@ export default function RegisterPage() {
                   type="email" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  placeholder={t('emailPlaceholder')}
                   className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/15 text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-foreground"
                   required
                 />
@@ -174,6 +189,7 @@ export default function RegisterPage() {
                     type={showPassword ? "text" : "password"} 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    placeholder={t('passwordPlaceholder')}
                     className="w-full px-4 py-3 pr-10 rounded-xl bg-background border border-foreground/15 text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-foreground"
                     required
                   />
@@ -188,13 +204,13 @@ export default function RegisterPage() {
               </div>
               
               <button type="submit" className="w-full py-3.5 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white font-bold text-sm sm:text-base rounded-xl hover:from-orange-600 hover:to-amber-600 transition-all hover:-translate-y-0.5 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40">
-                {t('submitButton')}
+                {t('registerSubmit')}
               </button>
             </form>
 
             <div className="my-6 flex items-center">
               <div className="flex-1 border-t border-foreground/10"></div>
-              <span className="px-3 text-foreground/50 text-xs font-semibold uppercase">{tLogin('orText')}</span>
+              <span className="px-3 text-foreground/50 text-xs font-semibold uppercase">{t('orText')}</span>
               <div className="flex-1 border-t border-foreground/10"></div>
             </div>
 
@@ -206,14 +222,14 @@ export default function RegisterPage() {
                   <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                   <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                 </svg>
-                {tLogin('continueGoogle')}
+                {t('continueGoogle')}
               </button>
 
               <button type="button" onClick={() => handleSocialLogin(new FacebookAuthProvider())} className="w-full py-3 bg-[#1877F2] text-white font-semibold rounded-xl hover:bg-[#166fe5] transition-colors text-sm flex items-center justify-center gap-2 shadow-sm">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                 </svg>
-                {tLogin('continueFacebook')}
+                {t('continueFacebook')}
               </button>
             </div>
           </div>

@@ -31,8 +31,8 @@ export default function StudentHelpDeskPage() {
   const [issues, setIssues] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Tab Filter State
-  const [filter, setFilter] = useState<'all' | 'open' | 'solved'>('all');
+  // Tab Filter State (Default: 'open')
+  const [filter, setFilter] = useState<'open' | 'solved'>('open');
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -198,16 +198,15 @@ export default function StudentHelpDeskPage() {
           আপনার পাঠানো প্রশ্ন ও সমাধানসমূহ ({filteredIssues.length})
         </h2>
 
-        <div className="flex bg-foreground/5 p-1 rounded-xl w-full sm:w-auto border border-foreground/10">
+        <div className="flex bg-foreground/5 p-1 rounded-xl w-full sm:w-auto border border-foreground/10 shrink-0">
           {[
-            { id: 'all', label: `সব (${issues.length})` },
             { id: 'open', label: `অপেক্ষমাণ (${issues.filter(i => i.status !== 'solved' && !i.replyText).length})` },
             { id: 'solved', label: `উত্তর পাওয়া গেছে (${issues.filter(i => i.status === 'solved' || i.replyText).length})` }
           ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setFilter(tab.id as any)}
-              className={`flex-1 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+              className={`flex-1 sm:flex-initial px-4 sm:px-6 py-2.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex items-center justify-center ${
                 filter === tab.id
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-foreground/60 hover:text-foreground hover:bg-foreground/5'

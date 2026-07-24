@@ -29,7 +29,7 @@ export default function DashboardLayout({
 
         {/* Main Content */}
         <div className={`flex-1 w-full min-w-0 p-4 pb-20 md:p-6 md:pb-6 lg:p-8 ${!isCourseDashboard ? 'md:ml-64 lg:ml-[280px]' : ''}`}>
-          <div className="max-w-[1280px] mx-auto w-full">
+          <div className="w-full">
             {children}
           </div>
         </div>

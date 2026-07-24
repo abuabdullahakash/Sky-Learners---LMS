@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations, useLocale } from 'next-intl';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { User, Shield, Bell, CreditCard, Camera, CheckCircle2, XCircle, Eye, EyeOff, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
@@ -14,10 +14,18 @@ import { uploadImageToImgBB } from '@/lib/imgbb';
 export default function SettingsPage() {
   const t = useTranslations('Dashboard.settings');
   const locale = useLocale();
+  const tabsRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'preferences' | 'billing'>('profile');
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { user, userData, refreshUserData } = useAuth();
+
+  const scrollTabs = (direction: 'left' | 'right') => {
+    if (tabsRef.current) {
+      const scrollAmount = direction === 'left' ? -150 : 150;
+      tabsRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
   
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -125,21 +133,22 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      {/* Tabs Navigation with Mobile Arrows */}
+      {/* Tabs Navigation with Mobile Scroll Arrows */}
       <div className="relative w-full flex items-center">
         <button 
           type="button"
-          onClick={() => {
-            const idx = tabs.findIndex(t => t.id === activeTab);
-            if (idx > 0) setActiveTab(tabs[idx - 1].id);
-          }}
-          disabled={tabs.findIndex(t => t.id === activeTab) === 0}
-          className="p-2 bg-foreground/10 hover:bg-foreground/20 rounded-xl text-foreground disabled:opacity-30 disabled:pointer-events-none shrink-0 mr-1.5 sm:hidden"
+          onClick={() => scrollTabs('left')}
+          className="p-2 bg-foreground/10 hover:bg-foreground/20 active:scale-95 rounded-xl text-foreground shrink-0 mr-1.5 sm:hidden transition-all shadow-sm"
+          title="Scroll Left"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
 
-        <div className="flex-1 overflow-x-auto custom-scrollbar flex items-center gap-1.5 sm:gap-2 p-1 bg-foreground/5 rounded-2xl">
+        <div 
+          ref={tabsRef}
+          className="flex-1 overflow-x-auto scrollbar-none flex items-center gap-1.5 sm:gap-2 p-1 bg-foreground/5 rounded-2xl"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -162,12 +171,9 @@ export default function SettingsPage() {
 
         <button 
           type="button"
-          onClick={() => {
-            const idx = tabs.findIndex(t => t.id === activeTab);
-            if (idx < tabs.length - 1) setActiveTab(tabs[idx + 1].id);
-          }}
-          disabled={tabs.findIndex(t => t.id === activeTab) === tabs.length - 1}
-          className="p-2 bg-foreground/10 hover:bg-foreground/20 rounded-xl text-foreground disabled:opacity-30 disabled:pointer-events-none shrink-0 ml-1.5 sm:hidden"
+          onClick={() => scrollTabs('right')}
+          className="p-2 bg-foreground/10 hover:bg-foreground/20 active:scale-95 rounded-xl text-foreground shrink-0 ml-1.5 sm:hidden transition-all shadow-sm"
+          title="Scroll Right"
         >
           <ChevronRight className="w-5 h-5" />
         </button>

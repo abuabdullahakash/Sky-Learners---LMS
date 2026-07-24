@@ -357,39 +357,54 @@ export default function Navbar() {
               </div>
             ) : (
               /* CASE 3: Public Site Pages (Home, Courses, About) */
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <div className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/40 px-3 mb-2">
                   Navigation
                 </div>
                 <Link
                   href="/"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-medium text-sm transition-all border ${
-                    pathname === '/' ? 'bg-primary text-white font-bold shadow-md border-primary/30' : 'hover:bg-foreground/5 text-foreground/80 border-transparent hover:border-foreground/10'
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
+                    pathname === '/' 
+                      ? 'bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 border-blue-400/40 ring-1 ring-blue-400/30' 
+                      : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
                   }`}
                 >
-                  <span>{t('home')}</span>
-                  <ChevronRight className="w-4 h-4 opacity-50" />
+                  <span className="flex items-center gap-2.5">
+                    <span className={`w-2 h-2 rounded-full ${pathname === '/' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
+                    <span>{t('home')}</span>
+                  </span>
+                  <ChevronRight className={`w-4 h-4 transition-transform ${pathname === '/' ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
                 </Link>
                 <Link
                   href="/courses"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-medium text-sm transition-all border ${
-                    pathname === '/courses' ? 'bg-primary text-white font-bold shadow-md border-primary/30' : 'hover:bg-foreground/5 text-foreground/80 border-transparent hover:border-foreground/10'
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
+                    pathname === '/courses' 
+                      ? 'bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 border-blue-400/40 ring-1 ring-blue-400/30' 
+                      : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
                   }`}
                 >
-                  <span>{t('courses')}</span>
-                  <ChevronRight className="w-4 h-4 opacity-50" />
+                  <span className="flex items-center gap-2.5">
+                    <span className={`w-2 h-2 rounded-full ${pathname === '/courses' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
+                    <span>{t('courses')}</span>
+                  </span>
+                  <ChevronRight className={`w-4 h-4 transition-transform ${pathname === '/courses' ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
                 </Link>
                 <Link
                   href="/about"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-medium text-sm transition-all border ${
-                    pathname === '/about' ? 'bg-primary text-white font-bold shadow-md border-primary/30' : 'hover:bg-foreground/5 text-foreground/80 border-transparent hover:border-foreground/10'
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
+                    pathname === '/about' 
+                      ? 'bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 border-blue-400/40 ring-1 ring-blue-400/30' 
+                      : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
                   }`}
                 >
-                  <span>About</span>
-                  <ChevronRight className="w-4 h-4 opacity-50" />
+                  <span className="flex items-center gap-2.5">
+                    <span className={`w-2 h-2 rounded-full ${pathname === '/about' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
+                    <span>About</span>
+                  </span>
+                  <ChevronRight className={`w-4 h-4 transition-transform ${pathname === '/about' ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
                 </Link>
 
                 {user && (

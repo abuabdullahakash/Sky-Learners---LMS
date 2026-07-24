@@ -8,6 +8,7 @@ import { Video, Calendar, Clock, ExternalLink, PlayCircle, Users, CheckCircle, X
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { useTranslations } from 'next-intl';
+import FlyingBookLoader from '@/components/ui/FlyingBookLoader';
 
 type LiveClass = {
   id: string;
@@ -143,9 +144,8 @@ export default function StudentLiveClasses() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-32 gap-4">
-        <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-        <div className="text-gray-500 font-medium animate-pulse">{t('loading')}</div>
+      <div className="flex flex-col items-center justify-center py-20">
+        <FlyingBookLoader />
       </div>
     );
   }
@@ -166,13 +166,13 @@ export default function StudentLiveClasses() {
     return (
       <div 
         key={cls.id} 
-        className={`bg-white dark:bg-foreground/5 border border-gray-200 dark:border-foreground/10 p-6 rounded-none shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-6 group animate-in fade-in slide-in-from-bottom-4 ${canJoin ? 'hover:border-orange-500/50 hover:shadow-md' : 'opacity-90'} ${isEnded ? 'opacity-80' : ''}`}
+        className={`bg-white dark:bg-foreground/5 border border-gray-200 dark:border-foreground/10 p-3.5 sm:p-6 rounded-xl sm:rounded-none shadow-sm transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6 group animate-in fade-in slide-in-from-bottom-4 ${canJoin ? 'hover:border-orange-500/50 hover:shadow-md' : 'opacity-90'} ${isEnded ? 'opacity-80' : ''}`}
         style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
       >
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center flex-wrap gap-2 mb-2">
             {cls.isLive ? (
-              <span className="px-2.5 py-1 bg-red-500 text-white text-xs font-bold rounded uppercase tracking-wider animate-pulse flex items-center gap-1.5 shadow-sm shadow-red-500/20">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-red-500 text-white text-[10px] sm:text-xs font-bold rounded uppercase tracking-wider animate-pulse flex items-center gap-1.5 shadow-sm shadow-red-500/20">
                 <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span> 
                 <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span> 
                 {t('liveNow')}
@@ -183,52 +183,52 @@ export default function StudentLiveClasses() {
                 )}
               </span>
             ) : isAutoStarting ? (
-              <span className="px-2.5 py-1 bg-orange-500 text-white text-xs font-bold rounded uppercase tracking-wider animate-pulse flex items-center gap-1.5 shadow-sm">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-orange-500 text-white text-[10px] sm:text-xs font-bold rounded uppercase tracking-wider animate-pulse flex items-center gap-1.5 shadow-sm">
                 <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span>
                 Auto-starting...
               </span>
             ) : isEnded ? (
-              <span className="px-2.5 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded uppercase tracking-wider shadow-sm">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] sm:text-xs font-bold rounded uppercase tracking-wider shadow-sm">
                 {t('completed')}
               </span>
             ) : (
-              <span className="px-2.5 py-1 bg-gray-100 dark:bg-foreground/10 text-gray-600 dark:text-foreground/70 text-xs font-bold rounded uppercase tracking-wider">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-gray-100 dark:bg-foreground/10 text-gray-600 dark:text-foreground/70 text-[10px] sm:text-xs font-bold rounded uppercase tracking-wider">
                 {t('upcoming')}
               </span>
             )}
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white line-clamp-1">{cls.title}</h3>
+            <h3 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white line-clamp-2 leading-snug">{cls.title}</h3>
           </div>
           
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-foreground/70 font-medium mt-4">
-            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-foreground/5 px-3 py-1.5 rounded">
-              <Calendar className="w-4 h-4 text-orange-500" /> 
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600 dark:text-foreground/70 font-medium mt-2.5 sm:mt-4">
+            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-foreground/5 px-2.5 py-1 rounded">
+              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-500" /> 
               <span>{cls.date}</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-foreground/5 px-3 py-1.5 rounded">
-              <Clock className="w-4 h-4 text-orange-500" /> 
+            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-foreground/5 px-2.5 py-1 rounded">
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-500" /> 
               <span>{formatTime12Hour(cls.time)}</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-foreground/5 px-3 py-1.5 rounded">
+            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-foreground/5 px-2.5 py-1 rounded">
               {hasAttended ? (
-                <span className="flex items-center gap-1.5 text-green-600 dark:text-green-500"><CheckCircle className="w-4 h-4" /> {t('present')}</span>
+                <span className="flex items-center gap-1.5 text-green-600 dark:text-green-500"><CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> {t('present')}</span>
               ) : isEnded ? (
-                <span className="flex items-center gap-1.5 text-red-500 dark:text-red-400"><XCircle className="w-4 h-4" /> {t('missed')}</span>
+                <span className="flex items-center gap-1.5 text-red-500 dark:text-red-400"><XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> {t('missed')}</span>
               ) : (
-                <span className="flex items-center gap-1.5 text-orange-600 dark:text-orange-500"><Users className="w-4 h-4" /> {t('interactiveSession')}</span>
+                <span className="flex items-center gap-1.5 text-orange-600 dark:text-orange-500"><Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> {t('interactiveSession')}</span>
               )}
             </div>
           </div>
         </div>
         
-        <div className="shrink-0 flex flex-col items-center gap-0">
+        <div className="w-full sm:w-auto shrink-0 flex flex-col items-stretch sm:items-center gap-2 mt-2 sm:mt-0">
           {isEnded ? (
             (() => {
               const platform = getRecordingPlatform(cls.meetLink);
               return (
-                <div className="flex flex-col items-stretch overflow-hidden rounded-none shadow-sm">
-                  <div className="flex flex-col items-center bg-gradient-to-r from-orange-500/80 to-red-500/80 px-5 py-2">
-                    <span className="text-xs text-white/80 font-bold">{t('classDuration')}</span>
-                    <span className="text-lg font-extrabold text-white font-mono leading-tight">
+                <div className="flex flex-col items-stretch overflow-hidden rounded-lg shadow-sm border border-orange-500/20">
+                  <div className="flex flex-row sm:flex-col items-center justify-between sm:justify-center bg-gradient-to-r from-orange-500/90 to-red-500/90 px-3.5 sm:px-5 py-2 gap-2">
+                    <span className="text-[11px] sm:text-xs text-white/90 font-bold">{t('classDuration')}</span>
+                    <span className="text-sm sm:text-lg font-extrabold text-white font-mono leading-tight">
                       {cls.liveStartedAt && cls.liveEndedAt ? (
                         (() => {
                           const diff = Math.floor((cls.liveEndedAt - cls.liveStartedAt) / 1000);
@@ -246,16 +246,16 @@ export default function StudentLiveClasses() {
                       href={cls.meetLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex items-center justify-center gap-1.5 px-4 py-1.5 font-bold text-xs transition-all ${
+                      className={`flex items-center justify-center gap-1.5 px-4 py-2 font-bold text-xs transition-all ${
                         platform === 'facebook'
                           ? 'bg-blue-600 text-white hover:bg-blue-700'
                           : 'bg-[#FF0000] text-white hover:bg-red-700'
                       }`}
                     >
                       {platform === 'facebook' ? (
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                       ) : (
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                       )}
                       {t('watchRecording')}
                     </a>
@@ -266,21 +266,21 @@ export default function StudentLiveClasses() {
           ) : canJoin ? (
             <button 
               onClick={() => handleJoinLive(cls)}
-              className="px-8 py-3.5 bg-orange-500 text-white font-bold rounded hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/30 hover:-translate-y-1 animate-in zoom-in duration-300"
+              className="w-full sm:w-auto px-6 py-2.5 sm:px-8 sm:py-3.5 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/30 text-sm sm:text-base"
             >
-              <PlayCircle className="w-5 h-5" /> {t('joinLive')}
+              <PlayCircle className="w-4 h-4 sm:w-5 sm:h-5" /> {t('joinLive')}
             </button>
           ) : (
             <button 
               disabled
-              className="px-8 py-3.5 bg-gray-200 dark:bg-foreground/10 text-gray-400 dark:text-foreground/40 font-bold rounded cursor-not-allowed flex items-center justify-center gap-2 transition-all"
+              className="w-full sm:w-auto px-6 py-2.5 sm:px-8 sm:py-3.5 bg-gray-200 dark:bg-foreground/10 text-gray-400 dark:text-foreground/40 font-bold rounded-lg cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
             >
-              <Clock className="w-5 h-5" /> {t('startingSoon')}
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5" /> {t('startingSoon')}
             </button>
           )}
           
           {!canJoin && !isEnded && (
-            <span className="text-xs text-gray-500 dark:text-foreground/50 font-medium">
+            <span className="text-[10px] sm:text-xs text-gray-500 dark:text-foreground/50 font-medium text-center">
               {cls.isAutoStart ? t('autoStartNote') : t('manualStartNote')}
             </span>
           )}

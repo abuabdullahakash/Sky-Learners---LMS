@@ -72,7 +72,8 @@
       "resources": "Resources",
       "exams": "Exams & Quizzes",
       "community": "Community",
-      "studentIssues": "Student Issues"
+      "studentIssues": "Student Issues",
+      "helpDesk": "Help & Doubts"
     },
     "courseOverview": {
       "welcome": "Welcome to",

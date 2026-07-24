@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
+import FlyingBookLoader from '@/components/ui/FlyingBookLoader';
 
 export default function SyllabusPage() {
   const tHero = useTranslations('Dashboard.studentHero');
@@ -62,37 +63,37 @@ export default function SyllabusPage() {
           <BookOpen className="w-32 h-32 text-orange-500 animate-pulse" />
         </div>
 
-        <div className="relative z-10 px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="relative z-10 px-6 sm:px-8 py-6 sm:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-2 sm:mb-3">
               <span className="px-2.5 py-1 bg-orange-500/25 border border-orange-500/40 text-orange-300 text-xs font-extrabold rounded uppercase tracking-widest">{tHero('badge')}</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-sm">{tHero('syllabusTitle')}</h1>
-            <p className="text-gray-300 text-sm font-medium">{tHero('syllabusSubtitle')}</p>
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-white mb-1.5 sm:mb-2 drop-shadow-sm">{tHero('syllabusTitle')}</h1>
+            <p className="text-gray-300 text-xs sm:text-sm font-medium">{tHero('syllabusSubtitle')}</p>
           </div>
         </div>
       </div>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+          <FlyingBookLoader />
         </div>
       ) : (
-        <div className="w-full md:w-[96%] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="w-full sm:w-[96%] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           
           {/* Main Content: Curriculum */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+            <div className="bg-background border border-foreground/10 rounded-2xl p-3.5 sm:p-6 shadow-sm">
+              <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 sm:mb-6 flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-orange-500" /> {tSyllabus('courseCurriculum')}
               </h2>
               
               {(!course?.syllabus?.modules || course.syllabus.modules.length === 0) ? (
                 <div className="text-center py-10 bg-foreground/5 rounded-xl border-2 border-dashed border-foreground/10">
-                  <p className="text-foreground/50 font-medium">Curriculum is being prepared.</p>
+                  <p className="text-foreground/50 font-medium text-xs sm:text-sm">Curriculum is being prepared.</p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {course.syllabus.modules.map((module: any, mIndex: number) => {
                     const isExpanded = expandedModules.includes(module.id);
                     return (
@@ -100,21 +101,21 @@ export default function SyllabusPage() {
                         {/* Module Header */}
                         <button 
                           onClick={() => toggleModule(module.id)}
-                          className="w-full bg-foreground/5 hover:bg-foreground/10 p-4 flex items-center justify-between transition-colors text-left"
+                          className="w-full bg-foreground/5 hover:bg-foreground/10 p-3 sm:p-4 flex items-center justify-between transition-colors text-left"
                         >
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-3 sm:gap-4">
                             {module.imageUrl ? (
-                              <img src={module.imageUrl} alt={module.title} className="w-10 h-10 object-cover rounded-lg bg-white" />
+                              <img src={module.imageUrl} alt={module.title} className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-lg bg-white" />
                             ) : (
-                              <div className="w-10 h-10 bg-orange-500/10 text-orange-500 rounded-lg flex items-center justify-center">
-                                <BookOpen className="w-5 h-5" />
+                              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-orange-500/10 text-orange-500 rounded-lg flex items-center justify-center">
+                                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
                               </div>
                             )}
                             <div>
-                              <span className="font-bold text-foreground text-lg">{module.title}</span>
+                              <span className="font-bold text-foreground text-sm sm:text-lg">{module.title}</span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2 sm:gap-3">
                             <div className="hidden sm:flex items-center gap-2 text-xs font-medium text-foreground/50 bg-background px-3 py-1.5 rounded-full border border-foreground/10">
                               <span>{tSyllabus('topicsCount', { count: module.lessons?.length || 0 })}</span>
                             </div>
@@ -128,7 +129,7 @@ export default function SyllabusPage() {
                         {isExpanded && (
                           <div className="bg-background divide-y divide-foreground/5">
                             {(!module.lessons || module.lessons.length === 0) ? (
-                              <div className="p-4 text-sm text-foreground/40 text-center">No topics added yet.</div>
+                              <div className="p-3 sm:p-4 text-xs sm:text-sm text-foreground/40 text-center">No topics added yet.</div>
                             ) : (
                               module.lessons.map((lesson: any, lIndex: number) => {
                                 const vCount = lesson.videoCount || 0;
@@ -140,17 +141,17 @@ export default function SyllabusPage() {
                                 if (nCount > 0) metaData.push(tSyllabus('noteCount', { count: nCount }));
                                 
                                 return (
-                                  <div key={lesson.id} className="p-4 flex items-start sm:items-center gap-4 hover:bg-foreground/[0.02] transition-colors">
-                                    <div className="mt-1 sm:mt-0 text-foreground/30 bg-foreground/5 p-2 rounded-lg">
-                                      <FileText className="w-5 h-5" />
+                                  <div key={lesson.id} className="p-3 sm:p-4 flex items-start sm:items-center gap-3 sm:gap-4 hover:bg-foreground/[0.02] transition-colors">
+                                    <div className="mt-0.5 sm:mt-0 text-foreground/30 bg-foreground/5 p-1.5 sm:p-2 rounded-lg">
+                                      <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
                                     </div>
-                                    <div className="flex-1">
-                                      <h4 className="text-sm font-bold text-foreground mb-1">
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className="text-xs sm:text-sm font-bold text-foreground mb-0.5 sm:mb-1 truncate">
                                         {lesson.title}
                                       </h4>
-                                      <div className="text-xs text-foreground/50 font-medium flex items-center flex-wrap gap-2">
+                                      <div className="text-[10px] sm:text-xs text-foreground/50 font-medium flex items-center flex-wrap gap-1.5 sm:gap-2">
                                         {metaData.length > 0 ? metaData.map((meta, i) => (
-                                          <span key={i} className="flex items-center gap-2">
+                                          <span key={i} className="flex items-center gap-1.5">
                                             {meta} {i < metaData.length - 1 && <span className="text-foreground/20">•</span>}
                                           </span>
                                         )) : (
@@ -173,42 +174,42 @@ export default function SyllabusPage() {
           </div>
 
           {/* Sidebar: Details */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-4 sm:space-y-6">
             {!hasSyllabusDetails ? (
-              <div className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm text-center">
+              <div className="bg-background border border-foreground/10 rounded-2xl p-4 sm:p-6 shadow-sm text-center">
                 <BookOpen className="w-8 h-8 text-foreground/20 mx-auto mb-3" />
-                <p className="text-foreground/50 text-sm">More details coming soon.</p>
+                <p className="text-foreground/50 text-xs sm:text-sm">More details coming soon.</p>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {course?.syllabus?.objectives && (
-                  <div className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm">
-                    <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
-                      <CheckCircle2 className="w-5 h-5 text-green-500" /> {tSyllabus('whatYouWillLearn')}
+                  <div className="bg-background border border-foreground/10 rounded-2xl p-3.5 sm:p-6 shadow-sm">
+                    <h3 className="font-bold text-foreground text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" /> {tSyllabus('whatYouWillLearn')}
                     </h3>
-                    <div className="text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">
+                    <div className="text-xs sm:text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">
                       {course.syllabus.objectives}
                     </div>
                   </div>
                 )}
                 
                 {course?.syllabus?.prerequisites && (
-                  <div className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm">
-                    <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
-                      <Clock className="w-5 h-5 text-blue-500" /> {tSyllabus('requirements')}
+                  <div className="bg-background border border-foreground/10 rounded-2xl p-3.5 sm:p-6 shadow-sm">
+                    <h3 className="font-bold text-foreground text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-2">
+                      <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" /> {tSyllabus('requirements')}
                     </h3>
-                    <div className="text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">
+                    <div className="text-xs sm:text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">
                       {course.syllabus.prerequisites}
                     </div>
                   </div>
                 )}
 
                 {course?.syllabus?.grading && (
-                  <div className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm">
-                    <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
-                      <FileText className="w-5 h-5 text-purple-500" /> {tSyllabus('grading')}
+                  <div className="bg-background border border-foreground/10 rounded-2xl p-3.5 sm:p-6 shadow-sm">
+                    <h3 className="font-bold text-foreground text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-2">
+                      <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" /> {tSyllabus('grading')}
                     </h3>
-                    <div className="text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">
+                    <div className="text-xs sm:text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">
                       {course.syllabus.grading}
                     </div>
                   </div>

@@ -353,7 +353,7 @@ export default function AuthModal({ initialMode }: AuthModalProps) {
                       onClick={() => router.push('/forgot-password')} 
                       className="text-orange-500 hover:text-orange-600 font-bold transition-colors text-xs sm:text-sm"
                     >
-                      {t('forgotPassword')}
+                      {t('forgotPasswordLink')}
                     </button>
                   </div>
                 )}

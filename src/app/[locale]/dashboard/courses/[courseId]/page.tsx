@@ -353,7 +353,7 @@ export default function StudentCourseOverview() {
       </div>
 
       {/* Right Column (Widgets) */}
-      <div className="xl:col-span-1 space-y-6">
+      <div className="xl:col-span-1 space-y-6 -mt-2 md:-mt-4">
         
         {/* Widget 1: Circular Progress */}
         <div className="bg-white dark:bg-foreground/5 rounded-3xl p-6 border border-gray-200 dark:border-foreground/10 shadow-sm flex flex-col items-center">

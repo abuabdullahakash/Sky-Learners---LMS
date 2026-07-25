@@ -7,8 +7,10 @@ import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { GraduationCap, Presentation, CheckCircle2, ChevronDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function OnboardingPage() {
+  const t = useTranslations('Onboarding');
   const { user, userData, refreshUserData, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -113,8 +115,8 @@ export default function OnboardingPage() {
         {isSuccess ? (
           <div className="text-center py-6 sm:py-8 animate-in fade-in zoom-in">
             <CheckCircle2 className="w-16 h-16 sm:w-20 sm:h-20 text-green-500 mx-auto mb-3.5 sm:mb-4 animate-bounce" />
-            <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-primary">অভিনন্দন! (Congratulations!)</h2>
-            <p className="text-xs sm:text-sm text-foreground/70 mb-6 sm:mb-8">আপনার প্রোফাইল সফলভাবে তৈরি হয়েছে।</p>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-primary">{t('congrats')}</h2>
+            <p className="text-xs sm:text-sm text-foreground/70 mb-6 sm:mb-8">{t('profileCreated')}</p>
             
             <div className="flex flex-col gap-3 mt-2">
               {role === 'student' ? (
@@ -123,13 +125,13 @@ export default function OnboardingPage() {
                     onClick={() => router.push('/courses')}
                     className="w-full py-3 px-4 bg-primary text-primary-foreground font-bold text-xs sm:text-sm rounded-xl hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all"
                   >
-                    Browse Available Courses
+                    {t('browseCourses')}
                   </button>
                   <button 
                     onClick={() => router.push('/dashboard')}
                     className="w-full py-3 px-4 bg-foreground/10 text-foreground font-bold text-xs sm:text-sm rounded-xl hover:bg-foreground/20 transition-all"
                   >
-                    Go to Dashboard
+                    {t('goToDashboard')}
                   </button>
                 </>
               ) : (
@@ -137,7 +139,7 @@ export default function OnboardingPage() {
                   onClick={() => router.push('/teacher-dashboard')}
                   className="w-full py-3 px-4 bg-orange-500 text-white font-bold text-xs sm:text-sm rounded-xl hover:shadow-[0_0_15px_rgba(249,115,22,0.4)] transition-all"
                 >
-                  Go to Teacher Dashboard
+                  {t('goToTeacherDashboard')}
                 </button>
               )}
             </div>
@@ -145,8 +147,8 @@ export default function OnboardingPage() {
         ) : !role ? (
           <div className="animate-in fade-in zoom-in duration-300">
             <div className="text-center mb-6 sm:mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 text-foreground">Welcome to Sky Learners!</h2>
-              <p className="text-xs sm:text-sm text-foreground/60">Please tell us how you plan to use the platform.</p>
+              <h2 className="text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 text-foreground">{t('welcomeTitle')}</h2>
+              <p className="text-xs sm:text-sm text-foreground/60">{t('welcomeSubtitle')}</p>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -158,8 +160,8 @@ export default function OnboardingPage() {
                   <GraduationCap className="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold mb-0.5 sm:mb-1 text-foreground">I am a Student</h3>
-                  <p className="text-xs text-foreground/60">I want to learn</p>
+                  <h3 className="text-lg sm:text-xl font-bold mb-0.5 sm:mb-1 text-foreground">{t('iAmStudent')}</h3>
+                  <p className="text-xs text-foreground/60">{t('wantToLearn')}</p>
                 </div>
               </button>
               
@@ -171,8 +173,8 @@ export default function OnboardingPage() {
                   <Presentation className="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold mb-0.5 sm:mb-1 text-foreground">I am a Teacher</h3>
-                  <p className="text-xs text-foreground/60">I want to teach</p>
+                  <h3 className="text-lg sm:text-xl font-bold mb-0.5 sm:mb-1 text-foreground">{t('iAmTeacher')}</h3>
+                  <p className="text-xs text-foreground/60">{t('wantToTeach')}</p>
                 </div>
               </button>
             </div>
@@ -180,8 +182,10 @@ export default function OnboardingPage() {
         ) : (
           <div className="animate-in slide-in-from-right-8 duration-300">
             <div className="text-center mb-6 sm:mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 text-foreground">Complete Your Profile</h2>
-              <p className="text-xs sm:text-sm text-foreground/60">Just a few more details to set up your {role} account.</p>
+              <h2 className="text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 text-foreground">{t('completeTitle')}</h2>
+              <p className="text-xs sm:text-sm text-foreground/60">
+                {t('completeSubtitle', { role: role === 'teacher' ? t('teacherRole') : t('studentRole') })}
+              </p>
             </div>
 
             {error && (
@@ -193,12 +197,12 @@ export default function OnboardingPage() {
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
               
               <div>
-                <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Phone Number</label>
+                <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">{t('phoneLabel')}</label>
                 <input 
                   type="tel" 
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+880 1XXX-XXXXXX"
+                  placeholder={t('phonePlaceholder')}
                   className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                   required
                 />
@@ -208,7 +212,7 @@ export default function OnboardingPage() {
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                      <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Date of Birth</label>
+                      <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">{t('dobLabel')}</label>
                       <input 
                         type="date" 
                         value={dob}
@@ -218,7 +222,7 @@ export default function OnboardingPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Gender</label>
+                      <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">{t('genderLabel')}</label>
                       <div className="relative">
                         <select 
                           value={gender}
@@ -226,10 +230,10 @@ export default function OnboardingPage() {
                           className="w-full px-3.5 sm:px-4 pr-10 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground appearance-none cursor-pointer"
                           required
                         >
-                          <option value="" disabled className="bg-background text-foreground">Select Gender</option>
-                          <option value="Male" className="bg-background text-foreground">Male</option>
-                          <option value="Female" className="bg-background text-foreground">Female</option>
-                          <option value="Other" className="bg-background text-foreground">Other</option>
+                          <option value="" disabled className="bg-background text-foreground">{t('selectGender')}</option>
+                          <option value="Male" className="bg-background text-foreground">{t('male')}</option>
+                          <option value="Female" className="bg-background text-foreground">{t('female')}</option>
+                          <option value="Other" className="bg-background text-foreground">{t('other')}</option>
                         </select>
                         <ChevronDown className="w-4 h-4 text-foreground/50 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                       </div>
@@ -237,11 +241,11 @@ export default function OnboardingPage() {
                   </div>
 
                   <div className="border-t border-foreground/10 pt-4 mt-2">
-                    <h3 className="font-bold text-base sm:text-lg mb-3 text-primary">Academic Details</h3>
+                    <h3 className="font-bold text-base sm:text-lg mb-3 text-primary">{t('academicDetails')}</h3>
                     
                     <div className="space-y-3.5 sm:space-y-4">
                       <div>
-                        <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Education Level</label>
+                        <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">{t('eduLevelLabel')}</label>
                         <div className="relative">
                           <select 
                             value={eduLevel}
@@ -249,12 +253,12 @@ export default function OnboardingPage() {
                             className="w-full px-3.5 sm:px-4 pr-10 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground appearance-none cursor-pointer"
                             required
                           >
-                            <option value="" disabled className="bg-background text-foreground">Select Education Level</option>
-                            <option value="primary" className="bg-background text-foreground">Primary School</option>
-                            <option value="high_school" className="bg-background text-foreground">High School</option>
-                            <option value="intermediate" className="bg-background text-foreground">Intermediate / HSC</option>
-                            <option value="honours" className="bg-background text-foreground">Honours / Undergrad</option>
-                            <option value="masters" className="bg-background text-foreground">Masters / Postgrad</option>
+                            <option value="" disabled className="bg-background text-foreground">{t('selectEduLevel')}</option>
+                            <option value="primary" className="bg-background text-foreground">{t('primary')}</option>
+                            <option value="high_school" className="bg-background text-foreground">{t('highSchool')}</option>
+                            <option value="intermediate" className="bg-background text-foreground">{t('intermediate')}</option>
+                            <option value="honours" className="bg-background text-foreground">{t('honours')}</option>
+                            <option value="masters" className="bg-background text-foreground">{t('masters')}</option>
                           </select>
                           <ChevronDown className="w-4 h-4 text-foreground/50 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                         </div>
@@ -262,12 +266,12 @@ export default function OnboardingPage() {
 
                       {eduLevel && (
                         <div>
-                          <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Institution Name</label>
+                          <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">{t('institutionName')}</label>
                           <input 
                             type="text" 
                             value={institution}
                             onChange={(e) => setInstitution(e.target.value)}
-                            placeholder="e.g. Dhaka College"
+                            placeholder={t('instPlaceholder')}
                             className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                             required
                           />
@@ -276,7 +280,7 @@ export default function OnboardingPage() {
 
                       {(eduLevel === 'primary' || eduLevel === 'high_school') && (
                         <div>
-                          <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Class</label>
+                          <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">{t('classLabel')}</label>
                           <div className="relative">
                             <select 
                               value={eduClass}
@@ -284,10 +288,10 @@ export default function OnboardingPage() {
                               className="w-full px-3.5 sm:px-4 pr-10 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground appearance-none cursor-pointer"
                               required
                             >
-                              <option value="" disabled className="bg-background text-foreground">Select Class</option>
+                              <option value="" disabled className="bg-background text-foreground">{t('selectClass')}</option>
                               {eduLevel === 'primary' 
-                                ? Array.from({length: 5}, (_, i) => <option key={i+1} value={i+1} className="bg-background text-foreground">Class {i+1}</option>)
-                                : Array.from({length: 5}, (_, i) => <option key={i+6} value={i+6} className="bg-background text-foreground">Class {i+6}</option>)
+                                ? Array.from({length: 5}, (_, i) => <option key={i+1} value={i+1} className="bg-background text-foreground">{t('classPrefix')} {i+1}</option>)
+                                : Array.from({length: 5}, (_, i) => <option key={i+6} value={i+6} className="bg-background text-foreground">{t('classPrefix')} {i+6}</option>)
                               }
                             </select>
                             <ChevronDown className="w-4 h-4 text-foreground/50 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -298,24 +302,24 @@ export default function OnboardingPage() {
                       {eduLevel === 'intermediate' && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           <div>
-                            <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Class</label>
+                            <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">{t('classLabel')}</label>
                             <div className="relative">
                               <select value={eduClass} onChange={(e) => setEduClass(e.target.value)} className="w-full px-3.5 sm:px-4 pr-10 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground appearance-none cursor-pointer" required>
-                                <option value="" disabled className="bg-background text-foreground">Select Class</option>
-                                <option value="11" className="bg-background text-foreground">Class 11</option>
-                                <option value="12" className="bg-background text-foreground">Class 12</option>
+                                <option value="" disabled className="bg-background text-foreground">{t('selectClass')}</option>
+                                <option value="11" className="bg-background text-foreground">{t('classPrefix')} 11</option>
+                                <option value="12" className="bg-background text-foreground">{t('classPrefix')} 12</option>
                               </select>
                               <ChevronDown className="w-4 h-4 text-foreground/50 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                             </div>
                           </div>
                           <div>
-                            <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Group</label>
+                            <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">{t('groupLabel')}</label>
                             <div className="relative">
                               <select value={department} onChange={(e) => setDepartment(e.target.value)} className="w-full px-3.5 sm:px-4 pr-10 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground appearance-none cursor-pointer" required>
-                                <option value="" disabled className="bg-background text-foreground">Select Group</option>
-                                <option value="science" className="bg-background text-foreground">Science</option>
-                                <option value="arts" className="bg-background text-foreground">Arts (Humanities)</option>
-                                <option value="commerce" className="bg-background text-foreground">Commerce</option>
+                                <option value="" disabled className="bg-background text-foreground">{t('selectGroup')}</option>
+                                <option value="science" className="bg-background text-foreground">{t('science')}</option>
+                                <option value="arts" className="bg-background text-foreground">{t('arts')}</option>
+                                <option value="commerce" className="bg-background text-foreground">{t('commerce')}</option>
                               </select>
                               <ChevronDown className="w-4 h-4 text-foreground/50 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                             </div>
@@ -326,23 +330,23 @@ export default function OnboardingPage() {
                       {(eduLevel === 'honours' || eduLevel === 'masters') && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           <div>
-                            <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Department</label>
+                            <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">{t('departmentLabel')}</label>
                             <input 
                               type="text" 
                               value={department}
                               onChange={(e) => setDepartment(e.target.value)}
-                              placeholder="e.g. Physics"
+                              placeholder={t('deptPlaceholder')}
                               className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                               required
                             />
                           </div>
                           <div>
-                            <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Year / Semester</label>
+                            <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">{t('yearLabel')}</label>
                             <input 
                               type="text" 
                               value={year}
                               onChange={(e) => setYear(e.target.value)}
-                              placeholder="e.g. 1st Year"
+                              placeholder={t('yearPlaceholder')}
                               className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                               required
                             />
@@ -358,26 +362,26 @@ export default function OnboardingPage() {
               {role === 'teacher' && (
                 <>
                   <div className="border-t border-foreground/10 pt-4 mt-2">
-                    <h3 className="font-bold text-base sm:text-lg mb-3 text-orange-500">Professional Details</h3>
+                    <h3 className="font-bold text-base sm:text-lg mb-3 text-orange-500">{t('professionalDetails')}</h3>
                     <div className="space-y-3.5 sm:space-y-4">
                       <div>
-                        <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Subject Expertise</label>
+                        <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">{t('subjectLabel')}</label>
                         <input 
                           type="text" 
                           value={subject}
                           onChange={(e) => setSubject(e.target.value)}
-                          placeholder="e.g. Higher Mathematics, Physics"
+                          placeholder={t('subjectPlaceholder')}
                           className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Years of Experience</label>
+                        <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">{t('experienceLabel')}</label>
                         <input 
                           type="number" 
                           value={experience}
                           onChange={(e) => setExperience(e.target.value)}
-                          placeholder="e.g. 5"
+                          placeholder={t('expPlaceholder')}
                           className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                           required
                         />
@@ -392,7 +396,7 @@ export default function OnboardingPage() {
                 disabled={isLoading}
                 className="w-full py-3.5 mt-4 bg-primary text-primary-foreground font-bold text-sm sm:text-base rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/30 disabled:opacity-50"
               >
-                {isLoading ? 'Saving...' : 'Complete Profile'}
+                {isLoading ? t('saving') : t('completeBtn')}
               </button>
 
             </form>

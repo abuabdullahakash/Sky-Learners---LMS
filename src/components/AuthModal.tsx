@@ -122,7 +122,6 @@ export default function AuthModal({ initialMode }: AuthModalProps) {
         }
 
         const userData = userDoc.data();
-        setIsSuccess(true);
         if (!userData.onboardingComplete) {
           router.push('/onboarding');
         } else {
@@ -146,8 +145,7 @@ export default function AuthModal({ initialMode }: AuthModalProps) {
           createdAt: new Date().toISOString()
         });
 
-        setIsSuccess(true);
-        // Instant redirect to onboarding page!
+        // Instant direct redirect to onboarding page!
         router.push('/onboarding');
       } catch (err: any) {
         if (err.code === 'auth/email-already-in-use') {
@@ -182,7 +180,6 @@ export default function AuthModal({ initialMode }: AuthModalProps) {
         }
         
         const userData = userDoc.data();
-        setIsSuccess(true);
         if (!userData.onboardingComplete) {
           router.push('/onboarding');
         } else {
@@ -205,7 +202,7 @@ export default function AuthModal({ initialMode }: AuthModalProps) {
             redirectUrl = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
           }
         }
-        setIsSuccess(true);
+        // Instant direct redirect to onboarding page!
         router.push(redirectUrl);
       }
     } catch (err: any) {
@@ -222,19 +219,8 @@ export default function AuthModal({ initialMode }: AuthModalProps) {
         ref={cardRef} 
         className="max-w-md w-full bg-background/95 border border-foreground/15 p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl backdrop-blur-xl opacity-0 max-h-[90vh] overflow-y-auto custom-scrollbar"
       >
-        {isSuccess ? (
-          <div className="text-center py-8">
-            <div className="flex justify-center mb-4">
-              <CheckCircle2 className="w-16 h-16 text-green-500 animate-bounce" />
-            </div>
-            <h2 className="text-2xl font-bold mb-4 text-green-500">
-              {mode === 'login' ? t('loginSuccess') : t('registerSuccess')}
-            </h2>
-            <div className="w-6 h-6 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          </div>
-        ) : (
-          <div>
-            {/* Header with In-Page Tab Switcher & Close Button */}
+        <div>
+          {/* Header with In-Page Tab Switcher & Close Button */}
             <div className="space-y-4 mb-6">
               <div className="flex items-center justify-between gap-2 border-b border-foreground/10 pb-3">
                 {/* In-Page Auth Mode Tabs */}
@@ -409,8 +395,7 @@ export default function AuthModal({ initialMode }: AuthModalProps) {
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
-    </div>
   );
 }

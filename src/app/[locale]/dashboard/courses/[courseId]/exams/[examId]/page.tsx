@@ -6,7 +6,7 @@ import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, addDoc, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/i18n/routing';
-import { Clock, Trophy, CheckCircle, ArrowLeft, AlertCircle, CheckSquare } from 'lucide-react';
+import { Clock, Trophy, CheckCircle, ArrowLeft, AlertCircle, CheckSquare, FileText, Send } from 'lucide-react';
 import { Exam, Question } from '@/app/[locale]/teacher-dashboard/courses/[courseId]/exams/page';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -101,9 +101,8 @@ export default function TakeExamPage() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [hasStarted, hasCompleted, timeLeft]); // Note: handleSubmit is not in dependency array to avoid stale closures, we'll use a ref or simple call
+  }, [hasStarted, hasCompleted, timeLeft]);
 
-  // Fix for stale closure on handleSubmit within setInterval
   const answersRef = useRef(answers);
   useEffect(() => {
     answersRef.current = answers;
@@ -171,7 +170,12 @@ export default function TakeExamPage() {
     return `${m}m ${s}s`;
   };
 
-  if (isLoading) return <div className="flex justify-center items-center h-64">Loading...</div>;
+  const getOptionLabel = (idx: number) => {
+    const bnLabels = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ'];
+    return bnLabels[idx] || String.fromCharCode(65 + idx);
+  };
+
+  if (isLoading) return <div className="flex justify-center items-center h-64 text-foreground/70 font-medium">Loading...</div>;
 
   if (!exam) return null;
 
@@ -181,91 +185,117 @@ export default function TakeExamPage() {
     const canShowResult = !exam.endTime || hasEnded;
 
     return (
-      <div className="max-w-3xl mx-auto py-12 px-4 animate-in fade-in zoom-in-95 duration-500">
-        <div className="bg-background border border-foreground/10 rounded-3xl p-8 md:p-12 text-center animate-in zoom-in-95 duration-500 shadow-xl max-w-2xl mx-auto mt-10">
-        <div className="w-24 h-24 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-          <CheckCircle className="w-12 h-12" />
-        </div>
-        <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-2">{t('examCompleted')}</h2>
-        <p className="text-xl text-foreground/60 mb-8">{exam.title}</p>
+      <div className="max-w-3xl mx-auto py-4 sm:py-10 px-2.5 sm:px-4 animate-in fade-in zoom-in-95 duration-500">
+        <div className="bg-background border border-foreground/15 rounded-2xl sm:rounded-3xl p-5 sm:p-10 text-center shadow-xl max-w-2xl mx-auto mt-2 sm:mt-6 relative overflow-hidden">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20 shadow-inner">
+            <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-500" />
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground mb-1">{t('examCompleted')}</h2>
+          <p className="text-sm sm:text-lg text-foreground/70 mb-6 font-medium">{exam.title}</p>
 
-        <div className="flex justify-center mb-8">
-          {result && canShowResult ? (
-            <div className="inline-block bg-primary/5 border border-primary/20 rounded-2xl px-12 py-8">
-              <p className="text-sm font-bold text-primary uppercase tracking-wider mb-2">{t('yourScore')}</p>
-              <div className="text-5xl font-black text-primary">
-                {result.score} <span className="text-2xl text-primary/50">/ {result.totalMarks}</span>
+          <div className="mb-6">
+            {result && canShowResult ? (
+              <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5 sm:p-8 max-w-md mx-auto relative shadow-sm">
+                <p className="text-xs font-bold text-primary uppercase tracking-wider mb-2">{t('yourScore')}</p>
+                <div className="text-4xl sm:text-5xl font-black text-primary flex items-baseline justify-center gap-1">
+                  {result.score} <span className="text-xl sm:text-2xl text-foreground/40 font-bold">/ {result.totalMarks}</span>
+                </div>
+                
+                <div className="mt-4 pt-4 border-t border-foreground/10 grid grid-cols-2 gap-3 text-xs sm:text-sm font-semibold text-foreground/80">
+                  <div className="bg-background/80 p-2.5 rounded-xl border border-foreground/10 flex flex-col items-center justify-center">
+                    <span className="text-[10px] text-foreground/50 uppercase font-bold">{t('percentage')}</span>
+                    <span className="text-sm sm:text-base font-extrabold text-foreground">{Math.round((result.score / result.totalMarks) * 100)}%</span>
+                  </div>
+                  {result.timeTakenSeconds !== undefined && (
+                    <div className="bg-background/80 p-2.5 rounded-xl border border-foreground/10 flex flex-col items-center justify-center">
+                      <span className="text-[10px] text-foreground/50 uppercase font-bold">{t('timeTaken')}</span>
+                      <span className="text-sm sm:text-base font-extrabold text-foreground flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-blue-500" />
+                        {formatTimeTaken(result.timeTakenSeconds)}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="mt-4 flex items-center justify-center gap-4 text-sm font-medium text-foreground/70">
-                <span>{t('percentage')}: {Math.round((result.score / result.totalMarks) * 100)}%</span>
-                {result.timeTakenSeconds !== undefined && (
-                  <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> {t('timeTaken')}: {formatTimeTaken(result.timeTakenSeconds)}</span>
+            ) : (
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-5 mb-6 max-w-md mx-auto text-left">
+                <AlertCircle className="w-7 h-7 text-amber-500 mx-auto mb-2" />
+                <p className="text-foreground/80 font-medium text-xs sm:text-sm text-center">{t('motivationalMsg')}</p>
+                {result?.timeTakenSeconds !== undefined && (
+                  <p className="text-xs text-foreground/60 mt-3 font-bold flex items-center justify-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-blue-500" />
+                    {t('timeTaken')}: {formatTimeTaken(result.timeTakenSeconds)}
+                  </p>
                 )}
               </div>
-            </div>
-          ) : (
-            <div className="inline-block bg-orange-500/5 border border-orange-500/20 rounded-2xl p-6 mb-8 max-w-md">
-              <AlertCircle className="w-8 h-8 text-orange-500 mx-auto mb-3" />
-              <p className="text-foreground/80 font-medium">{t('motivationalMsg')}</p>
-              {result?.timeTakenSeconds !== undefined && (
-                <p className="text-sm text-foreground/60 mt-4 font-bold">
-                  {t('timeTaken')}: {formatTimeTaken(result.timeTakenSeconds)}
-                </p>
-              )}
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        <Link 
-          href={`/dashboard/courses/${courseId}/exams`}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-foreground/5 hover:bg-foreground/10 text-foreground font-bold rounded-xl transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          {t('backToExams')}
-        </Link>
-      </div>
+          <div className="flex justify-center">
+            <Link 
+              href={`/dashboard/courses/${courseId}/exams`}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-bold rounded-xl transition-colors shadow-md hover:bg-primary/90"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              {t('backToExams')}
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!hasStarted) {
     return (
-      <div className="max-w-3xl mx-auto py-12 px-4 animate-in fade-in zoom-in-95 duration-500">
-        <div className="bg-background border border-foreground/10 rounded-3xl p-8 text-center shadow-xl">
-          <h1 className="text-3xl font-extrabold mb-4">{exam.title}</h1>
+      <div className="max-w-3xl mx-auto py-4 sm:py-10 px-2.5 sm:px-4 animate-in fade-in zoom-in-95 duration-500">
+        <div className="bg-background border border-foreground/15 rounded-2xl sm:rounded-3xl p-4 sm:p-8 text-center shadow-xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold mb-3">
+            <FileText className="w-3.5 h-3.5" />
+            <span>পরীক্ষার বিস্তারিত / Exam Instructions</span>
+          </div>
+          <h1 className="text-xl sm:text-3xl font-extrabold mb-5 text-foreground leading-snug">{exam.title}</h1>
           
-          <div className="flex flex-wrap justify-center gap-6 mb-8">
-            <div className="flex flex-col items-center p-4 bg-foreground/5 rounded-2xl min-w-[120px]">
-              <Trophy className="w-6 h-6 text-orange-500 mb-2" />
-              <span className="font-bold text-lg">{exam.totalMarks}</span>
-              <span className="text-xs text-foreground/50 uppercase tracking-wider font-bold">{t('totalMarks')}</span>
+          {/* 2-Column Mobile Stats Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4 mb-6 sm:mb-8">
+            <div className="flex flex-col items-center justify-center p-3.5 sm:p-5 bg-amber-500/10 border border-amber-500/20 rounded-2xl transition-all hover:scale-[1.02]">
+              <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center mb-2">
+                <Trophy className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              </div>
+              <span className="font-extrabold text-xl sm:text-2xl text-foreground">{exam.totalMarks}</span>
+              <span className="text-[11px] sm:text-xs text-foreground/60 uppercase tracking-wider font-bold mt-0.5">{t('totalMarks')}</span>
             </div>
-            <div className="flex flex-col items-center p-4 bg-foreground/5 rounded-2xl min-w-[120px]">
-              <Clock className="w-6 h-6 text-blue-500 mb-2" />
-              <span className="font-bold text-lg">{exam.durationMinutes}</span>
-              <span className="text-xs text-foreground/50 uppercase tracking-wider font-bold">{t('minutes')}</span>
+
+            <div className="flex flex-col items-center justify-center p-3.5 sm:p-5 bg-blue-500/10 border border-blue-500/20 rounded-2xl transition-all hover:scale-[1.02]">
+              <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center mb-2">
+                <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <span className="font-extrabold text-xl sm:text-2xl text-foreground">{exam.durationMinutes}</span>
+              <span className="text-[11px] sm:text-xs text-foreground/60 uppercase tracking-wider font-bold mt-0.5">{t('minutes')}</span>
             </div>
-            <div className="flex flex-col items-center p-4 bg-foreground/5 rounded-2xl min-w-[120px]">
-              <CheckSquare className="w-6 h-6 text-green-500 mb-2" />
-              <span className="font-bold text-lg">{exam.questions?.length || 0}</span>
-              <span className="text-xs text-foreground/50 uppercase tracking-wider font-bold">{t('questions')}</span>
+
+            <div className="col-span-2 sm:col-span-1 flex flex-col items-center justify-center p-3.5 sm:p-5 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl transition-all hover:scale-[1.02]">
+              <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center mb-2">
+                <CheckSquare className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <span className="font-extrabold text-xl sm:text-2xl text-foreground">{exam.questions?.length || 0}</span>
+              <span className="text-[11px] sm:text-xs text-foreground/60 uppercase tracking-wider font-bold mt-0.5">{t('questions')}</span>
             </div>
           </div>
 
-          <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-6 text-left mb-8 text-orange-600 dark:text-orange-400">
-            <h3 className="font-bold flex items-center gap-2 mb-2"><AlertCircle className="w-5 h-5" /> {t('instructions')}</h3>
-            <ul className="list-disc list-inside space-y-1 text-sm">
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 sm:p-6 text-left mb-6 sm:mb-8 text-amber-700 dark:text-amber-300">
+            <h3 className="font-bold flex items-center gap-2 mb-2 text-sm sm:text-base"><AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" /> {t('instructions')}</h3>
+            <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-sm font-medium">
               <li>{t('instruction1')}</li>
               <li>{t('instruction2')}</li>
               {exam.strictTimeLimit === false ? null : <li>{t('instruction3')}</li>}
             </ul>
           </div>
 
-          <div className="flex justify-center gap-4">
-            <Link href={`/dashboard/courses/${courseId}/exams`} className="px-6 py-3 bg-foreground/5 hover:bg-foreground/10 font-bold rounded-xl transition-colors">
+          <div className="flex flex-col-reverse sm:flex-row justify-center gap-3 sm:gap-4">
+            <Link href={`/dashboard/courses/${courseId}/exams`} className="w-full sm:w-auto px-6 py-3 bg-foreground/5 hover:bg-foreground/10 font-bold rounded-xl transition-colors text-foreground text-center">
               {t('cancel')}
             </Link>
-            <button onClick={() => setHasStarted(true)} className="px-8 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-lg hover:shadow-primary/30">
+            <button onClick={() => setHasStarted(true)} className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 text-sm sm:text-base">
               {t('startExamNow')}
             </button>
           </div>
@@ -275,76 +305,111 @@ export default function TakeExamPage() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto pb-24 animate-in fade-in duration-500">
-      {/* Sticky Header */}
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-foreground/10 p-4 mb-8 flex justify-between items-center rounded-b-2xl shadow-sm">
-        <h1 className="font-bold text-lg truncate max-w-[50%]">{exam.title}</h1>
-        <div className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold font-mono text-lg ${timeLeft < 60 ? 'bg-red-500/10 text-red-500 animate-pulse' : 'bg-primary/10 text-primary'}`}>
-          <Clock className="w-5 h-5" />
-          {formatTime(timeLeft)}
+    <div className="w-full max-w-4xl mx-auto pb-6 sm:pb-12 px-2 sm:px-4 animate-in fade-in duration-500">
+      {/* Offline Board Exam Header Banner */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b-2 border-primary/20 p-3 sm:p-4 mb-4 sm:mb-6 shadow-md rounded-b-2xl">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="hidden sm:flex w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 items-center justify-center shrink-0 text-primary font-serif font-extrabold text-lg">
+              📜
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-primary/10 text-primary px-2 py-0.5 rounded">
+                  পরীক্ষা / Exam Paper
+                </span>
+              </div>
+              <h1 className="font-extrabold text-sm sm:text-lg text-foreground truncate mt-0.5">{exam.title}</h1>
+            </div>
+          </div>
+          <div className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-bold font-mono text-sm sm:text-lg shrink-0 border ${timeLeft < 60 ? 'bg-red-500/10 text-red-500 border-red-500/30 animate-pulse' : 'bg-primary/10 text-primary border-primary/20'}`}>
+            <Clock className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+            <span>{formatTime(timeLeft)}</span>
+          </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8 px-4">
+      {/* Exam Paper Questions Form */}
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         {exam.questions?.map((q, idx) => (
-          <div key={q.id} className="bg-background border border-foreground/10 rounded-2xl p-6 shadow-sm">
-            <div className="flex justify-between items-start gap-4 mb-4">
-              <h3 className="font-bold text-lg leading-relaxed"><span className="text-primary mr-2">{idx + 1}.</span> {q.text}</h3>
-              <span className="shrink-0 bg-foreground/5 px-2 py-1 rounded text-xs font-bold text-foreground/50">{q.marks} {t('marks')}</span>
+          <div key={q.id} className="bg-card border border-border/80 rounded-xl sm:rounded-2xl p-3.5 sm:p-6 shadow-sm relative overflow-hidden">
+            {/* Paper Corner Strip */}
+            <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/60" />
+
+            <div className="flex justify-between items-start gap-3 mb-3.5 pl-1">
+              <h3 className="font-bold text-base sm:text-lg leading-relaxed text-foreground flex items-start gap-2">
+                <span className="text-primary font-extrabold shrink-0">{idx + 1}.</span>
+                <span>{q.text}</span>
+              </h3>
+              <span className="shrink-0 bg-foreground/5 border border-foreground/10 px-2 py-0.5 rounded-lg text-xs font-bold text-foreground/70">{q.marks} {t('marks')}</span>
             </div>
 
             {q.imageUrl && (
-              <div className="mb-6">
-                <img src={q.imageUrl} alt={`Question ${idx + 1}`} className="max-h-80 w-auto object-contain rounded-xl border border-foreground/10 shadow-sm bg-background" />
+              <div className="mb-4 sm:mb-6 pl-1">
+                <img src={q.imageUrl} alt={`Question ${idx + 1}`} className="max-h-72 w-auto object-contain rounded-xl border border-foreground/10 shadow-sm bg-background" />
               </div>
             )}
             
             {q.isMultipleStatement && q.statements && (
-              <div className="mb-6 pl-6 space-y-2">
+              <div className="mb-4 sm:mb-6 pl-3 sm:pl-6 space-y-1.5 sm:space-y-2 border-l-2 border-primary/20">
                 {q.statements.map((stmt, sIdx) => (
-                  <div key={sIdx} className="flex items-start gap-3 text-foreground/80">
-                    <span className="font-semibold text-foreground/60 min-w-[24px]">{['i.', 'ii.', 'iii.'][sIdx]}</span>
+                  <div key={sIdx} className="flex items-start gap-2 sm:gap-3 text-xs sm:text-sm text-foreground/80">
+                    <span className="font-semibold text-foreground/60 min-w-[20px]">{['i.', 'ii.', 'iii.'][sIdx]}</span>
                     <span className="font-medium">{stmt}</span>
                   </div>
                 ))}
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {q.options.map((opt, optIdx) => (
-                <label 
-                  key={optIdx} 
-                  className={`flex flex-col p-4 rounded-xl border cursor-pointer transition-all ${answers[q.id] === optIdx ? 'border-primary bg-primary/5 shadow-[0_0_0_1px_rgba(var(--primary),0.5)]' : 'border-foreground/10 hover:border-foreground/30 hover:bg-foreground/5'}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${answers[q.id] === optIdx ? 'border-primary' : 'border-foreground/30'}`}>
-                      {answers[q.id] === optIdx && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
+              {q.options.map((opt, optIdx) => {
+                const isSelected = answers[q.id] === optIdx;
+                return (
+                  <label 
+                    key={optIdx} 
+                    className={`flex flex-col p-3 sm:p-4 rounded-xl border cursor-pointer transition-all ${isSelected ? 'border-primary bg-primary/10 shadow-[0_0_0_1px_rgba(var(--primary),0.5)]' : 'border-foreground/10 hover:border-foreground/30 hover:bg-foreground/5'}`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${isSelected ? 'border-primary' : 'border-foreground/30'}`}>
+                        {isSelected && <div className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-primary" />}
+                      </div>
+                      <input
+                        type="radio"
+                        name={`question-${q.id}`}
+                        value={optIdx}
+                        checked={isSelected}
+                        onChange={() => handleSelectAnswer(q.id, optIdx)}
+                        className="sr-only"
+                      />
+                      <span className="font-bold text-primary shrink-0 min-w-[20px] text-sm sm:text-base">
+                        {getOptionLabel(optIdx)})
+                      </span>
+                      <span className="font-medium text-xs sm:text-base text-foreground leading-snug">{opt}</span>
                     </div>
-                    <input
-                      type="radio"
-                      name={`question-${q.id}`}
-                      value={optIdx}
-                      checked={answers[q.id] === optIdx}
-                      onChange={() => handleSelectAnswer(q.id, optIdx)}
-                      className="sr-only"
-                    />
-                    <span className="font-medium">{opt}</span>
-                  </div>
-                  {q.optionImages?.[optIdx] && (
-                    <div className="mt-3 ml-8">
-                      <img src={q.optionImages[optIdx]} alt={`Option ${optIdx + 1}`} className="max-h-40 rounded-lg border border-foreground/10 object-contain bg-background" />
-                    </div>
-                  )}
-                </label>
-              ))}
+                    {q.optionImages?.[optIdx] && (
+                      <div className="mt-2 ml-7 sm:ml-8">
+                        <img src={q.optionImages[optIdx]} alt={`Option ${optIdx + 1}`} className="max-h-36 rounded-lg border border-foreground/10 object-contain bg-background" />
+                      </div>
+                    )}
+                  </label>
+                );
+              })}
             </div>
           </div>
         ))}
 
-        <div className="bg-background border border-foreground/10 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
-          <p className="text-foreground/60 font-medium">Please review your answers before submitting.</p>
-          <button type="submit" disabled={isSubmitting} className="w-full md:w-auto px-8 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
-            {isSubmitting ? 'Submitting...' : 'Submit Exam'}
+        {/* Submit Card */}
+        <div className="bg-card border border-border/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 shadow-sm mt-6">
+          <p className="text-foreground/70 font-medium text-xs sm:text-sm text-center sm:text-left">
+            {t('reviewBeforeSubmit')}
+          </p>
+          <button 
+            type="submit" 
+            disabled={isSubmitting} 
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 text-sm sm:text-base shrink-0 disabled:opacity-50"
+          >
+            <Send className="w-4 h-4" />
+            <span>{isSubmitting ? t('submitting') : t('submitExam')}</span>
           </button>
         </div>
       </form>

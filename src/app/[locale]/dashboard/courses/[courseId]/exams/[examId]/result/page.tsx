@@ -124,8 +124,13 @@ export default function ExamResultPage() {
     return `${m}m ${s}s`;
   };
 
+  const getOptionLabel = (idx: number) => {
+    const bnLabels = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ'];
+    return bnLabels[idx] || String.fromCharCode(65 + idx);
+  };
+
   return (
-    <div className="w-full pb-24 animate-in fade-in duration-500">
+    <div className="w-full pb-12 sm:pb-24 animate-in fade-in duration-500">
       
       {/* Hero Section */}
       <div className="relative w-full mb-6 sm:mb-8 shadow-lg rounded-none overflow-hidden">
@@ -262,6 +267,7 @@ export default function ExamResultPage() {
                       <div key={optIdx} className={`flex flex-col p-3 sm:p-4 rounded-xl transition-all ${bgClass}`}>
                         <div className="flex items-center gap-2.5 sm:gap-3">
                           <div className="shrink-0">{icon}</div>
+                          <span className="font-bold text-primary shrink-0 text-xs sm:text-base mr-0.5">{getOptionLabel(optIdx)})</span>
                           <span className="text-xs sm:text-base flex-1">{opt}</span>
                           {isActualCorrect && (
                             <span className="ml-auto text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded">

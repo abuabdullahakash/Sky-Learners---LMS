@@ -6,7 +6,7 @@ import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, addDoc, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/i18n/routing';
-import { Clock, Trophy, CheckCircle, ArrowLeft, AlertCircle, CheckSquare, FileText, Send } from 'lucide-react';
+import { Clock, Trophy, CheckCircle, ArrowLeft, AlertCircle, CheckSquare, FileText, Send, ZoomIn, X } from 'lucide-react';
 import { Exam, Question } from '@/app/[locale]/teacher-dashboard/courses/[courseId]/exams/page';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -30,6 +30,9 @@ export default function TakeExamPage() {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Image Preview Lightbox State
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -175,6 +178,12 @@ export default function TakeExamPage() {
     return bnLabels[idx] || String.fromCharCode(65 + idx);
   };
 
+  // Helper to strip duplicate prefixes like "ক)", "খ)", "A)" if present in option string
+  const cleanOptionText = (opt: string) => {
+    if (!opt) return '';
+    return opt.replace(/^([কখগঘঙচA-Za-z১-৯0-9][\)\.\:-]\s*)+/, '').trim();
+  };
+
   if (isLoading) return <div className="flex justify-center items-center h-64 text-foreground/70 font-medium">Loading...</div>;
 
   if (!exam) return null;
@@ -185,8 +194,8 @@ export default function TakeExamPage() {
     const canShowResult = !exam.endTime || hasEnded;
 
     return (
-      <div className="w-full py-4 sm:py-10 px-2.5 sm:px-4 animate-in fade-in zoom-in-95 duration-500">
-        <div className="bg-background border border-foreground/15 rounded-2xl sm:rounded-3xl p-5 sm:p-10 text-center shadow-xl w-full max-w-4xl mx-auto mt-2 sm:mt-6 relative overflow-hidden">
+      <div className="w-full py-2 sm:py-10 px-0.5 sm:px-4 animate-in fade-in zoom-in-95 duration-500">
+        <div className="bg-background border border-foreground/15 rounded-xl sm:rounded-3xl p-4 sm:p-10 text-center shadow-xl w-full max-w-4xl mx-auto relative overflow-hidden">
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20 shadow-inner">
             <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-500" />
           </div>
@@ -195,13 +204,13 @@ export default function TakeExamPage() {
 
           <div className="mb-6">
             {result && canShowResult ? (
-              <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5 sm:p-8 max-w-md mx-auto relative shadow-sm">
+              <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 sm:p-8 max-w-md mx-auto relative shadow-sm">
                 <p className="text-xs font-bold text-primary uppercase tracking-wider mb-2">{t('yourScore')}</p>
                 <div className="text-4xl sm:text-5xl font-black text-primary flex items-baseline justify-center gap-1">
                   {result.score} <span className="text-xl sm:text-2xl text-foreground/40 font-bold">/ {result.totalMarks}</span>
                 </div>
                 
-                <div className="mt-4 pt-4 border-t border-foreground/10 grid grid-cols-2 gap-3 text-xs sm:text-sm font-semibold text-foreground/80">
+                <div className="mt-4 pt-4 border-t border-foreground/10 grid grid-cols-2 gap-2.5 sm:gap-3 text-xs sm:text-sm font-semibold text-foreground/80">
                   <div className="bg-background/80 p-2.5 rounded-xl border border-foreground/10 flex flex-col items-center justify-center">
                     <span className="text-[10px] text-foreground/50 uppercase font-bold">{t('percentage')}</span>
                     <span className="text-sm sm:text-base font-extrabold text-foreground">{Math.round((result.score / result.totalMarks) * 100)}%</span>
@@ -218,7 +227,7 @@ export default function TakeExamPage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-5 mb-6 max-w-md mx-auto text-left">
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 sm:p-5 mb-6 max-w-md mx-auto text-left">
                 <AlertCircle className="w-7 h-7 text-amber-500 mx-auto mb-2" />
                 <p className="text-foreground/80 font-medium text-xs sm:text-sm text-center">{t('motivationalMsg')}</p>
                 {result?.timeTakenSeconds !== undefined && (
@@ -234,7 +243,7 @@ export default function TakeExamPage() {
           <div className="flex justify-center">
             <Link 
               href={`/dashboard/courses/${courseId}/exams`}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-bold rounded-xl transition-colors shadow-md hover:bg-primary/90"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground font-bold rounded-xl transition-colors shadow-md hover:bg-primary/90 text-sm sm:text-base"
             >
               <ArrowLeft className="w-4 h-4" />
               {t('backToExams')}
@@ -247,8 +256,8 @@ export default function TakeExamPage() {
 
   if (!hasStarted) {
     return (
-      <div className="w-full py-4 sm:py-10 px-2.5 sm:px-4 animate-in fade-in zoom-in-95 duration-500">
-        <div className="bg-background border border-foreground/15 rounded-2xl sm:rounded-3xl p-4 sm:p-8 text-center shadow-xl w-full max-w-5xl mx-auto">
+      <div className="w-full py-2 sm:py-10 px-0.5 sm:px-4 animate-in fade-in zoom-in-95 duration-500">
+        <div className="bg-background border border-foreground/15 rounded-xl sm:rounded-3xl p-3.5 sm:p-8 text-center shadow-xl w-full max-w-5xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold mb-3">
             <FileText className="w-3.5 h-3.5" />
             <span>পরীক্ষার বিস্তারিত / Exam Instructions</span>
@@ -305,11 +314,11 @@ export default function TakeExamPage() {
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto pb-6 sm:pb-12 px-2 sm:px-4 animate-in fade-in duration-500">
+    <div className="w-full max-w-5xl mx-auto pb-6 sm:pb-12 px-0.5 sm:px-4 animate-in fade-in duration-500">
       {/* Offline Board Exam Header Banner */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b-2 border-primary/20 p-3 sm:p-4 mb-4 sm:mb-6 shadow-md rounded-b-2xl">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 min-w-0">
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b-2 border-primary/20 p-2.5 sm:p-4 mb-3.5 sm:mb-6 shadow-md rounded-b-xl sm:rounded-b-2xl">
+        <div className="flex items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
             <div className="hidden sm:flex w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 items-center justify-center shrink-0 text-primary font-serif font-extrabold text-lg">
               📜
             </div>
@@ -319,57 +328,72 @@ export default function TakeExamPage() {
                   পরীক্ষা / Exam Paper
                 </span>
               </div>
-              <h1 className="font-extrabold text-sm sm:text-lg text-foreground truncate mt-0.5">{exam.title}</h1>
+              <h1 className="font-extrabold text-xs sm:text-lg text-foreground truncate mt-0.5">{exam.title}</h1>
             </div>
           </div>
-          <div className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-bold font-mono text-sm sm:text-lg shrink-0 border ${timeLeft < 60 ? 'bg-red-500/10 text-red-500 border-red-500/30 animate-pulse' : 'bg-primary/10 text-primary border-primary/20'}`}>
-            <Clock className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+          <div className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1 sm:py-2 rounded-xl font-bold font-mono text-xs sm:text-lg shrink-0 border ${timeLeft < 60 ? 'bg-red-500/10 text-red-500 border-red-500/30 animate-pulse' : 'bg-primary/10 text-primary border-primary/20'}`}>
+            <Clock className="w-3.5 h-3.5 sm:w-5 sm:h-5 shrink-0" />
             <span>{formatTime(timeLeft)}</span>
           </div>
         </div>
       </div>
 
       {/* Exam Paper Questions Form */}
-      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-6">
         {exam.questions?.map((q, idx) => (
-          <div key={q.id} className="bg-card border border-border/80 rounded-xl sm:rounded-2xl p-3.5 sm:p-6 shadow-sm relative overflow-hidden">
+          <div key={q.id} className="bg-card border border-border/80 rounded-xl sm:rounded-2xl p-3 sm:p-6 shadow-sm relative overflow-hidden">
             {/* Paper Corner Strip */}
-            <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/60" />
+            <div className="absolute top-0 left-0 w-1 sm:w-1.5 h-full bg-primary/60" />
 
-            <div className="flex justify-between items-start gap-3 mb-3.5 pl-1">
-              <h3 className="font-bold text-base sm:text-lg leading-relaxed text-foreground flex items-start gap-2">
+            <div className="flex justify-between items-start gap-2.5 mb-3 pl-1">
+              <h3 className="font-bold text-sm sm:text-lg leading-relaxed text-foreground flex items-start gap-2">
                 <span className="text-primary font-extrabold shrink-0">{idx + 1}.</span>
                 <span>{q.text}</span>
               </h3>
-              <span className="shrink-0 bg-foreground/5 border border-foreground/10 px-2 py-0.5 rounded-lg text-xs font-bold text-foreground/70">{q.marks} {t('marks')}</span>
+              <span className="shrink-0 bg-foreground/5 border border-foreground/10 px-2 py-0.5 rounded-lg text-[11px] sm:text-xs font-bold text-foreground/70">{q.marks} {t('marks')}</span>
             </div>
 
+            {/* Enhanced Question Image View */}
             {q.imageUrl && (
-              <div className="mb-4 sm:mb-6 pl-1">
-                <img src={q.imageUrl} alt={`Question ${idx + 1}`} className="max-h-72 w-auto object-contain rounded-xl border border-foreground/10 shadow-sm bg-background" />
+              <div className="my-3 sm:my-4 p-2 bg-background border border-foreground/15 rounded-xl flex flex-col items-center justify-center shadow-sm overflow-hidden group">
+                <div 
+                  className="relative cursor-pointer max-w-full flex justify-center"
+                  onClick={() => setPreviewImage(q.imageUrl!)}
+                >
+                  <img 
+                    src={q.imageUrl} 
+                    alt={`Question ${idx + 1}`} 
+                    className="max-h-72 sm:max-h-96 w-auto max-w-full object-contain rounded-lg transition-transform group-hover:scale-[1.01]" 
+                  />
+                  <div className="absolute bottom-2 right-2 bg-black/70 text-white text-[11px] px-2 py-1 rounded-md flex items-center gap-1 opacity-90 backdrop-blur-sm">
+                    <ZoomIn className="w-3.5 h-3.5" /> বড় করে দেখুন (Zoom)
+                  </div>
+                </div>
               </div>
             )}
             
             {q.isMultipleStatement && q.statements && (
-              <div className="mb-4 sm:mb-6 pl-3 sm:pl-6 space-y-1.5 sm:space-y-2 border-l-2 border-primary/20">
+              <div className="mb-3.5 sm:mb-6 pl-2.5 sm:pl-6 space-y-1 sm:space-y-2 border-l-2 border-primary/20">
                 {q.statements.map((stmt, sIdx) => (
                   <div key={sIdx} className="flex items-start gap-2 sm:gap-3 text-xs sm:text-sm text-foreground/80">
-                    <span className="font-semibold text-foreground/60 min-w-[20px]">{['i.', 'ii.', 'iii.'][sIdx]}</span>
+                    <span className="font-semibold text-foreground/60 min-w-[18px]">{['i.', 'ii.', 'iii.'][sIdx]}</span>
                     <span className="font-medium">{stmt}</span>
                   </div>
                 ))}
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
               {q.options.map((opt, optIdx) => {
                 const isSelected = answers[q.id] === optIdx;
+                const cleanedText = cleanOptionText(opt);
+                
                 return (
                   <label 
                     key={optIdx} 
-                    className={`flex flex-col p-3 sm:p-4 rounded-xl border cursor-pointer transition-all ${isSelected ? 'border-primary bg-primary/10 shadow-[0_0_0_1px_rgba(var(--primary),0.5)]' : 'border-foreground/10 hover:border-foreground/30 hover:bg-foreground/5'}`}
+                    className={`flex flex-col p-2.5 sm:p-4 rounded-xl border cursor-pointer transition-all ${isSelected ? 'border-primary bg-primary/10 shadow-[0_0_0_1px_rgba(var(--primary),0.5)]' : 'border-foreground/10 hover:border-foreground/30 hover:bg-foreground/5'}`}
                   >
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-2 sm:gap-2.5">
                       <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${isSelected ? 'border-primary' : 'border-foreground/30'}`}>
                         {isSelected && <div className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-primary" />}
                       </div>
@@ -381,14 +405,31 @@ export default function TakeExamPage() {
                         onChange={() => handleSelectAnswer(q.id, optIdx)}
                         className="sr-only"
                       />
-                      <span className="font-bold text-primary shrink-0 min-w-[20px] text-sm sm:text-base">
+                      <span className="font-extrabold text-primary shrink-0 min-w-[20px] text-xs sm:text-base">
                         {getOptionLabel(optIdx)})
                       </span>
-                      <span className="font-medium text-xs sm:text-base text-foreground leading-snug">{opt}</span>
+                      <span className="font-medium text-xs sm:text-base text-foreground leading-snug">{cleanedText}</span>
                     </div>
+
+                    {/* Enhanced Option Image View */}
                     {q.optionImages?.[optIdx] && (
-                      <div className="mt-2 ml-7 sm:ml-8">
-                        <img src={q.optionImages[optIdx]} alt={`Option ${optIdx + 1}`} className="max-h-36 rounded-lg border border-foreground/10 object-contain bg-background" />
+                      <div className="mt-2 ml-6 sm:ml-8 p-1 bg-background border border-foreground/15 rounded-lg inline-block overflow-hidden group">
+                        <div 
+                          className="relative cursor-pointer max-w-full"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setPreviewImage(q.optionImages![optIdx]);
+                          }}
+                        >
+                          <img 
+                            src={q.optionImages[optIdx]} 
+                            alt={`Option ${optIdx + 1}`} 
+                            className="max-h-32 sm:max-h-48 w-auto max-w-full object-contain rounded transition-transform group-hover:scale-[1.02]" 
+                          />
+                          <div className="absolute bottom-1 right-1 bg-black/70 text-white text-[9px] px-1.5 py-0.5 rounded flex items-center gap-1 backdrop-blur-sm">
+                            <ZoomIn className="w-2.5 h-2.5" /> Zoom
+                          </div>
+                        </div>
                       </div>
                     )}
                   </label>
@@ -399,7 +440,7 @@ export default function TakeExamPage() {
         ))}
 
         {/* Submit Card */}
-        <div className="bg-card border border-border/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 shadow-sm mt-6">
+        <div className="bg-card border border-border/80 rounded-xl sm:rounded-2xl p-3.5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 shadow-sm mt-4 sm:mt-6">
           <p className="text-foreground/70 font-medium text-xs sm:text-sm text-center sm:text-left">
             {t('reviewBeforeSubmit')}
           </p>
@@ -413,6 +454,33 @@ export default function TakeExamPage() {
           </button>
         </div>
       </form>
+
+      {/* Fullscreen Image Preview Lightbox Modal */}
+      {previewImage && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div 
+            className="relative max-w-5xl w-full max-h-[92vh] flex flex-col items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button 
+              onClick={() => setPreviewImage(null)}
+              className="absolute -top-10 right-0 text-white hover:text-orange-400 font-bold text-xs sm:text-sm bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1.5 transition-colors shadow-lg"
+            >
+              <X className="w-4 h-4" /> বন্ধ করুন (Close)
+            </button>
+            <div className="p-2 bg-background/90 rounded-2xl border border-white/20 shadow-2xl overflow-hidden max-w-full">
+              <img 
+                src={previewImage} 
+                alt="Full Resolution Image" 
+                className="max-w-full max-h-[82vh] object-contain rounded-xl"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

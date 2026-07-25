@@ -7,7 +7,7 @@ import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firesto
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
-import { ArrowLeft, CheckCircle2, XCircle, Info, HelpCircle, Trophy, Clock, Medal } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, XCircle, Info, HelpCircle, Trophy, Clock, Medal, ZoomIn, X } from 'lucide-react';
 import { Exam } from '@/app/[locale]/teacher-dashboard/courses/[courseId]/exams/page';
 import Link from 'next/link';
 import FlyingBookLoader from '@/components/ui/FlyingBookLoader';
@@ -27,6 +27,9 @@ export default function ExamResultPage() {
   const [rank, setRank] = useState<number | null>(null);
   const [totalParticipants, setTotalParticipants] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Image Preview Lightbox State
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   
   const t = useTranslations('Exam');
 
@@ -129,11 +132,16 @@ export default function ExamResultPage() {
     return bnLabels[idx] || String.fromCharCode(65 + idx);
   };
 
+  const cleanOptionText = (opt: string) => {
+    if (!opt) return '';
+    return opt.replace(/^([কখগঘঙচA-Za-z১-৯0-9][\)\.\:-]\s*)+/, '').trim();
+  };
+
   return (
-    <div className="w-full pb-12 sm:pb-24 animate-in fade-in duration-500">
+    <div className="w-full pb-12 sm:pb-24 px-0.5 sm:px-4 animate-in fade-in duration-500">
       
       {/* Hero Section */}
-      <div className="relative w-full mb-6 sm:mb-8 shadow-lg rounded-none overflow-hidden">
+      <div className="relative w-full mb-6 sm:mb-8 shadow-lg rounded-xl sm:rounded-2xl overflow-hidden">
         <div className="absolute inset-0 bg-[#111827]"/>
         <div className="absolute inset-0" style={{background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 30%, #111827 60%, #0f172a 100%)'}} />
         <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 15% 60%, rgba(249,115,22,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 20%, rgba(239,68,68,0.2) 0%, transparent 40%)'}} />
@@ -145,12 +153,12 @@ export default function ExamResultPage() {
           <Trophy className="w-32 h-32 text-orange-500 animate-pulse" />
         </div>
 
-        <div className="relative z-10 px-6 sm:px-8 py-6 sm:py-8">
+        <div className="relative z-10 px-4 sm:px-8 py-5 sm:py-8">
           <Link href={`/dashboard/courses/${courseId}/exams`} className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-orange-400 hover:text-orange-300 transition-colors mb-3">
             <ArrowLeft className="w-4 h-4" /> {t('backToExams')}
           </Link>
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-white mb-1.5 sm:mb-2 drop-shadow-sm flex items-center gap-2.5">
-            <Trophy className="w-7 h-7 sm:w-10 sm:h-10 text-amber-400 shrink-0" />
+          <h1 className="text-xl sm:text-4xl font-extrabold text-white mb-1.5 sm:mb-2 drop-shadow-sm flex items-center gap-2">
+            <Trophy className="w-6 h-6 sm:w-10 sm:h-10 text-amber-400 shrink-0" />
             {t('examResult')}
           </h1>
           <p className="text-gray-300 text-xs sm:text-sm font-medium">{exam.title}</p>
@@ -158,39 +166,39 @@ export default function ExamResultPage() {
       </div>
 
       {/* 2-Column Mobile Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 mb-8 sm:mb-12">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-6 mb-6 sm:mb-12">
         
         {/* Score Card */}
-        <div className="bg-background border border-foreground/10 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center shadow-sm flex flex-col items-center justify-center relative overflow-hidden">
-          <Trophy className="w-7 h-7 sm:w-10 sm:h-10 text-orange-500 mb-2" />
+        <div className="bg-background border border-foreground/10 rounded-xl sm:rounded-2xl p-3.5 sm:p-6 text-center shadow-sm flex flex-col items-center justify-center relative overflow-hidden">
+          <Trophy className="w-6 h-6 sm:w-10 sm:h-10 text-orange-500 mb-1.5 sm:mb-2" />
           <p className="text-[10px] sm:text-xs font-bold text-foreground/60 uppercase tracking-wider mb-1">{t('finalScore')}</p>
-          <div className="text-2xl sm:text-5xl font-black text-orange-500 drop-shadow-sm leading-tight">
-            {score} <span className="text-sm sm:text-2xl text-foreground/40 font-bold">/ {exam.totalMarks}</span>
+          <div className="text-xl sm:text-5xl font-black text-orange-500 drop-shadow-sm leading-tight">
+            {score} <span className="text-xs sm:text-2xl text-foreground/40 font-bold">/ {exam.totalMarks}</span>
           </div>
-          <p className="text-foreground/70 font-bold mt-1.5 bg-foreground/5 px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs border border-foreground/10">
+          <p className="text-foreground/70 font-bold mt-1.5 bg-foreground/5 px-2 py-0.5 rounded-full text-[10px] sm:text-xs border border-foreground/10">
             {t('percentage')}: {Math.round((score / exam.totalMarks) * 100)}%
           </p>
         </div>
 
         {/* Time Taken Card */}
-        <div className="bg-background border border-foreground/10 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center shadow-sm flex flex-col items-center justify-center relative overflow-hidden">
-          <Clock className="w-7 h-7 sm:w-10 sm:h-10 text-blue-500 mb-2" />
+        <div className="bg-background border border-foreground/10 rounded-xl sm:rounded-2xl p-3.5 sm:p-6 text-center shadow-sm flex flex-col items-center justify-center relative overflow-hidden">
+          <Clock className="w-6 h-6 sm:w-10 sm:h-10 text-blue-500 mb-1.5 sm:mb-2" />
           <p className="text-[10px] sm:text-xs font-bold text-foreground/60 uppercase tracking-wider mb-1">{t('timeTaken')}</p>
-          <div className="text-xl sm:text-4xl font-black text-foreground drop-shadow-sm leading-tight">
+          <div className="text-lg sm:text-4xl font-black text-foreground drop-shadow-sm leading-tight">
             {timeTakenSeconds !== undefined ? formatTimeTaken(timeTakenSeconds) : 'N/A'}
           </div>
         </div>
 
         {/* Rank Card */}
-        <div className="col-span-2 md:col-span-1 bg-background border border-foreground/10 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center shadow-sm flex flex-col items-center justify-center relative overflow-hidden">
-          <Medal className={`w-7 h-7 sm:w-10 sm:h-10 mb-2 ${rank === 1 ? 'text-yellow-500' : rank === 2 ? 'text-gray-400' : rank === 3 ? 'text-amber-600' : 'text-purple-500'}`} />
+        <div className="col-span-2 md:col-span-1 bg-background border border-foreground/10 rounded-xl sm:rounded-2xl p-3.5 sm:p-6 text-center shadow-sm flex flex-col items-center justify-center relative overflow-hidden">
+          <Medal className={`w-6 h-6 sm:w-10 sm:h-10 mb-1.5 sm:mb-2 ${rank === 1 ? 'text-yellow-500' : rank === 2 ? 'text-gray-400' : rank === 3 ? 'text-amber-600' : 'text-purple-500'}`} />
           <p className="text-[10px] sm:text-xs font-bold text-foreground/60 uppercase tracking-wider mb-1">{t('rank')}</p>
-          <div className="text-xl sm:text-4xl font-black text-foreground drop-shadow-sm flex items-baseline justify-center gap-1.5 leading-tight">
+          <div className="text-lg sm:text-4xl font-black text-foreground drop-shadow-sm flex items-baseline justify-center gap-1.5 leading-tight">
             {isLate ? (
-              <span className="text-sm sm:text-xl text-red-500 font-bold">{t('unrankedLate')}</span>
+              <span className="text-xs sm:text-xl text-red-500 font-bold">{t('unrankedLate')}</span>
             ) : (
               <>
-                #{rank} <span className="text-xs sm:text-base text-foreground/40 font-bold">{t('outOf')} {totalParticipants}</span>
+                #{rank} <span className="text-[10px] sm:text-base text-foreground/40 font-bold">{t('outOf')} {totalParticipants}</span>
               </>
             )}
           </div>
@@ -199,9 +207,9 @@ export default function ExamResultPage() {
       </div>
 
       {/* Answer Review Section */}
-      <div className="space-y-6 sm:space-y-8">
-        <h2 className="text-lg sm:text-xl font-bold border-b border-foreground/10 pb-2 text-foreground flex items-center gap-2">
-          <HelpCircle className="w-5 h-5 text-orange-500" />
+      <div className="space-y-4 sm:space-y-8">
+        <h2 className="text-base sm:text-xl font-bold border-b border-foreground/10 pb-2 text-foreground flex items-center gap-2">
+          <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
           {t('reviewAnswers')}
         </h2>
         
@@ -212,77 +220,105 @@ export default function ExamResultPage() {
 
           return (
             <div key={q.id} className={`bg-background border rounded-xl sm:rounded-2xl overflow-hidden shadow-sm ${isCorrect ? 'border-emerald-500/30' : 'border-red-500/30'}`}>
-              <div className={`p-4 sm:p-6 ${isCorrect ? 'bg-emerald-500/[0.03]' : 'bg-red-500/[0.03]'}`}>
-                <div className="flex justify-between items-start gap-3 mb-4">
-                  <h3 className="font-bold text-sm sm:text-lg leading-relaxed flex items-start gap-2.5 text-foreground">
+              <div className={`p-3 sm:p-6 ${isCorrect ? 'bg-emerald-500/[0.03]' : 'bg-red-500/[0.03]'}`}>
+                <div className="flex justify-between items-start gap-2.5 mb-3">
+                  <h3 className="font-bold text-sm sm:text-lg leading-relaxed flex items-start gap-2 text-foreground">
                     {isCorrect ? (
-                      <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500 shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-4 h-4 sm:w-6 sm:h-6 text-emerald-500 shrink-0 mt-0.5" />
                     ) : (
-                      <XCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 shrink-0 mt-0.5" />
+                      <XCircle className="w-4 h-4 sm:w-6 sm:h-6 text-red-500 shrink-0 mt-0.5" />
                     )}
                     <span><span className="text-foreground/50 mr-1">{idx + 1}.</span> {q.text}</span>
                   </h3>
                   <div className="text-right shrink-0">
-                    <span className={`px-2.5 py-1 rounded-lg text-xs sm:text-sm font-bold ${isCorrect ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-red-500/10 text-red-600 dark:text-red-400'}`}>
+                    <span className={`px-2 py-0.5 rounded-lg text-[11px] sm:text-sm font-bold ${isCorrect ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-red-500/10 text-red-600 dark:text-red-400'}`}>
                       {isCorrect ? `${q.marks} / ${q.marks} ${t('marks')}` : `0 / ${q.marks} ${t('marks')}`}
                     </span>
                     {skipped && <p className="text-[10px] sm:text-xs text-red-500 mt-1 font-semibold text-center">{t('skipped')}</p>}
                   </div>
                 </div>
 
+                {/* Enhanced Question Image View in Result */}
                 {q.imageUrl && (
-                  <div className="mb-4 sm:mb-6 pl-7 sm:pl-9">
-                    <img src={q.imageUrl} alt={`Question ${idx + 1}`} className="max-h-60 sm:max-h-72 w-auto object-contain rounded-xl border border-foreground/10 shadow-sm bg-background" />
+                  <div className="my-3 sm:my-4 p-2 bg-background border border-foreground/15 rounded-xl flex flex-col items-center justify-center shadow-sm overflow-hidden group">
+                    <div 
+                      className="relative cursor-pointer max-w-full flex justify-center"
+                      onClick={() => setPreviewImage(q.imageUrl!)}
+                    >
+                      <img 
+                        src={q.imageUrl} 
+                        alt={`Question ${idx + 1}`} 
+                        className="max-h-60 sm:max-h-80 w-auto max-w-full object-contain rounded-lg transition-transform group-hover:scale-[1.01]" 
+                      />
+                      <div className="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] px-2 py-0.5 rounded-md flex items-center gap-1 opacity-90 backdrop-blur-sm">
+                        <ZoomIn className="w-3 h-3" /> Zoom
+                      </div>
+                    </div>
                   </div>
                 )}
 
                 {q.isMultipleStatement && q.statements && (
-                  <div className="mb-4 sm:mb-6 pl-7 sm:pl-10 space-y-1.5 sm:space-y-2">
+                  <div className="mb-3 sm:mb-6 pl-5 sm:pl-10 space-y-1 sm:space-y-2">
                     {q.statements.map((stmt, sIdx) => (
                       <div key={sIdx} className="flex items-start gap-2 sm:gap-3 text-xs sm:text-sm text-foreground/80">
-                        <span className="font-semibold text-foreground/60 min-w-[20px]">{['i.', 'ii.', 'iii.'][sIdx]}</span>
+                        <span className="font-semibold text-foreground/60 min-w-[18px]">{['i.', 'ii.', 'iii.'][sIdx]}</span>
                         <span className="font-medium">{stmt}</span>
                       </div>
                     ))}
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 gap-2.5 sm:gap-3">
+                <div className="grid grid-cols-1 gap-2 sm:gap-3">
                   {q.options.map((opt, optIdx) => {
                     const isSelected = studentAnswer === optIdx;
                     const isActualCorrect = q.correctOptionIndex === optIdx;
+                    const cleanedText = cleanOptionText(opt);
                     
                     let bgClass = "bg-background/60 border-foreground/10 text-foreground/70";
-                    let icon = <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 border-foreground/30 shrink-0" />;
+                    let icon = <div className="w-3.5 h-3.5 sm:w-5 sm:h-5 rounded-full border-2 border-foreground/30 shrink-0" />;
 
                     if (isActualCorrect) {
                       bgClass = "bg-emerald-500/10 border-2 border-emerald-500 text-emerald-700 dark:text-emerald-400 font-bold";
-                      icon = <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />;
+                      icon = <CheckCircle2 className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />;
                     } else if (isSelected && !isActualCorrect) {
                       bgClass = "bg-background border-2 border-red-500/50 text-red-600 dark:text-red-400 font-semibold";
-                      icon = <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 shrink-0" />;
+                      icon = <XCircle className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-red-500 shrink-0" />;
                     }
 
                     return (
-                      <div key={optIdx} className={`flex flex-col p-3 sm:p-4 rounded-xl transition-all ${bgClass}`}>
-                        <div className="flex items-center gap-2.5 sm:gap-3">
+                      <div key={optIdx} className={`flex flex-col p-2.5 sm:p-4 rounded-xl transition-all ${bgClass}`}>
+                        <div className="flex items-center gap-2 sm:gap-3">
                           <div className="shrink-0">{icon}</div>
-                          <span className="font-bold text-primary shrink-0 text-xs sm:text-base mr-0.5">{getOptionLabel(optIdx)})</span>
-                          <span className="text-xs sm:text-base flex-1">{opt}</span>
+                          <span className="font-extrabold text-primary shrink-0 text-xs sm:text-base mr-0.5">{getOptionLabel(optIdx)})</span>
+                          <span className="text-xs sm:text-base flex-1">{cleanedText}</span>
                           {isActualCorrect && (
-                            <span className="ml-auto text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded">
+                            <span className="ml-auto text-[9px] sm:text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded">
                               সঠিক উত্তর
                             </span>
                           )}
                           {isSelected && !isActualCorrect && (
-                            <span className="ml-auto text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-red-500/20 text-red-600 dark:text-red-400 px-2 py-0.5 rounded">
+                            <span className="ml-auto text-[9px] sm:text-xs font-bold uppercase tracking-wider bg-red-500/20 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded">
                               আপনার উত্তর (ভুল)
                             </span>
                           )}
                         </div>
+
+                        {/* Enhanced Option Image View in Result */}
                         {q.optionImages?.[optIdx] && (
-                          <div className="mt-2 ml-7 sm:ml-8">
-                            <img src={q.optionImages[optIdx]} alt={`Option ${optIdx + 1}`} className="max-h-28 sm:max-h-36 rounded-lg border border-foreground/10 object-contain bg-background" />
+                          <div className="mt-2 ml-6 sm:ml-8 p-1 bg-background border border-foreground/15 rounded-lg inline-block overflow-hidden group">
+                            <div 
+                              className="relative cursor-pointer max-w-full"
+                              onClick={() => setPreviewImage(q.optionImages![optIdx])}
+                            >
+                              <img 
+                                src={q.optionImages[optIdx]} 
+                                alt={`Option ${optIdx + 1}`} 
+                                className="max-h-28 sm:max-h-40 w-auto max-w-full object-contain rounded transition-transform group-hover:scale-[1.02]" 
+                              />
+                              <div className="absolute bottom-1 right-1 bg-black/70 text-white text-[9px] px-1.5 py-0.5 rounded flex items-center gap-1 backdrop-blur-sm">
+                                <ZoomIn className="w-2.5 h-2.5" /> Zoom
+                              </div>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -292,17 +328,44 @@ export default function ExamResultPage() {
               </div>
 
               {q.explanation && (
-                <div className="bg-blue-500/5 border-t border-blue-500/10 p-3.5 sm:p-5">
-                  <h4 className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-xs sm:text-sm mb-1.5 sm:mb-2">
+                <div className="bg-blue-500/5 border-t border-blue-500/10 p-3 sm:p-5">
+                  <h4 className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-xs sm:text-sm mb-1 sm:mb-2">
                     <Info className="w-4 h-4 sm:w-5 sm:h-5" /> {t('explanation')}
                   </h4>
-                  <p className="text-foreground/80 text-xs sm:text-sm leading-relaxed whitespace-pre-wrap pl-6 sm:pl-7">{q.explanation}</p>
+                  <p className="text-foreground/80 text-xs sm:text-sm leading-relaxed whitespace-pre-wrap pl-5 sm:pl-7">{q.explanation}</p>
                 </div>
               )}
             </div>
           );
         })}
       </div>
+
+      {/* Fullscreen Image Preview Lightbox Modal */}
+      {previewImage && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div 
+            className="relative max-w-5xl w-full max-h-[92vh] flex flex-col items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button 
+              onClick={() => setPreviewImage(null)}
+              className="absolute -top-10 right-0 text-white hover:text-orange-400 font-bold text-xs sm:text-sm bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1.5 transition-colors shadow-lg"
+            >
+              <X className="w-4 h-4" /> বন্ধ করুন (Close)
+            </button>
+            <div className="p-2 bg-background/90 rounded-2xl border border-white/20 shadow-2xl overflow-hidden max-w-full">
+              <img 
+                src={previewImage} 
+                alt="Full Resolution Image" 
+                className="max-w-full max-h-[82vh] object-contain rounded-xl"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

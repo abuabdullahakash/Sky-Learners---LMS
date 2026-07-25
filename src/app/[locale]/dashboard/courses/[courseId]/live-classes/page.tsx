@@ -331,7 +331,7 @@ export default function StudentLiveClasses() {
           </p>
         </div>
       ) : (
-        <div className="space-y-6 max-w-5xl mx-auto">
+        <div className="space-y-6 w-full">
           {liveModules.map((module, mIndex) => {
             const moduleClasses = sortedClasses.filter(c => c.moduleId === module.id);
             const isExpanded = expandedModules.includes(module.id);

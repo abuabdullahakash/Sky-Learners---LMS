@@ -156,7 +156,7 @@ export default function StudentCourseOverview() {
   const teacherAvatar = teacherProfile?.profilePhoto || teacherProfile?.photoUrl || teacherProfile?.image;
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 max-w-7xl">
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 w-full">
       
       {/* Left Column (Main Content) */}
       <div className="xl:col-span-2 space-y-8">

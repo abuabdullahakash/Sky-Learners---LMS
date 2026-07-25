@@ -185,8 +185,8 @@ export default function TakeExamPage() {
     const canShowResult = !exam.endTime || hasEnded;
 
     return (
-      <div className="max-w-3xl mx-auto py-4 sm:py-10 px-2.5 sm:px-4 animate-in fade-in zoom-in-95 duration-500">
-        <div className="bg-background border border-foreground/15 rounded-2xl sm:rounded-3xl p-5 sm:p-10 text-center shadow-xl max-w-2xl mx-auto mt-2 sm:mt-6 relative overflow-hidden">
+      <div className="w-full py-4 sm:py-10 px-2.5 sm:px-4 animate-in fade-in zoom-in-95 duration-500">
+        <div className="bg-background border border-foreground/15 rounded-2xl sm:rounded-3xl p-5 sm:p-10 text-center shadow-xl w-full max-w-4xl mx-auto mt-2 sm:mt-6 relative overflow-hidden">
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20 shadow-inner">
             <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-500" />
           </div>
@@ -247,8 +247,8 @@ export default function TakeExamPage() {
 
   if (!hasStarted) {
     return (
-      <div className="max-w-3xl mx-auto py-4 sm:py-10 px-2.5 sm:px-4 animate-in fade-in zoom-in-95 duration-500">
-        <div className="bg-background border border-foreground/15 rounded-2xl sm:rounded-3xl p-4 sm:p-8 text-center shadow-xl">
+      <div className="w-full py-4 sm:py-10 px-2.5 sm:px-4 animate-in fade-in zoom-in-95 duration-500">
+        <div className="bg-background border border-foreground/15 rounded-2xl sm:rounded-3xl p-4 sm:p-8 text-center shadow-xl w-full max-w-5xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold mb-3">
             <FileText className="w-3.5 h-3.5" />
             <span>পরীক্ষার বিস্তারিত / Exam Instructions</span>
@@ -305,7 +305,7 @@ export default function TakeExamPage() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto pb-6 sm:pb-12 px-2 sm:px-4 animate-in fade-in duration-500">
+    <div className="w-full max-w-5xl mx-auto pb-6 sm:pb-12 px-2 sm:px-4 animate-in fade-in duration-500">
       {/* Offline Board Exam Header Banner */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b-2 border-primary/20 p-3 sm:p-4 mb-4 sm:mb-6 shadow-md rounded-b-2xl">
         <div className="flex items-center justify-between gap-3">

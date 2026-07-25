@@ -127,7 +127,7 @@ export default function StudentExams() {
   const completedCount = Object.keys(completedExams).length;
 
   return (
-    <div className="w-full max-w-7xl space-y-6 sm:space-y-8 animate-in fade-in duration-500">
+    <div className="w-full space-y-6 sm:space-y-8 animate-in fade-in duration-500">
       {/* Hero Section */}
       <div className="relative w-full mb-6 shadow-lg rounded-none overflow-hidden">
         <div className="absolute inset-0 bg-[#111827]"/>

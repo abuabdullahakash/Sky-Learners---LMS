@@ -36,9 +36,6 @@ function ResetPasswordForm() {
   // Verify the code when component mounts
   useEffect(() => {
     if (!oobCode) {
-      // Avoid calling setState in effect synchronously
-      // We will handle the false state in the render directly or use a timeout if absolutely needed
-      // But since we have a check `if (!oobCode)` in render, it's fine.
       setTimeout(() => setIsVerifying(false), 0);
       return;
     }
@@ -88,28 +85,28 @@ function ResetPasswordForm() {
   if (isVerifying) {
     return (
       <div className="text-center py-10">
-        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-foreground/70">{t('verifying')}</p>
+        <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-xs sm:text-sm text-foreground/70 font-medium">{t('verifying')}</p>
       </div>
     );
   }
 
   if (isSuccess) {
     return (
-      <div className="text-center py-6">
+      <div className="text-center py-6 animate-in fade-in zoom-in duration-300">
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center">
-            <CheckCircle2 className="w-10 h-10 text-green-500" />
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-green-500/15 border border-green-500/30 rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-lg shadow-green-500/10">
+            <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 text-green-500 animate-bounce" />
           </div>
         </div>
-        <h2 className="text-2xl font-bold mb-3 text-green-500">{t('successTitle')}</h2>
-        <p className="text-foreground/70 mb-8 leading-relaxed">
+        <h2 className="text-2xl sm:text-3xl font-extrabold mb-3 text-green-500">{t('successTitle')}</h2>
+        <p className="text-xs sm:text-sm text-foreground/80 mb-8 leading-relaxed px-2">
           {t('successMessage')}
         </p>
         
         <Link 
           href="/login" 
-          className="w-full py-3 px-4 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors inline-block shadow-lg shadow-primary/25"
+          className="w-full py-3.5 px-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-xs sm:text-sm rounded-xl sm:rounded-2xl hover:brightness-110 active:scale-[0.99] transition-all shadow-lg shadow-orange-500/25 inline-block text-center"
         >
           {t('loginButton')}
         </Link>
@@ -119,19 +116,19 @@ function ResetPasswordForm() {
 
   if (!isValidCode) {
     return (
-      <div className="text-center py-6">
+      <div className="text-center py-6 animate-in fade-in duration-300">
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center">
-            <AlertCircle className="w-10 h-10 text-red-500" />
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-red-500/15 border border-red-500/30 rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-lg shadow-red-500/10">
+            <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-red-500" />
           </div>
         </div>
-        <h2 className="text-2xl font-bold mb-3 text-red-500">{t('invalidLinkTitle')}</h2>
-        <p className="text-foreground/70 mb-8 leading-relaxed">
-          {error}
+        <h2 className="text-2xl sm:text-3xl font-extrabold mb-3 text-red-500">{t('invalidLinkTitle')}</h2>
+        <p className="text-xs sm:text-sm text-foreground/80 mb-8 leading-relaxed px-2">
+          {error || t('invalidLinkMessage')}
         </p>
         <Link 
           href="/forgot-password" 
-          className="w-full py-3 px-4 bg-foreground/10 text-foreground font-medium rounded-lg hover:bg-foreground/15 transition-colors inline-block"
+          className="w-full py-3.5 px-4 bg-foreground/10 text-foreground font-extrabold text-xs sm:text-sm rounded-xl sm:rounded-2xl hover:bg-foreground/20 transition-all inline-block text-center"
         >
           {t('requestNewLink')}
         </Link>
@@ -141,38 +138,38 @@ function ResetPasswordForm() {
 
   return (
     <>
-      <div className="text-center mb-8">
-        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4 text-primary">
-          <KeyRound className="w-6 h-6" />
+      <div className="text-center mb-6 sm:mb-8">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-tr from-orange-500/20 to-amber-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 text-orange-500 shadow-md">
+          <KeyRound className="w-7 h-7 sm:w-8 sm:h-8" />
         </div>
-        <h2 className="text-2xl font-bold mb-2">{t('title')}</h2>
-        <p className="text-foreground/60 text-sm">
+        <h2 className="text-2xl sm:text-3xl font-extrabold mb-2 text-foreground">{t('title')}</h2>
+        <p className="text-xs sm:text-sm text-foreground/70 leading-relaxed px-1 sm:px-3">
           {t('subtitle')}
         </p>
       </div>
       
       {error && (
-        <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm p-3 rounded-lg mb-6 text-center">
+        <div className="bg-red-500/10 border border-red-500/30 text-red-500 text-xs sm:text-sm p-3.5 rounded-xl mb-6 text-center font-medium leading-relaxed">
           {error}
         </div>
       )}
       
-      <form onSubmit={handleReset} className="space-y-4">
+      <form onSubmit={handleReset} className="space-y-4 sm:space-y-5">
         <div>
-          <label className="block text-sm font-medium mb-1.5 text-foreground/80">{t('newPasswordLabel')}</label>
+          <label className="block text-xs sm:text-sm font-semibold mb-1.5 text-foreground/80">{t('newPasswordLabel')}</label>
           <div className="relative">
             <input 
               type={showNewPassword ? "text" : "password"} 
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder={t('newPasswordPlaceholder')}
-              className="w-full px-4 py-3 pr-10 rounded-xl bg-background border border-foreground/10 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-sm"
+              className="w-full px-3.5 sm:px-4 py-3 sm:py-3.5 pr-10 rounded-xl sm:rounded-2xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all shadow-sm text-foreground"
               required
             />
             <button
               type="button"
               onClick={() => setShowNewPassword(!showNewPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground/80 transition-colors"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground/80 transition-colors p-1"
             >
               {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -180,20 +177,20 @@ function ResetPasswordForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1.5 text-foreground/80">{t('confirmPasswordLabel')}</label>
+          <label className="block text-xs sm:text-sm font-semibold mb-1.5 text-foreground/80">{t('confirmPasswordLabel')}</label>
           <div className="relative">
             <input 
               type={showConfirmPassword ? "text" : "password"} 
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder={t('confirmPasswordPlaceholder')}
-              className="w-full px-4 py-3 pr-10 rounded-xl bg-background border border-foreground/10 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-sm"
+              className="w-full px-3.5 sm:px-4 py-3 sm:py-3.5 pr-10 rounded-xl sm:rounded-2xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all shadow-sm text-foreground"
               required
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground/80 transition-colors"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground/80 transition-colors p-1"
             >
               {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -203,11 +200,11 @@ function ResetPasswordForm() {
         <button 
           type="submit" 
           disabled={isLoading}
-          className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4"
+          className="w-full py-3.5 sm:py-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-xs sm:text-sm rounded-xl sm:rounded-2xl hover:brightness-110 active:scale-[0.99] transition-all shadow-lg shadow-orange-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 cursor-pointer"
         >
           {isLoading ? (
             <>
-              <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
               <span>{t('changing')}</span>
             </>
           ) : (
@@ -220,18 +217,17 @@ function ResetPasswordForm() {
 }
 
 export default function ResetPasswordPage() {
-
   return (
-    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-10">
-      <div className="max-w-md w-full bg-foreground/5 p-8 rounded-2xl border border-foreground/10 backdrop-blur-md relative overflow-hidden">
-        {/* Decorative background element */}
-        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
+    <div className="min-h-screen w-full flex items-center justify-center px-3 sm:px-6 pt-24 sm:pt-28 pb-12 bg-background">
+      <div className="max-w-md w-full bg-background/95 border border-foreground/15 p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl backdrop-blur-xl relative overflow-hidden">
+        {/* Decorative background glows */}
+        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="relative z-10">
           <Suspense fallback={
             <div className="text-center py-10">
-              <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             </div>
           }>
             <ResetPasswordForm />

@@ -183,29 +183,18 @@ export default function DashboardOverview() {
           setLastAccessed(lastAccessedSnap.docs[0].data());
         }
 
-        // 6. Fetch recommended courses
+        // 6. Fetch recommended courses strictly filtered by student eduLevel
         const coursesRef = collection(db, 'courses');
-        let courseQuery = query(coursesRef, where('isPublished', '==', true), limit(3));
-        
+        const pubQuery = query(coursesRef, where('isPublished', '==', true));
+        const courseSnap = await getDocs(pubQuery);
+        let allPublished = courseSnap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+
         if (userData?.eduLevel) {
-          courseQuery = query(
-            coursesRef,
-            where('isPublished', '==', true),
-            where('category', '==', userData.eduLevel),
-            limit(3)
-          );
+          const userLevel = (userData.eduLevel || '').toLowerCase().trim();
+          allPublished = allPublished.filter((c: any) => (c.category || '').toLowerCase().trim() === userLevel);
         }
 
-        const courseSnap = await getDocs(courseQuery);
-        let coursesData = courseSnap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-
-        if (coursesData.length === 0 && userData?.eduLevel) {
-          const fallbackQuery = query(coursesRef, where('isPublished', '==', true), limit(3));
-          const fallbackSnap = await getDocs(fallbackQuery);
-          coursesData = fallbackSnap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-        }
-
-        setRecommendedCourses(coursesData);
+        setRecommendedCourses(allPublished.slice(0, 4));
 
         // Helper to parse Live Class Date & Time safely in local timezone
         const parseLiveClassTimestamp = (dateStr?: string, timeStr?: string): number => {
@@ -609,7 +598,21 @@ export default function DashboardOverview() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {recommendedCourses.length === 0 ? (
+          <div className="bg-foreground/5 rounded-3xl border border-foreground/10 p-8 text-center flex flex-col items-center">
+            <Sparkles className="w-10 h-10 text-orange-500 mb-3" />
+            <h3 className="text-lg font-bold mb-1">
+              {locale === 'bn' ? `আপনার শিক্ষাগত স্তর (${userData?.eduLevel || ''}) অনুযায়ী কোর্স পাওয়া যায়নি` : `No courses available for your level (${userData?.eduLevel || ''})`}
+            </h3>
+            <p className="text-xs sm:text-sm text-foreground/60 max-w-md mb-4">
+              {locale === 'bn' ? 'আপনার একাডেমি লেভেলের নতুন কোর্স শীঘ্রই যুক্ত করা হবে।' : 'New courses for your academic profile will be added soon.'}
+            </p>
+            <Link href="/courses" className="px-5 py-2.5 bg-primary text-white text-xs font-bold rounded-xl hover:bg-primary/90">
+              {locale === 'bn' ? 'সব কোর্স দেখুন' : 'Browse All Courses'}
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
           {recommendedCourses.map((course) => {
             const hasDiscount = course.discountPrice !== undefined && course.discountPrice !== null && (course.discountPrice as any) !== '';
             const isDiscountValid = hasDiscount && course.discountValidUntil && new Date() <= (course.discountValidUntil?.toDate ? course.discountValidUntil.toDate() : new Date(course.discountValidUntil));
@@ -730,12 +733,8 @@ export default function DashboardOverview() {
               </div>
             );
           })}
-          {recommendedCourses.length === 0 && (
-            <div className="col-span-full py-10 text-center text-gray-500">
-              {t('noRecommended')}
-            </div>
-          )}
         </div>
+        )}
       </div>
 
     </div>

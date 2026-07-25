@@ -6,7 +6,7 @@ import { db } from '@/lib/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
-import { GraduationCap, Presentation, CheckCircle2 } from 'lucide-react';
+import { GraduationCap, Presentation, CheckCircle2, ChevronDown } from 'lucide-react';
 
 export default function OnboardingPage() {
   const { user, userData, refreshUserData, loading } = useAuth();
@@ -105,8 +105,8 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-2.5 sm:px-4 py-4 sm:py-10 bg-background">
-      <div className="max-w-xl w-full bg-background border border-foreground/15 p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+    <div className="min-h-screen w-full flex items-start justify-center px-2.5 sm:px-4 pt-24 sm:pt-28 pb-12 bg-background">
+      <div className="max-w-xl w-full bg-background border border-foreground/15 p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl overflow-y-auto max-h-[calc(100vh-140px)] custom-scrollbar">
         
         {isSuccess ? (
           <div className="text-center py-6 sm:py-8 animate-in fade-in zoom-in">
@@ -217,17 +217,20 @@ export default function OnboardingPage() {
                     </div>
                     <div>
                       <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Gender</label>
-                      <select 
-                        value={gender}
-                        onChange={(e) => setGender(e.target.value)}
-                        className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
-                        required
-                      >
-                        <option value="" disabled className="bg-background text-foreground">Select Gender</option>
-                        <option value="Male" className="bg-background text-foreground">Male</option>
-                        <option value="Female" className="bg-background text-foreground">Female</option>
-                        <option value="Other" className="bg-background text-foreground">Other</option>
-                      </select>
+                      <div className="relative">
+                        <select 
+                          value={gender}
+                          onChange={(e) => setGender(e.target.value)}
+                          className="w-full px-3.5 sm:px-4 pr-10 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground appearance-none cursor-pointer"
+                          required
+                        >
+                          <option value="" disabled className="bg-background text-foreground">Select Gender</option>
+                          <option value="Male" className="bg-background text-foreground">Male</option>
+                          <option value="Female" className="bg-background text-foreground">Female</option>
+                          <option value="Other" className="bg-background text-foreground">Other</option>
+                        </select>
+                        <ChevronDown className="w-4 h-4 text-foreground/50 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      </div>
                     </div>
                   </div>
 
@@ -237,19 +240,22 @@ export default function OnboardingPage() {
                     <div className="space-y-3.5 sm:space-y-4">
                       <div>
                         <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Education Level</label>
-                        <select 
-                          value={eduLevel}
-                          onChange={(e) => setEduLevel(e.target.value)}
-                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
-                          required
-                        >
-                          <option value="" disabled className="bg-background text-foreground">Select Education Level</option>
-                          <option value="primary" className="bg-background text-foreground">Primary School</option>
-                          <option value="high_school" className="bg-background text-foreground">High School</option>
-                          <option value="intermediate" className="bg-background text-foreground">Intermediate / HSC</option>
-                          <option value="honours" className="bg-background text-foreground">Honours / Undergrad</option>
-                          <option value="masters" className="bg-background text-foreground">Masters / Postgrad</option>
-                        </select>
+                        <div className="relative">
+                          <select 
+                            value={eduLevel}
+                            onChange={(e) => setEduLevel(e.target.value)}
+                            className="w-full px-3.5 sm:px-4 pr-10 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground appearance-none cursor-pointer"
+                            required
+                          >
+                            <option value="" disabled className="bg-background text-foreground">Select Education Level</option>
+                            <option value="primary" className="bg-background text-foreground">Primary School</option>
+                            <option value="high_school" className="bg-background text-foreground">High School</option>
+                            <option value="intermediate" className="bg-background text-foreground">Intermediate / HSC</option>
+                            <option value="honours" className="bg-background text-foreground">Honours / Undergrad</option>
+                            <option value="masters" className="bg-background text-foreground">Masters / Postgrad</option>
+                          </select>
+                          <ChevronDown className="w-4 h-4 text-foreground/50 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        </div>
                       </div>
 
                       {eduLevel && (
@@ -269,18 +275,21 @@ export default function OnboardingPage() {
                       {(eduLevel === 'primary' || eduLevel === 'high_school') && (
                         <div>
                           <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Class</label>
-                          <select 
-                            value={eduClass}
-                            onChange={(e) => setEduClass(e.target.value)}
-                            className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
-                            required
-                          >
-                            <option value="" disabled className="bg-background text-foreground">Select Class</option>
-                            {eduLevel === 'primary' 
-                              ? Array.from({length: 5}, (_, i) => <option key={i+1} value={i+1} className="bg-background text-foreground">Class {i+1}</option>)
-                              : Array.from({length: 5}, (_, i) => <option key={i+6} value={i+6} className="bg-background text-foreground">Class {i+6}</option>)
-                            }
-                          </select>
+                          <div className="relative">
+                            <select 
+                              value={eduClass}
+                              onChange={(e) => setEduClass(e.target.value)}
+                              className="w-full px-3.5 sm:px-4 pr-10 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground appearance-none cursor-pointer"
+                              required
+                            >
+                              <option value="" disabled className="bg-background text-foreground">Select Class</option>
+                              {eduLevel === 'primary' 
+                                ? Array.from({length: 5}, (_, i) => <option key={i+1} value={i+1} className="bg-background text-foreground">Class {i+1}</option>)
+                                : Array.from({length: 5}, (_, i) => <option key={i+6} value={i+6} className="bg-background text-foreground">Class {i+6}</option>)
+                              }
+                            </select>
+                            <ChevronDown className="w-4 h-4 text-foreground/50 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                          </div>
                         </div>
                       )}
 
@@ -288,20 +297,26 @@ export default function OnboardingPage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           <div>
                             <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Class</label>
-                            <select value={eduClass} onChange={(e) => setEduClass(e.target.value)} className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground" required>
-                              <option value="" disabled className="bg-background text-foreground">Select Class</option>
-                              <option value="11" className="bg-background text-foreground">Class 11</option>
-                              <option value="12" className="bg-background text-foreground">Class 12</option>
-                            </select>
+                            <div className="relative">
+                              <select value={eduClass} onChange={(e) => setEduClass(e.target.value)} className="w-full px-3.5 sm:px-4 pr-10 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground appearance-none cursor-pointer" required>
+                                <option value="" disabled className="bg-background text-foreground">Select Class</option>
+                                <option value="11" className="bg-background text-foreground">Class 11</option>
+                                <option value="12" className="bg-background text-foreground">Class 12</option>
+                              </select>
+                              <ChevronDown className="w-4 h-4 text-foreground/50 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            </div>
                           </div>
                           <div>
                             <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Group</label>
-                            <select value={department} onChange={(e) => setDepartment(e.target.value)} className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground" required>
-                              <option value="" disabled className="bg-background text-foreground">Select Group</option>
-                              <option value="science" className="bg-background text-foreground">Science</option>
-                              <option value="arts" className="bg-background text-foreground">Arts (Humanities)</option>
-                              <option value="commerce" className="bg-background text-foreground">Commerce</option>
-                            </select>
+                            <div className="relative">
+                              <select value={department} onChange={(e) => setDepartment(e.target.value)} className="w-full px-3.5 sm:px-4 pr-10 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground appearance-none cursor-pointer" required>
+                                <option value="" disabled className="bg-background text-foreground">Select Group</option>
+                                <option value="science" className="bg-background text-foreground">Science</option>
+                                <option value="arts" className="bg-background text-foreground">Arts (Humanities)</option>
+                                <option value="commerce" className="bg-background text-foreground">Commerce</option>
+                              </select>
+                              <ChevronDown className="w-4 h-4 text-foreground/50 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            </div>
                           </div>
                         </div>
                       )}

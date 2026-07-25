@@ -2,7 +2,7 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import { useState, useEffect, useRef } from 'react';
-import { User, Shield, Bell, CreditCard, Camera, CheckCircle2, XCircle, Eye, EyeOff, Loader2, ChevronLeft, ChevronRight, Receipt, Printer, FileText, Clock, Download } from 'lucide-react';
+import { User, Shield, Bell, CreditCard, Camera, CheckCircle2, XCircle, Eye, EyeOff, Loader2, ChevronLeft, ChevronRight, Receipt, Printer, FileText, Clock, Download, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
@@ -276,12 +276,15 @@ export default function SettingsPage() {
                     </div>
                     <div>
                       <label className="block text-sm text-foreground/70 mb-1">{t('profile.gender')}</label>
-                      <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none text-sm">
-                        <option value="" disabled className="bg-background text-foreground">{t('profile.selectGender')}</option>
-                        <option value="Male" className="bg-background text-foreground">{t('profile.male')}</option>
-                        <option value="Female" className="bg-background text-foreground">{t('profile.female')}</option>
-                        <option value="Other" className="bg-background text-foreground">{t('profile.other')}</option>
-                      </select>
+                      <div className="relative">
+                        <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full px-4 pr-10 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none text-sm cursor-pointer">
+                          <option value="" disabled className="bg-background text-foreground">{t('profile.selectGender')}</option>
+                          <option value="Male" className="bg-background text-foreground">{t('profile.male')}</option>
+                          <option value="Female" className="bg-background text-foreground">{t('profile.female')}</option>
+                          <option value="Other" className="bg-background text-foreground">{t('profile.other')}</option>
+                        </select>
+                        <ChevronDown className="w-4 h-4 text-foreground/50 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -305,23 +308,26 @@ export default function SettingsPage() {
                   {/* Field 2: Education Level */}
                   <div>
                     <label className="block text-sm text-foreground/70 mb-1">{t('profile.eduLevel')}</label>
-                    <select 
-                      value={eduLevel}
-                      onChange={(e) => {
-                        setEduLevel(e.target.value);
-                        setStudentClass(''); // Reset dependent fields when level changes
-                        setDepartment('');
-                        setYear('');
-                      }}
-                      className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none text-sm"
-                    >
-                      <option value="" disabled className="bg-background text-foreground">{t('profile.selectLevel')}</option>
-                      <option value="primary" className="bg-background text-foreground">{t('profile.levels.primary')}</option>
-                      <option value="high_school" className="bg-background text-foreground">{t('profile.levels.high_school')}</option>
-                      <option value="intermediate" className="bg-background text-foreground">{t('profile.levels.intermediate')}</option>
-                      <option value="honours" className="bg-background text-foreground">{t('profile.levels.honours')}</option>
-                      <option value="masters" className="bg-background text-foreground">{t('profile.levels.masters')}</option>
-                    </select>
+                    <div className="relative">
+                      <select 
+                        value={eduLevel}
+                        onChange={(e) => {
+                          setEduLevel(e.target.value);
+                          setStudentClass(''); // Reset dependent fields when level changes
+                          setDepartment('');
+                          setYear('');
+                        }}
+                        className="w-full px-4 pr-10 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none text-sm cursor-pointer"
+                      >
+                        <option value="" disabled className="bg-background text-foreground">{t('profile.selectLevel')}</option>
+                        <option value="primary" className="bg-background text-foreground">{t('profile.levels.primary')}</option>
+                        <option value="high_school" className="bg-background text-foreground">{t('profile.levels.high_school')}</option>
+                        <option value="intermediate" className="bg-background text-foreground">{t('profile.levels.intermediate')}</option>
+                        <option value="honours" className="bg-background text-foreground">{t('profile.levels.honours')}</option>
+                        <option value="masters" className="bg-background text-foreground">{t('profile.levels.masters')}</option>
+                      </select>
+                      <ChevronDown className="w-4 h-4 text-foreground/50 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    </div>
                   </div>
 
                   {/* Dynamic Fields based on Education Level */}

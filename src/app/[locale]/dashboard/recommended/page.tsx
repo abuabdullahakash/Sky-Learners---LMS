@@ -28,31 +28,17 @@ export default function RecommendedCourses() {
       setLoading(true);
       try {
         const coursesRef = collection(db, 'courses');
-        
-        let q = query(coursesRef, where('isPublished', '==', true));
-        
-        if (userData?.eduLevel) {
-          q = query(
-            coursesRef,
-            where('isPublished', '==', true),
-            where('category', '==', userData.eduLevel)
-          );
-        }
-
-        const querySnapshot = await getDocs(q);
+        const pubQuery = query(coursesRef, where('isPublished', '==', true));
+        const querySnapshot = await getDocs(pubQuery);
         
         let coursesData = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
 
-        if (coursesData.length === 0 && userData?.eduLevel) {
-          const fallbackQuery = query(coursesRef, where('isPublished', '==', true));
-          const fallbackSnap = await getDocs(fallbackQuery);
-          coursesData = fallbackSnap.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
+        if (userData?.eduLevel) {
+          const userLevel = (userData.eduLevel || '').toLowerCase().trim();
+          coursesData = coursesData.filter((c: any) => (c.category || '').toLowerCase().trim() === userLevel);
         }
 
         setCourses(coursesData);
@@ -125,25 +111,29 @@ export default function RecommendedCourses() {
           <p className="text-foreground/60 text-sm font-medium">{isBn ? 'কোর্স লোড হচ্ছে...' : 'Loading recommended courses...'}</p>
         </div>
       ) : courses.length === 0 ? (
-        <div className="bg-foreground/5 rounded-[2.5rem] border border-foreground/10 p-12 text-center flex flex-col items-center">
-          <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-6">
-            <Sparkles className="w-10 h-10" />
+        <div className="bg-foreground/5 rounded-[2.5rem] border border-foreground/10 p-8 sm:p-12 text-center flex flex-col items-center max-w-xl mx-auto">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-orange-500/10 text-orange-500 rounded-full flex items-center justify-center mb-5 border border-orange-500/20">
+            <Sparkles className="w-8 h-8 sm:w-10 sm:h-10" />
           </div>
-          <h2 className="text-2xl font-bold mb-2">{isBn ? 'কোনো কোর্স পাওয়া যায়নি' : 'No Courses Available'}</h2>
-          <p className="text-foreground/60 max-w-md mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold mb-2 text-foreground">
             {isBn 
-              ? 'আপনার ক্যাটাগরিতে বর্তমানে কোনো কোর্স নেই। অনুগ্রহ করে পরবর্তীতে চেক করুন অথবা অন্যান্য কোর্স ব্রাউজ করুন।' 
-              : 'There are currently no courses for your academic profile. Check back later or browse all courses.'}
+              ? `আপনার একাডেমি লেভেল (${userData?.eduLevel || 'প্রোফাইল'}) অনুযায়ী কোর্স পাওয়া যায়নি` 
+              : `No Courses available for your level (${userData?.eduLevel || 'Profile'}) yet`}
+          </h2>
+          <p className="text-foreground/70 text-xs sm:text-sm max-w-md mb-8 leading-relaxed">
+            {isBn 
+              ? 'আপনার শিক্ষাগত স্তরের জন্য নতুন কোর্স খুব শীঘ্রই যুক্ত করা হবে! আপনি চাইলে ওয়েবসাইট থেকে অন্যান্য সব বিষয়ভিত্তিক কোর্সসমূহ ব্রাউজ করে দেখতে পারেন।' 
+              : 'New courses tailored specifically for your academic profile will be published soon! Feel free to explore all available courses on Sky Learners.'}
           </p>
           <Link 
             href="/courses" 
-            className="px-8 py-3.5 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/30"
+            className="px-8 py-3.5 bg-primary text-white font-bold text-xs sm:text-sm rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/30"
           >
-            {isBn ? 'সব কোর্স দেখুন' : 'Browse All Courses'}
+            {isBn ? 'সব কোর্স দেখুন (Browse All)' : 'Browse All Courses'}
           </Link>
         </div>
       ) : (
-        <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        <div ref={containerRef} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
           {courses.map((course) => {
             const hasDiscount = course.discountPrice !== undefined && course.discountPrice !== null && (course.discountPrice as any) !== '';
             const isDiscountValid = hasDiscount && course.discountValidUntil && new Date() <= (course.discountValidUntil?.toDate ? course.discountValidUntil.toDate() : new Date(course.discountValidUntil));

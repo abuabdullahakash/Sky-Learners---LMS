@@ -55,6 +55,8 @@ export default function OnboardingPage() {
       const dataToSave: any = {
         role,
         phone,
+        email: user.email || '',
+        name: user.displayName || '',
         onboardingComplete: true,
       };
 

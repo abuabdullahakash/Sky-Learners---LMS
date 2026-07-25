@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged, signOut, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
 export interface UserData {
@@ -58,29 +58,57 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    let unsubscribeDoc: (() => void) | null = null;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        await fetchUserData(currentUser.uid);
+        // Real-time listener for user document changes
+        const userRef = doc(db, "users", currentUser.uid);
+        unsubscribeDoc = onSnapshot(
+          userRef, 
+          (docSnap) => {
+            if (docSnap.exists()) {
+              setUserData(docSnap.data() as UserData);
+            } else {
+              setUserData(null);
+            }
+            setLoading(false);
+          },
+          (error) => {
+            console.error("Error listening to user document:", error);
+            setUserData(null);
+            setLoading(false);
+          }
+        );
       } else {
+        if (unsubscribeDoc) {
+          unsubscribeDoc();
+          unsubscribeDoc = null;
+        }
         setUserData(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeDoc) {
+        unsubscribeDoc();
+      }
+    };
   }, []);
 
   const logout = async () => {
     try {
       await signOut(auth);
+      setUserData(null);
     } catch (error) {
       console.error("Error signing out", error);
     }
   };
 
   const setUpRecaptcha = (number: string) => {
-    // Clear any existing recaptcha to prevent "element has been removed" error on re-renders
     if ((window as any).recaptchaVerifier) {
       try {
         (window as any).recaptchaVerifier.clear();

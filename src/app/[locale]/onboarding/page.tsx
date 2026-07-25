@@ -77,7 +77,6 @@ export default function OnboardingPage() {
         dataToSave.subject = subject;
       }
 
-      // Add a timeout to prevent hanging forever if Firestore has connectivity issues
       let timeoutId: NodeJS.Timeout;
       const setDocPromise = setDoc(doc(db, "users", user.uid), dataToSave, { merge: true });
       const timeoutPromise = new Promise((_, reject) => {
@@ -88,9 +87,7 @@ export default function OnboardingPage() {
       clearTimeout(timeoutId!);
       
       setIsSuccess(true);
-      // Not calling refreshUserData here because it would trigger the useEffect redirect
-      // and hide this success screen. Full page reload on link click will fetch new data.
-      
+      await refreshUserData();
     } catch (err: any) {
       console.error("Error saving onboarding details", err);
       setError(err.message || "An error occurred while saving your profile.");
@@ -100,39 +97,43 @@ export default function OnboardingPage() {
   };
 
   if (loading || !user || (userData && userData.onboardingComplete && !isSuccess)) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-10 bg-background">
-      <div className="max-w-xl w-full bg-foreground/5 p-8 rounded-3xl border border-foreground/10 shadow-2xl">
+    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-2.5 sm:px-4 py-4 sm:py-10 bg-background">
+      <div className="max-w-xl w-full bg-background border border-foreground/15 p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
         
         {isSuccess ? (
-          <div className="text-center py-8 animate-in fade-in zoom-in">
-            <CheckCircle2 className="w-20 h-20 text-green-500 mx-auto mb-4 animate-bounce" />
-            <h2 className="text-3xl font-bold mb-2 text-primary">অভিনন্দন! (Congratulations!)</h2>
-            <p className="text-foreground/70 mb-8">আপনার প্রোফাইল সফলভাবে তৈরি হয়েছে।</p>
+          <div className="text-center py-6 sm:py-8 animate-in fade-in zoom-in">
+            <CheckCircle2 className="w-16 h-16 sm:w-20 sm:h-20 text-green-500 mx-auto mb-3.5 sm:mb-4 animate-bounce" />
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-primary">অভিনন্দন! (Congratulations!)</h2>
+            <p className="text-xs sm:text-sm text-foreground/70 mb-6 sm:mb-8">আপনার প্রোফাইল সফলভাবে তৈরি হয়েছে।</p>
             
-            <div className="flex flex-col gap-4 mt-4">
+            <div className="flex flex-col gap-3 mt-2">
               {role === 'student' ? (
                 <>
                   <button 
-                    onClick={() => window.location.href = '/courses'}
-                    className="w-full py-3 px-4 bg-primary text-primary-foreground font-bold rounded-xl hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all"
+                    onClick={() => router.push('/courses')}
+                    className="w-full py-3 px-4 bg-primary text-primary-foreground font-bold text-xs sm:text-sm rounded-xl hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all"
                   >
                     Browse Available Courses
                   </button>
                   <button 
-                    onClick={() => window.location.href = '/dashboard'}
-                    className="w-full py-3 px-4 bg-foreground/10 text-foreground font-bold rounded-xl hover:bg-foreground/20 transition-all"
+                    onClick={() => router.push('/dashboard')}
+                    className="w-full py-3 px-4 bg-foreground/10 text-foreground font-bold text-xs sm:text-sm rounded-xl hover:bg-foreground/20 transition-all"
                   >
                     Go to Dashboard
                   </button>
                 </>
               ) : (
                 <button 
-                  onClick={() => window.location.href = '/teacher-dashboard'}
-                  className="w-full py-3 px-4 bg-orange-500 text-white font-bold rounded-xl hover:shadow-[0_0_15px_rgba(249,115,22,0.4)] transition-all"
+                  onClick={() => router.push('/teacher-dashboard')}
+                  className="w-full py-3 px-4 bg-orange-500 text-white font-bold text-xs sm:text-sm rounded-xl hover:shadow-[0_0_15px_rgba(249,115,22,0.4)] transition-all"
                 >
                   Go to Teacher Dashboard
                 </button>
@@ -141,85 +142,85 @@ export default function OnboardingPage() {
           </div>
         ) : !role ? (
           <div className="animate-in fade-in zoom-in duration-300">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-2">Welcome to Sky Learners!</h2>
-              <p className="text-foreground/60">Please tell us how you plan to use the platform.</p>
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 text-foreground">Welcome to Sky Learners!</h2>
+              <p className="text-xs sm:text-sm text-foreground/60">Please tell us how you plan to use the platform.</p>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <button 
                 onClick={() => setSelectedRole('student')}
-                className="p-6 flex flex-col items-center text-center gap-4 bg-foreground/5 hover:bg-primary/10 border border-foreground/10 hover:border-primary/50 rounded-2xl transition-all group"
+                className="p-4 sm:p-6 flex flex-col items-center text-center gap-3 bg-foreground/5 hover:bg-primary/10 border border-foreground/10 hover:border-primary/50 rounded-2xl transition-all group"
               >
-                <div className="w-20 h-20 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <GraduationCap size={40} />
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <GraduationCap className="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold mb-1">I am a Student</h3>
-                  <p className="text-sm text-foreground/60">I want to learn</p>
+                  <h3 className="text-lg sm:text-xl font-bold mb-0.5 sm:mb-1 text-foreground">I am a Student</h3>
+                  <p className="text-xs text-foreground/60">I want to learn</p>
                 </div>
               </button>
               
               <button 
                 onClick={() => setSelectedRole('teacher')}
-                className="p-6 flex flex-col items-center text-center gap-4 bg-foreground/5 hover:bg-orange-500/10 border border-foreground/10 hover:border-orange-500/50 rounded-2xl transition-all group"
+                className="p-4 sm:p-6 flex flex-col items-center text-center gap-3 bg-foreground/5 hover:bg-orange-500/10 border border-foreground/10 hover:border-orange-500/50 rounded-2xl transition-all group"
               >
-                <div className="w-20 h-20 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Presentation size={40} />
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Presentation className="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold mb-1">I am a Teacher</h3>
-                  <p className="text-sm text-foreground/60">I want to teach</p>
+                  <h3 className="text-lg sm:text-xl font-bold mb-0.5 sm:mb-1 text-foreground">I am a Teacher</h3>
+                  <p className="text-xs text-foreground/60">I want to teach</p>
                 </div>
               </button>
             </div>
           </div>
         ) : (
           <div className="animate-in slide-in-from-right-8 duration-300">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-2">Complete Your Profile</h2>
-              <p className="text-foreground/60">Just a few more details to set up your {role} account.</p>
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 text-foreground">Complete Your Profile</h2>
+              <p className="text-xs sm:text-sm text-foreground/60">Just a few more details to set up your {role} account.</p>
             </div>
 
             {error && (
-              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl text-red-500 text-sm text-center">
+              <div className="mb-5 p-3.5 bg-red-500/10 border border-red-500/30 rounded-xl text-red-500 text-xs sm:text-sm text-center font-medium leading-relaxed">
                 {error}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
               
               <div>
-                <label className="block text-sm font-medium mb-1 text-foreground/70">Phone Number</label>
+                <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Phone Number</label>
                 <input 
                   type="tel" 
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+880 1XXX-XXXXXX"
-                  className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/10 focus:outline-none focus:border-primary transition-colors"
+                  className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                   required
                 />
               </div>
 
               {role === 'student' && (
                 <>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1 text-foreground/70">Date of Birth</label>
+                      <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Date of Birth</label>
                       <input 
                         type="date" 
                         value={dob}
                         onChange={(e) => setDob(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/10 focus:outline-none focus:border-primary transition-colors text-foreground"
+                        className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1 text-foreground/70">Gender</label>
+                      <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Gender</label>
                       <select 
                         value={gender}
                         onChange={(e) => setGender(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/10 focus:outline-none focus:border-primary transition-colors appearance-none"
+                        className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                         required
                       >
                         <option value="" disabled className="bg-background text-foreground">Select Gender</option>
@@ -230,16 +231,16 @@ export default function OnboardingPage() {
                     </div>
                   </div>
 
-                  <div className="border-t border-foreground/10 pt-4 mt-4">
-                    <h3 className="font-semibold text-lg mb-4 text-primary">Academic Details</h3>
+                  <div className="border-t border-foreground/10 pt-4 mt-2">
+                    <h3 className="font-bold text-base sm:text-lg mb-3 text-primary">Academic Details</h3>
                     
-                    <div className="space-y-4">
+                    <div className="space-y-3.5 sm:space-y-4">
                       <div>
-                        <label className="block text-sm font-medium mb-1 text-foreground/70">Education Level</label>
+                        <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Education Level</label>
                         <select 
                           value={eduLevel}
                           onChange={(e) => setEduLevel(e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/10 focus:outline-none focus:border-primary transition-colors appearance-none"
+                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                           required
                         >
                           <option value="" disabled className="bg-background text-foreground">Select Education Level</option>
@@ -253,13 +254,13 @@ export default function OnboardingPage() {
 
                       {eduLevel && (
                         <div>
-                          <label className="block text-sm font-medium mb-1 text-foreground/70">Institution Name</label>
+                          <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Institution Name</label>
                           <input 
                             type="text" 
                             value={institution}
                             onChange={(e) => setInstitution(e.target.value)}
                             placeholder="e.g. Dhaka College"
-                            className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/10 focus:outline-none focus:border-primary transition-colors"
+                            className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                             required
                           />
                         </div>
@@ -267,11 +268,11 @@ export default function OnboardingPage() {
 
                       {(eduLevel === 'primary' || eduLevel === 'high_school') && (
                         <div>
-                          <label className="block text-sm font-medium mb-1 text-foreground/70">Class</label>
+                          <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Class</label>
                           <select 
                             value={eduClass}
                             onChange={(e) => setEduClass(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/10 focus:outline-none focus:border-primary transition-colors appearance-none"
+                            className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                             required
                           >
                             <option value="" disabled className="bg-background text-foreground">Select Class</option>
@@ -284,18 +285,18 @@ export default function OnboardingPage() {
                       )}
 
                       {eduLevel === 'intermediate' && (
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           <div>
-                            <label className="block text-sm font-medium mb-1 text-foreground/70">Class</label>
-                            <select value={eduClass} onChange={(e) => setEduClass(e.target.value)} className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/10 focus:outline-none focus:border-primary transition-colors appearance-none" required>
+                            <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Class</label>
+                            <select value={eduClass} onChange={(e) => setEduClass(e.target.value)} className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground" required>
                               <option value="" disabled className="bg-background text-foreground">Select Class</option>
                               <option value="11" className="bg-background text-foreground">Class 11</option>
                               <option value="12" className="bg-background text-foreground">Class 12</option>
                             </select>
                           </div>
                           <div>
-                            <label className="block text-sm font-medium mb-1 text-foreground/70">Group</label>
-                            <select value={department} onChange={(e) => setDepartment(e.target.value)} className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/10 focus:outline-none focus:border-primary transition-colors appearance-none" required>
+                            <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Group</label>
+                            <select value={department} onChange={(e) => setDepartment(e.target.value)} className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground" required>
                               <option value="" disabled className="bg-background text-foreground">Select Group</option>
                               <option value="science" className="bg-background text-foreground">Science</option>
                               <option value="arts" className="bg-background text-foreground">Arts (Humanities)</option>
@@ -306,26 +307,26 @@ export default function OnboardingPage() {
                       )}
 
                       {(eduLevel === 'honours' || eduLevel === 'masters') && (
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           <div>
-                            <label className="block text-sm font-medium mb-1 text-foreground/70">Department</label>
+                            <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Department</label>
                             <input 
                               type="text" 
                               value={department}
                               onChange={(e) => setDepartment(e.target.value)}
                               placeholder="e.g. Physics"
-                              className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/10 focus:outline-none focus:border-primary transition-colors"
+                              className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                               required
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium mb-1 text-foreground/70">Year / Semester</label>
+                            <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Year / Semester</label>
                             <input 
                               type="text" 
                               value={year}
                               onChange={(e) => setYear(e.target.value)}
                               placeholder="e.g. 1st Year"
-                              className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/10 focus:outline-none focus:border-primary transition-colors"
+                              className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                               required
                             />
                           </div>
@@ -339,28 +340,28 @@ export default function OnboardingPage() {
 
               {role === 'teacher' && (
                 <>
-                  <div className="border-t border-foreground/10 pt-4 mt-4">
-                    <h3 className="font-semibold text-lg mb-4 text-orange-500">Professional Details</h3>
-                    <div className="space-y-4">
+                  <div className="border-t border-foreground/10 pt-4 mt-2">
+                    <h3 className="font-bold text-base sm:text-lg mb-3 text-orange-500">Professional Details</h3>
+                    <div className="space-y-3.5 sm:space-y-4">
                       <div>
-                        <label className="block text-sm font-medium mb-1 text-foreground/70">Subject Expertise</label>
+                        <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Subject Expertise</label>
                         <input 
                           type="text" 
                           value={subject}
                           onChange={(e) => setSubject(e.target.value)}
                           placeholder="e.g. Higher Mathematics, Physics"
-                          className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/10 focus:outline-none focus:border-primary transition-colors"
+                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1 text-foreground/70">Years of Experience</label>
+                        <label className="block text-xs sm:text-sm font-semibold mb-1 text-foreground/80">Years of Experience</label>
                         <input 
                           type="number" 
                           value={experience}
                           onChange={(e) => setExperience(e.target.value)}
                           placeholder="e.g. 5"
-                          className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/10 focus:outline-none focus:border-primary transition-colors"
+                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background border border-foreground/15 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all text-foreground"
                           required
                         />
                       </div>
@@ -372,7 +373,7 @@ export default function OnboardingPage() {
               <button 
                 type="submit" 
                 disabled={isLoading}
-                className="w-full py-4 mt-6 bg-primary text-primary-foreground font-bold text-lg rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/40 hover:-translate-y-0.5 disabled:opacity-50"
+                className="w-full py-3.5 mt-4 bg-primary text-primary-foreground font-bold text-sm sm:text-base rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/30 disabled:opacity-50"
               >
                 {isLoading ? 'Saving...' : 'Complete Profile'}
               </button>

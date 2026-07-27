@@ -419,10 +419,10 @@ export default function DashboardOverview() {
       </div>
 
       {/* Continue Learning & Activity Feed */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
         
         {/* Main Focus / Continue Learning */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-6 xl:col-span-7 space-y-6">
           <div className="flex justify-between items-end">
             <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{t('continue')}</h2>
             <Link href="/dashboard/courses" className="text-primary text-sm font-semibold hover:underline flex items-center gap-1">
@@ -436,7 +436,7 @@ export default function DashboardOverview() {
                 <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
                 {/* Compact Thumbnail Image List view on Mobile */}
-                <div className="w-28 sm:w-52 h-24 sm:h-36 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl sm:rounded-2xl relative overflow-hidden flex-shrink-0 group-hover:scale-[1.02] transition-transform duration-500 shadow-md">
+                <div className="w-28 sm:w-48 lg:w-44 xl:w-52 h-24 sm:h-36 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl sm:rounded-2xl relative overflow-hidden flex-shrink-0 group-hover:scale-[1.02] transition-transform duration-500 shadow-md">
                   {lastAccessed.thumbnailUrl ? (
                     <img src={lastAccessed.thumbnailUrl} alt={lastAccessed.courseTitle} className="w-full h-full object-cover" />
                   ) : (
@@ -460,7 +460,7 @@ export default function DashboardOverview() {
                 {/* Text Content List view */}
                 <div className="flex-1 min-w-0 py-0.5 sm:py-1 flex flex-col justify-between h-full">
                   <div>
-                    <div className="flex items-center justify-between gap-2 mb-1">
+                    <div className="flex items-center justify-between gap-2 mb-1 flex-wrap sm:flex-nowrap">
                       <span className="text-[10px] sm:text-xs font-extrabold text-primary bg-primary/10 px-2 sm:px-3 py-0.5 rounded-md uppercase tracking-wider border border-primary/20 truncate">
                         {getCategoryTranslation(lastAccessed.category)}
                       </span>
@@ -501,18 +501,18 @@ export default function DashboardOverview() {
         </div>
 
         {/* Sidebar / Dynamic Activity Feed (সাম্প্রতিক ৩টি আপডেট) */}
-        <div className="space-y-6">
+        <div className="lg:col-span-6 xl:col-span-5 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
               <Bell className="w-5 h-5 text-primary" />
               {t('upcomingTasks')} & আপডেট
             </h2>
-            <span className="px-2.5 py-1 text-xs font-bold bg-primary/10 text-primary rounded-full border border-primary/20">
+            <span className="px-2.5 py-1 text-xs font-bold bg-primary/10 text-primary rounded-full border border-primary/20 shrink-0">
               সর্বশেষ ৩টি
             </span>
           </div>
           
-          <div className="bg-white dark:bg-foreground/5 rounded-3xl p-5 border border-gray-200 dark:border-foreground/10 space-y-3 relative overflow-hidden backdrop-blur-xl shadow-lg">
+          <div className="bg-white dark:bg-foreground/5 rounded-3xl p-4 sm:p-5 border border-gray-200 dark:border-foreground/10 space-y-3 relative overflow-hidden backdrop-blur-xl shadow-lg">
             
             {isFeedLoading ? (
               <div className="space-y-3 p-2">
@@ -545,17 +545,17 @@ export default function DashboardOverview() {
 
                 return (
                   <Link key={item.id} href={item.link} className="block group">
-                    <div className="flex items-center gap-3.5 p-4 bg-gray-50/80 dark:bg-white/[0.04] hover:bg-white dark:hover:bg-white/[0.08] rounded-2xl border border-gray-200/60 dark:border-white/10 hover:border-primary/40 dark:hover:border-primary/40 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5">
+                    <div className="flex items-center gap-3 sm:gap-3.5 p-3.5 sm:p-4 bg-gray-50/80 dark:bg-white/[0.04] hover:bg-white dark:hover:bg-white/[0.08] rounded-2xl border border-gray-200/60 dark:border-white/10 hover:border-primary/40 dark:hover:border-primary/40 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5">
                       
                       {/* Clean SVG Icon Box */}
-                      <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-300 ${iconWrapperClass}`}>
-                        <IconComponent className="w-5 h-5" />
+                      <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-300 ${iconWrapperClass}`}>
+                        <IconComponent className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
 
                       <div className="flex-1 min-w-0">
                         {/* Course Tag & Type Badges */}
-                        <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
-                          <span className="px-2.5 py-0.5 text-[10px] font-extrabold bg-primary/10 text-primary border border-primary/25 rounded-md truncate max-w-[140px] sm:max-w-[220px]" title={item.courseTitle}>
+                        <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                          <span className="px-2.5 py-0.5 text-[10px] font-extrabold bg-primary/10 text-primary border border-primary/25 rounded-md truncate max-w-[150px] sm:max-w-[240px]" title={item.courseTitle}>
                             📚 {item.courseTitle}
                           </span>
                           {item.type === 'notice' && (
@@ -575,19 +575,19 @@ export default function DashboardOverview() {
                           )}
                         </div>
 
-                        <h4 className="font-bold text-sm text-gray-900 dark:text-white group-hover:text-primary transition-colors truncate">
+                        <h4 className="font-bold text-xs sm:text-sm text-gray-900 dark:text-white group-hover:text-primary transition-colors truncate">
                           {item.title}
                         </h4>
                         
                         {item.subtitle && (
-                          <p className="text-xs text-foreground/60 mt-0.5 truncate font-medium">
+                          <p className="text-[11px] sm:text-xs text-foreground/60 mt-0.5 truncate font-medium">
                             {item.subtitle}
                           </p>
                         )}
                       </div>
 
-                      <div className="text-foreground/30 group-hover:text-primary group-hover:translate-x-1 transition-all">
-                        <ChevronRight className="w-5 h-5" />
+                      <div className="text-foreground/30 group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0">
+                        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
 
                     </div>
@@ -630,7 +630,7 @@ export default function DashboardOverview() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
           {recommendedCourses.map((course) => {
             const hasDiscount = course.discountPrice !== undefined && course.discountPrice !== null && (course.discountPrice as any) !== '';
             const isDiscountValid = hasDiscount && course.discountValidUntil && new Date() <= (course.discountValidUntil?.toDate ? course.discountValidUntil.toDate() : new Date(course.discountValidUntil));
@@ -679,22 +679,22 @@ export default function DashboardOverview() {
 
                   {/* Category Pill */}
                   <div className="absolute top-4 left-4 z-10">
-                    <span className={`px-3.5 py-1.5 rounded-full text-xs font-extrabold shadow-md uppercase tracking-wider backdrop-blur-md border border-white/20 ${badgeBg} ${badgeTextColor}`}>
+                    <span className={`px-3 py-1 rounded-full text-xs font-extrabold shadow-md uppercase tracking-wider backdrop-blur-md border border-white/20 ${badgeBg} ${badgeTextColor}`}>
                       {course.category || 'General'}
                     </span>
                   </div>
 
                   {/* Free badge */}
                   {isFree && (
-                    <div className="absolute top-4 right-4 z-10 bg-emerald-500 text-white font-extrabold text-xs px-3 py-1.5 rounded-full shadow-lg border border-white/20">
+                    <div className="absolute top-4 right-4 z-10 bg-emerald-500 text-white font-extrabold text-xs px-3 py-1 rounded-full shadow-lg border border-white/20">
                       🎁 {locale === 'bn' ? 'ফ্রি' : 'FREE'}
                     </div>
                   )}
                 </div>
 
                 {/* Body Content */}
-                <div className="p-6 flex flex-col flex-grow relative z-10">
-                  <h3 className="text-xl font-bold mb-2 line-clamp-2 text-gray-900 dark:text-white group-hover:text-orange-500 transition-colors duration-300">
+                <div className="p-4 sm:p-5 flex flex-col flex-grow relative z-10">
+                  <h3 className="text-base sm:text-lg font-bold mb-1.5 line-clamp-2 text-gray-900 dark:text-white group-hover:text-orange-500 transition-colors duration-300">
                     {course.title}
                   </h3>
 
@@ -703,43 +703,43 @@ export default function DashboardOverview() {
                   </p>
 
                   {/* Course Metadata Stats */}
-                  <div className="grid grid-cols-2 gap-3 p-3 rounded-2xl bg-foreground/[0.03] border border-foreground/10 mb-6 text-xs font-semibold text-foreground/70">
-                    <div className="flex items-center gap-2">
-                      <Video className="w-4 h-4 text-blue-500" />
-                      <span>{formatNumber(course.totalVideoLessons || 0)} {locale === 'bn' ? 'টি ভিডিও' : 'Lessons'}</span>
+                  <div className="grid grid-cols-2 gap-2 p-2.5 rounded-2xl bg-foreground/[0.03] border border-foreground/10 mb-5 text-[11px] sm:text-xs font-semibold text-foreground/70">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <Video className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                      <span className="truncate">{formatNumber(course.totalVideoLessons || 0)} {locale === 'bn' ? 'টি ভিডিও' : 'Lessons'}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <CheckSquare className="w-4 h-4 text-green-500" />
-                      <span>{formatNumber(course.totalExams || 0)} {locale === 'bn' ? 'টি এক্সাম' : 'Exams'}</span>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <CheckSquare className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                      <span className="truncate">{formatNumber(course.totalExams || 0)} {locale === 'bn' ? 'টি এক্সাম' : 'Exams'}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-orange-500" />
-                      <span>{course.courseValidity || (locale === 'bn' ? 'লাইফটাইম' : 'Lifetime')}</span>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <Clock className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                      <span className="truncate">{course.courseValidity || (locale === 'bn' ? 'লাইফটাইম' : 'Lifetime')}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-purple-500" />
-                      <span>{formatNumber(course.enrolledStudents || 0)} {locale === 'bn' ? 'শিক্ষার্থী' : 'Students'}</span>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <Users className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                      <span className="truncate">{formatNumber(course.enrolledStudents || 0)} {locale === 'bn' ? 'শিক্ষার্থী' : 'Students'}</span>
                     </div>
                   </div>
 
                   {/* Price & Action */}
-                  <div className="mt-auto pt-4 border-t border-foreground/10 flex items-center justify-between gap-4">
+                  <div className="mt-auto pt-4 border-t border-foreground/10 flex items-center justify-between gap-3">
                     <div className="flex flex-col">
                       {isFree ? (
-                        <span className="text-2xl font-extrabold text-emerald-500">{locale === 'bn' ? 'ফ্রি' : 'FREE'}</span>
+                        <span className="text-xl sm:text-2xl font-extrabold text-emerald-500">{locale === 'bn' ? 'ফ্রি' : 'FREE'}</span>
                       ) : isDiscountValid ? (
                         <>
-                          <span className="text-xs text-foreground/50 line-through font-medium">৳{formatNumber(course.price)}</span>
-                          <span className="text-2xl font-extrabold text-orange-500">৳{formatNumber(course.discountPrice)}</span>
+                          <span className="text-[10px] text-foreground/50 line-through font-medium">৳{formatNumber(course.price)}</span>
+                          <span className="text-xl sm:text-2xl font-extrabold text-orange-500">৳{formatNumber(course.discountPrice)}</span>
                         </>
                       ) : (
-                        <span className="text-2xl font-extrabold text-gray-900 dark:text-white">৳{formatNumber(course.price || 0)}</span>
+                        <span className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white">৳{formatNumber(course.price || 0)}</span>
                       )}
                     </div>
 
                     <Link 
                       href={`/courses/${course.id}`}
-                      className="px-5 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-md hover:shadow-orange-500/30 hover:-translate-y-0.5"
+                      className="px-4 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1 transition-all shadow-md hover:shadow-orange-500/30 hover:-translate-y-0.5 shrink-0"
                     >
                       <span>{locale === 'bn' ? 'কোর্সটি দেখুন' : 'View Course'}</span>
                       <ChevronRight className="w-4 h-4" />

@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { CheckCircle, Clock, Search, ChevronDown, ChevronUp, Image as ImageIcon, Loader2, Send, MessageSquare, X, Upload } from 'lucide-react';
+import { CheckCircle, Clock, Search, ChevronDown, ChevronUp, Image as ImageIcon, Loader2, Send, MessageSquare, X, Upload, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadImageToImgBB } from '@/lib/imgbb';
 
@@ -28,8 +28,23 @@ export default function CourseIssuesPage() {
   const [replyImagePreviewMap, setReplyImagePreviewMap] = useState<{ [key: string]: string | null }>({});
   const [isSubmittingReplyMap, setIsSubmittingReplyMap] = useState<{ [key: string]: boolean }>({});
   
-  // Full-screen image preview lightbox
-  const [selectedPreviewImage, setSelectedPreviewImage] = useState<string | null>(null);
+  // Full-screen image preview lightbox carousel
+  const [lightboxState, setLightboxState] = useState<{ images: string[]; index: number } | null>(null);
+
+  useEffect(() => {
+    if (!lightboxState) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setLightboxState(null);
+      } else if (e.key === 'ArrowLeft' && lightboxState.images.length > 1) {
+        setLightboxState(prev => prev ? { ...prev, index: (prev.index - 1 + prev.images.length) % prev.images.length } : null);
+      } else if (e.key === 'ArrowRight' && lightboxState.images.length > 1) {
+        setLightboxState(prev => prev ? { ...prev, index: (prev.index + 1) % prev.images.length } : null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxState]);
 
   const fetchIssues = async () => {
     if (!user || !courseId) return;
@@ -328,7 +343,7 @@ export default function CourseIssuesPage() {
                               <div 
                                 key={idx} 
                                 className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl border border-foreground/10 overflow-hidden bg-background group cursor-pointer shadow-sm hover:border-orange-500 transition-colors"
-                                onClick={() => setSelectedPreviewImage(url)}
+                                onClick={() => setLightboxState({ images: screenshots, index: idx })}
                               >
                                 <img src={url} alt={`Screenshot ${idx + 1}`} className="w-full h-full object-cover" />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -358,7 +373,7 @@ export default function CourseIssuesPage() {
                             <div className="pt-1">
                               <span className="text-xs font-bold text-green-600 dark:text-green-400 uppercase tracking-wider block mb-1.5">সংযুক্ত খাতার ছবি (Solution Sheet):</span>
                               <div 
-                                onClick={() => setSelectedPreviewImage(issue.replyImageUrl)}
+                                onClick={() => setLightboxState({ images: [issue.replyImageUrl], index: 0 })}
                                 className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-xl border border-green-500/30 overflow-hidden bg-background group cursor-pointer shadow-sm hover:border-green-500 transition-colors"
                               >
                                 <img src={issue.replyImageUrl} alt="Solution Sheet" className="w-full h-full object-cover" />
@@ -444,23 +459,74 @@ export default function CourseIssuesPage() {
         </div>
       )}
 
-      {/* Lightbox Modal */}
-      {selectedPreviewImage && (
+      {/* Lightbox Modal Carousel with Navigation */}
+      {lightboxState && (
         <div 
-          className="fixed inset-0 bg-black/90 backdrop-blur-md z-[200] flex items-center justify-center p-4"
-          onClick={() => setSelectedPreviewImage(null)}
+          className="fixed inset-0 bg-black/95 backdrop-blur-md z-[200] flex items-center justify-center p-4 select-none animate-in fade-in duration-200"
+          onClick={() => setLightboxState(null)}
         >
-          <div className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center">
+          {/* Close Button */}
+          <button 
+            type="button"
+            onClick={() => setLightboxState(null)}
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 p-3 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-colors z-50 shadow-lg cursor-pointer"
+            title="Close (Esc)"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          {/* Counter Badge */}
+          {lightboxState.images.length > 1 && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-bold rounded-full z-50 shadow-md">
+              {lightboxState.index + 1} / {lightboxState.images.length}
+            </div>
+          )}
+
+          {/* Previous Arrow Button */}
+          {lightboxState.images.length > 1 && (
             <button 
-              onClick={() => setSelectedPreviewImage(null)}
-              className="absolute -top-12 right-0 p-2 text-white/80 hover:text-white bg-white/10 rounded-full transition-colors"
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxState(prev => prev ? {
+                  ...prev,
+                  index: (prev.index - 1 + prev.images.length) % prev.images.length
+                } : null);
+              }}
+              className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 p-3 sm:p-4 text-white bg-white/15 hover:bg-white/30 border border-white/20 rounded-full transition-all z-50 shadow-xl active:scale-95 cursor-pointer"
+              title="Previous Image (←)"
             >
-              <X className="w-6 h-6" />
+              <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
             </button>
+          )}
+
+          {/* Next Arrow Button */}
+          {lightboxState.images.length > 1 && (
+            <button 
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxState(prev => prev ? {
+                  ...prev,
+                  index: (prev.index + 1) % prev.images.length
+                } : null);
+              }}
+              className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 p-3 sm:p-4 text-white bg-white/15 hover:bg-white/30 border border-white/20 rounded-full transition-all z-50 shadow-xl active:scale-95 cursor-pointer"
+              title="Next Image (→)"
+            >
+              <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
+            </button>
+          )}
+
+          {/* Main Image View */}
+          <div 
+            className="relative max-w-5xl w-full max-h-[90vh] flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
             <img 
-              src={selectedPreviewImage} 
-              alt="Full Preview" 
-              className="max-w-full max-h-[85vh] object-contain rounded-2xl border border-white/10 shadow-2xl" 
+              src={lightboxState.images[lightboxState.index]} 
+              alt={`Preview ${lightboxState.index + 1}`} 
+              className="max-w-full max-h-[85vh] object-contain rounded-2xl border border-white/10 shadow-2xl transition-all duration-300" 
             />
           </div>
         </div>

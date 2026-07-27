@@ -17,7 +17,9 @@ import {
   Loader2, 
   AlertCircle,
   BookOpen,
-  UserCheck
+  UserCheck,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadImageToImgBB } from '@/lib/imgbb';
@@ -43,7 +45,22 @@ export default function StudentHelpDeskPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Lightbox State
-  const [selectedPreviewImage, setSelectedPreviewImage] = useState<string | null>(null);
+  const [lightboxState, setLightboxState] = useState<{ images: string[]; index: number } | null>(null);
+
+  useEffect(() => {
+    if (!lightboxState) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setLightboxState(null);
+      } else if (e.key === 'ArrowLeft' && lightboxState.images.length > 1) {
+        setLightboxState(prev => prev ? { ...prev, index: (prev.index - 1 + prev.images.length) % prev.images.length } : null);
+      } else if (e.key === 'ArrowRight' && lightboxState.images.length > 1) {
+        setLightboxState(prev => prev ? { ...prev, index: (prev.index + 1) % prev.images.length } : null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxState]);
 
   const fetchHelpData = async () => {
     if (!user || !courseId) return;
@@ -249,26 +266,27 @@ export default function StudentHelpDeskPage() {
                   }`}
                 >
                   {/* Status Header */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 mb-3 pb-3 border-b border-foreground/10">
-                    <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 pb-3 border-b border-foreground/10">
+                    <div className="flex items-center justify-between sm:justify-start gap-2 flex-wrap">
                       <span className={`text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider flex items-center gap-1.5 ${
                         isSolved 
                           ? 'bg-green-500/15 text-green-600 dark:text-green-400 border border-green-500/20' 
                           : 'bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-500/20'
                       }`}>
-                        {isSolved ? <CheckCircle className="w-4 h-4" /> : <Clock className="w-4 h-4" />}
-                        {isSolved ? 'উত্তর দেওয়া হয়েছে (Solved)' : 'অপেক্ষা করা হচ্ছে (Open)'}
+                        {isSolved ? <CheckCircle className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
+                        {isSolved ? 'উত্তর দেওয়া হয়েছে (Solved)' : 'অপেক্ষা করা হচ্ছে (OPEN)'}
                       </span>
-                      <span className="text-xs text-foreground/40 font-medium">
-                        {new Date(issue.createdAt).toLocaleString()}
-                      </span>
+
+                      {issue.lessonTitle && issue.lessonTitle !== 'General Help & Doubt' && (
+                        <span className="text-xs font-semibold text-orange-500 bg-orange-500/10 px-2.5 py-1 rounded-lg">
+                          {issue.lessonTitle}
+                        </span>
+                      )}
                     </div>
 
-                    {issue.lessonTitle && issue.lessonTitle !== 'General Help & Doubt' && (
-                      <span className="text-xs font-semibold text-orange-500 bg-orange-500/10 px-2.5 py-1 rounded-lg">
-                        {issue.lessonTitle}
-                      </span>
-                    )}
+                    <span className="text-[11px] sm:text-xs text-foreground/50 font-medium shrink-0">
+                      {new Date(issue.createdAt).toLocaleString()}
+                    </span>
                   </div>
 
                   {/* Question Content */}
@@ -287,7 +305,7 @@ export default function StudentHelpDeskPage() {
                           {screenshots.map((url, idx) => (
                             <div 
                               key={idx}
-                              onClick={() => setSelectedPreviewImage(url)}
+                              onClick={() => setLightboxState({ images: screenshots, index: idx })}
                               className="w-20 h-20 rounded-xl border border-foreground/10 overflow-hidden bg-background cursor-pointer group hover:border-orange-500 transition-colors relative"
                             >
                               <img src={url} alt={`Screenshot ${idx + 1}`} className="w-full h-full object-cover" />
@@ -323,7 +341,7 @@ export default function StudentHelpDeskPage() {
                               স্যারের পাঠানো সমাধানের ছবি (Solution Sheet):
                             </span>
                             <div 
-                              onClick={() => setSelectedPreviewImage(issue.replyImageUrl)}
+                              onClick={() => setLightboxState({ images: [issue.replyImageUrl], index: 0 })}
                               className="relative w-32 h-32 sm:w-44 sm:h-44 rounded-xl border border-green-500/30 overflow-hidden bg-background group cursor-pointer shadow-md hover:border-green-500 transition-all"
                             >
                               <img src={issue.replyImageUrl} alt="Teacher Solution Sheet" className="w-full h-full object-cover" />
@@ -460,17 +478,75 @@ export default function StudentHelpDeskPage() {
         </div>
       )}
 
-      {/* Image Preview Lightbox */}
-      {selectedPreviewImage && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-[200] flex items-center justify-center p-4" onClick={() => setSelectedPreviewImage(null)}>
-          <div className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center">
+      {/* Image Preview Lightbox Carousel with Navigation */}
+      {lightboxState && (
+        <div 
+          className="fixed inset-0 bg-black/95 backdrop-blur-md z-[200] flex items-center justify-center p-4 select-none animate-in fade-in duration-200" 
+          onClick={() => setLightboxState(null)}
+        >
+          {/* Close Button */}
+          <button 
+            type="button"
+            onClick={() => setLightboxState(null)}
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 p-3 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-colors z-50 shadow-lg cursor-pointer"
+            title="Close (Esc)"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          {/* Counter Badge */}
+          {lightboxState.images.length > 1 && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-bold rounded-full z-50 shadow-md">
+              {lightboxState.index + 1} / {lightboxState.images.length}
+            </div>
+          )}
+
+          {/* Previous Arrow Button */}
+          {lightboxState.images.length > 1 && (
             <button 
-              onClick={() => setSelectedPreviewImage(null)}
-              className="absolute -top-12 right-0 p-2 text-white/80 hover:text-white bg-white/10 rounded-full transition-colors"
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxState(prev => prev ? {
+                  ...prev,
+                  index: (prev.index - 1 + prev.images.length) % prev.images.length
+                } : null);
+              }}
+              className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 p-3 sm:p-4 text-white bg-white/15 hover:bg-white/30 border border-white/20 rounded-full transition-all z-50 shadow-xl active:scale-95 cursor-pointer"
+              title="Previous Image (←)"
             >
-              <X className="w-6 h-6" />
+              <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
             </button>
-            <img src={selectedPreviewImage} alt="Full Preview" className="max-w-full max-h-[85vh] object-contain rounded-2xl border border-white/10 shadow-2xl" />
+          )}
+
+          {/* Next Arrow Button */}
+          {lightboxState.images.length > 1 && (
+            <button 
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxState(prev => prev ? {
+                  ...prev,
+                  index: (prev.index + 1) % prev.images.length
+                } : null);
+              }}
+              className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 p-3 sm:p-4 text-white bg-white/15 hover:bg-white/30 border border-white/20 rounded-full transition-all z-50 shadow-xl active:scale-95 cursor-pointer"
+              title="Next Image (→)"
+            >
+              <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
+            </button>
+          )}
+
+          {/* Main Image View */}
+          <div 
+            className="relative max-w-5xl w-full max-h-[90vh] flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img 
+              src={lightboxState.images[lightboxState.index]} 
+              alt={`Preview ${lightboxState.index + 1}`} 
+              className="max-w-full max-h-[85vh] object-contain rounded-2xl border border-white/10 shadow-2xl transition-all duration-300" 
+            />
           </div>
         </div>
       )}

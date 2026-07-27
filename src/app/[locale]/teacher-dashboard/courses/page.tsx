@@ -291,10 +291,10 @@ export default function CoursesListPage() {
             <div 
               key={course.id} 
               onClick={() => router.push(`/teacher-dashboard/courses/${course.id}`)}
-              className="cursor-pointer group bg-foreground/5 rounded-2xl border border-orange-500/30 md:border-foreground/10 hover:border-orange-500/60 active:border-orange-500 shadow-md hover:shadow-xl hover:shadow-orange-500/10 active:scale-[0.99] transition-all duration-300 flex flex-col"
+              className="cursor-pointer group bg-foreground/5 rounded-2xl border border-orange-500/30 md:border-foreground/10 hover:border-orange-500/60 active:border-orange-500 shadow-md hover:shadow-xl hover:shadow-orange-500/10 active:scale-[0.99] transition-all duration-300 flex flex-col overflow-hidden"
             >
               
-              <div className="relative aspect-[16/9] w-full bg-foreground/10">
+              <div className="relative aspect-[16/9] w-full bg-foreground/10 overflow-hidden rounded-t-2xl">
                 {course.thumbnailUrl ? (
                   <Image src={course.thumbnailUrl} alt={course.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                 ) : (

@@ -27,8 +27,8 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
   const textColor = hasCover ? "text-white" : "text-foreground";
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500">
-      <div className={`min-h-[60vh] lg:min-h-[75vh] pt-20 pb-16 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-gradient-to-br from-red-900/40 via-background to-red-900/20 dark:from-red-950 dark:via-background dark:to-red-900/30'}`}>
+    <div className="min-h-screen bg-background text-foreground pb-6 sm:pb-20 animate-in fade-in duration-500 w-full max-w-full overflow-x-hidden">
+      <div className={`min-h-[380px] sm:min-h-[500px] lg:min-h-[75vh] pt-20 sm:pt-28 md:pt-32 pb-8 sm:pb-16 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-gradient-to-br from-red-950/30 via-background to-orange-950/20'}`}>
         
         {/* Background Layer */}
         {hasSlider ? (
@@ -85,14 +85,24 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
               </div>
             </div>
             
-            {course.teacherId && (
-              <div className="mt-4 sm:mt-8">
-                <Link href={`/teachers/${course.teacherId}`} target="_blank" className={`inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 shadow-md hover:shadow-lg group border backdrop-blur-md ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20 hover:border-white/40' : 'bg-primary/5 hover:bg-primary/10 text-primary border-primary/20 hover:border-primary/40'}`}>
-                  <User className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                  {t('viewProfile')}
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 mt-4 sm:mt-8">
+              {course.teacherId && (
+                <Link href={`/teachers/${course.teacherId}`} target="_blank" className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 shadow-md hover:shadow-lg group border backdrop-blur-md ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20 hover:border-white/40' : 'bg-primary/5 hover:bg-primary/10 text-primary border-primary/20 hover:border-primary/40'}`}>
+                  <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:scale-110 transition-transform" />
+                  <span>{t('viewProfile')}</span>
                 </Link>
-              </div>
-            )}
+              )}
+
+              {course.introVideoUrl && (
+                <button 
+                  onClick={() => setIsVideoModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold bg-orange-500/20 hover:bg-orange-500 text-orange-400 hover:text-white border border-orange-500/30 transition-all cursor-pointer shadow-md active:scale-95"
+                >
+                  <PlayCircle className="w-4 h-4 fill-current text-orange-400" />
+                  <span>ভিডিও ট্রেইলার</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -156,7 +166,7 @@ export default function AdmissionTemplate({ course, currentSlide, setCurrentSlid
         )}
       </div>
 
-      <div className="max-w-[1280px] mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px] py-16">
+      <div className="max-w-[1280px] mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px] py-6 sm:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
           <div className="lg:col-span-2 space-y-12">

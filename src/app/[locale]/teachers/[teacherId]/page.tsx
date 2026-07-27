@@ -40,10 +40,10 @@ export default function TeacherProfilePage({ params }: { params: Promise<{ teach
   if (!profileData) return <div className="min-h-screen flex items-center justify-center text-xl text-foreground/50 bg-background">Profile not found.</div>;
 
   return (
-    <div className="min-h-screen bg-background pb-20 animate-in fade-in duration-300 pt-16">
+    <div className="min-h-screen bg-background pb-12 sm:pb-20 animate-in fade-in duration-300 pt-20 sm:pt-28 w-full max-w-full overflow-x-hidden">
       
       {/* Cover Banner */}
-      <div className="h-52 md:h-80 relative bg-foreground/10 w-full overflow-hidden">
+      <div className="h-44 sm:h-52 md:h-80 relative bg-foreground/10 w-full overflow-hidden">
         <img 
           src={profileData.coverPhoto || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1000&auto=format&fit=crop'} 
           alt="Cover" 
@@ -52,14 +52,14 @@ export default function TeacherProfilePage({ params }: { params: Promise<{ teach
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-80"></div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="max-w-5xl mx-auto px-3.5 sm:px-6">
         <div className="relative w-full bg-background flex flex-col">
 
           {/* Profile Header Info */}
-          <div className="relative pb-8">
+          <div className="relative pb-6 sm:pb-8">
             
             {/* Avatar / Logo */}
-            <div className="relative w-32 h-32 md:w-40 md:h-40 -mt-16 md:-mt-20 mb-4 shadow-xl z-10">
+            <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 -mt-12 sm:-mt-16 md:-mt-20 mb-3 shadow-xl z-10">
               <img 
                 src={profileData.profilePhoto || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'} 
                 alt="Profile" 
@@ -68,16 +68,16 @@ export default function TeacherProfilePage({ params }: { params: Promise<{ teach
             </div>
 
             {/* Title & Headline */}
-            <div className="flex items-center gap-2 mb-2">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground leading-tight">{profileData.displayName || (profileData.type === 'individual' ? 'Teacher Name' : 'Institution Name')}</h1>
-              <CheckCircle2 className="w-6 h-6 text-blue-500 shrink-0" />
+            <div className="flex items-center gap-2 mb-1.5">
+              <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-foreground leading-tight">{profileData.displayName || (profileData.type === 'individual' ? 'Teacher Name' : 'Institution Name')}</h1>
+              <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 shrink-0" />
             </div>
-            <p className="text-primary font-semibold text-base md:text-lg mb-7 leading-relaxed">{profileData.headline || 'Instructor'}</p>
+            <p className="text-primary font-semibold text-sm sm:text-base md:text-lg mb-4 sm:mb-7 leading-relaxed">{profileData.headline || 'Instructor'}</p>
 
             {/* Quick Stats Grid */}
-            <div className="grid grid-cols-3 gap-4 md:gap-8 mb-10 py-6 border-y border-foreground/10 bg-foreground/5 dark:bg-foreground/[0.02] rounded-2xl px-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-primary/10 rounded-xl text-primary"><Users className="w-5 h-5" /></div>
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-8 mb-6 sm:mb-10 py-4 sm:py-6 border-y border-foreground/10 bg-foreground/5 dark:bg-foreground/[0.02] rounded-xl sm:rounded-2xl px-3 sm:px-6">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-2 sm:p-3 bg-primary/10 rounded-xl text-primary shrink-0"><Users className="w-4 h-4 sm:w-5 sm:h-5" /></div>
                 <div>
                   <p className="font-extrabold text-lg leading-none text-foreground">500+</p>
                   <p className="text-xs text-foreground/60 uppercase font-bold tracking-wider mt-1">Students</p>

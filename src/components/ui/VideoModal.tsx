@@ -49,28 +49,29 @@ export function VideoModal({ isOpen, onClose, videoUrl }: VideoModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-12">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2.5 sm:p-6 md:p-12">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
+        className="absolute inset-0 bg-black/85 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
         onClick={onClose}
       />
       
       {/* Modal Content */}
-      <div className="relative w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/10 animate-in zoom-in-95 duration-300">
+      <div className="relative w-[96vw] max-w-5xl aspect-video bg-black rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 animate-in zoom-in-95 duration-300">
         
         {/* Close Button */}
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 bg-black/50 hover:bg-red-500 rounded-full text-white transition-colors backdrop-blur-md"
+          className="absolute top-2 right-2 sm:top-4 sm:right-4 z-20 p-1.5 sm:p-2 bg-black/70 hover:bg-red-500 rounded-full text-white transition-colors backdrop-blur-md"
+          title="Close Video"
         >
-          <X className="w-6 h-6" />
+          <X className="w-4 h-4 sm:w-6 sm:h-6" />
         </button>
 
         {/* Loading Spinner */}
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-900 z-0">
-            <Loader2 className="w-10 h-10 animate-spin text-orange-500" />
+            <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 animate-spin text-orange-500" />
           </div>
         )}
 

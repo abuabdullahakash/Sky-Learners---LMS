@@ -58,8 +58,8 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
   const softColor = hasCover ? "text-white/60" : "text-foreground/50";
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500 w-full max-w-full overflow-x-hidden">
-      <div className={`min-h-[380px] sm:min-h-[550px] lg:min-h-[85vh] pt-14 sm:pt-28 pb-8 sm:pb-12 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-foreground/5'}`}>
+    <div className="min-h-screen bg-background text-foreground pb-6 sm:pb-20 animate-in fade-in duration-500 w-full max-w-full overflow-x-hidden">
+      <div className={`min-h-[380px] sm:min-h-[500px] lg:min-h-[85vh] pt-20 sm:pt-28 md:pt-32 pb-8 sm:pb-12 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-foreground/5'}`}>
         {hasSlider ? (
           <div className="absolute inset-0 z-0">
             <img 
@@ -141,22 +141,31 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
                 {course.subtitle || t('descriptionFallback')}
               </p>
               
-              <div className="flex flex-wrap items-center gap-8 text-sm font-semibold">
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${hasCover ? 'bg-white/10 text-white' : 'bg-primary/20 text-primary'}`}>
-                    <Users className="w-6 h-6" />
+              <div className="flex flex-wrap items-center gap-4 sm:gap-8 text-sm font-semibold">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shrink-0 ${hasCover ? 'bg-white/10 text-white' : 'bg-primary/20 text-primary'}`}>
+                    <Users className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <p className={`text-xs uppercase tracking-wide ${softColor}`}>{t('instructor')}</p>
-                    <p className="font-bold text-base mt-0.5">{course.coachingName || 'Instructor'}</p>
-                    {course.teacherId && (
-                      <div className="mt-2.5">
-                        <Link href={`/teachers/${course.teacherId}`} target="_blank" className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 shadow-sm hover:shadow-md group border backdrop-blur-md ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20 hover:border-white/40' : 'bg-primary/5 hover:bg-primary/10 text-primary border-primary/20 hover:border-primary/40'}`}>
+                    <p className={`text-[10px] sm:text-xs uppercase tracking-wide ${softColor}`}>{t('instructor')}</p>
+                    <p className="font-bold text-xs sm:text-base mt-0.5">{course.coachingName || 'Instructor'}</p>
+                    <div className="flex flex-wrap items-center gap-2 mt-2">
+                      {course.teacherId && (
+                        <Link href={`/teachers/${course.teacherId}`} target="_blank" className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all duration-300 shadow-sm hover:shadow-md group border backdrop-blur-md ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20 hover:border-white/40' : 'bg-primary/5 hover:bg-primary/10 text-primary border-primary/20 hover:border-primary/40'}`}>
                           <User className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                          {t('viewProfile')}
+                          <span>{t('viewProfile')}</span>
                         </Link>
-                      </div>
-                    )}
+                      )}
+                      {course.introVideoUrl && (
+                        <button 
+                          onClick={() => setIsVideoModalOpen(true)}
+                          className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-orange-500/20 hover:bg-orange-500 text-orange-400 hover:text-white border border-orange-500/30 transition-all cursor-pointer shadow-sm active:scale-95"
+                        >
+                          <PlayCircle className="w-3.5 h-3.5 fill-current text-orange-400" />
+                          <span>ভিডিও ট্রেইলার</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -182,7 +191,7 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
         )}
       </div>
 
-      <div className="max-w-[1280px] mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px] py-16">
+      <div className="max-w-[1280px] mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px] py-6 sm:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
           <div className="lg:col-span-2 space-y-12">

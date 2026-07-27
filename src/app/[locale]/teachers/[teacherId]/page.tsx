@@ -75,26 +75,34 @@ export default function TeacherProfilePage({ params }: { params: Promise<{ teach
             <p className="text-primary font-semibold text-sm sm:text-base md:text-lg mb-4 sm:mb-7 leading-relaxed">{profileData.headline || 'Instructor'}</p>
 
             {/* Quick Stats Grid */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-8 mb-6 sm:mb-10 py-4 sm:py-6 border-y border-foreground/10 bg-foreground/5 dark:bg-foreground/[0.02] rounded-xl sm:rounded-2xl px-3 sm:px-6">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-2 sm:p-3 bg-primary/10 rounded-xl text-primary shrink-0"><Users className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                <div>
-                  <p className="font-extrabold text-lg leading-none text-foreground">500+</p>
-                  <p className="text-xs text-foreground/60 uppercase font-bold tracking-wider mt-1">Students</p>
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-4 md:gap-8 mb-6 sm:mb-10 py-3 sm:py-6 border border-foreground/10 bg-foreground/5 dark:bg-foreground/[0.02] rounded-xl sm:rounded-2xl px-2 sm:px-6">
+              <div className="flex items-center justify-center sm:justify-start gap-1.5 sm:gap-3 p-1 sm:p-0">
+                <div className="p-1.5 sm:p-3 bg-primary/10 rounded-lg sm:rounded-xl text-primary shrink-0">
+                  <Users className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-extrabold text-xs sm:text-lg leading-none text-foreground truncate">500+</p>
+                  <p className="text-[9px] sm:text-xs text-foreground/60 uppercase font-bold tracking-wider mt-0.5 sm:mt-1 truncate">Students</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-primary/10 rounded-xl text-primary"><Video className="w-5 h-5" /></div>
-                <div>
-                  <p className="font-extrabold text-lg leading-none text-foreground">{coursesCount}</p>
-                  <p className="text-xs text-foreground/60 uppercase font-bold tracking-wider mt-1">Courses</p>
+
+              <div className="flex items-center justify-center sm:justify-start gap-1.5 sm:gap-3 p-1 sm:p-0">
+                <div className="p-1.5 sm:p-3 bg-primary/10 rounded-lg sm:rounded-xl text-primary shrink-0">
+                  <Video className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-extrabold text-xs sm:text-lg leading-none text-foreground truncate">{coursesCount}</p>
+                  <p className="text-[9px] sm:text-xs text-foreground/60 uppercase font-bold tracking-wider mt-0.5 sm:mt-1 truncate">Courses</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-500"><Star className="w-5 h-5" /></div>
-                <div>
-                  <p className="font-extrabold text-lg leading-none text-foreground">4.8</p>
-                  <p className="text-xs text-foreground/60 uppercase font-bold tracking-wider mt-1">Rating</p>
+
+              <div className="flex items-center justify-center sm:justify-start gap-1.5 sm:gap-3 p-1 sm:p-0">
+                <div className="p-1.5 sm:p-3 bg-yellow-500/10 rounded-lg sm:rounded-xl text-yellow-500 shrink-0">
+                  <Star className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-extrabold text-xs sm:text-lg leading-none text-foreground truncate">4.8</p>
+                  <p className="text-[9px] sm:text-xs text-foreground/60 uppercase font-bold tracking-wider mt-0.5 sm:mt-1 truncate">Rating</p>
                 </div>
               </div>
             </div>

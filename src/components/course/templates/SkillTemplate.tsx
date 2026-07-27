@@ -3,7 +3,7 @@ import 'react-quill-new/dist/quill.snow.css';
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { ArrowLeft, Briefcase, Award, Users, Image as ImageIcon, PlayCircle, ChevronLeft, ChevronRight, User, CheckCircle2, Video } from 'lucide-react';
+import { ArrowLeft, Briefcase, Award, Users, Image as ImageIcon, PlayCircle, ChevronLeft, ChevronRight, User, CheckCircle2, Video, Play } from 'lucide-react';
 import RelatedCourses from '../RelatedCourses';
 import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
@@ -56,7 +56,7 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-6 sm:pb-20 animate-in fade-in duration-500 w-full max-w-full overflow-x-hidden">
-      <div className={`min-h-[380px] sm:min-h-[500px] lg:min-h-[75vh] pt-20 sm:pt-28 md:pt-32 pb-8 sm:pb-16 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-gradient-to-br from-emerald-900/30 via-background to-teal-900/20 dark:from-emerald-950 dark:via-background dark:to-teal-900/30'}`}>
+      <div className={`min-h-[420px] sm:min-h-[520px] lg:min-h-[75vh] pt-28 sm:pt-36 md:pt-40 pb-14 sm:pb-20 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-gradient-to-br from-emerald-900/30 via-background to-teal-900/20 dark:from-emerald-950 dark:via-background dark:to-teal-900/30'}`}>
         
         {/* Background Layer */}
         {hasSlider ? (
@@ -80,11 +80,11 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
           </div>
         ) : null}
 
-        <div className={`w-full max-w-[1280px] px-[15px] md:px-[20px] lg:px-[30px] mx-auto relative z-20 h-full flex flex-col justify-center py-4 sm:py-12 ${textColor}`}>
+        <div className={`w-full max-w-[1280px] px-[15px] md:px-[20px] lg:px-[30px] mx-auto relative z-20 h-full flex flex-col justify-center py-6 sm:py-12 ${textColor}`}>
           
           {/* Top Header Row with Go Back & Category Badge side by side */}
           <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-6 flex-wrap">
-            <Link href="/courses" className={`inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-full border backdrop-blur-md transition-colors ${hasCover ? 'bg-white/10 text-white/90 border-white/20 hover:bg-white/20' : 'bg-foreground/5 text-foreground/80 border-foreground/10'}`}>
+            <Link href="/courses" className={`inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold px-3.5 py-1.5 rounded-full border backdrop-blur-md transition-colors ${hasCover ? 'bg-white/10 text-white/90 border-white/20 hover:bg-white/20' : 'bg-foreground/5 text-foreground/80 border-foreground/10'}`}>
               <ArrowLeft className="w-3.5 h-3.5" /> {t('goBack')}
             </Link>
             
@@ -126,9 +126,9 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
               {course.introVideoUrl && (
                 <button 
                   onClick={() => setIsVideoModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold bg-orange-500/20 hover:bg-orange-500 text-orange-400 hover:text-white border border-orange-500/30 transition-all cursor-pointer shadow-md active:scale-95"
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold border backdrop-blur-md transition-all cursor-pointer shadow-md active:scale-95 ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20' : 'bg-foreground/5 hover:bg-foreground/10 text-foreground border-foreground/10'}`}
                 >
-                  <PlayCircle className="w-4 h-4 fill-current text-orange-400" />
+                  <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span>ভিডিও ট্রেইলার</span>
                 </button>
               )}

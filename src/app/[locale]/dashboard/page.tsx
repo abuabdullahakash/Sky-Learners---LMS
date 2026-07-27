@@ -63,6 +63,19 @@ export default function DashboardOverview() {
     return t('timeAgo.daysAgo', { days: formatNumber(days) });
   };
 
+  const formatTime12Hour = (timeStr: string) => {
+    if (!timeStr) return '';
+    const parts = timeStr.split(':');
+    if (parts.length < 2) return timeStr;
+    const hour = parseInt(parts[0], 10);
+    const minutes = parts[1].replace(/[^0-9]/g, '');
+    if (isNaN(hour)) return timeStr;
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12;
+    const formattedHourStr = formattedHour < 10 ? `0${formattedHour}` : `${formattedHour}`;
+    return `${formattedHourStr}:${minutes} ${ampm}`;
+  };
+
   const getCategoryTranslation = (cat: string) => {
     if (!cat) return t('continueBtn');
     const lowerCat = cat.toLowerCase();
@@ -268,11 +281,16 @@ export default function DashboardOverview() {
                       const creationTime = Number(lc.createdAt) || (Number(lc.id) > 1000000000000 ? Number(lc.id) : 0);
                       const bestTime = Math.max(lcTime, creationTime);
                       const isLiveNow = Boolean(lc.isLive);
+                      const formattedTime = lc.time ? formatTime12Hour(lc.time) : '';
+                      const formattedSubtitle = isLiveNow 
+                        ? '🔴 Live Now! (লাইভ ক্লাস শুরু হয়েছে)' 
+                        : (lc.date ? `${lc.date}${formattedTime ? ' • ' + formattedTime : ''}` : 'সিডিউলড লাইভ ক্লাস');
+
                       feedItems.push({
                         id: `live-${lc.id}`,
                         type: 'live_class',
                         title: lc.title,
-                        subtitle: isLiveNow ? '🔴 Live Now! (লাইভ ক্লাস শুরু হয়েছে)' : (lc.date ? `${lc.date}${lc.time ? ' • ' + lc.time : ''}` : 'সিডিউলড লাইভ ক্লাস'),
+                        subtitle: formattedSubtitle,
                         dateStr: lc.date || '',
                         courseTitle,
                         courseId,

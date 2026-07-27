@@ -1,6 +1,6 @@
 import { Book, Users, Video, Edit3, MonitorPlay, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 interface Subject {
   name: string;
@@ -13,7 +13,26 @@ interface Subject {
 export default function CourseSubjects({ subjects, courseType }: { subjects: Subject[], courseType?: string }) {
   const t = useTranslations('CourseDetails');
   const tableScrollRef = useRef<HTMLDivElement>(null);
-  
+  const [canScroll, setCanScroll] = useState(false);
+
+  useEffect(() => {
+    const checkScroll = () => {
+      if (tableScrollRef.current) {
+        const { scrollWidth, clientWidth } = tableScrollRef.current;
+        setCanScroll(scrollWidth > clientWidth + 5);
+      }
+    };
+
+    checkScroll();
+    const timer = setTimeout(checkScroll, 300);
+    window.addEventListener('resize', checkScroll);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [subjects]);
+
   if (!subjects || subjects.length === 0) return null;
 
   // Check which columns have at least one value across all subjects
@@ -40,8 +59,8 @@ export default function CourseSubjects({ subjects, courseType }: { subjects: Sub
           <span>{t('subjectBreakdown') || 'বিষয়ভিত্তিক ক্লাস ডিস্ট্রিবিউশন'}</span>
         </h2>
 
-        {!isSimpleList && (
-          <div className="flex items-center gap-1.5 shrink-0">
+        {!isSimpleList && canScroll && (
+          <div className="flex items-center gap-1.5 shrink-0 animate-in fade-in duration-300">
             <button
               type="button"
               onClick={() => scrollTable('left')}

@@ -124,111 +124,116 @@ export default function StudentCommunity() {
         </div>
       </div>
 
-      {/* 📢 Course Notices Section */}
-      <div className="bg-white dark:bg-foreground/5 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border border-gray-200 dark:border-foreground/10 space-y-4">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
-          <Megaphone className="w-6 h-6 sm:w-7 sm:h-7 text-orange-500 shrink-0 animate-bounce" />
-          <span>Teacher Announcements & Notices (নোটিশ বোর্ড)</span>
-        </h2>
+      {/* Main Grid Container for Desktop / Laptop & Mobile Stack */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {notices.length === 0 ? (
-          <div className="p-6 text-center border border-dashed border-gray-200 dark:border-foreground/10 rounded-2xl">
-            <Bell className="w-8 h-8 mx-auto text-gray-400 mb-2" />
-            <p className="text-gray-500 dark:text-foreground/60 text-xs sm:text-sm font-medium">No teacher notices posted for this course yet.</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {notices.map((notice) => {
-              const imageList = notice.images && notice.images.length > 0 
-                ? notice.images 
-                : notice.imageUrl 
-                  ? [notice.imageUrl] 
-                  : [];
+        {/* 📢 Course Notices Section (Left Column on Desktop) */}
+        <div className="lg:col-span-7 xl:col-span-8 bg-white dark:bg-foreground/5 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border border-gray-200 dark:border-foreground/10 space-y-4">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
+            <Megaphone className="w-6 h-6 sm:w-7 sm:h-7 text-orange-500 shrink-0 animate-bounce" />
+            <span>Teacher Announcements & Notices (নোটিশ বোর্ড)</span>
+          </h2>
+          
+          {notices.length === 0 ? (
+            <div className="p-6 text-center border border-dashed border-gray-200 dark:border-foreground/10 rounded-2xl">
+              <Bell className="w-8 h-8 mx-auto text-gray-400 mb-2" />
+              <p className="text-gray-500 dark:text-foreground/60 text-xs sm:text-sm font-medium">No teacher notices posted for this course yet.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {notices.map((notice) => {
+                const imageList = notice.images && notice.images.length > 0 
+                  ? notice.images 
+                  : notice.imageUrl 
+                    ? [notice.imageUrl] 
+                    : [];
 
-              return (
-                <div key={notice.id} className="p-4 sm:p-5 bg-orange-500/5 dark:bg-foreground/5 rounded-xl sm:rounded-2xl border border-orange-500/20 space-y-2">
-                  <div className="flex items-center justify-between gap-2 flex-wrap">
-                    <span className="px-2.5 py-0.5 bg-orange-500/10 text-orange-500 text-[10px] sm:text-xs font-bold rounded-full uppercase tracking-wider">Announcement</span>
-                    <span className="text-[10px] sm:text-xs text-foreground/50">{new Date(notice.createdAt).toLocaleString()}</span>
-                  </div>
-                  <h3 className="font-bold text-base sm:text-lg text-gray-900 dark:text-white">{notice.title}</h3>
-                  <p className="text-xs sm:text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed">{notice.content}</p>
-                  
-                  {/* Notice Images Thumbnails Grid */}
-                  {imageList.length > 0 && (
-                    <div className="mt-3 flex flex-wrap items-center gap-2">
-                      {imageList.map((imgUrl, imgIdx) => (
-                        <div 
-                          key={imgIdx}
-                          className="relative group w-20 h-20 sm:w-28 sm:h-28 rounded-xl overflow-hidden border border-foreground/15 bg-black/5 cursor-pointer shadow-sm shrink-0"
-                          onClick={() => setActiveLightboxImage(imgUrl)}
-                        >
-                          <img 
-                            src={imgUrl} 
-                            alt={`Notice image ${imgIdx + 1}`} 
-                            className="w-full h-full object-cover rounded-xl transition-all duration-300 group-hover:scale-105 group-hover:brightness-90" 
-                          />
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 text-white font-bold text-[10px] sm:text-xs">
-                            <ZoomIn className="w-4 h-4 text-orange-400" />
-                            <span>Zoom</span>
+                return (
+                  <div key={notice.id} className="p-4 sm:p-5 bg-orange-500/5 dark:bg-foreground/5 rounded-xl sm:rounded-2xl border border-orange-500/20 space-y-2">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className="px-2.5 py-0.5 bg-orange-500/10 text-orange-500 text-[10px] sm:text-xs font-bold rounded-full uppercase tracking-wider">Announcement</span>
+                      <span className="text-[10px] sm:text-xs text-foreground/50">{new Date(notice.createdAt).toLocaleString()}</span>
+                    </div>
+                    <h3 className="font-bold text-base sm:text-lg text-gray-900 dark:text-white">{notice.title}</h3>
+                    <p className="text-xs sm:text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed">{notice.content}</p>
+                    
+                    {/* Notice Images Thumbnails Grid */}
+                    {imageList.length > 0 && (
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        {imageList.map((imgUrl, imgIdx) => (
+                          <div 
+                            key={imgIdx}
+                            className="relative group w-20 h-20 sm:w-28 sm:h-28 rounded-xl overflow-hidden border border-foreground/15 bg-black/5 cursor-pointer shadow-sm shrink-0"
+                            onClick={() => setActiveLightboxImage(imgUrl)}
+                          >
+                            <img 
+                              src={imgUrl} 
+                              alt={`Notice image ${imgIdx + 1}`} 
+                              className="w-full h-full object-cover rounded-xl transition-all duration-300 group-hover:scale-105 group-hover:brightness-90" 
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 text-white font-bold text-[10px] sm:text-xs">
+                              <ZoomIn className="w-4 h-4 text-orange-400" />
+                              <span>Zoom</span>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
 
-                  {notice.teacherName && (
-                    <p className="text-xs font-semibold text-primary pt-1">— {notice.teacherName}</p>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* 🔗 Community Links Section */}
-      <div className="space-y-4">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <LinkIcon className="w-5 h-5 text-primary" />
-          {t('groupsTitle')}
-        </h2>
-
-        {links.length === 0 ? (
-          <div className="text-center py-12 bg-white dark:bg-foreground/5 rounded-3xl border border-gray-200 dark:border-foreground/10">
-            <MessageSquare className="w-10 h-10 mx-auto text-foreground/30 mb-3" />
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('notActiveTitle')}</h3>
-            <p className="text-gray-500 dark:text-foreground/60 text-sm mt-1">{t('notActiveSubtitle')}</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {links.map((link) => {
-              const info = PLATFORM_INFO[link.platform] || PLATFORM_INFO['other'];
-              const Icon = info.icon;
-              
-              return (
-                <Link 
-                  key={link.id} 
-                  href={link.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className={`flex items-center justify-between p-4 sm:p-5 rounded-xl sm:rounded-2xl border transition-all duration-300 group ${info.colorClass}`}
-                >
-                  <div className="flex items-center gap-3.5">
-                    <div className={`p-2.5 sm:p-3 rounded-xl shadow-sm ${info.iconBg}`}>
-                      <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-base sm:text-lg text-foreground">{t(`platforms.${link.platform}`)}</h3>
-                      <p className="text-xs sm:text-sm opacity-80 mt-0.5">{t('clickToJoin')}</p>
-                    </div>
+                    {notice.teacherName && (
+                      <p className="text-xs font-semibold text-primary pt-1">— {notice.teacherName}</p>
+                    )}
                   </div>
-                  <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                </Link>
-              );
-            })}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* 🔗 Community Links Section (Right Column on Desktop) */}
+        <div className="lg:col-span-5 xl:col-span-4 bg-white dark:bg-foreground/5 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border border-gray-200 dark:border-foreground/10 space-y-4">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <LinkIcon className="w-5 h-5 text-primary" />
+            <span>{t('groupsTitle')}</span>
+          </h2>
+
+          {links.length === 0 ? (
+            <div className="text-center py-8 bg-foreground/5 rounded-2xl border border-dashed border-foreground/10 p-4">
+              <MessageSquare className="w-8 h-8 mx-auto text-foreground/30 mb-2" />
+              <h3 className="text-sm font-bold text-gray-900 dark:text-white">{t('notActiveTitle')}</h3>
+              <p className="text-gray-500 dark:text-foreground/60 text-xs mt-1">{t('notActiveSubtitle')}</p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {links.map((link) => {
+                const info = PLATFORM_INFO[link.platform] || PLATFORM_INFO['other'];
+                const Icon = info.icon;
+                
+                return (
+                  <Link 
+                    key={link.id} 
+                    href={link.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={`flex items-center justify-between p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border transition-all duration-300 group ${info.colorClass}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2.5 rounded-xl shadow-sm ${info.iconBg}`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-sm sm:text-base text-foreground">{t(`platforms.${link.platform}`)}</h3>
+                        <p className="text-xs opacity-80 mt-0.5">{t('clickToJoin')}</p>
+                      </div>
+                    </div>
+                    <ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
       </div>
 
       {/* Lightbox Modal */}

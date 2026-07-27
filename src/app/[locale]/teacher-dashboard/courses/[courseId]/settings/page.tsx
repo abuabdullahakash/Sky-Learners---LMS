@@ -158,7 +158,7 @@ export default function CourseSettingsPage() {
         hasDoubtSolving: course.hasDoubtSolving || false,
         category: course.category,
         isFullClassCourse: course.isFullClassCourse ?? true,
-        specificSubjects: !(course.isFullClassCourse ?? true) ? (course.specificSubjects || []) : [],
+        specificSubjects: course.specificSubjects || [],
         totalLiveClasses: course.totalLiveClasses ? Number(course.totalLiveClasses) : null,
         faqs: course.faqs || [],
         learningOutcomes: course.learningOutcomes || [],

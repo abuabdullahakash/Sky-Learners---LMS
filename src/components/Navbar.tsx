@@ -32,7 +32,8 @@ import {
   AlertCircle,
   MoreVertical,
   UserCircle,
-  PlusCircle
+  PlusCircle,
+  HelpCircle
 } from 'lucide-react';
 import RoleSelectionModal from './RoleSelectionModal';
 
@@ -151,6 +152,7 @@ export default function Navbar() {
     { name: 'Resources', href: `/dashboard/courses/${courseId}/resources`, icon: FileText },
     { name: 'Exams & Quizzes', href: `/dashboard/courses/${courseId}/exams`, icon: CheckSquare },
     { name: 'Community', href: `/dashboard/courses/${courseId}/community`, icon: MessageSquare },
+    { name: 'Help & Doubts', href: `/dashboard/courses/${courseId}/help`, icon: HelpCircle },
   ];
 
   return (

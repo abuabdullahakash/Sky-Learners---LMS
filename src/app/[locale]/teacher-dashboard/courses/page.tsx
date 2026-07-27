@@ -286,7 +286,7 @@ export default function CoursesListPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-4.5">
           {filteredCourses.map((course) => (
             <div 
               key={course.id} 
@@ -300,25 +300,25 @@ export default function CoursesListPage() {
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-foreground/30 text-xs font-bold">No Image</div>
                 )}
-                <div className="absolute top-3 left-3">
-                  <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${course.isPublished ? 'bg-green-500 text-white' : 'bg-foreground/60 text-white backdrop-blur-md'}`}>
+                <div className="absolute top-2.5 left-2.5">
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${course.isPublished ? 'bg-green-500 text-white' : 'bg-foreground/60 text-white backdrop-blur-md'}`}>
                     {course.isPublished ? 'Published' : 'Draft'}
                   </span>
                 </div>
               </div>
 
-              <div className="p-4 sm:p-5 flex-1 flex flex-col">
-                <div className="text-xs font-extrabold text-orange-500 mb-1 tracking-wide">{(course.category || '').toUpperCase()}</div>
-                <h3 className="text-base sm:text-lg font-bold mb-2 line-clamp-2" title={course.title}>{course.title}</h3>
+              <div className="p-3.5 sm:p-4 flex-1 flex flex-col">
+                <div className="text-[10px] sm:text-[11px] font-extrabold text-orange-500 mb-0.5 tracking-wide">{(course.category || '').toUpperCase()}</div>
+                <h3 className="text-sm sm:text-base font-bold mb-1.5 line-clamp-2 leading-snug" title={course.title}>{course.title}</h3>
                 
-                <div className="flex flex-wrap gap-x-3 gap-y-1.5 mt-2 mb-4 text-xs text-foreground/60 font-medium">
+                <div className="flex flex-wrap gap-x-2.5 gap-y-1 my-1.5 text-[11px] sm:text-xs text-foreground/60 font-medium">
                   <div className="flex items-center gap-1" title="Enrolled Students"><Users className="w-3.5 h-3.5 text-orange-500" /> {course.enrolledStudents || 0}</div>
                   <div className="flex items-center gap-1" title="Total Videos"><Video className="w-3.5 h-3.5 text-blue-500" /> {course.totalVideoLessons || 0}</div>
                   <div className="flex items-center gap-1" title="Total Exams"><CheckSquare className="w-3.5 h-3.5 text-green-500" /> {course.totalExams || 0}</div>
                   <div className="flex items-center gap-1" title="Validity"><Calendar className="w-3.5 h-3.5 text-purple-500" /> {course.courseValidity || 'N/A'}</div>
                 </div>
 
-                <div className="flex items-center justify-between mt-auto pt-3 border-t border-foreground/10">
+                <div className="flex items-center justify-between mt-auto pt-2.5 border-t border-foreground/10">
                   <div className="flex flex-col">
                     {(() => {
                       const hasDiscount = course.discountPrice !== undefined && course.discountPrice !== null && (course.discountPrice as any) !== '';
@@ -330,20 +330,20 @@ export default function CoursesListPage() {
                         return isDiscountValid ? (
                           <>
                             <span className="text-[10px] text-foreground/50 line-through">৳{course.price}</span>
-                            <span className="text-base font-extrabold text-emerald-500">ফ্রি</span>
+                            <span className="text-sm sm:text-base font-extrabold text-emerald-500">ফ্রি</span>
                           </>
                         ) : (
-                          <span className="text-base font-extrabold text-emerald-500">ফ্রি</span>
+                          <span className="text-sm sm:text-base font-extrabold text-emerald-500">ফ্রি</span>
                         );
                       }
 
                       return isDiscountValid ? (
                         <>
                           <span className="text-[10px] text-foreground/50 line-through">৳{course.price}</span>
-                          <span className="text-base font-extrabold text-orange-500">৳{course.discountPrice}</span>
+                          <span className="text-sm sm:text-base font-extrabold text-orange-500">৳{course.discountPrice}</span>
                         </>
                       ) : (
-                        <span className="text-base font-extrabold">৳{course.price}</span>
+                        <span className="text-sm sm:text-base font-extrabold">৳{course.price}</span>
                       );
                     })()}
                   </div>
@@ -352,7 +352,7 @@ export default function CoursesListPage() {
                       e.stopPropagation();
                       router.push(`/teacher-dashboard/courses/${course.id}/edit`);
                     }}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white rounded-xl font-bold text-xs shadow-md shadow-orange-500/25 active:scale-95 transition-all duration-200"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white rounded-lg font-bold text-xs shadow-md shadow-orange-500/25 active:scale-95 transition-all duration-200"
                   >
                     <Edit className="w-3.5 h-3.5" /> Edit Course
                   </button>

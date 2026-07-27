@@ -440,8 +440,8 @@ export default function EditCoursePage() {
                         </button>
                       </div>
                       
-                      {/* Name & Instructor */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {/* All Subject Fields in 1 Single Row on Desktop/Laptop */}
+                      <div className={`grid grid-cols-1 ${courseType === 'coaching' ? 'md:grid-cols-5' : 'md:grid-cols-4'} gap-2.5 items-end`}>
                         <div>
                           <label className="block text-[11px] font-bold text-foreground/70 mb-1">Subject Name</label>
                           <input 
@@ -465,10 +465,6 @@ export default function EditCoursePage() {
                             />
                           </div>
                         )}
-                      </div>
-
-                      {/* Class Distribution Numbers (3 columns on mobile) */}
-                      <div className="grid grid-cols-3 gap-2 pt-1">
                         <div>
                           <label className="block text-[11px] font-bold text-foreground/70 mb-1 text-center">Live Classes</label>
                           <input 

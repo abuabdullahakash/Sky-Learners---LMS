@@ -58,8 +58,8 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
   const softColor = hasCover ? "text-white/60" : "text-foreground/50";
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500">
-      <div className={`min-h-[420px] sm:min-h-[550px] lg:min-h-[85vh] pt-20 sm:pt-28 pb-8 sm:pb-12 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-foreground/5'}`}>
+    <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500 w-full max-w-full overflow-x-hidden">
+      <div className={`min-h-[380px] sm:min-h-[550px] lg:min-h-[85vh] pt-14 sm:pt-28 pb-8 sm:pb-12 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-foreground/5'}`}>
         {hasSlider ? (
           <div className="absolute inset-0 z-0">
             <img 
@@ -123,14 +123,17 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
           </div>
 
           <div className={`w-full px-2 sm:px-6 lg:px-20 xl:px-24 py-4 sm:py-12 ${textColor}`}>
-            <Link href="/courses" className={`inline-flex items-center gap-2 text-xs sm:text-sm font-semibold mb-4 sm:mb-8 transition-colors hover:opacity-100 ${hasCover ? 'text-white/70 hover:text-white' : 'text-foreground/60 hover:text-foreground'}`}>
-              <ArrowLeft className="w-4 h-4" /> {t('goBack')}
-            </Link>
-            
-            <div className="max-w-2xl">
-              <div className={`inline-block px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold mb-3 sm:mb-6 border shadow-sm uppercase tracking-wide ${hasCover ? 'bg-primary/20 text-primary border-primary/30' : 'bg-primary/10 text-primary border-primary/20'}`}>
+            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-6 flex-wrap">
+              <Link href="/courses" className={`inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold px-3 py-1 rounded-full border backdrop-blur-md transition-colors hover:opacity-100 ${hasCover ? 'text-white/90 bg-white/10 border-white/20 hover:bg-white/20' : 'text-foreground/80 bg-foreground/5 border-foreground/10'}`}>
+                <ArrowLeft className="w-3.5 h-3.5" /> {t('goBack')}
+              </Link>
+              
+              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs sm:text-sm font-bold border shadow-sm uppercase tracking-wide ${hasCover ? 'bg-primary/20 text-primary border-primary/30' : 'bg-primary/10 text-primary border-primary/20'}`}>
                 {t(`category.${course.category}`) || course.category}
               </div>
+            </div>
+            
+            <div className="max-w-2xl">
               <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold mb-3 sm:mb-6 leading-tight tracking-tight bg-gradient-to-r from-cyan-400 via-blue-500 via-purple-500 to-pink-500 text-transparent bg-clip-text drop-shadow-sm">
                 {course.title}
               </h1>

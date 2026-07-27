@@ -3,7 +3,7 @@ import 'react-quill-new/dist/quill.snow.css';
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { ArrowLeft, Briefcase, Award, Users, Image as ImageIcon, PlayCircle, ChevronLeft, ChevronRight, User } from 'lucide-react';
+import { ArrowLeft, Briefcase, Award, Users, Image as ImageIcon, PlayCircle, ChevronLeft, ChevronRight, User, CheckCircle2, Video } from 'lucide-react';
 import RelatedCourses from '../RelatedCourses';
 import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
@@ -28,25 +28,25 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
+  }, []);
+
+  useEffect(() => {
     if (galleryRef.current && course?.galleryImages?.length > 0) {
-      const elements = galleryRef.current.querySelectorAll('.gallery-item');
-      if (elements.length > 0) {
-        gsap.fromTo(elements, 
-          { opacity: 0, y: 50, scale: 0.95 }, 
-          { 
-            opacity: 1, 
-            y: 0, 
-            scale: 1, 
-            duration: 0.8, 
-            stagger: 0.15,
-            ease: "back.out(1.7)",
-            scrollTrigger: {
-              trigger: galleryRef.current,
-              start: "top 85%",
-            }
+      gsap.fromTo(
+        galleryRef.current.children,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: galleryRef.current,
+            start: "top 80%",
           }
-        );
-      }
+        }
+      );
     }
   }, [course?.galleryImages]);
 
@@ -55,8 +55,8 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
   const textColor = hasCover ? "text-white" : "text-foreground";
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500">
-      <div className={`min-h-[420px] sm:min-h-[550px] lg:min-h-[75vh] pt-16 sm:pt-20 pb-10 sm:pb-16 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-gradient-to-br from-emerald-900/30 via-background to-teal-900/20 dark:from-emerald-950 dark:via-background dark:to-teal-900/30'}`}>
+    <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500 w-full max-w-full overflow-x-hidden">
+      <div className={`min-h-[380px] sm:min-h-[500px] lg:min-h-[75vh] pt-14 sm:pt-20 pb-8 sm:pb-16 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-gradient-to-br from-emerald-900/30 via-background to-teal-900/20 dark:from-emerald-950 dark:via-background dark:to-teal-900/30'}`}>
         
         {/* Background Layer */}
         {hasSlider ? (
@@ -80,37 +80,43 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
           </div>
         ) : null}
 
-        <div className={`w-full max-w-[1280px] px-[15px] md:px-[20px] lg:px-[30px] mx-auto relative z-20 h-full flex flex-col justify-center py-6 sm:py-12 ${textColor}`}>
-          <Link href="/courses" className={`inline-flex items-center gap-2 text-xs sm:text-sm font-semibold mb-4 sm:mb-8 transition-colors ${hasCover ? 'text-white/70 hover:text-white' : 'text-foreground/60 hover:text-foreground'}`}>
-            <ArrowLeft className="w-4 h-4" /> {t('goBack')}
-          </Link>
+        <div className={`w-full max-w-[1280px] px-[15px] md:px-[20px] lg:px-[30px] mx-auto relative z-20 h-full flex flex-col justify-center py-4 sm:py-12 ${textColor}`}>
           
-          <div className="max-w-3xl">
-            <div className={`inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold mb-3 sm:mb-6 uppercase tracking-wide border ${hasCover ? 'bg-white/10 border-white/20 text-white backdrop-blur-md' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'}`}>
-              <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          {/* Top Header Row with Go Back & Category Badge side by side */}
+          <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-6 flex-wrap">
+            <Link href="/courses" className={`inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-full border backdrop-blur-md transition-colors ${hasCover ? 'bg-white/10 text-white/90 border-white/20 hover:bg-white/20' : 'bg-foreground/5 text-foreground/80 border-foreground/10'}`}>
+              <ArrowLeft className="w-3.5 h-3.5" /> {t('goBack')}
+            </Link>
+            
+            <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wide border ${hasCover ? 'bg-white/10 border-white/20 text-white backdrop-blur-md' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'}`}>
+              <Award className="w-3.5 h-3.5" />
               {t(`category.${course.category}`) || course.category}
             </div>
-            <h1 className="text-2xl sm:text-4xl lg:text-6xl font-extrabold mb-3 sm:mb-6 leading-tight drop-shadow-sm">
+          </div>
+          
+          <div className="max-w-3xl">
+            <h1 className="text-xl sm:text-4xl lg:text-6xl font-extrabold mb-2.5 sm:mb-6 leading-tight drop-shadow-sm">
               {course.title}
             </h1>
-            <p className={`text-xs sm:text-base md:text-xl mb-6 sm:mb-10 leading-relaxed line-clamp-3 sm:line-clamp-none ${hasCover ? 'text-white/80' : 'text-foreground/80'}`}>
+            <p className={`text-xs sm:text-base md:text-xl mb-4 sm:mb-8 leading-relaxed line-clamp-3 sm:line-clamp-none ${hasCover ? 'text-white/80' : 'text-foreground/80'}`}>
               {course.subtitle || t('descriptionFallbackSkill')}
             </p>
             
-            <div className="flex gap-6 mt-4">
-              <div className="flex items-center gap-2 text-emerald-400">
-                <Briefcase className="w-5 h-5" />
-                <span className="font-bold">ক্যারিয়ার ফোকাসড</span>
+            {/* Feature Pills */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 sm:mt-4">
+              <div className="flex items-center gap-1.5 text-emerald-400 text-xs sm:text-sm font-bold bg-white/10 dark:bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>প্রপার গাইডলাইন & মেন্টরশিপ</span>
               </div>
-              <div className="flex items-center gap-2 text-amber-400">
-                <Award className="w-5 h-5" />
-                <span className="font-bold">সার্টিফিকেট ও পোর্টফোলিও</span>
+              <div className="flex items-center gap-1.5 text-amber-400 text-xs sm:text-sm font-bold bg-white/10 dark:bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
+                <Video className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>রেকর্ডেড ও লাইভ ক্লাস</span>
               </div>
             </div>
             
             {course.teacherId && (
-              <div className="mt-8">
-                <Link href={`/teachers/${course.teacherId}`} target="_blank" className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-md hover:shadow-lg group border backdrop-blur-md ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20 hover:border-white/40' : 'bg-primary/5 hover:bg-primary/10 text-primary border-primary/20 hover:border-primary/40'}`}>
+              <div className="mt-4 sm:mt-8">
+                <Link href={`/teachers/${course.teacherId}`} target="_blank" className={`inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 shadow-md hover:shadow-lg group border backdrop-blur-md ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20 hover:border-white/40' : 'bg-primary/5 hover:bg-primary/10 text-primary border-primary/20 hover:border-primary/40'}`}>
                   <User className="w-4 h-4 group-hover:scale-110 transition-transform" />
                   {t('viewProfile')}
                 </Link>
@@ -140,36 +146,38 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
 
         {/* Slider Controls */}
         {hasSlider && course.sliderImages.length > 1 && (
-          <div className="absolute bottom-10 left-0 right-0 z-20 pointer-events-none">
+          <div className="absolute bottom-4 sm:bottom-10 left-0 right-0 z-20 pointer-events-none">
             <div className="w-full max-w-[1280px] px-[15px] md:px-[20px] lg:px-[30px] mx-auto relative flex justify-between items-center pointer-events-auto">
               {/* Pagination Dots */}
-              <div className="flex items-center gap-4">
-                <span className="text-white/80 text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
-                <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <span className="text-white/80 text-xs sm:text-sm font-bold tracking-widest">{String(currentSlide + 1).padStart(2, '0')}</span>
+                <div className="flex items-center gap-1.5 sm:gap-3">
                   {course.sliderImages.map((_: any, idx: number) => (
                     <div 
                       key={idx} 
                       onClick={() => setCurrentSlide(idx)} 
-                      className={`transition-all duration-500 cursor-pointer rounded-full ${idx === currentSlide ? 'bg-gradient-to-r from-emerald-400 to-teal-500 w-10 h-2.5 shadow-[0_0_15px_rgba(16,185,129,0.6)]' : 'bg-white/40 w-2.5 h-2.5 hover:bg-white/80'}`} 
+                      className={`transition-all duration-500 cursor-pointer rounded-full ${idx === currentSlide ? 'bg-gradient-to-r from-emerald-400 to-teal-500 w-6 sm:w-10 h-2 sm:h-2.5 shadow-[0_0_15px_rgba(16,185,129,0.6)]' : 'bg-white/40 w-2 sm:w-2.5 h-2 sm:h-2.5 hover:bg-white/80'}`} 
                     />
                   ))}
                 </div>
-                <span className="text-white/40 text-xs font-bold">{String(course.sliderImages.length).padStart(2, '0')}</span>
+                <span className="text-white/40 text-[10px] sm:text-xs font-bold">{String(course.sliderImages.length).padStart(2, '0')}</span>
               </div>
 
               {/* Next/Prev Navigation */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 sm:gap-3">
                 <button 
                   onClick={() => setCurrentSlide((currentSlide === 0 ? course.sliderImages.length - 1 : currentSlide - 1))}
-                  className="w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all shadow-lg hover:scale-105"
+                  className="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/60 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all shadow-lg active:scale-90"
+                  title="Previous"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                 </button>
                 <button 
                   onClick={() => setCurrentSlide((currentSlide + 1) % course.sliderImages.length)}
-                  className="w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all shadow-lg hover:scale-105"
+                  className="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/60 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all shadow-lg active:scale-90"
+                  title="Next"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                 </button>
               </div>
             </div>

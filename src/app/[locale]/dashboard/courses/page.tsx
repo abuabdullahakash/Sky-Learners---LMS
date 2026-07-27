@@ -192,7 +192,7 @@ export default function StudentCoursesPage() {
                 <Clock className="w-6 h-6 text-orange-500" />
                 {t('pendingApproval')}
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 sm:gap-8">
                 {pendingCourses.map((item) => (
                   <CourseCard key={item.enrollmentId} item={item} t={t} formatNumber={formatNumber} />
                 ))}
@@ -207,7 +207,7 @@ export default function StudentCoursesPage() {
                 <CheckCircle2 className="w-6 h-6 text-green-500" />
                 {t('activeCourses')}
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 sm:gap-8">
                 {approvedCourses.map((item) => (
                   <CourseCard key={item.enrollmentId} item={item} t={t} formatNumber={formatNumber} />
                 ))}

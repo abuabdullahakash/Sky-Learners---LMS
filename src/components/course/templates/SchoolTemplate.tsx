@@ -112,7 +112,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
               {course.introVideoUrl && (
                 <button 
                   onClick={() => setIsVideoModalOpen(true)}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold border backdrop-blur-md transition-all cursor-pointer shadow-md active:scale-95 ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20' : 'bg-foreground/5 hover:bg-foreground/10 text-foreground border-foreground/10'}`}
+                  className={`inline-flex lg:hidden items-center gap-1.5 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold border backdrop-blur-md transition-all cursor-pointer shadow-md active:scale-95 ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20' : 'bg-foreground/5 hover:bg-foreground/10 text-foreground border-foreground/10'}`}
                 >
                   <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span>ভিডিও ট্রেইলার</span>

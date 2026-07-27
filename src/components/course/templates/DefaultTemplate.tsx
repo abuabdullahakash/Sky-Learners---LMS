@@ -159,7 +159,7 @@ export default function DefaultTemplate({ course, currentSlide, setCurrentSlide 
                       {course.introVideoUrl && (
                         <button 
                           onClick={() => setIsVideoModalOpen(true)}
-                          className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold border backdrop-blur-md transition-all cursor-pointer shadow-sm active:scale-95 ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20' : 'bg-foreground/5 hover:bg-foreground/10 text-foreground border-foreground/10'}`}
+                          className={`inline-flex lg:hidden items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold border backdrop-blur-md transition-all cursor-pointer shadow-sm active:scale-95 ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20' : 'bg-foreground/5 hover:bg-foreground/10 text-foreground border-foreground/10'}`}
                         >
                           <Play className="w-3.5 h-3.5" />
                           <span>ভিডিও ট্রেইলার</span>

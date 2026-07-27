@@ -248,237 +248,239 @@ export default function CourseCommunityPage() {
 
       {message && <div className="p-4 bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400 rounded-xl font-bold">{message}</div>}
 
-      {/* 📢 Notice Board Section */}
-      <div className="bg-background p-4 sm:p-6 rounded-2xl border border-foreground/10 space-y-4 sm:space-y-6 shadow-sm">
-        <div className="flex flex-row items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
-              <Megaphone className="w-5 h-5 text-orange-500 shrink-0" />
-              <span>Course Notice Board (নোটিশ বোর্ড)</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-foreground/60 mt-0.5 hidden sm:block">
-              Publish announcements that appear on the student dashboard activity feed for enrolled students.
-            </p>
+      {/* Main Responsive Grid Container */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        {/* 📢 Notice Board Section (Left Column on Desktop) */}
+        <div className="lg:col-span-7 xl:col-span-8 bg-background p-4 sm:p-6 rounded-2xl border border-foreground/10 space-y-4 sm:space-y-6 shadow-sm">
+          <div className="flex flex-row items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
+                <Megaphone className="w-5 h-5 text-orange-500 shrink-0" />
+                <span>Course Notice Board (নোটিশ বোর্ড)</span>
+              </h2>
+              <p className="text-xs sm:text-sm text-foreground/60 mt-0.5 hidden sm:block">
+                Publish announcements that appear on the student dashboard activity feed for enrolled students.
+              </p>
+            </div>
+            {!isAddingNotice && (
+              <button 
+                type="button" 
+                onClick={() => setIsAddingNotice(true)}
+                className="px-3 sm:px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm text-sm shrink-0 z-10"
+                title="Post New Notice"
+              >
+                <Plus className="w-5 h-5" /> 
+                <span className="hidden sm:inline">Post New Notice</span>
+              </button>
+            )}
           </div>
-          {!isAddingNotice && (
-            <button 
-              type="button" 
-              onClick={() => setIsAddingNotice(true)}
-              className="px-3 sm:px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm text-sm shrink-0 z-10"
-              title="Post New Notice"
-            >
-              <Plus className="w-5 h-5" /> 
-              <span className="hidden sm:inline">Post New Notice</span>
-            </button>
+
+          {isAddingNotice && (
+            <form onSubmit={handleAddNotice} className="p-4 sm:p-5 bg-foreground/5 rounded-2xl border border-orange-500/30 space-y-4">
+              <h3 className="font-bold text-sm sm:text-base flex items-center gap-2">
+                <Bell className="w-4 h-4 text-orange-500" /> Write Announcement / Notice
+              </h3>
+              
+              {noticeError && <div className="p-3 bg-red-500/10 text-red-500 text-sm font-medium rounded-lg">{noticeError}</div>}
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-foreground/60 mb-1 ml-1">Notice Title</label>
+                <input 
+                  type="text"
+                  value={noticeTitle}
+                  onChange={e => setNoticeTitle(e.target.value)}
+                  placeholder="e.g. Next Class Postponed / Assignment Deadline Extended"
+                  className="w-full px-4 py-2.5 bg-background border border-foreground/10 rounded-xl text-sm focus:border-orange-500 focus:outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-foreground/60 mb-1 ml-1">Notice Details</label>
+                <textarea 
+                  value={noticeContent}
+                  onChange={e => setNoticeContent(e.target.value)}
+                  onPaste={handleNoticePaste}
+                  placeholder="Write full notice details for your students... (বা স্ক্রিনশট নিয়া সরাসরি Ctrl+V পেস্ট করুন)"
+                  className="w-full px-4 py-2.5 bg-background border border-foreground/10 rounded-xl text-sm focus:border-orange-500 focus:outline-none min-h-[100px]"
+                  required
+                />
+              </div>
+
+              {/* Notice Image Upload */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-foreground/60 mb-1 ml-1">Notice Image (Optional)</label>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <label className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-bold rounded-xl border border-orange-500/20 transition-colors">
+                    <ImageIcon className="w-4 h-4 text-orange-500" />
+                    <span>{noticeImagePreview ? 'ছবি পরিবর্তন করুন (Ctrl+V)' : '📷 নোটিশের ছবি আপলোড / Ctrl+V পেস্ট'}</span>
+                    <input type="file" accept="image/*" onChange={handleNoticeImageChange} className="hidden" />
+                  </label>
+                  {noticeImagePreview && (
+                    <button 
+                      type="button" 
+                      onClick={() => { setNoticeImage(null); setNoticeImagePreview(''); }}
+                      className="text-xs text-red-500 hover:underline font-bold"
+                    >
+                      ছবি রিমুভ করুন
+                    </button>
+                  )}
+                </div>
+                {noticeImagePreview && (
+                  <div className="mt-3 relative w-fit">
+                    <img src={noticeImagePreview} alt="Notice Preview" className="max-h-48 rounded-xl border border-foreground/10 object-contain bg-background shadow-sm" />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button 
+                  type="button" 
+                  onClick={() => { setIsAddingNotice(false); setNoticeError(''); setNoticeImage(null); setNoticeImagePreview(''); }}
+                  className="px-4 py-2 text-sm font-bold text-foreground/60 hover:text-foreground"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isSaving || isUploadingImage}
+                  className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm rounded-xl transition-all shadow-md flex items-center gap-2"
+                >
+                  {isUploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  <span>{isSaving ? 'Publishing...' : 'Publish Notice'}</span>
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* Notices List */}
+          {notices.length === 0 ? (
+            <div className="p-8 text-center border-2 border-dashed border-foreground/10 rounded-xl">
+              <Megaphone className="w-10 h-10 mx-auto text-foreground/20 mb-3" />
+              <p className="text-foreground/60 font-medium">No notices published yet.</p>
+              <p className="text-sm text-foreground/40 mt-1">Post a notice so students can see important announcements in their dashboard.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {notices.map((notice) => (
+                <div key={notice.id} className="p-4 bg-background rounded-xl border border-foreground/10 flex items-start justify-between gap-4 hover:border-orange-500/30 transition-all shadow-sm">
+                  <div className="flex-1 space-y-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 bg-orange-500/10 text-orange-500 text-xs font-bold rounded-full uppercase tracking-wider">Notice</span>
+                      <span className="text-xs text-foreground/40">{new Date(notice.createdAt).toLocaleString()}</span>
+                    </div>
+                    <h4 className="font-bold text-base text-foreground truncate">{notice.title}</h4>
+                    <p className="text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">{notice.content}</p>
+                    {notice.imageUrl && (
+                      <div 
+                        className="mt-3 relative group inline-block max-w-xs sm:max-w-sm rounded-xl overflow-hidden border border-foreground/15 bg-black/5 cursor-pointer shadow-sm"
+                        onClick={() => setActiveLightboxImage(notice.imageUrl!)}
+                      >
+                        <img 
+                          src={notice.imageUrl} 
+                          alt={notice.title} 
+                          className="max-h-48 w-auto object-cover rounded-xl transition-all duration-300 group-hover:scale-105 group-hover:brightness-90" 
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white font-bold text-xs">
+                          <ZoomIn className="w-4 h-4 text-orange-400" />
+                          <span>Click to Zoom</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <button 
+                    onClick={() => handleDeleteNotice(notice.id)}
+                    className="p-2 text-foreground/40 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors shrink-0"
+                    title="Delete Notice"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
           )}
         </div>
 
-        {isAddingNotice && (
-          <form onSubmit={handleAddNotice} className="p-4 sm:p-5 bg-foreground/5 rounded-2xl border border-orange-500/30 space-y-4">
-            <h3 className="font-bold text-sm sm:text-base flex items-center gap-2">
-              <Bell className="w-4 h-4 text-orange-500" /> Write Announcement / Notice
-            </h3>
-            
-            {noticeError && <div className="p-3 bg-red-500/10 text-red-500 text-sm font-medium rounded-lg">{noticeError}</div>}
-
+        {/* 🔗 Community Links Section (Right Column on Desktop) */}
+        <div className="lg:col-span-5 xl:col-span-4 bg-background p-4 sm:p-6 rounded-2xl border border-foreground/10 space-y-4 sm:space-y-6 shadow-sm">
+          <div className="flex flex-row items-center justify-between gap-3 mb-2">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-foreground/60 mb-1 ml-1">Notice Title</label>
-              <input 
-                type="text"
-                value={noticeTitle}
-                onChange={e => setNoticeTitle(e.target.value)}
-                placeholder="e.g. Next Class Postponed / Assignment Deadline Extended"
-                className="w-full px-4 py-2.5 bg-background border border-foreground/10 rounded-xl text-sm focus:border-orange-500 focus:outline-none"
-                required
-              />
+              <h2 className="text-lg sm:text-xl font-bold mb-0.5 flex items-center gap-2">
+                <LinkIcon className="w-5 h-5 text-orange-500 shrink-0" />
+                <span>Community Links (কমিউনিটি লিঙ্কসমূহ)</span>
+              </h2>
+              <p className="text-xs sm:text-sm text-foreground/60 hidden sm:block">
+                Add links to your community groups (Facebook, WhatsApp, Telegram, etc.).
+              </p>
             </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-foreground/60 mb-1 ml-1">Notice Details</label>
-              <textarea 
-                value={noticeContent}
-                onChange={e => setNoticeContent(e.target.value)}
-                onPaste={handleNoticePaste}
-                placeholder="Write full notice details for your students... (বা স্ক্রিনশট নিয়া সরাসরি Ctrl+V পেস্ট করুন)"
-                className="w-full px-4 py-2.5 bg-background border border-foreground/10 rounded-xl text-sm focus:border-orange-500 focus:outline-none min-h-[100px]"
-                required
-              />
-            </div>
-
-            {/* Notice Image Upload */}
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-foreground/60 mb-1 ml-1">Notice Image (Optional)</label>
-              <div className="flex items-center gap-3 flex-wrap">
-                <label className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-bold rounded-xl border border-orange-500/20 transition-colors">
-                  <ImageIcon className="w-4 h-4 text-orange-500" />
-                  <span>{noticeImagePreview ? 'ছবি পরিবর্তন করুন (Ctrl+V)' : '📷 নোটিশের ছবি আপলোড / Ctrl+V পেস্ট'}</span>
-                  <input type="file" accept="image/*" onChange={handleNoticeImageChange} className="hidden" />
-                </label>
-                {noticeImagePreview && (
-                  <button 
-                    type="button" 
-                    onClick={() => { setNoticeImage(null); setNoticeImagePreview(''); }}
-                    className="text-xs text-red-500 hover:underline font-bold"
-                  >
-                    ছবি রিমুভ করুন
-                  </button>
-                )}
-              </div>
-              {noticeImagePreview && (
-                <div className="mt-3 relative w-fit">
-                  <img src={noticeImagePreview} alt="Notice Preview" className="max-h-48 rounded-xl border border-foreground/10 object-contain bg-background shadow-sm" />
-                </div>
-              )}
-            </div>
-
-            <div className="flex justify-end gap-3 pt-2">
-              <button 
-                type="button" 
-                onClick={() => { setIsAddingNotice(false); setNoticeError(''); setNoticeImage(null); setNoticeImagePreview(''); }}
-                className="px-4 py-2 text-sm font-bold text-foreground/60 hover:text-foreground"
-              >
-                Cancel
-              </button>
-              <button 
-                type="submit" 
-                disabled={isSaving || isUploadingImage}
-                className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm rounded-xl transition-all shadow-md flex items-center gap-2"
-              >
-                {isUploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                <span>{isSaving ? 'Publishing...' : 'Publish Notice'}</span>
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* Notices List */}
-        {notices.length === 0 ? (
-          <div className="p-8 text-center border-2 border-dashed border-foreground/10 rounded-xl">
-            <Megaphone className="w-10 h-10 mx-auto text-foreground/20 mb-3" />
-            <p className="text-foreground/60 font-medium">No notices published yet.</p>
-            <p className="text-sm text-foreground/40 mt-1">Post a notice so students can see important announcements in their dashboard.</p>
+            <button 
+              type="button" 
+              onClick={addLink}
+              className="px-3 py-1.5 bg-primary/10 text-primary font-bold rounded-xl hover:bg-primary/20 transition-colors flex items-center justify-center gap-1 text-xs sm:text-sm whitespace-nowrap shrink-0 z-10"
+              title="Add Link"
+            >
+              <Plus className="w-4 h-4" /> 
+              <span>Add Link</span>
+            </button>
           </div>
-        ) : (
-          <div className="space-y-3">
-            {notices.map((notice) => (
-              <div key={notice.id} className="p-4 bg-background rounded-xl border border-foreground/10 flex items-start justify-between gap-4 hover:border-orange-500/30 transition-all shadow-sm">
-                <div className="flex-1 space-y-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 bg-orange-500/10 text-orange-500 text-xs font-bold rounded-full uppercase tracking-wider">Notice</span>
-                    <span className="text-xs text-foreground/40">{new Date(notice.createdAt).toLocaleString()}</span>
-                  </div>
-                  <h4 className="font-bold text-base text-foreground truncate">{notice.title}</h4>
-                  <p className="text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">{notice.content}</p>
-                  {notice.imageUrl && (
-                    <div 
-                      className="mt-3 relative group inline-block max-w-xs sm:max-w-sm rounded-xl overflow-hidden border border-foreground/15 bg-black/5 cursor-pointer shadow-sm"
-                      onClick={() => setActiveLightboxImage(notice.imageUrl!)}
-                    >
-                      <img 
-                        src={notice.imageUrl} 
-                        alt={notice.title} 
-                        className="max-h-48 w-auto object-cover rounded-xl transition-all duration-300 group-hover:scale-105 group-hover:brightness-90" 
-                      />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white font-bold text-xs">
-                        <ZoomIn className="w-4 h-4 text-orange-400" />
-                        <span>Click to Zoom</span>
-                      </div>
+
+          <form onSubmit={handleSaveLinks} className="space-y-4">
+            {communityLinks.length === 0 ? (
+              <div className="p-8 text-center border-2 border-dashed border-foreground/10 rounded-xl">
+                <LinkIcon className="w-10 h-10 mx-auto text-foreground/20 mb-3" />
+                <p className="text-foreground/60 font-medium">No community links added yet.</p>
+                <p className="text-sm text-foreground/40 mt-1">Click "Add Link" to create one.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {communityLinks.map((link) => (
+                  <div key={link.id} className="p-3.5 bg-foreground/5 rounded-xl border border-foreground/10 space-y-2.5 relative group">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-[11px] font-bold text-foreground/60 uppercase tracking-wider">Platform</label>
+                      <button 
+                        type="button" 
+                        onClick={() => removeLink(link.id)}
+                        className="p-1 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                        title="Remove Link"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                  )}
-                </div>
-                <button 
-                  onClick={() => handleDeleteNotice(notice.id)}
-                  className="p-2 text-foreground/40 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors shrink-0"
-                  title="Delete Notice"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* 🔗 Community Links Section */}
-      <div className="bg-background p-4 sm:p-6 rounded-2xl border border-foreground/10 space-y-4 sm:space-y-6 shadow-sm">
-        <div className="flex flex-row items-center justify-between gap-3 mb-2">
-          <div>
-            <h2 className="text-lg sm:text-xl font-bold mb-0.5 flex items-center gap-2">
-              <LinkIcon className="w-5 h-5 text-orange-500 shrink-0" />
-              <span>Community Links (কমিউনিটি লিঙ্কসমূহ)</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-foreground/60 hidden sm:block">
-              Add links to your community groups (Facebook, WhatsApp, Telegram, etc.) where students can discuss topics.
-            </p>
-          </div>
-          <button 
-            type="button" 
-            onClick={addLink}
-            className="px-3 sm:px-4 py-2 bg-primary/10 text-primary font-bold rounded-xl hover:bg-primary/20 transition-colors flex items-center justify-center gap-1.5 text-sm whitespace-nowrap shrink-0 z-10"
-            title="Add Link"
-          >
-            <Plus className="w-5 h-5" /> 
-            <span className="hidden sm:inline">Add Link</span>
-          </button>
-        </div>
-
-        <form onSubmit={handleSaveLinks} className="space-y-4">
-          {communityLinks.length === 0 ? (
-            <div className="p-8 text-center border-2 border-dashed border-foreground/10 rounded-xl">
-              <LinkIcon className="w-10 h-10 mx-auto text-foreground/20 mb-3" />
-              <p className="text-foreground/60 font-medium">No community links added yet.</p>
-              <p className="text-sm text-foreground/40 mt-1">Click "Add Link" to create one.</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {communityLinks.map((link) => (
-                <div key={link.id} className="flex flex-col sm:flex-row gap-3 p-4 bg-foreground/5 rounded-xl border border-foreground/10 relative group">
-                  <div className="w-full sm:w-1/3">
-                    <label className="block text-xs font-medium text-foreground/60 mb-1 ml-1 uppercase tracking-wider">Platform</label>
                     <select 
                       value={link.platform}
                       onChange={(e) => updateLink(link.id, 'platform', e.target.value)}
-                      className="w-full px-4 py-2.5 bg-background border border-foreground/10 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary transition-colors appearance-none text-sm font-medium"
+                      className="w-full px-3 py-2 bg-background border border-foreground/10 rounded-xl focus:border-primary transition-colors text-xs font-medium"
                     >
                       {PLATFORMS.map(p => (
                         <option key={p.id} value={p.id}>{p.label}</option>
                       ))}
                     </select>
-                  </div>
-                  <div className="w-full sm:w-2/3 flex gap-2">
-                    <div className="flex-grow">
-                      <label className="block text-xs font-medium text-foreground/60 mb-1 ml-1 uppercase tracking-wider">URL</label>
+
+                    <div>
+                      <label className="block text-[11px] font-bold text-foreground/60 mb-1 uppercase tracking-wider">URL</label>
                       <input 
                         type="url" 
                         value={link.url} 
                         onChange={e => updateLink(link.id, 'url', e.target.value)}
                         placeholder="https://..."
-                        className="w-full px-4 py-2.5 bg-background border border-foreground/10 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-sm"
+                        className="w-full px-3 py-2 bg-background border border-foreground/10 rounded-xl focus:border-primary transition-colors text-xs"
                         required
                       />
                     </div>
-                    <div className="flex items-end pb-1">
-                      <button 
-                        type="button" 
-                        onClick={() => removeLink(link.id)}
-                        className="p-2.5 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                        title="Remove Link"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+            
+            <div className="flex justify-end pt-4 border-t border-foreground/10">
+              <button type="submit" disabled={isSaving} className="px-5 py-2.5 font-bold rounded-xl flex items-center gap-2 text-white transition-all shadow-md hover:shadow-lg hover:opacity-90 disabled:opacity-60 text-xs sm:text-sm" style={{background: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)'}}>
+                <Save className="w-4 h-4" /> {isSaving ? 'Saving...' : 'Save Links'}
+              </button>
             </div>
-          )}
-          
-          <div className="flex justify-end pt-6 border-t border-foreground/10">
-            <button type="submit" disabled={isSaving} className="px-6 py-2.5 font-bold rounded-xl flex items-center gap-2 text-white transition-all shadow-md hover:shadow-lg hover:opacity-90 disabled:opacity-60 text-sm" style={{background: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)'}}>
-              <Save className="w-4 h-4" /> {isSaving ? 'Saving...' : 'Save Links'}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
+
       </div>
 
       {/* Lightbox Modal */}

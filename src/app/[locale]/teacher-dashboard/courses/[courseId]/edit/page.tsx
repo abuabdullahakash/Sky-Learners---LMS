@@ -10,6 +10,7 @@ import { uploadImageToImgBB } from '@/lib/imgbb';
 import { ImagePlus, Loader2, ArrowLeft, Sparkles, BookOpen, Trash2 } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
+import toast from 'react-hot-toast';
 
 export default function EditCoursePage() {
   const router = useRouter();
@@ -181,8 +182,8 @@ export default function EditCoursePage() {
 
       await updateDoc(doc(db, 'courses', courseId), courseData);
       
-      // 3. Redirect back to dashboard listing
-      router.push('/teacher-dashboard/courses');
+      toast.success('Course updated successfully!');
+      setIsLoading(false);
       
     } catch (err: any) {
       console.error('Error updating course:', err);

@@ -119,9 +119,9 @@ export default function StickyPricingCard({ course }: { course: any }) {
 
         <button 
           onClick={() => router.push(`/courses/${course.id}/checkout`)}
-          className="w-full py-4 bg-primary text-primary-foreground text-xl font-bold rounded-lg hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-primary/20 relative z-10"
+          className="relative overflow-hidden w-full py-4 bg-primary text-primary-foreground text-xl font-bold rounded-lg shadow-lg shadow-primary/20 z-10 transition-all duration-300 before:absolute before:inset-0 before:-translate-x-full hover:before:translate-x-0 before:transition-transform before:duration-500 before:bg-white/20 cursor-pointer"
         >
-          {t('pricingCard.enrollBtn')}
+          <span className="relative z-10">{t('pricingCard.enrollBtn')}</span>
         </button>
         
         <p className="text-center text-xs font-semibold text-foreground/40 mt-4">
@@ -133,9 +133,9 @@ export default function StickyPricingCard({ course }: { course: any }) {
       {course.contactNumber && (
         <div className="bg-background border border-foreground/10 rounded-3xl p-6 shadow-sm text-center">
           <h2 className="text-xl font-bold mb-4">{t('pricingCard.moreQuestions')}</h2>
-          <a href={`tel:${course.contactNumber}`} className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400 font-bold rounded-2xl hover:bg-green-100 dark:hover:bg-green-500/20 transition-colors border border-green-200 dark:border-green-500/20">
-            <PhoneCall className="w-5 h-5" />
-            {t('pricingCard.callUs')} {course.contactNumber}
+          <a href={`tel:${course.contactNumber}`} className="relative overflow-hidden inline-flex items-center justify-center gap-2 w-full py-3 px-4 bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400 font-bold rounded-2xl border border-green-200 dark:border-green-500/20 transition-all duration-300 before:absolute before:inset-0 before:-translate-x-full hover:before:translate-x-0 before:transition-transform before:duration-500 before:bg-green-500/20">
+            <PhoneCall className="w-5 h-5 relative z-10" />
+            <span className="relative z-10">{t('pricingCard.callUs')} {course.contactNumber}</span>
           </a>
         </div>
       )}

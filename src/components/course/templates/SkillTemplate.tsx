@@ -84,8 +84,8 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
           
           {/* Top Header Row with Go Back & Category Badge side by side */}
           <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-6 flex-wrap">
-            <Link href="/courses" className={`inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold px-3.5 py-1.5 rounded-full border backdrop-blur-md transition-colors ${hasCover ? 'bg-white/10 text-white/90 border-white/20 hover:bg-white/20' : 'bg-foreground/5 text-foreground/80 border-foreground/10'}`}>
-              <ArrowLeft className="w-3.5 h-3.5" /> {t('goBack')}
+            <Link href="/courses" className={`relative overflow-hidden inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold px-3.5 py-1.5 rounded-full border backdrop-blur-md transition-all ${hasCover ? 'bg-white/10 text-white/90 border-white/20' : 'bg-foreground/5 text-foreground/80 border-foreground/10'} before:absolute before:inset-0 before:-translate-x-full hover:before:translate-x-0 before:transition-transform before:duration-500 ${hasCover ? 'before:bg-white/20' : 'before:bg-foreground/10'}`}>
+              <ArrowLeft className="w-3.5 h-3.5 relative z-10" /> <span className="relative z-10">{t('goBack')}</span>
             </Link>
             
             <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wide border ${hasCover ? 'bg-white/10 border-white/20 text-white backdrop-blur-md' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'}`}>
@@ -117,19 +117,19 @@ export default function SkillTemplate({ course, currentSlide, setCurrentSlide }:
             {/* Action Buttons: View Profile & Video Trailer */}
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 mt-4 sm:mt-8">
               {course.teacherId && (
-                <Link href={`/teachers/${course.teacherId}`} target="_blank" className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 shadow-md hover:shadow-lg group border backdrop-blur-md ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20 hover:border-white/40' : 'bg-primary/5 hover:bg-primary/10 text-primary border-primary/20 hover:border-primary/40'}`}>
-                  <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:scale-110 transition-transform" />
-                  <span>{t('viewProfile')}</span>
+                <Link href={`/teachers/${course.teacherId}`} target="_blank" className={`relative overflow-hidden inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 shadow-md group border backdrop-blur-md ${hasCover ? 'bg-white/10 text-white border-white/20' : 'bg-primary/5 text-primary border-primary/20'} before:absolute before:inset-0 before:-translate-x-full hover:before:translate-x-0 before:transition-transform before:duration-500 ${hasCover ? 'before:bg-white/25' : 'before:bg-primary/15'}`}>
+                  <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 relative z-10" />
+                  <span className="relative z-10">{t('viewProfile')}</span>
                 </Link>
               )}
 
               {course.introVideoUrl && (
                 <button 
                   onClick={() => setIsVideoModalOpen(true)}
-                  className={`inline-flex lg:hidden items-center gap-1.5 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold border backdrop-blur-md transition-all cursor-pointer shadow-md active:scale-95 ${hasCover ? 'bg-white/10 hover:bg-white/25 text-white border-white/20' : 'bg-foreground/5 hover:bg-foreground/10 text-foreground border-foreground/10'}`}
+                  className={`relative overflow-hidden inline-flex lg:hidden items-center gap-1.5 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold border backdrop-blur-md transition-all cursor-pointer shadow-md ${hasCover ? 'bg-white/10 text-white border-white/20' : 'bg-foreground/5 text-foreground border-foreground/10'} before:absolute before:inset-0 before:-translate-x-full hover:before:translate-x-0 before:transition-transform before:duration-500 ${hasCover ? 'before:bg-white/25' : 'before:bg-foreground/10'}`}
                 >
-                  <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span>ভিডিও ট্রেইলার</span>
+                  <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 relative z-10" />
+                  <span className="relative z-10">ভিডিও ট্রেইলার</span>
                 </button>
               )}
             </div>

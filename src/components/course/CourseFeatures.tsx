@@ -73,8 +73,8 @@ export default function CourseFeatures({ course }: { course: any }) {
 
   return (
     <section className="animate-in slide-in-from-bottom-4 duration-700 mt-8 mb-12">
-      <h2 className="text-3xl font-bold mb-6">কোর্সে যা যা থাকছে</h2>
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      <h2 className="text-xl sm:text-3xl font-bold mb-4 sm:mb-6">কোর্সে যা যা থাকছে</h2>
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {features.map((feature, i) => {
           const colors = [
             'bg-blue-50/50 hover:bg-blue-100/50 dark:bg-blue-900/10 dark:hover:bg-blue-900/20 border-blue-200/50 dark:border-blue-800/30 text-blue-700 dark:text-blue-400',
@@ -94,18 +94,18 @@ export default function CourseFeatures({ course }: { course: any }) {
           const shapeColorClass = shapeColors[i % shapeColors.length];
 
           return (
-            <div key={i} className={`border rounded-xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col items-center text-center group cursor-default relative overflow-hidden ${colorClass}`}>
+            <div key={i} className={`border rounded-xl p-3.5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col items-center text-center group cursor-default relative overflow-hidden ${colorClass}`}>
               {/* Animated Background Shape */}
               <div 
                 ref={el => { shapesRef.current[i] = el; }}
                 className={`absolute -right-6 -bottom-6 w-32 h-32 rounded-full opacity-30 dark:opacity-20 ${shapeColorClass} pointer-events-none`}
               />
               
-              <div className="p-4 bg-white/60 dark:bg-black/20 rounded-lg mb-4 group-hover:scale-110 transition-transform duration-300 shadow-sm relative z-10">
+              <div className="p-2.5 sm:p-4 bg-white/60 dark:bg-black/20 rounded-xl mb-2.5 sm:mb-4 group-hover:scale-110 transition-transform duration-300 shadow-sm relative z-10">
                 {feature.icon}
               </div>
-              <h3 className="font-bold text-lg mb-1 text-foreground">{feature.title}</h3>
-              <p className="text-sm opacity-80">{feature.description}</p>
+              <h3 className="font-bold text-xs sm:text-lg mb-1 text-foreground">{feature.title}</h3>
+              <p className="text-[11px] sm:text-sm opacity-80">{feature.description}</p>
             </div>
           );
         })}

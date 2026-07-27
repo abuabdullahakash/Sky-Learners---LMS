@@ -58,7 +58,7 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
   return (
     <div className="min-h-screen bg-background text-foreground pb-20 animate-in fade-in duration-500">
       {/* Playful Hero Section for School Level */}
-      <div className={`min-h-[60vh] lg:min-h-[75vh] pt-20 pb-16 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-gradient-to-br from-blue-500/20 via-purple-500/10 to-pink-500/20'}`}>
+      <div className={`min-h-[420px] sm:min-h-[550px] lg:min-h-[75vh] pt-16 sm:pt-20 pb-10 sm:pb-16 flex items-center relative overflow-hidden ${hasCover ? '' : 'bg-gradient-to-br from-blue-500/20 via-purple-500/10 to-pink-500/20'}`}>
         
         {/* Background Layer */}
         {hasSlider ? (
@@ -82,21 +82,19 @@ export default function SchoolTemplate({ course, currentSlide, setCurrentSlide }
           </div>
         ) : null}
 
-
-
-        <div className={`w-full max-w-[1280px] px-[15px] md:px-[20px] lg:px-[30px] mx-auto relative z-20 h-full flex flex-col justify-center ${textColor}`}>
-          <Link href="/courses" className={`inline-flex items-center gap-2 font-semibold mb-8 transition-colors ${hasCover ? 'text-white/70 hover:text-white' : 'text-foreground/60 hover:text-foreground'}`}>
+        <div className={`w-full max-w-[1280px] px-[15px] md:px-[20px] lg:px-[30px] mx-auto relative z-20 h-full flex flex-col justify-center py-6 sm:py-12 ${textColor}`}>
+          <Link href="/courses" className={`inline-flex items-center gap-2 text-xs sm:text-sm font-semibold mb-4 sm:mb-8 transition-colors ${hasCover ? 'text-white/70 hover:text-white' : 'text-foreground/60 hover:text-foreground'}`}>
             <ArrowLeft className="w-4 h-4" /> {t('goBack')}
           </Link>
           
           <div className="max-w-3xl">
-            <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold mb-6 uppercase tracking-wide ${hasCover ? 'bg-white/20 text-white backdrop-blur-md' : 'bg-primary text-white shadow-lg shadow-primary/30'}`}>
+            <div className={`inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold mb-3 sm:mb-6 uppercase tracking-wide ${hasCover ? 'bg-white/20 text-white backdrop-blur-md' : 'bg-primary text-white shadow-lg shadow-primary/30'}`}>
               {t(`category.${course.category}`) || course.category}
             </div>
-            <h1 className="text-4xl lg:text-6xl font-extrabold mb-6 leading-tight drop-shadow-sm">
+            <h1 className="text-2xl sm:text-4xl lg:text-6xl font-extrabold mb-3 sm:mb-6 leading-tight drop-shadow-sm">
               {course.title}
             </h1>
-            <p className={`text-xl mb-10 leading-relaxed ${hasCover ? 'text-white/80' : 'text-foreground/80'}`}>
+            <p className={`text-xs sm:text-base md:text-xl mb-6 sm:mb-10 leading-relaxed line-clamp-3 sm:line-clamp-none ${hasCover ? 'text-white/80' : 'text-foreground/80'}`}>
               {course.subtitle || t('descriptionFallbackPrimary')}
             </p>
             

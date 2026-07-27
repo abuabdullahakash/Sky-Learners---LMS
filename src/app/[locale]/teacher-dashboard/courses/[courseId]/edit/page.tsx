@@ -108,13 +108,22 @@ export default function EditCoursePage() {
           setContactNumber(data.contactNumber || '');
           
           let parsedSubjects: any[] = [];
-          if (data.specificSubjects && Array.isArray(data.specificSubjects)) {
+          if (data.specificSubjects && Array.isArray(data.specificSubjects) && data.specificSubjects.length > 0) {
             parsedSubjects = data.specificSubjects.map((sub: any) => {
               if (typeof sub === 'string') {
                 return { name: sub, instructor: '', liveClasses: '', videoLessons: '', exams: '' };
               }
               return sub;
             });
+          } else if (data.totalLiveClasses || data.totalVideoLessons || data.totalExams) {
+            // Auto-recover subject row from existing course total stats in Firestore
+            parsedSubjects = [{
+              name: data.title || 'Course Breakdown',
+              instructor: '',
+              liveClasses: data.totalLiveClasses ? String(data.totalLiveClasses) : '',
+              videoLessons: data.totalVideoLessons ? String(data.totalVideoLessons) : '',
+              exams: data.totalExams ? String(data.totalExams) : ''
+            }];
           }
           setSpecificSubjects(parsedSubjects);
         }

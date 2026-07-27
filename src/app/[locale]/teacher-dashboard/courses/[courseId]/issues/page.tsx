@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { CheckCircle, Clock, Search, ChevronDown, ChevronUp, Image as ImageIcon, Loader2, Send, MessageSquare, X, Upload, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CheckCircle, Clock, Search, ChevronDown, ChevronUp, Image as ImageIcon, Loader2, Send, MessageSquare, X, Upload, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadImageToImgBB } from '@/lib/imgbb';
 
@@ -30,6 +30,24 @@ export default function CourseIssuesPage() {
   
   // Full-screen image preview lightbox carousel
   const [lightboxState, setLightboxState] = useState<{ images: string[]; index: number } | null>(null);
+
+  const handleDownloadImage = async (url: string) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `sky-learners-image-${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+      toast.success('Image downloaded!');
+    } catch (err) {
+      window.open(url, '_blank');
+    }
+  };
 
   useEffect(() => {
     if (!lightboxState) return;
@@ -465,22 +483,38 @@ export default function CourseIssuesPage() {
           className="fixed inset-0 bg-black/95 backdrop-blur-md z-[200] flex items-center justify-center p-4 select-none animate-in fade-in duration-200"
           onClick={() => setLightboxState(null)}
         >
-          {/* Close Button */}
-          <button 
-            type="button"
-            onClick={() => setLightboxState(null)}
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 p-3 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-colors z-50 shadow-lg cursor-pointer"
-            title="Close (Esc)"
-          >
-            <X className="w-6 h-6" />
-          </button>
+          {/* Top Bar with Download, Counter, and Close */}
+          <div className="absolute top-4 left-4 right-4 sm:top-6 sm:right-6 sm:left-6 flex items-center justify-between z-50 pointer-events-none">
+            <div className="flex items-center gap-2 pointer-events-auto">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDownloadImage(lightboxState.images[lightboxState.index]);
+                }}
+                className="px-3 py-2 bg-white/15 hover:bg-white/25 active:scale-95 border border-white/20 text-white rounded-full text-xs font-bold transition-all flex items-center gap-1.5 shadow-lg cursor-pointer backdrop-blur-md"
+                title="Download Image"
+              >
+                <Download className="w-4 h-4 text-orange-400" />
+                <span className="hidden sm:inline">Download</span>
+              </button>
 
-          {/* Counter Badge */}
-          {lightboxState.images.length > 1 && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-bold rounded-full z-50 shadow-md">
-              {lightboxState.index + 1} / {lightboxState.images.length}
+              {lightboxState.images.length > 1 && (
+                <div className="px-3 py-2 bg-white/15 border border-white/20 text-white text-xs font-bold rounded-full shadow-lg backdrop-blur-md">
+                  {lightboxState.index + 1} / {lightboxState.images.length}
+                </div>
+              )}
             </div>
-          )}
+
+            <button 
+              type="button"
+              onClick={() => setLightboxState(null)}
+              className="p-2.5 sm:p-3 text-white/80 hover:text-white bg-white/15 hover:bg-white/25 border border-white/20 rounded-full transition-colors shadow-lg cursor-pointer pointer-events-auto backdrop-blur-md"
+              title="Close (Esc)"
+            >
+              <X className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+          </div>
 
           {/* Previous Arrow Button */}
           {lightboxState.images.length > 1 && (
@@ -493,10 +527,10 @@ export default function CourseIssuesPage() {
                   index: (prev.index - 1 + prev.images.length) % prev.images.length
                 } : null);
               }}
-              className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 p-3 sm:p-4 text-white bg-white/15 hover:bg-white/30 border border-white/20 rounded-full transition-all z-50 shadow-xl active:scale-95 cursor-pointer"
+              className="absolute left-1.5 sm:left-6 top-1/2 -translate-y-1/2 p-2 sm:p-4 text-white bg-white/20 hover:bg-white/35 border border-white/25 rounded-full transition-all z-50 shadow-xl active:scale-95 cursor-pointer backdrop-blur-md"
               title="Previous Image (←)"
             >
-              <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
+              <ChevronLeft className="w-4 h-4 sm:w-8 sm:h-8" />
             </button>
           )}
 
@@ -511,16 +545,16 @@ export default function CourseIssuesPage() {
                   index: (prev.index + 1) % prev.images.length
                 } : null);
               }}
-              className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 p-3 sm:p-4 text-white bg-white/15 hover:bg-white/30 border border-white/20 rounded-full transition-all z-50 shadow-xl active:scale-95 cursor-pointer"
+              className="absolute right-1.5 sm:right-6 top-1/2 -translate-y-1/2 p-2 sm:p-4 text-white bg-white/20 hover:bg-white/35 border border-white/25 rounded-full transition-all z-50 shadow-xl active:scale-95 cursor-pointer backdrop-blur-md"
               title="Next Image (→)"
             >
-              <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
+              <ChevronRight className="w-4 h-4 sm:w-8 sm:h-8" />
             </button>
           )}
 
           {/* Main Image View */}
           <div 
-            className="relative max-w-5xl w-full max-h-[90vh] flex items-center justify-center"
+            className="relative max-w-5xl w-full max-h-[90vh] flex items-center justify-center pt-8 sm:pt-0"
             onClick={(e) => e.stopPropagation()}
           >
             <img 

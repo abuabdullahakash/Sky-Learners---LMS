@@ -63,28 +63,28 @@ export default function RecommendedCourses() {
   }, [loading, courses]);
 
   return (
-    <div className="w-full space-y-8 animate-in fade-in duration-500">
+    <div className="w-full space-y-6 sm:space-y-8 animate-in fade-in duration-500">
       
       {/* Top Banner & Header */}
-      <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-r from-orange-500 via-rose-500 to-purple-600 p-8 sm:p-10 text-white shadow-2xl">
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-[2.5rem] bg-gradient-to-r from-orange-500 via-rose-500 to-purple-600 p-5 sm:p-10 text-white shadow-2xl">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.2),transparent_60%)] pointer-events-none"></div>
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-start gap-4">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
+          <div className="flex items-start gap-3 sm:gap-4">
             <Link 
-              href="/dashboard/settings" 
-              className="p-3 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-2xl transition-all hover:scale-105 shrink-0 border border-white/20 mt-1"
+              href="/dashboard" 
+              className="p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl transition-all hover:scale-105 shrink-0 border border-white/20 mt-1"
             >
-              <ArrowLeft className="w-6 h-6 text-white" />
+              <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </Link>
             <div>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-extrabold bg-white/20 backdrop-blur-md border border-white/30 mb-3 uppercase tracking-wider">
-                <Sparkles className="w-4 h-4 text-amber-300" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-xs font-extrabold bg-white/20 backdrop-blur-md border border-white/30 mb-2 sm:mb-3 uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                 {userData?.eduLevel ? `${userData.eduLevel} Academic Profile` : (isBn ? 'আপনার জন্য সাজানো' : 'Tailored For You')}
               </div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+              <h1 className="text-xl sm:text-4xl font-extrabold tracking-tight">
                 {isBn ? 'সুপারিশকৃত কোর্সসমূহ' : 'Recommended Courses'}
               </h1>
-              <p className="text-white/80 text-base sm:text-lg mt-1 font-medium max-w-xl">
+              <p className="text-white/80 text-xs sm:text-lg mt-1 font-medium max-w-xl leading-relaxed">
                 {isBn 
                   ? 'আপনার একাডেমিক লেভেল অনুযায়ী সেরা কোর্সগুলো নিচে সাজানো হয়েছে' 
                   : 'Hand-picked courses specially aligned with your learning profile.'}
@@ -93,11 +93,11 @@ export default function RecommendedCourses() {
           </div>
 
           {userData?.eduLevel && (
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-4 flex items-center gap-3 shrink-0 self-start md:self-auto">
-              <Tag className="w-6 h-6 text-amber-300" />
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-6 sm:py-4 flex items-center gap-3 shrink-0 self-start md:self-auto">
+              <Tag className="w-5 h-5 sm:w-6 sm:h-6 text-amber-300" />
               <div>
-                <div className="text-xs text-white/70 font-semibold uppercase">{isBn ? 'আপনার শ্রেণি / বিভাগ' : 'Academic Profile'}</div>
-                <div className="text-lg font-bold text-white capitalize">{userData.eduLevel}</div>
+                <div className="text-[10px] sm:text-xs text-white/70 font-semibold uppercase">{isBn ? 'আপনার শ্রেণি / বিভাগ' : 'Academic Profile'}</div>
+                <div className="text-sm sm:text-lg font-bold text-white capitalize">{userData.eduLevel}</div>
               </div>
             </div>
           )}
@@ -111,23 +111,23 @@ export default function RecommendedCourses() {
           <p className="text-foreground/60 text-sm font-medium">{isBn ? 'কোর্স লোড হচ্ছে...' : 'Loading recommended courses...'}</p>
         </div>
       ) : courses.length === 0 ? (
-        <div className="bg-foreground/5 rounded-[2.5rem] border border-foreground/10 p-8 sm:p-12 text-center flex flex-col items-center max-w-xl mx-auto">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-orange-500/10 text-orange-500 rounded-full flex items-center justify-center mb-5 border border-orange-500/20">
-            <Sparkles className="w-8 h-8 sm:w-10 sm:h-10" />
+        <div className="bg-foreground/5 rounded-2xl sm:rounded-[2.5rem] border border-foreground/10 p-5 sm:p-12 text-center flex flex-col items-center max-w-xl mx-auto shadow-sm">
+          <div className="w-14 h-14 sm:w-20 sm:h-20 bg-orange-500/10 text-orange-500 rounded-2xl sm:rounded-full flex items-center justify-center mb-4 border border-orange-500/20">
+            <Sparkles className="w-7 h-7 sm:w-10 sm:h-10" />
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold mb-2 text-foreground">
+          <h2 className="text-base sm:text-2xl font-bold mb-2 text-foreground px-2">
             {isBn 
               ? `আপনার একাডেমি লেভেল (${userData?.eduLevel || 'প্রোফাইল'}) অনুযায়ী কোর্স পাওয়া যায়নি` 
               : `No Courses available for your level (${userData?.eduLevel || 'Profile'}) yet`}
           </h2>
-          <p className="text-foreground/70 text-xs sm:text-sm max-w-md mb-8 leading-relaxed">
+          <p className="text-foreground/70 text-xs sm:text-sm max-w-md mb-6 leading-relaxed px-2">
             {isBn 
               ? 'আপনার শিক্ষাগত স্তরের জন্য নতুন কোর্স খুব শীঘ্রই যুক্ত করা হবে! আপনি চাইলে ওয়েবসাইট থেকে অন্যান্য সব বিষয়ভিত্তিক কোর্সসমূহ ব্রাউজ করে দেখতে পারেন।' 
               : 'New courses tailored specifically for your academic profile will be published soon! Feel free to explore all available courses on Sky Learners.'}
           </p>
           <Link 
             href="/courses" 
-            className="px-8 py-3.5 bg-primary text-white font-bold text-xs sm:text-sm rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/30"
+            className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-primary text-white font-bold text-xs sm:text-sm rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/30 text-center"
           >
             {isBn ? 'সব কোর্স দেখুন (Browse All)' : 'Browse All Courses'}
           </Link>

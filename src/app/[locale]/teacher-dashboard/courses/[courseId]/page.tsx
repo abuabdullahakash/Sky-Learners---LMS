@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Users, DollarSign, PlayCircle, BookOpen } from 'lucide-react';
+import { Users, DollarSign, PlayCircle, BookOpen, Loader2 } from 'lucide-react';
 
 export default function CourseOverviewPage() {
   const { user } = useAuth();
@@ -14,33 +14,74 @@ export default function CourseOverviewPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [course, setCourse] = useState<any>(null);
+  const [statsData, setStatsData] = useState({
+    approvedStudents: 0,
+    revenue: 0,
+  });
 
   useEffect(() => {
-    const fetchCourse = async () => {
-      if (!user) return;
+    const fetchCourseAndStats = async () => {
+      if (!user || !courseId) return;
       try {
         const docRef = doc(db, 'courses', courseId);
         const docSnap = await getDoc(docRef);
+        
         if (docSnap.exists() && docSnap.data().teacherId === user.uid) {
           setCourse(docSnap.data());
+
+          // Fetch enrollments for this course to calculate approved students & revenue
+          const enrollmentsQuery = query(
+            collection(db, 'enrollments'),
+            where('courseId', '==', courseId)
+          );
+          const enrollmentsSnap = await getDocs(enrollmentsQuery);
+
+          let approvedCount = 0;
+          let calculatedRevenue = 0;
+
+          enrollmentsSnap.forEach((docItem) => {
+            const data = docItem.data();
+            const status = data.status || 'pending';
+            if (status === 'approved' || status === 'completed') {
+              approvedCount += 1;
+              calculatedRevenue += Number(data.amount) || 0;
+            }
+          });
+
+          setStatsData({
+            approvedStudents: approvedCount,
+            revenue: calculatedRevenue,
+          });
         }
       } catch (error) {
-        console.error("Error fetching course", error);
+        console.error("Error fetching course overview stats:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchCourse();
+
+    fetchCourseAndStats();
   }, [user, courseId]);
 
-  if (isLoading) return <div className="flex justify-center items-center h-64">Loading...</div>;
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64 text-orange-500 font-bold gap-2">
+        <Loader2 className="w-6 h-6 animate-spin" />
+        Loading course stats...
+      </div>
+    );
+  }
+
   if (!course) return null;
 
+  const totalModules = course.modules?.length || 0;
+  const totalLessons = course.modules?.reduce((acc: number, m: any) => acc + (m.lessons?.length || 0), 0) || 0;
+
   const stats = [
-    { label: 'Total Students', value: '0', icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-    { label: 'Revenue', value: '৳0', icon: DollarSign, color: 'text-green-500', bg: 'bg-green-500/10' },
-    { label: 'Total Modules', value: course.modules?.length || 0, icon: BookOpen, color: 'text-orange-500', bg: 'bg-orange-500/10' },
-    { label: 'Total Lessons', value: course.modules?.reduce((acc: number, m: any) => acc + (m.lessons?.length || 0), 0) || 0, icon: PlayCircle, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+    { label: 'Total Students', value: statsData.approvedStudents.toString(), icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    { label: 'Revenue', value: `৳${statsData.revenue.toLocaleString()}`, icon: DollarSign, color: 'text-green-500', bg: 'bg-green-500/10' },
+    { label: 'Total Modules', value: totalModules.toString(), icon: BookOpen, color: 'text-orange-500', bg: 'bg-orange-500/10' },
+    { label: 'Total Lessons', value: totalLessons.toString(), icon: PlayCircle, color: 'text-purple-500', bg: 'bg-purple-500/10' },
   ];
 
   return (

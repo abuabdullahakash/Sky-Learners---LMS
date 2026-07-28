@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Plus, Trash2, Link as LinkIcon, Save, FileText, Info } from 'lucide-react';
+import { Plus, Trash2, Link as LinkIcon, Save, FileText, Info, ExternalLink, BookOpen, FileImage } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 
 type Resource = {
@@ -14,6 +14,15 @@ type Resource = {
   type: string;
   fileUrl: string;
 };
+
+const TYPE_INFO: Record<string, { icon: React.FC<any>; color: string; bg: string; badge: string }> = {
+  'PDF':        { icon: FileText,     color: 'text-red-500 dark:text-red-400',    bg: 'bg-red-50 dark:bg-red-500/15',     badge: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400' },
+  'Slide':      { icon: BookOpen,     color: 'text-blue-500 dark:text-blue-400',  bg: 'bg-blue-50 dark:bg-blue-500/15',   badge: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400' },
+  'Image':      { icon: FileImage,    color: 'text-green-500 dark:text-green-400',bg: 'bg-green-50 dark:bg-green-500/15', badge: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400' },
+  'Other Link': { icon: LinkIcon,     color: 'text-purple-500 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-500/15', badge: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400' },
+};
+
+const getTypeInfo = (type: string) => TYPE_INFO[type] || TYPE_INFO['Other Link'];
 
 export default function CourseResourcesPage() {
   const { user } = useAuth();
@@ -187,43 +196,63 @@ export default function CourseResourcesPage() {
         </form>
       )}
 
-      <div className="space-y-3 mt-6">
-        {resources.length === 0 && !isAdding ? (
-          <div className="text-center p-8 sm:p-12 border-2 border-dashed border-foreground/10 rounded-2xl sm:rounded-3xl bg-background/50">
-            <FileText className="w-12 h-12 mx-auto text-foreground/20 mb-4" />
-            <p className="text-foreground/50 font-medium text-base sm:text-lg">No resources added yet.</p>
-          </div>
-        ) : (
-          resources.map((res) => (
-            <div 
-              key={res.id} 
-              className="bg-background border border-foreground/10 p-3.5 sm:p-5 rounded-2xl flex items-center justify-between gap-3 hover:border-orange-500/30 transition-all shadow-sm w-full overflow-hidden"
-            >
-              <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0">
-                  <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-bold text-base sm:text-lg mb-1 truncate text-foreground">{res.title}</h3>
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-foreground/60 font-medium">
-                    <span className="bg-foreground/10 px-2 py-0.5 rounded-md text-[11px] sm:text-xs font-bold text-foreground shrink-0">{res.type}</span>
-                    <a href={res.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-orange-500 hover:underline truncate">
-                      <LinkIcon className="w-3.5 h-3.5 shrink-0" /> Open Link
-                    </a>
+      {resources.length === 0 && !isAdding ? (
+        <div className="text-center p-8 sm:p-12 border-2 border-dashed border-foreground/10 rounded-2xl sm:rounded-3xl bg-background/50 mt-6">
+          <FileText className="w-12 h-12 mx-auto text-foreground/20 mb-4" />
+          <p className="text-foreground/50 font-medium text-base sm:text-lg">No resources added yet.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
+          {resources.map((res) => {
+            const info = getTypeInfo(res.type);
+            const Icon = info.icon;
+            return (
+              <div 
+                key={res.id} 
+                className="group relative bg-background border border-foreground/10 p-4 sm:p-5 rounded-2xl flex flex-col justify-between hover:border-orange-500/40 hover:shadow-md transition-all duration-300 gap-3"
+              >
+                {/* Top Row: Icon, Badge, and Delete Button */}
+                <div className="flex items-start justify-between gap-2">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${info.bg}`}>
+                    <Icon className={`w-5 h-5 ${info.color}`} />
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-md ${info.badge}`}>
+                      {res.type}
+                    </span>
+                    <button 
+                      onClick={() => handleDelete(res.id)} 
+                      className="p-1.5 text-foreground/40 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors shrink-0"
+                      title="Delete Resource"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
+
+                {/* Title */}
+                <div className="flex-1 my-1">
+                  <h3 className="font-bold text-base text-foreground line-clamp-2 leading-snug group-hover:text-orange-500 transition-colors" title={res.title}>
+                    {res.title}
+                  </h3>
+                </div>
+
+                {/* Action Link */}
+                <div className="pt-2 border-t border-foreground/10">
+                  <a 
+                    href={res.fileUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-orange-500 hover:underline group-hover:translate-x-0.5 transition-transform"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" /> Open Link
+                  </a>
+                </div>
               </div>
-              <button 
-                onClick={() => handleDelete(res.id)} 
-                className="p-2 text-foreground/40 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-colors shrink-0"
-                title="Delete Resource"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
-            </div>
-          ))
-        )}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { Link, usePathname } from '@/i18n/routing';
 import { LayoutDashboard, BookOpen, Video, FileText, CheckSquare, MessageSquare, Settings, ArrowLeft, Users, ClipboardList, GraduationCap, AlertCircle } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 export default function CourseSidebar() {
@@ -14,6 +14,7 @@ export default function CourseSidebar() {
   const [courseTitle, setCourseTitle] = useState('Loading...');
   const [isPublished, setIsPublished] = useState(false);
   const [courseType, setCourseType] = useState('coaching');
+  const [openIssuesCount, setOpenIssuesCount] = useState<number>(0);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -31,6 +32,35 @@ export default function CourseSidebar() {
       }
     };
     if (courseId) fetchCourse();
+  }, [courseId]);
+
+  // Real-time listener for unresolved student issues count
+  useEffect(() => {
+    if (!courseId) return;
+
+    try {
+      const q = query(
+        collection(db, 'lesson_issues'),
+        where('courseId', '==', courseId)
+      );
+
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        let count = 0;
+        snapshot.docs.forEach((issueDoc) => {
+          const data = issueDoc.data();
+          if (data.status !== 'solved') {
+            count++;
+          }
+        });
+        setOpenIssuesCount(count);
+      }, (error) => {
+        console.error("Error listening to open issues count:", error);
+      });
+
+      return () => unsubscribe();
+    } catch (error) {
+      console.error("Error subscribing to lesson_issues:", error);
+    }
   }, [courseId]);
 
   const handleTogglePublish = async () => {
@@ -84,18 +114,35 @@ export default function CourseSidebar() {
             : pathname.startsWith(item.href);
             
           const Icon = item.icon;
+          const isIssuesItem = item.name === 'Student Issues';
+
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 font-medium text-sm ${
+              className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-300 font-medium text-sm group ${
                 isActive 
                   ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' 
                   : 'hover:bg-foreground/5 text-foreground/70 hover:text-foreground'
               }`}
             >
-              <Icon className="w-4 h-4" />
-              {item.name}
+              <div className="flex items-center gap-3 min-w-0">
+                <Icon className="w-4 h-4 shrink-0" />
+                <span className="truncate">{item.name}</span>
+              </div>
+
+              {isIssuesItem && openIssuesCount > 0 && (
+                <span 
+                  className={`shrink-0 ml-2 px-2 py-0.5 text-xs font-extrabold rounded-full transition-all duration-300 flex items-center justify-center min-w-[20px] h-5 ${
+                    isActive 
+                      ? 'bg-white text-orange-600 shadow-sm' 
+                      : 'bg-red-500 text-white shadow-md shadow-red-500/30 animate-pulse'
+                  }`}
+                  title={`${openIssuesCount} unhandled student ${openIssuesCount === 1 ? 'issue' : 'issues'}`}
+                >
+                  {openIssuesCount}
+                </span>
+              )}
             </Link>
           );
         })}

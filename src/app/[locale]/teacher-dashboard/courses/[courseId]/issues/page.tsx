@@ -19,7 +19,7 @@ export default function CourseIssuesPage() {
 
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState<'all' | 'open' | 'solved'>('all');
+  const [filter, setFilter] = useState<'open' | 'solved'>('open');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // Teacher Reply State
@@ -200,7 +200,7 @@ export default function CourseIssuesPage() {
   };
 
   const filteredIssues = issues.filter(issue => {
-    const matchesFilter = filter === 'all' || issue.status === filter;
+    const matchesFilter = filter === 'solved' ? issue.status === 'solved' : issue.status !== 'solved';
     const matchesSearch = 
       (issue.subjectTitle || issue.subject || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (issue.studentName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -243,7 +243,7 @@ export default function CourseIssuesPage() {
         </div>
 
         <div className="flex bg-foreground/5 p-1 rounded-xl w-full sm:w-auto border border-foreground/10">
-          {['all', 'open', 'solved'].map((f) => (
+          {['open', 'solved'].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f as any)}

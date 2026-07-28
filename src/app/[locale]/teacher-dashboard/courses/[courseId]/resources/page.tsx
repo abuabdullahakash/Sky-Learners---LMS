@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Plus, Trash2, Link as LinkIcon, Save, FileText, Info, ExternalLink, BookOpen, FileImage } from 'lucide-react';
+import { Plus, Trash2, Link as LinkIcon, Save, FileText, Info, ExternalLink, BookOpen, FileImage, ChevronDown } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 
 type Resource = {
@@ -176,12 +176,21 @@ export default function CourseResourcesPage() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Type</label>
-              <select value={newType} onChange={e => setNewType(e.target.value)} className="w-full px-4 py-2.5 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 appearance-none">
-                <option value="PDF">PDF Document</option>
-                <option value="Slide">Presentation / Slide</option>
-                <option value="Image">Image</option>
-                <option value="Other Link">Other Link</option>
-              </select>
+              <div className="relative">
+                <select 
+                  value={newType} 
+                  onChange={e => setNewType(e.target.value)} 
+                  className="w-full px-4 py-2.5 bg-background dark:bg-slate-900 text-foreground dark:text-white border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500 transition-colors appearance-none cursor-pointer pr-10 font-medium"
+                >
+                  <option value="PDF" className="bg-background text-foreground dark:bg-slate-900 dark:text-white font-medium py-1">PDF Document</option>
+                  <option value="Slide" className="bg-background text-foreground dark:bg-slate-900 dark:text-white font-medium py-1">Presentation / Slide</option>
+                  <option value="Image" className="bg-background text-foreground dark:bg-slate-900 dark:text-white font-medium py-1">Image</option>
+                  <option value="Other Link" className="bg-background text-foreground dark:bg-slate-900 dark:text-white font-medium py-1">Other Link</option>
+                </select>
+                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-foreground/50">
+                  <ChevronDown className="w-4 h-4" />
+                </div>
+              </div>
             </div>
             <div className="md:col-span-4">
               <label className="block text-sm font-medium mb-1">Google Drive Shareable Link <span className="text-red-500">*</span></label>

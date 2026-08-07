@@ -187,20 +187,13 @@ export default function Navbar() {
                   <div className="w-[120px] h-[40px] bg-foreground/10 animate-pulse rounded-full"></div>
                 ) : user ? (
                   <div className="flex items-center gap-4">
-                    {(userData?.onboardingComplete || Boolean(userData?.role)) ? (
-                      <Link href={userData?.role === 'teacher' ? '/teacher-dashboard' : '/dashboard'} className="flex items-center gap-2 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-full font-medium transition-colors border border-foreground/10">
-                        <UserIcon className="w-4 h-4" />
-                        My Profile
-                      </Link>
-                    ) : (
-                      <button 
-                        onClick={() => setIsRoleModalOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-full font-medium transition-colors border border-foreground/10 text-orange-500 hover:text-orange-600"
-                      >
-                        <UserIcon className="w-4 h-4" />
-                        My Account
-                      </button>
-                    )}
+                    <Link 
+                      href={userData?.role === 'teacher' ? '/teacher-dashboard' : '/dashboard'} 
+                      className="flex items-center gap-2 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-full font-medium transition-colors border border-foreground/10"
+                    >
+                      <UserIcon className="w-4 h-4" />
+                      My Account
+                    </Link>
                   </div>
                 ) : (
                   <Link href="/register" className="px-6 py-2 bg-primary text-primary-foreground font-bold rounded-full hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all">

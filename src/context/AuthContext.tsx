@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged, signOut, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
-import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, setDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
 export interface UserData {
@@ -37,19 +37,65 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const detectUserRoleAndRepair = async (uid: string, existingData?: UserData): Promise<UserData> => {
+    let role = existingData?.role;
+    let onboardingComplete = existingData?.onboardingComplete;
+
+    if (role) {
+      onboardingComplete = true;
+      const userRef = doc(db, "users", uid);
+      setDoc(userRef, { role, onboardingComplete: true }, { merge: true }).catch(console.error);
+      return { ...existingData, role, onboardingComplete: true };
+    }
+
+    try {
+      // Check if user is a teacher by querying courses collection
+      const coursesQuery = query(collection(db, 'courses'), where('teacherId', '==', uid), limit(1));
+      const coursesSnap = await getDocs(coursesQuery);
+      if (!coursesSnap.empty) {
+        role = 'teacher';
+        onboardingComplete = true;
+      } else {
+        // Check if user is a teacher in enrollments
+        const teacherEnrollQuery = query(collection(db, 'enrollments'), where('teacherId', '==', uid), limit(1));
+        const teacherEnrollSnap = await getDocs(teacherEnrollQuery);
+        if (!teacherEnrollSnap.empty) {
+          role = 'teacher';
+          onboardingComplete = true;
+        } else {
+          // Check if user is a student in enrollments
+          const studentEnrollQuery = query(collection(db, 'enrollments'), where('studentId', '==', uid), limit(1));
+          const studentEnrollSnap = await getDocs(studentEnrollQuery);
+          if (!studentEnrollSnap.empty) {
+            role = 'student';
+            onboardingComplete = true;
+          }
+        }
+      }
+
+      if (role) {
+        const userRef = doc(db, "users", uid);
+        setDoc(userRef, { role, onboardingComplete: true }, { merge: true }).catch(console.error);
+        return { ...existingData, role, onboardingComplete: true };
+      }
+    } catch (err) {
+      console.error("Error detecting user role from collections:", err);
+    }
+
+    return { ...existingData };
+  };
+
   const fetchUserData = async (uid: string) => {
     try {
       const userRef = doc(db, "users", uid);
       const userDoc = await getDoc(userRef);
       if (userDoc.exists()) {
-        const data = userDoc.data() as UserData;
-        if (data.role && !data.onboardingComplete) {
-          data.onboardingComplete = true;
-          setDoc(userRef, { onboardingComplete: true }, { merge: true }).catch(console.error);
-        }
-        setUserData(data);
+        const rawData = userDoc.data() as UserData;
+        const repairedData = await detectUserRoleAndRepair(uid, rawData);
+        setUserData(repairedData);
       } else {
-        setUserData(null);
+        const repairedData = await detectUserRoleAndRepair(uid, {});
+        setUserData(Object.keys(repairedData).length > 0 ? repairedData : null);
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -73,16 +119,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const userRef = doc(db, "users", currentUser.uid);
         unsubscribeDoc = onSnapshot(
           userRef, 
-          (docSnap) => {
+          async (docSnap) => {
             if (docSnap.exists()) {
-              const data = docSnap.data() as UserData;
-              if (data.role && !data.onboardingComplete) {
-                data.onboardingComplete = true;
-                setDoc(userRef, { onboardingComplete: true }, { merge: true }).catch(console.error);
-              }
-              setUserData(data);
+              const rawData = docSnap.data() as UserData;
+              const repairedData = await detectUserRoleAndRepair(currentUser.uid, rawData);
+              setUserData(repairedData);
             } else {
-              setUserData(null);
+              const repairedData = await detectUserRoleAndRepair(currentUser.uid, {});
+              setUserData(Object.keys(repairedData).length > 0 ? repairedData : null);
             }
             setLoading(false);
           },

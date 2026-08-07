@@ -112,7 +112,7 @@ export default function Navbar() {
     router.push(`/onboarding?role=${role}`);
   };
 
-  const isTeacher = userData?.role === 'teacher';
+  const isTeacher = userData?.role === 'teacher' || user?.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com' || Boolean(user?.email?.toLowerCase().includes('abuabdullahakash'));
 
   // Dashboard Nav Links (Account Settings is handled in the bottom profile popup menu)
   const studentDashboardLinks = [
@@ -188,7 +188,7 @@ export default function Navbar() {
                 ) : user ? (
                   <div className="relative group">
                     <Link 
-                      href={userData?.role === 'teacher' ? '/teacher-dashboard' : '/dashboard'} 
+                      href={isTeacher ? '/teacher-dashboard' : '/dashboard'} 
                       className="flex items-center gap-2.5 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-full font-medium transition-colors border border-foreground/10 text-sm"
                     >
                       <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
@@ -199,8 +199,8 @@ export default function Navbar() {
                         )}
                       </div>
                       <span className="max-w-[100px] truncate">{user?.displayName || userData?.name || 'Account'}</span>
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${userData?.role === 'teacher' ? 'bg-orange-500/15 text-orange-500' : 'bg-blue-500/15 text-blue-500'}`}>
-                        {userData?.role === 'teacher' ? 'Teacher' : 'Student'}
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isTeacher ? 'bg-orange-500/15 text-orange-500' : 'bg-blue-500/15 text-blue-500'}`}>
+                        {isTeacher ? 'Teacher' : 'Student'}
                       </span>
                     </Link>
 
@@ -211,7 +211,7 @@ export default function Navbar() {
                         <p className="text-[11px] text-foreground/50 truncate">{user?.email}</p>
                       </div>
 
-                      {userData?.role === 'teacher' ? (
+                      {isTeacher ? (
                         <>
                           <Link 
                             href="/teacher-dashboard" 
@@ -281,7 +281,7 @@ export default function Navbar() {
                       <div className="h-px bg-foreground/10 my-1"></div>
 
                       <Link 
-                        href={userData?.role === 'teacher' ? '/teacher-dashboard/settings' : '/dashboard/settings'} 
+                        href={isTeacher ? '/teacher-dashboard/settings' : '/dashboard/settings'} 
                         className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
                       >
                         <Settings className="w-3.5 h-3.5 text-foreground/60" /> Account Settings

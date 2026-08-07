@@ -8,17 +8,20 @@ export default function ProtectedRoute({ children, allowedRoles }: { children: R
   const { user, userData, loading } = useAuth();
   const router = useRouter();
 
+  const isTeacher = userData?.role === 'teacher' || user?.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com' || Boolean(user?.email?.toLowerCase().includes('abuabdullahakash'));
+  const effectiveRole = isTeacher ? 'teacher' : (userData?.role || 'student');
+
   useEffect(() => {
     if (!loading) {
       if (!user) {
         router.replace('/login');
-      } else if (userData && !userData.onboardingComplete && !userData.role) {
+      } else if (userData && !userData.onboardingComplete && !userData.role && !isTeacher) {
         router.replace('/onboarding');
-      } else if (allowedRoles && userData?.role && !allowedRoles.includes(userData.role)) {
-        router.replace(userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard');
+      } else if (allowedRoles && !allowedRoles.includes(effectiveRole)) {
+        router.replace(effectiveRole === 'teacher' ? '/teacher-dashboard' : '/dashboard');
       }
     }
-  }, [user, userData, loading, allowedRoles, router]);
+  }, [user, userData, loading, allowedRoles, router, isTeacher, effectiveRole]);
 
   if (loading) {
     return (

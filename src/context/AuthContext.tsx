@@ -40,30 +40,50 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const detectUserRoleAndRepair = async (uid: string, existingData?: UserData): Promise<UserData> => {
     let role: 'student' | 'teacher' | undefined = undefined;
 
-    try {
-      // Priority 1: Check if user is a creator of any course in courses collection
-      const coursesQuery = query(collection(db, 'courses'), where('teacherId', '==', uid), limit(1));
-      const coursesSnap = await getDocs(coursesQuery);
-      if (!coursesSnap.empty) {
-        role = 'teacher';
-      } else {
-        // Priority 2: Check if user has teacher enrollments
+    // Check 1: If explicitly already a teacher in memory/data
+    if (existingData?.role === 'teacher' || existingData?.experience || existingData?.subject) {
+      role = 'teacher';
+    }
+
+    // Check 2: Check if teacher profile document exists
+    if (!role) {
+      try {
+        const teacherProfileSnap = await getDoc(doc(db, 'teacherProfiles', uid));
+        if (teacherProfileSnap.exists()) {
+          role = 'teacher';
+        }
+      } catch (err) {
+        console.error("Error checking teacherProfiles:", err);
+      }
+    }
+
+    // Check 3: Check if user is a creator of any course in courses collection
+    if (!role) {
+      try {
+        const coursesQuery = query(collection(db, 'courses'), where('teacherId', '==', uid), limit(1));
+        const coursesSnap = await getDocs(coursesQuery);
+        if (!coursesSnap.empty) {
+          role = 'teacher';
+        }
+      } catch (err) {
+        console.error("Error checking courses for role detection:", err);
+      }
+    }
+
+    // Check 4: Check if user has teacher enrollments
+    if (!role) {
+      try {
         const teacherEnrollQuery = query(collection(db, 'enrollments'), where('teacherId', '==', uid), limit(1));
         const teacherEnrollSnap = await getDocs(teacherEnrollQuery);
         if (!teacherEnrollSnap.empty) {
           role = 'teacher';
         }
+      } catch (err) {
+        console.error("Error checking teacher enrollments:", err);
       }
-    } catch (err) {
-      console.error("Error checking courses/enrollments for role detection:", err);
     }
 
-    // Priority 3: Check teacher profile fields
-    if (!role && (existingData?.experience || existingData?.subject || existingData?.role === 'teacher')) {
-      role = 'teacher';
-    }
-
-    // Priority 4: Check if user is a student in enrollments
+    // Check 5: Check if user is a student in enrollments
     if (!role) {
       try {
         const studentEnrollQuery = query(collection(db, 'enrollments'), where('studentId', '==', uid), limit(1));
@@ -76,14 +96,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     }
 
-    // Priority 5: Existing stored role or student fallback
+    // Check 6: Existing stored role or fallback
     if (!role) {
       role = existingData?.role || 'student';
     }
 
-    const onboardingComplete = true;
-    const userRef = doc(db, "users", uid);
-    setDoc(userRef, { role, onboardingComplete: true }, { merge: true }).catch(console.error);
+    const needsUpdate = existingData?.role !== role || existingData?.onboardingComplete !== true;
+    if (needsUpdate) {
+      const userRef = doc(db, "users", uid);
+      setDoc(userRef, { role, onboardingComplete: true }, { merge: true }).catch(console.error);
+    }
 
     return { ...existingData, role, onboardingComplete: true };
   };

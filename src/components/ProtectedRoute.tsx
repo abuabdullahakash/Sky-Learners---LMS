@@ -12,13 +12,8 @@ export default function ProtectedRoute({ children, allowedRoles }: { children: R
     if (!loading) {
       if (!user) {
         router.replace('/login');
-      } else if (userData && allowedRoles && !allowedRoles.includes(userData.role as string)) {
-        // Redirect to appropriate page based on role and onboarding status
-        if (!userData.onboardingComplete && !userData.role) {
-          router.replace('/onboarding');
-        } else {
-          router.replace(userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard');
-        }
+      } else if (userData && !userData.onboardingComplete && !userData.role) {
+        router.replace('/onboarding');
       }
     }
   }, [user, userData, loading, allowedRoles, router]);
@@ -32,11 +27,7 @@ export default function ProtectedRoute({ children, allowedRoles }: { children: R
   }
 
   if (!user) {
-    return null; // Will redirect in useEffect
-  }
-
-  if (userData && allowedRoles && !allowedRoles.includes(userData.role as string)) {
-    return null; // Will redirect in useEffect
+    return null;
   }
 
   return <>{children}</>;

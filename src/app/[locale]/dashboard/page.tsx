@@ -1,10 +1,10 @@
 "use client";
 
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
-import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { BookOpen, CheckCircle, Trophy, PlayCircle, ArrowRight, Sparkles, Flame, Clock, Video, Megaphone, HelpCircle, Bell, ChevronRight, CheckSquare, Users } from 'lucide-react';
+import { BookOpen, CheckCircle, Trophy, PlayCircle, ArrowRight, Sparkles, Flame, Clock, Video, Megaphone, HelpCircle, Bell, ChevronRight, CheckSquare, Users, LayoutDashboard } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, limit, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
@@ -359,8 +359,39 @@ export default function DashboardOverview() {
   ];
 
   return (
-    <div ref={containerRef} className="w-full space-y-10">
+    <div ref={containerRef} className="w-full space-y-8">
       
+      {/* Teacher Account Notification & Switcher Banner */}
+      {userData?.role === 'teacher' && (
+        <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-orange-500/15 via-amber-500/10 to-orange-500/5 border border-orange-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-md backdrop-blur-md animate-in fade-in duration-300">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-orange-500 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-orange-500/30">
+              <LayoutDashboard className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-sm sm:text-base font-black text-orange-600 dark:text-orange-400">
+                  {locale === 'bn' ? 'শিক্ষক অ্যাকাউন্ট মোড' : 'Teacher Account Mode'}
+                </h4>
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-orange-500 text-white uppercase tracking-wider">Teacher</span>
+              </div>
+              <p className="text-xs text-foreground/75 mt-0.5">
+                {locale === 'bn' 
+                  ? 'আপনার তৈরি করা সকল কোর্স, শিক্ষার্থী এবং আয় দেখতে শিক্ষক ড্যাশবোর্ডে প্রবেশ করুন।' 
+                  : 'Manage your created courses, enrolled students, and earnings in the Teacher Dashboard.'}
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/teacher-dashboard"
+            className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-xl sm:rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 transition-all flex-shrink-0"
+          >
+            <span>{locale === 'bn' ? 'শিক্ষক ড্যাশবোর্ডে যান' : 'Go to Teacher Dashboard'}</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      )}
+
       {/* Welcome Banner */}
       <div className="relative overflow-hidden rounded-[2rem] sm:rounded-3xl bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-purple-500/10 dark:from-orange-500/20 dark:via-purple-500/15 dark:to-blue-500/20 border border-orange-500/20 dark:border-white/10 p-6 sm:p-8 md:p-12 shadow-lg backdrop-blur-xl">
         <div className="absolute top-0 right-0 p-4 sm:p-8 opacity-15 pointer-events-none">

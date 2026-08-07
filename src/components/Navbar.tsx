@@ -186,14 +186,73 @@ export default function Navbar() {
                 {loading ? (
                   <div className="w-[120px] h-[40px] bg-foreground/10 animate-pulse rounded-full"></div>
                 ) : user ? (
-                  <div className="flex items-center gap-4">
+                  <div className="relative group">
                     <Link 
                       href={userData?.role === 'teacher' ? '/teacher-dashboard' : '/dashboard'} 
-                      className="flex items-center gap-2 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-full font-medium transition-colors border border-foreground/10"
+                      className="flex items-center gap-2.5 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-full font-medium transition-colors border border-foreground/10 text-sm"
                     >
-                      <UserIcon className="w-4 h-4" />
-                      My Account
+                      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
+                        {user?.photoURL ? (
+                          <img src={user.photoURL} alt="User" className="w-full h-full object-cover" />
+                        ) : (
+                          <UserIcon className="w-3.5 h-3.5 text-primary" />
+                        )}
+                      </div>
+                      <span className="max-w-[100px] truncate">{user?.displayName || userData?.name || 'Account'}</span>
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${userData?.role === 'teacher' ? 'bg-orange-500/15 text-orange-500' : 'bg-blue-500/15 text-blue-500'}`}>
+                        {userData?.role === 'teacher' ? 'Teacher' : 'Student'}
+                      </span>
                     </Link>
+
+                    {/* Desktop Hover Dropdown Menu */}
+                    <div className="absolute right-0 top-full mt-2 w-64 bg-background border border-foreground/15 rounded-2xl shadow-2xl p-2 space-y-1.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-1 group-hover:translate-y-0 z-50">
+                      <div className="px-3 py-2 border-b border-foreground/10">
+                        <p className="text-xs font-bold text-foreground truncate">{user?.displayName || userData?.name || 'User'}</p>
+                        <p className="text-[11px] text-foreground/50 truncate">{user?.email}</p>
+                      </div>
+
+                      <Link 
+                        href="/teacher-dashboard" 
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-orange-500/10 text-orange-600 dark:text-orange-400 font-medium text-xs transition-colors"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                          <LayoutDashboard className="w-3.5 h-3.5 text-orange-500" />
+                        </div>
+                        <div>
+                          <p className="font-bold leading-tight">Teacher Dashboard</p>
+                          <p className="text-[10px] text-foreground/50 leading-tight">Manage Courses & Students</p>
+                        </div>
+                      </Link>
+
+                      <Link 
+                        href="/dashboard" 
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium text-xs transition-colors"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                          <GraduationCap className="w-3.5 h-3.5 text-blue-500" />
+                        </div>
+                        <div>
+                          <p className="font-bold leading-tight">Student Dashboard</p>
+                          <p className="text-[10px] text-foreground/50 leading-tight">Enrolled Courses & Study</p>
+                        </div>
+                      </Link>
+
+                      <div className="h-px bg-foreground/10 my-1"></div>
+
+                      <Link 
+                        href={userData?.role === 'teacher' ? '/teacher-dashboard/settings' : '/dashboard/settings'} 
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
+                      >
+                        <Settings className="w-3.5 h-3.5 text-foreground/60" /> Account Settings
+                      </Link>
+
+                      <button 
+                        onClick={() => setShowLogoutConfirm(true)} 
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-red-500/10 text-red-500 text-xs font-medium transition-colors"
+                      >
+                        <LogOut className="w-3.5 h-3.5" /> Log Out
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <Link href="/register" className="px-6 py-2 bg-primary text-primary-foreground font-bold rounded-full hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all">

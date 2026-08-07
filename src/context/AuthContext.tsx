@@ -39,10 +39,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const detectUserRoleAndRepair = async (uid: string, existingData?: UserData, email?: string | null): Promise<UserData> => {
     let role: 'student' | 'teacher' | undefined = undefined;
-    const userEmail = (email || existingData?.email || user?.email || '').toLowerCase().trim();
+    const userEmail = (email || existingData?.email || user?.email || auth.currentUser?.email || '').toLowerCase().trim();
 
     // Check 0: Platform Creator / Owner / Admin email
-    if (userEmail === 'abuabdullahakash@gmail.com') {
+    if (userEmail === 'abuabdullahakash@gmail.com' || userEmail.includes('abuabdullahakash')) {
       role = 'teacher';
     }
 
@@ -110,10 +110,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const needsUpdate = existingData?.role !== role || existingData?.onboardingComplete !== true;
     if (needsUpdate) {
       const userRef = doc(db, "users", uid);
-      setDoc(userRef, { role, onboardingComplete: true }, { merge: true }).catch(console.error);
+      await setDoc(userRef, { role, onboardingComplete: true, email: userEmail || existingData?.email || '' }, { merge: true }).catch(console.error);
     }
 
-    return { ...existingData, role, onboardingComplete: true };
+    return { ...existingData, email: userEmail || existingData?.email, role, onboardingComplete: true };
   };
 
   const fetchUserData = async (uid: string, email?: string | null) => {

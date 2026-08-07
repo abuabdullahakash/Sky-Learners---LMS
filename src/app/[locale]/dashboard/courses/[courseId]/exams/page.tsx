@@ -50,24 +50,58 @@ export default function StudentExams() {
     // Fetch completed exams
     const fetchCompletedExams = async () => {
       if (!user || !courseId) return;
+      
+      const updateCompletedState = async () => {
+        try {
+          const completedMap: Record<string, CompletedExamData> = {};
+          const uidSnap = await getDocs(query(
+            collection(db, 'completed_exams'),
+            where('studentId', '==', user.uid),
+            where('courseId', '==', courseId)
+          ));
+          uidSnap.forEach(d => {
+            const data = d.data();
+            completedMap[data.examId] = {
+              score: data.score,
+              totalMarks: data.totalMarks,
+              timeTakenSeconds: data.timeTakenSeconds,
+              isLate: !!data.isLate
+            };
+          });
+
+          if (user.email) {
+            const emailSnap = await getDocs(query(
+              collection(db, 'completed_exams'),
+              where('studentEmail', '==', user.email.toLowerCase().trim()),
+              where('courseId', '==', courseId)
+            ));
+            emailSnap.forEach(d => {
+              const data = d.data();
+              if (!completedMap[data.examId]) {
+                completedMap[data.examId] = {
+                  score: data.score,
+                  totalMarks: data.totalMarks,
+                  timeTakenSeconds: data.timeTakenSeconds,
+                  isLate: !!data.isLate
+                };
+              }
+            });
+          }
+
+          setCompletedExams(completedMap);
+        } catch (err) {
+          console.error("Error fetching completed exams:", err);
+        }
+      };
+
+      updateCompletedState();
       const q = query(
         collection(db, 'completed_exams'),
         where('studentId', '==', user.uid),
         where('courseId', '==', courseId)
       );
-      
-      const unsubscribe = onSnapshot(q, (snap) => {
-        const completed: Record<string, CompletedExamData> = {};
-        snap.docs.forEach(d => {
-          const data = d.data();
-          completed[data.examId] = {
-            score: data.score,
-            totalMarks: data.totalMarks,
-            timeTakenSeconds: data.timeTakenSeconds,
-            isLate: !!data.isLate
-          };
-        });
-        setCompletedExams(completed);
+      const unsubscribe = onSnapshot(q, () => {
+        updateCompletedState();
       });
 
       return () => unsubscribe();

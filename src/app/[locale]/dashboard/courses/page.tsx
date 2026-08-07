@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { Link } from '@/i18n/routing';
 import { BookOpen, Clock, CheckCircle2, PlayCircle, AlertCircle, Loader2, Sparkles } from 'lucide-react';
 import Image from 'next/image';
@@ -34,45 +34,78 @@ export default function StudentCoursesPage() {
     const fetchMyCourses = async () => {
       if (!user) return;
       try {
-        // Fetch enrollments for the current student
-        const q = query(
-          collection(db, 'enrollments'),
-          where('studentId', '==', user.uid)
-        );
-        const querySnapshot = await getDocs(q);
+        // 1. Fetch enrollments by studentId AND studentEmail / contactEmail
+        const enrollmentsMap = new Map<string, any>();
+        
+        // Query by studentId
+        const uidSnap = await getDocs(query(collection(db, 'enrollments'), where('studentId', '==', user.uid)));
+        uidSnap.forEach(d => enrollmentsMap.set(d.id, d));
+        
+        // Query by email
+        if (user.email) {
+          const userEmail = user.email.toLowerCase().trim();
+          const [byStudentEmailSnap, byContactEmailSnap] = await Promise.all([
+            getDocs(query(collection(db, 'enrollments'), where('studentEmail', '==', userEmail))),
+            getDocs(query(collection(db, 'enrollments'), where('contactEmail', '==', userEmail)))
+          ]);
+          
+          byStudentEmailSnap.forEach(d => {
+            enrollmentsMap.set(d.id, d);
+            if (d.data().studentId !== user.uid) {
+              updateDoc(doc(db, 'enrollments', d.id), { studentId: user.uid }).catch(() => {});
+            }
+          });
+          
+          byContactEmailSnap.forEach(d => {
+            enrollmentsMap.set(d.id, d);
+            if (d.data().studentId !== user.uid) {
+              updateDoc(doc(db, 'enrollments', d.id), { studentId: user.uid }).catch(() => {});
+            }
+          });
+        }
 
-        // Fetch completed lessons and completed exams for this student
-        const completedLessonsQuery = query(
-          collection(db, 'completed_lessons'),
-          where('studentId', '==', user.uid)
-        );
-        const completedExamsQuery = query(
-          collection(db, 'completed_exams'),
-          where('studentId', '==', user.uid)
-        );
+        const enrollmentDocs = Array.from(enrollmentsMap.values());
 
-        const [completedLessonsSnap, completedExamsSnap] = await Promise.all([
-          getDocs(completedLessonsQuery),
-          getDocs(completedExamsQuery),
-        ]);
-
-        const completedLessonsByCourse: Record<string, number> = {};
+        // 2. Fetch completed lessons and completed exams for this student
+        const completedLessonsMap: Record<string, number> = {};
+        const completedLessonsSnap = await getDocs(query(collection(db, 'completed_lessons'), where('studentId', '==', user.uid)));
         completedLessonsSnap.forEach((docSnap) => {
           const data = docSnap.data();
           if (data.courseId) {
-            completedLessonsByCourse[data.courseId] = (completedLessonsByCourse[data.courseId] || 0) + 1;
+            completedLessonsMap[data.courseId] = (completedLessonsMap[data.courseId] || 0) + 1;
           }
         });
 
-        const completedExamsByCourse: Record<string, number> = {};
+        if (user.email) {
+          const clEmailSnap = await getDocs(query(collection(db, 'completed_lessons'), where('studentEmail', '==', user.email.toLowerCase().trim())));
+          clEmailSnap.forEach((docSnap) => {
+            const data = docSnap.data();
+            if (data.courseId && !completedLessonsSnap.docs.some(d => d.id === docSnap.id)) {
+              completedLessonsMap[data.courseId] = (completedLessonsMap[data.courseId] || 0) + 1;
+            }
+          });
+        }
+
+        const completedExamsMap: Record<string, number> = {};
+        const completedExamsSnap = await getDocs(query(collection(db, 'completed_exams'), where('studentId', '==', user.uid)));
         completedExamsSnap.forEach((docSnap) => {
           const data = docSnap.data();
           if (data.courseId) {
-            completedExamsByCourse[data.courseId] = (completedExamsByCourse[data.courseId] || 0) + 1;
+            completedExamsMap[data.courseId] = (completedExamsMap[data.courseId] || 0) + 1;
           }
         });
+
+        if (user.email) {
+          const ceEmailSnap = await getDocs(query(collection(db, 'completed_exams'), where('studentEmail', '==', user.email.toLowerCase().trim())));
+          ceEmailSnap.forEach((docSnap) => {
+            const data = docSnap.data();
+            if (data.courseId && !completedExamsSnap.docs.some(d => d.id === docSnap.id)) {
+              completedExamsMap[data.courseId] = (completedExamsMap[data.courseId] || 0) + 1;
+            }
+          });
+        }
         
-        const enrollmentsPromises = querySnapshot.docs.map(async (enrollmentDoc) => {
+        const enrollmentsPromises = enrollmentDocs.map(async (enrollmentDoc) => {
           const enrollmentData = enrollmentDoc.data();
           const courseId = enrollmentData.courseId;
           
@@ -94,8 +127,8 @@ export default function StudentCoursesPage() {
               const promisedExams = Number(cData.totalExams) || (cData.exams?.length || 0);
 
               const totalCourseItems = promisedVideos + promisedExams;
-              const completedCount = completedLessonsByCourse[courseId] || 0;
-              const completedExamsCount = completedExamsByCourse[courseId] || 0;
+              const completedCount = completedLessonsMap[courseId] || 0;
+              const completedExamsCount = completedExamsMap[courseId] || 0;
               const totalCompletedItems = completedCount + completedExamsCount;
 
               progressPercentage = totalCourseItems > 0
@@ -104,11 +137,20 @@ export default function StudentCoursesPage() {
             }
           }
 
+          let enrolledAtDate = new Date();
+          if (enrollmentData.createdAt) {
+            if (typeof enrollmentData.createdAt.toDate === 'function') {
+              enrolledAtDate = enrollmentData.createdAt.toDate();
+            } else if (typeof enrollmentData.createdAt === 'string' || typeof enrollmentData.createdAt === 'number') {
+              enrolledAtDate = new Date(enrollmentData.createdAt);
+            }
+          }
+
           return {
             enrollmentId: enrollmentDoc.id,
             courseId: courseId,
             status: enrollmentData.status,
-            enrolledAt: enrollmentData.createdAt?.toDate() || new Date(),
+            enrolledAt: enrolledAtDate,
             courseDetails,
             progressPercentage,
           } as EnrolledCourse;

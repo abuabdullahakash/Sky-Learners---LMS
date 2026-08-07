@@ -91,17 +91,28 @@ export default function StudentHelpDeskPage() {
       }
 
       // Fetch Issues submitted by this student for this course
-      const q = query(
+      const issuesMap = new Map<string, any>();
+      const uidSnap = await getDocs(query(
         collection(db, 'lesson_issues'),
         where('courseId', '==', courseId),
         where('studentId', '==', user.uid)
-      );
-      const querySnapshot = await getDocs(q);
+      ));
+      uidSnap.forEach(d => issuesMap.set(d.id, d));
+
+      if (user.email) {
+        const emailSnap = await getDocs(query(
+          collection(db, 'lesson_issues'),
+          where('courseId', '==', courseId),
+          where('studentEmail', '==', user.email.toLowerCase().trim())
+        ));
+        emailSnap.forEach(d => issuesMap.set(d.id, d));
+      }
+
       const validIssues = [];
       const now = new Date().getTime();
       const ONE_DAY = 24 * 60 * 60 * 1000;
 
-      for (let issueDoc of querySnapshot.docs) {
+      for (let issueDoc of Array.from(issuesMap.values())) {
         const data = issueDoc.data();
         if (data.status === 'solved') {
           const age = now - new Date(data.createdAt).getTime();

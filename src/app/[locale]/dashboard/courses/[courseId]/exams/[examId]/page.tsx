@@ -45,7 +45,17 @@ export default function TakeExamPage() {
           where('courseId', '==', courseId),
           where('examId', '==', examId)
         );
-        const snap = await getDocs(q);
+        let snap = await getDocs(q);
+        if (snap.empty && user.email) {
+          const emailQ = query(
+            collection(db, 'completed_exams'),
+            where('studentEmail', '==', user.email.toLowerCase().trim()),
+            where('courseId', '==', courseId),
+            where('examId', '==', examId)
+          );
+          snap = await getDocs(emailQ);
+        }
+
         if (!snap.empty) {
           setHasCompleted(true);
           const data = snap.docs[0].data();

@@ -93,7 +93,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (!role) {
       try {
         const studentEnrollQuery = query(collection(db, 'enrollments'), where('studentId', '==', uid), limit(1));
-        const studentEnrollSnap = await getDocs(studentEnrollQuery);
+        let studentEnrollSnap = await getDocs(studentEnrollQuery);
+        if (studentEnrollSnap.empty && userEmail) {
+          const emailQ = query(collection(db, 'enrollments'), where('studentEmail', '==', userEmail.toLowerCase().trim()), limit(1));
+          studentEnrollSnap = await getDocs(emailQ);
+        }
+        if (studentEnrollSnap.empty && userEmail) {
+          const contactQ = query(collection(db, 'enrollments'), where('contactEmail', '==', userEmail.toLowerCase().trim()), limit(1));
+          studentEnrollSnap = await getDocs(contactQ);
+        }
         if (!studentEnrollSnap.empty) {
           role = 'student';
         }

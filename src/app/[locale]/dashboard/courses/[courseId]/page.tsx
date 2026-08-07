@@ -61,23 +61,45 @@ export default function StudentCourseOverview() {
     const fetchCompletionData = async () => {
       if (user && courseId) {
         try {
-          const completedLessonsQuery = query(
+          const lessonsMap = new Map<string, any>();
+          const uidLessonsSnap = await getDocs(query(
             collection(db, 'completed_lessons'),
             where('studentId', '==', user.uid),
             where('courseId', '==', courseId)
-          );
-          const completedLessonsSnap = await getDocs(completedLessonsQuery);
-          setCompletedCount(completedLessonsSnap.size);
-          const completedIds = completedLessonsSnap.docs.map((d) => d.data().lessonId);
+          ));
+          uidLessonsSnap.forEach(d => lessonsMap.set(d.id, d.data()));
+
+          if (user.email) {
+            const emailLessonsSnap = await getDocs(query(
+              collection(db, 'completed_lessons'),
+              where('studentEmail', '==', user.email.toLowerCase().trim()),
+              where('courseId', '==', courseId)
+            ));
+            emailLessonsSnap.forEach(d => lessonsMap.set(d.id, d.data()));
+          }
+
+          setCompletedCount(lessonsMap.size);
+          const completedIds = Array.from(lessonsMap.values()).map((d) => d.lessonId).filter(Boolean);
           setCompletedLessonIds(completedIds);
 
-          const completedExamsQuery = query(
+          const examsMap = new Map<string, any>();
+          const uidExamsSnap = await getDocs(query(
             collection(db, 'completed_exams'),
             where('studentId', '==', user.uid),
             where('courseId', '==', courseId)
-          );
-          const completedExamsSnap = await getDocs(completedExamsQuery);
-          setCompletedExamsCount(completedExamsSnap.size);
+          ));
+          uidExamsSnap.forEach(d => examsMap.set(d.id, d.data()));
+
+          if (user.email) {
+            const emailExamsSnap = await getDocs(query(
+              collection(db, 'completed_exams'),
+              where('studentEmail', '==', user.email.toLowerCase().trim()),
+              where('courseId', '==', courseId)
+            ));
+            emailExamsSnap.forEach(d => examsMap.set(d.id, d.data()));
+          }
+
+          setCompletedExamsCount(examsMap.size);
         } catch (error) {
           console.error("Error fetching completion data", error);
         }

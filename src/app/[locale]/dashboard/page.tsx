@@ -134,35 +134,70 @@ export default function DashboardOverview() {
         }
 
         // 2. Fetch approved enrollments count & IDs
+        const enrollmentsMap = new Map<string, any>();
         const enrollmentsRef = collection(db, 'enrollments');
-        const enrollmentsQuery = query(
+        
+        const enrollmentsUidSnap = await getDocs(query(
           enrollmentsRef,
           where('studentId', '==', user.uid),
           where('status', '==', 'approved')
-        );
-        const enrollmentsSnap = await getDocs(enrollmentsQuery);
-        setEnrolledCount(enrollmentsSnap.size);
+        ));
+        enrollmentsUidSnap.forEach(d => enrollmentsMap.set(d.id, d.data()));
 
-        const enrolledCourseIds = enrollmentsSnap.docs.map(d => d.data().courseId).filter(Boolean);
+        if (user.email) {
+          const userEmail = user.email.toLowerCase().trim();
+          const [bySEmail, byCEmail] = await Promise.all([
+            getDocs(query(enrollmentsRef, where('studentEmail', '==', userEmail), where('status', '==', 'approved'))),
+            getDocs(query(enrollmentsRef, where('contactEmail', '==', userEmail), where('status', '==', 'approved')))
+          ]);
+          bySEmail.forEach(d => {
+            enrollmentsMap.set(d.id, d.data());
+            if (d.data().studentId !== user.uid) {
+              updateDoc(doc(db, 'enrollments', d.id), { studentId: user.uid }).catch(() => {});
+            }
+          });
+          byCEmail.forEach(d => {
+            enrollmentsMap.set(d.id, d.data());
+            if (d.data().studentId !== user.uid) {
+              updateDoc(doc(db, 'enrollments', d.id), { studentId: user.uid }).catch(() => {});
+            }
+          });
+        }
+
+        const approvedEnrollments = Array.from(enrollmentsMap.values());
+        setEnrolledCount(approvedEnrollments.length);
+
+        const enrolledCourseIds = approvedEnrollments.map(d => d.courseId).filter(Boolean);
 
         // 3. Fetch completed lessons count
+        const completedMap = new Map<string, any>();
         const completedRef = collection(db, 'completed_lessons');
-        const completedQuery = query(completedRef, where('studentId', '==', user.uid));
-        const completedSnap = await getDocs(completedQuery);
-        setCompletedCount(completedSnap.size);
+        const completedUidSnap = await getDocs(query(completedRef, where('studentId', '==', user.uid)));
+        completedUidSnap.forEach(d => completedMap.set(d.id, d.data()));
+        if (user.email) {
+          const clEmail = await getDocs(query(completedRef, where('studentEmail', '==', user.email.toLowerCase().trim())));
+          clEmail.forEach(d => completedMap.set(d.id, d.data()));
+        }
+        setCompletedCount(completedMap.size);
 
         // 4. Calculate Real Average Exam Score Percentage
         try {
+          const completedExamsMap = new Map<string, any>();
           const completedExamsRef = collection(db, 'completed_exams');
-          const completedExamsQuery = query(completedExamsRef, where('studentId', '==', user.uid));
-          const completedExamsSnap = await getDocs(completedExamsQuery);
+          const completedExamsUidSnap = await getDocs(query(completedExamsRef, where('studentId', '==', user.uid)));
+          completedExamsUidSnap.forEach(d => completedExamsMap.set(d.id, d.data()));
+          if (user.email) {
+            const ceEmail = await getDocs(query(completedExamsRef, where('studentEmail', '==', user.email.toLowerCase().trim())));
+            ceEmail.forEach(d => completedExamsMap.set(d.id, d.data()));
+          }
 
-          if (!completedExamsSnap.empty) {
+          const completedExamsList = Array.from(completedExamsMap.values());
+
+          if (completedExamsList.length > 0) {
             let totalPercentageSum = 0;
             let validExamsCount = 0;
 
-            completedExamsSnap.docs.forEach(docSnap => {
-              const examData = docSnap.data();
+            completedExamsList.forEach(examData => {
               if (examData.totalMarks && examData.totalMarks > 0) {
                 const percentage = (examData.score / examData.totalMarks) * 100;
                 totalPercentageSum += Math.min(100, Math.max(0, percentage));

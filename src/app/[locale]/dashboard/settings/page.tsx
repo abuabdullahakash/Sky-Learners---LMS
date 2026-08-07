@@ -36,15 +36,30 @@ export default function SettingsPage() {
       if (!user || activeTab !== 'billing') return;
       setIsLoadingHistory(true);
       try {
-        const q = query(
+        const recordsMap = new Map<string, any>();
+        const uidSnap = await getDocs(query(
           collection(db, 'enrollments'),
           where('studentId', '==', user.uid)
-        );
-        const querySnap = await getDocs(q);
-        const records: any[] = [];
-        querySnap.forEach((docSnap) => {
-          records.push({ id: docSnap.id, ...docSnap.data() });
+        ));
+        uidSnap.forEach((docSnap) => {
+          recordsMap.set(docSnap.id, { id: docSnap.id, ...docSnap.data() });
         });
+
+        if (user.email) {
+          const userEmail = user.email.toLowerCase().trim();
+          const [bySEmail, byCEmail] = await Promise.all([
+            getDocs(query(collection(db, 'enrollments'), where('studentEmail', '==', userEmail))),
+            getDocs(query(collection(db, 'enrollments'), where('contactEmail', '==', userEmail)))
+          ]);
+          bySEmail.forEach((docSnap) => {
+            recordsMap.set(docSnap.id, { id: docSnap.id, ...docSnap.data() });
+          });
+          byCEmail.forEach((docSnap) => {
+            recordsMap.set(docSnap.id, { id: docSnap.id, ...docSnap.data() });
+          });
+        }
+
+        const records = Array.from(recordsMap.values());
         // Sort by createdAt desc
         records.sort((a, b) => {
           const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : new Date(a.createdAt || 0).getTime();

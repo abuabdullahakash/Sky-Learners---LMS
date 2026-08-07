@@ -187,7 +187,7 @@ export default function Navbar() {
                   <div className="w-[120px] h-[40px] bg-foreground/10 animate-pulse rounded-full"></div>
                 ) : user ? (
                   <div className="flex items-center gap-4">
-                    {userData?.onboardingComplete ? (
+                    {(userData?.onboardingComplete || Boolean(userData?.role)) ? (
                       <Link href={userData?.role === 'teacher' ? '/teacher-dashboard' : '/dashboard'} className="flex items-center gap-2 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-full font-medium transition-colors border border-foreground/10">
                         <UserIcon className="w-4 h-4" />
                         My Profile

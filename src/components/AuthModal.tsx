@@ -122,7 +122,7 @@ export default function AuthModal({ initialMode }: AuthModalProps) {
         }
 
         const userData = userDoc.data();
-        if (!userData.onboardingComplete) {
+        if (!userData.onboardingComplete && !userData.role) {
           router.push('/onboarding');
         } else {
           router.push(userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard');
@@ -180,7 +180,7 @@ export default function AuthModal({ initialMode }: AuthModalProps) {
         }
         
         const userData = userDoc.data();
-        if (!userData.onboardingComplete) {
+        if (!userData.onboardingComplete && !userData.role) {
           router.push('/onboarding');
         } else {
           router.push(userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard');
@@ -198,7 +198,7 @@ export default function AuthModal({ initialMode }: AuthModalProps) {
           });
         } else {
           const userData = userDoc.data();
-          if (userData.onboardingComplete) {
+          if (userData.onboardingComplete || userData.role) {
             redirectUrl = userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard';
           }
         }

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged, signOut, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
 export interface UserData {
@@ -39,9 +39,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchUserData = async (uid: string) => {
     try {
-      const userDoc = await getDoc(doc(db, "users", uid));
+      const userRef = doc(db, "users", uid);
+      const userDoc = await getDoc(userRef);
       if (userDoc.exists()) {
-        setUserData(userDoc.data() as UserData);
+        const data = userDoc.data() as UserData;
+        if (data.role && !data.onboardingComplete) {
+          data.onboardingComplete = true;
+          setDoc(userRef, { onboardingComplete: true }, { merge: true }).catch(console.error);
+        }
+        setUserData(data);
       } else {
         setUserData(null);
       }
@@ -69,7 +75,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           userRef, 
           (docSnap) => {
             if (docSnap.exists()) {
-              setUserData(docSnap.data() as UserData);
+              const data = docSnap.data() as UserData;
+              if (data.role && !data.onboardingComplete) {
+                data.onboardingComplete = true;
+                setDoc(userRef, { onboardingComplete: true }, { merge: true }).catch(console.error);
+              }
+              setUserData(data);
             } else {
               setUserData(null);
             }

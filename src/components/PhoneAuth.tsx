@@ -55,6 +55,7 @@ export default function PhoneAuth({ isRegister = false }: { isRegister?: boolean
           name: name || result.user.phoneNumber,
           phone: result.user.phoneNumber,
           role: "student",
+          onboardingComplete: true,
           createdAt: new Date().toISOString()
         });
       }

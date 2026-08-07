@@ -39,9 +39,10 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     if (!loading) {
+      const isComplete = userData && (userData.onboardingComplete || Boolean(userData.role));
       if (!user) {
         router.push('/login');
-      } else if (userData && userData.onboardingComplete && !isSuccess) {
+      } else if (isComplete && !isSuccess) {
         router.push(userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard');
       }
     }
@@ -100,7 +101,9 @@ export default function OnboardingPage() {
     }
   };
 
-  if (loading || !user || (userData && userData.onboardingComplete && !isSuccess)) {
+  const isUserComplete = userData && (userData.onboardingComplete || Boolean(userData.role));
+
+  if (loading || !user || (isUserComplete && !isSuccess)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>

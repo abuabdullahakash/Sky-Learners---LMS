@@ -42,23 +42,6 @@ export default function TeacherSidebar() {
   return (
     <aside className="w-full flex flex-col justify-between min-h-full overflow-x-hidden pr-2">
       <div className="p-4 space-y-2">
-        {/* Switch to Student Dashboard Card */}
-        <Link
-          href="/dashboard"
-          className="flex items-center justify-between p-3 mb-3 bg-gradient-to-r from-blue-500/15 via-indigo-500/10 to-transparent hover:from-blue-500/25 hover:to-blue-500/10 border border-blue-500/30 rounded-2xl transition-all group"
-        >
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-              <GraduationCap className="w-4 h-4" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-blue-600 dark:text-blue-400 leading-tight">Student View</p>
-              <p className="text-[10px] text-foreground/60 leading-tight">Enrolled Courses</p>
-            </div>
-          </div>
-          <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-full group-hover:translate-x-0.5 transition-transform">Go →</span>
-        </Link>
-
         {menuItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -84,9 +67,6 @@ export default function TeacherSidebar() {
         {/* Hover Popover Menu */}
         <div className="absolute bottom-full left-4 right-4 mb-2 bg-background border border-foreground/10 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0 overflow-hidden z-50">
           <div className="p-2 space-y-1">
-            <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-sm font-bold transition-colors">
-              <GraduationCap className="w-4 h-4" /> Student Dashboard
-            </Link>
             <Link href="/teacher-dashboard/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors">
               <UserCircle className="w-4 h-4 text-foreground/70" /> View Profile
             </Link>

@@ -37,11 +37,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const detectUserRoleAndRepair = async (uid: string, existingData?: UserData): Promise<UserData> => {
+  const detectUserRoleAndRepair = async (uid: string, existingData?: UserData, email?: string | null): Promise<UserData> => {
     let role: 'student' | 'teacher' | undefined = undefined;
+    const userEmail = (email || existingData?.email || user?.email || '').toLowerCase().trim();
+
+    // Check 0: Platform Creator / Owner / Admin email
+    if (userEmail === 'abuabdullahakash@gmail.com') {
+      role = 'teacher';
+    }
 
     // Check 1: If explicitly already a teacher in memory/data
-    if (existingData?.role === 'teacher' || existingData?.experience || existingData?.subject) {
+    if (!role && (existingData?.role === 'teacher' || existingData?.experience || existingData?.subject)) {
       role = 'teacher';
     }
 
@@ -57,7 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     }
 
-    // Check 3: Check if user is a creator of any course in courses collection
+    // Check 3: Check if user is a creator of any course in courses collection by teacherId
     if (!role) {
       try {
         const coursesQuery = query(collection(db, 'courses'), where('teacherId', '==', uid), limit(1));
@@ -110,16 +116,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return { ...existingData, role, onboardingComplete: true };
   };
 
-  const fetchUserData = async (uid: string) => {
+  const fetchUserData = async (uid: string, email?: string | null) => {
     try {
       const userRef = doc(db, "users", uid);
       const userDoc = await getDoc(userRef);
       if (userDoc.exists()) {
         const rawData = userDoc.data() as UserData;
-        const repairedData = await detectUserRoleAndRepair(uid, rawData);
+        const repairedData = await detectUserRoleAndRepair(uid, rawData, email);
         setUserData(repairedData);
       } else {
-        const repairedData = await detectUserRoleAndRepair(uid, {});
+        const repairedData = await detectUserRoleAndRepair(uid, {}, email);
         setUserData(Object.keys(repairedData).length > 0 ? repairedData : null);
       }
     } catch (error) {
@@ -130,7 +136,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const refreshUserData = async () => {
     if (user) {
-      await fetchUserData(user.uid);
+      await fetchUserData(user.uid, user.email);
     }
   };
 
@@ -147,10 +153,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           async (docSnap) => {
             if (docSnap.exists()) {
               const rawData = docSnap.data() as UserData;
-              const repairedData = await detectUserRoleAndRepair(currentUser.uid, rawData);
+              const repairedData = await detectUserRoleAndRepair(currentUser.uid, rawData, currentUser.email);
               setUserData(repairedData);
             } else {
-              const repairedData = await detectUserRoleAndRepair(currentUser.uid, {});
+              const repairedData = await detectUserRoleAndRepair(currentUser.uid, {}, currentUser.email);
               setUserData(Object.keys(repairedData).length > 0 ? repairedData : null);
             }
             setLoading(false);

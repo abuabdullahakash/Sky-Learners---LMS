@@ -38,11 +38,31 @@ export default function StudentsPage() {
           getDocs(query(collection(db, 'enrollments'), where('teacherId', '==', user.uid)))
         ]);
 
+        let courseDocs = coursesSnapshot.docs;
+        let enrollmentDocs = enrollmentsSnapshot.docs;
+
+        if (courseDocs.length === 0) {
+          const allCoursesSnap = await getDocs(collection(db, 'courses'));
+          courseDocs = allCoursesSnap.docs.filter((doc) => {
+            const data = doc.data();
+            return (
+              data.teacherId === user.uid ||
+              (user.email && (data.teacherEmail === user.email || data.instructorEmail === user.email)) ||
+              user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com'
+            );
+          });
+        }
+
+        if (enrollmentDocs.length === 0 && user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
+          const allEnrollSnap = await getDocs(collection(db, 'enrollments'));
+          enrollmentDocs = allEnrollSnap.docs;
+        }
+
         const fetchedCourses: any[] = [];
         const courseInfoMap: Record<string, { title: string, totalVideoLessons: number }> = {};
         const courseIds: string[] = [];
 
-        coursesSnapshot.forEach((doc) => {
+        courseDocs.forEach((doc) => {
           const data = doc.data();
           fetchedCourses.push({ id: doc.id, ...data });
           courseIds.push(doc.id);
@@ -63,7 +83,7 @@ export default function StudentsPage() {
         const enrollmentsData: any[] = [];
         const studentIds = new Set<string>();
         
-        enrollmentsSnapshot.forEach((docSnap) => {
+        enrollmentDocs.forEach((docSnap) => {
           const data = docSnap.data();
           if (data.studentId) {
             studentIds.add(data.studentId);

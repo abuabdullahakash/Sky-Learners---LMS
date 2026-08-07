@@ -50,12 +50,33 @@ export default function CoursesListPage() {
         );
 
         const [coursesSnap, enrollmentsSnap] = await Promise.all([
-          getDocs(coursesQuery),
-          getDocs(enrollmentsQuery),
+          getDocs(query(collection(db, 'courses'), where('teacherId', '==', user.uid))),
+          getDocs(query(collection(db, 'enrollments'), where('teacherId', '==', user.uid), where('status', '==', 'approved'))),
         ]);
 
+        let courseDocs = coursesSnap.docs;
+        let enrollmentDocs = enrollmentsSnap.docs;
+
+        // Fallback recovery if user ID changed or admin account
+        if (courseDocs.length === 0) {
+          const allCoursesSnap = await getDocs(collection(db, 'courses'));
+          courseDocs = allCoursesSnap.docs.filter((doc) => {
+            const data = doc.data();
+            return (
+              data.teacherId === user.uid ||
+              (user.email && (data.teacherEmail === user.email || data.instructorEmail === user.email)) ||
+              user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com'
+            );
+          });
+        }
+
+        if (enrollmentDocs.length === 0 && user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
+          const allEnrollSnap = await getDocs(collection(db, 'enrollments'));
+          enrollmentDocs = allEnrollSnap.docs.filter(d => d.data().status === 'approved');
+        }
+
         const enrollmentCounts: Record<string, number> = {};
-        enrollmentsSnap.forEach((doc) => {
+        enrollmentDocs.forEach((doc) => {
           const data = doc.data();
           if (data.courseId) {
             enrollmentCounts[data.courseId] = (enrollmentCounts[data.courseId] || 0) + 1;
@@ -63,7 +84,7 @@ export default function CoursesListPage() {
         });
 
         const fetchedCourses: Course[] = [];
-        coursesSnap.forEach((doc) => {
+        courseDocs.forEach((doc) => {
           const data = doc.data();
           fetchedCourses.push({
             id: doc.id,

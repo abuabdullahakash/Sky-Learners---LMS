@@ -211,31 +211,72 @@ export default function Navbar() {
                         <p className="text-[11px] text-foreground/50 truncate">{user?.email}</p>
                       </div>
 
-                      <Link 
-                        href="/teacher-dashboard" 
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-orange-500/10 text-orange-600 dark:text-orange-400 font-medium text-xs transition-colors"
-                      >
-                        <div className="w-7 h-7 rounded-lg bg-orange-500/20 flex items-center justify-center">
-                          <LayoutDashboard className="w-3.5 h-3.5 text-orange-500" />
-                        </div>
-                        <div>
-                          <p className="font-bold leading-tight">Teacher Dashboard</p>
-                          <p className="text-[10px] text-foreground/50 leading-tight">Manage Courses & Students</p>
-                        </div>
-                      </Link>
+                      {userData?.role === 'teacher' ? (
+                        <>
+                          <Link 
+                            href="/teacher-dashboard" 
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-orange-500/10 text-orange-600 dark:text-orange-400 font-medium text-xs transition-colors"
+                          >
+                            <div className="w-7 h-7 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                              <LayoutDashboard className="w-3.5 h-3.5 text-orange-500" />
+                            </div>
+                            <div>
+                              <p className="font-bold leading-tight">Teacher Dashboard</p>
+                              <p className="text-[10px] text-foreground/50 leading-tight">Overview & Analytics</p>
+                            </div>
+                          </Link>
 
-                      <Link 
-                        href="/dashboard" 
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium text-xs transition-colors"
-                      >
-                        <div className="w-7 h-7 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                          <GraduationCap className="w-3.5 h-3.5 text-blue-500" />
-                        </div>
-                        <div>
-                          <p className="font-bold leading-tight">Student Dashboard</p>
-                          <p className="text-[10px] text-foreground/50 leading-tight">Enrolled Courses & Study</p>
-                        </div>
-                      </Link>
+                          <Link 
+                            href="/teacher-dashboard/courses" 
+                            className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
+                          >
+                            <Video className="w-3.5 h-3.5 text-foreground/60" /> My Created Courses
+                          </Link>
+
+                          <Link 
+                            href="/teacher-dashboard/students" 
+                            className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
+                          >
+                            <Users className="w-3.5 h-3.5 text-foreground/60" /> Enrolled Students
+                          </Link>
+
+                          <Link 
+                            href="/teacher-dashboard/earnings" 
+                            className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
+                          >
+                            <DollarSign className="w-3.5 h-3.5 text-foreground/60" /> Earnings & Revenue
+                          </Link>
+                        </>
+                      ) : (
+                        <>
+                          <Link 
+                            href="/dashboard" 
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium text-xs transition-colors"
+                          >
+                            <div className="w-7 h-7 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                              <GraduationCap className="w-3.5 h-3.5 text-blue-500" />
+                            </div>
+                            <div>
+                              <p className="font-bold leading-tight">Student Dashboard</p>
+                              <p className="text-[10px] text-foreground/50 leading-tight">Learning & Progress</p>
+                            </div>
+                          </Link>
+
+                          <Link 
+                            href="/dashboard/courses" 
+                            className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
+                          >
+                            <BookOpen className="w-3.5 h-3.5 text-foreground/60" /> My Courses
+                          </Link>
+
+                          <Link 
+                            href="/dashboard/exams" 
+                            className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
+                          >
+                            <GraduationCap className="w-3.5 h-3.5 text-foreground/60" /> Daily Exams
+                          </Link>
+                        </>
+                      )}
 
                       <div className="h-px bg-foreground/10 my-1"></div>
 
@@ -486,37 +527,62 @@ export default function Navbar() {
                 {/* Popover Menu on Click / Hover */}
                 {showProfileMenu && (
                   <div className="absolute bottom-full left-4 right-4 mb-3 bg-background border border-foreground/10 rounded-2xl shadow-2xl p-2 space-y-1 animate-in slide-in-from-bottom-2 duration-200 z-50">
-                    <Link 
-                      href="/teacher-dashboard"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        setShowProfileMenu(false);
-                      }} 
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-orange-500/10 text-orange-500 text-sm font-bold transition-colors"
-                    >
-                      <LayoutDashboard className="w-4 h-4" /> Teacher Dashboard
-                    </Link>
-                    <Link 
-                      href="/dashboard"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        setShowProfileMenu(false);
-                      }} 
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-500/10 text-blue-500 text-sm font-bold transition-colors"
-                    >
-                      <GraduationCap className="w-4 h-4" /> Student Dashboard
-                    </Link>
-                    {isTeacher && (
-                      <Link 
-                        href="/teacher-dashboard/profile"
-                        onClick={() => {
-                          setIsMobileMenuOpen(false);
-                          setShowProfileMenu(false);
-                        }} 
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
-                      >
-                        <UserCircle className="w-4 h-4 text-foreground/70" /> View Profile
-                      </Link>
+                    {isTeacher ? (
+                      <>
+                        <Link 
+                          href="/teacher-dashboard"
+                          onClick={() => {
+                            setIsMobileMenuOpen(false);
+                            setShowProfileMenu(false);
+                          }} 
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-orange-500/10 text-orange-500 text-sm font-bold transition-colors"
+                        >
+                          <LayoutDashboard className="w-4 h-4" /> Teacher Dashboard
+                        </Link>
+                        <Link 
+                          href="/teacher-dashboard/courses"
+                          onClick={() => {
+                            setIsMobileMenuOpen(false);
+                            setShowProfileMenu(false);
+                          }} 
+                          className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
+                        >
+                          <Video className="w-3.5 h-3.5 text-foreground/60" /> My Created Courses
+                        </Link>
+                        <Link 
+                          href="/teacher-dashboard/profile"
+                          onClick={() => {
+                            setIsMobileMenuOpen(false);
+                            setShowProfileMenu(false);
+                          }} 
+                          className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
+                        >
+                          <UserCircle className="w-4 h-4 text-foreground/70" /> View Profile
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <Link 
+                          href="/dashboard"
+                          onClick={() => {
+                            setIsMobileMenuOpen(false);
+                            setShowProfileMenu(false);
+                          }} 
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-500/10 text-blue-500 text-sm font-bold transition-colors"
+                        >
+                          <GraduationCap className="w-4 h-4" /> Student Dashboard
+                        </Link>
+                        <Link 
+                          href="/dashboard/courses"
+                          onClick={() => {
+                            setIsMobileMenuOpen(false);
+                            setShowProfileMenu(false);
+                          }} 
+                          className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
+                        >
+                          <BookOpen className="w-3.5 h-3.5 text-foreground/60" /> My Courses
+                        </Link>
+                      </>
                     )}
                     <Link 
                       href={isTeacher ? "/teacher-dashboard/settings" : "/dashboard/settings"}

@@ -14,6 +14,8 @@ export default function ProtectedRoute({ children, allowedRoles }: { children: R
         router.replace('/login');
       } else if (userData && !userData.onboardingComplete && !userData.role) {
         router.replace('/onboarding');
+      } else if (allowedRoles && userData?.role && !allowedRoles.includes(userData.role)) {
+        router.replace(userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard');
       }
     }
   }, [user, userData, loading, allowedRoles, router]);

@@ -37,12 +37,56 @@ export default function StudentsPage() {
           teacherIds.push('Hcj812T9oIWV2kPcedQVzBEKvng1');
         }
 
-        const [coursesSnap, enrollmentsSnap] = await Promise.all([
-          getDocs(query(collection(db, 'courses'), where('teacherId', 'in', teacherIds))),
-          getDocs(query(collection(db, 'enrollments'), where('teacherId', 'in', teacherIds)))
-        ]);
-        const courseDocs = coursesSnap.docs;
-        const enrollmentDocs = enrollmentsSnap.docs;
+        const coursesMap = new Map<string, any>();
+        try {
+          const coursesSnap = await getDocs(query(collection(db, 'courses'), where('teacherId', 'in', teacherIds)));
+          coursesSnap.forEach(d => coursesMap.set(d.id, d));
+        } catch (e) {
+          console.error("Error querying courses:", e);
+        }
+
+        if (coursesMap.size === 0 || user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
+          try {
+            const allCoursesSnap = await getDocs(collection(db, 'courses'));
+            allCoursesSnap.forEach(d => {
+              const data = d.data();
+              const isMatch = teacherIds.includes(data.teacherId) ||
+                (user.email && (data.teacherEmail === user.email || data.instructorEmail === user.email)) ||
+                (user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com');
+              if (isMatch) {
+                coursesMap.set(d.id, d);
+              }
+            });
+          } catch (e) {
+            console.error("Error fetching all courses fallback:", e);
+          }
+        }
+
+        const enrollmentsMap = new Map<string, any>();
+        try {
+          const enrollmentsSnap = await getDocs(query(collection(db, 'enrollments'), where('teacherId', 'in', teacherIds)));
+          enrollmentsSnap.forEach(d => enrollmentsMap.set(d.id, d));
+        } catch (e) {
+          console.error("Error querying enrollments:", e);
+        }
+
+        const courseIdsList = Array.from(coursesMap.keys());
+        if (courseIdsList.length > 0 && enrollmentsMap.size === 0) {
+          try {
+            const allEnrollSnap = await getDocs(collection(db, 'enrollments'));
+            allEnrollSnap.forEach(d => {
+              const data = d.data();
+              if (courseIdsList.includes(data.courseId)) {
+                enrollmentsMap.set(d.id, d);
+              }
+            });
+          } catch (e) {
+            console.error("Error fetching all enrollments fallback:", e);
+          }
+        }
+
+        const courseDocs = Array.from(coursesMap.values());
+        const enrollmentDocs = Array.from(enrollmentsMap.values());
         
         courseDocs.forEach(d => {
           if (d.data().teacherId !== user.uid) {

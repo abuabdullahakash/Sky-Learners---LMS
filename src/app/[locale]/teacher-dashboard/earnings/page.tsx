@@ -43,8 +43,39 @@ export default function EarningsPage() {
           teacherIds.push('Hcj812T9oIWV2kPcedQVzBEKvng1');
         }
 
-        const snapshot = await getDocs(query(collection(db, 'enrollments'), where('teacherId', 'in', teacherIds)));
-        const enrollmentDocs = snapshot.docs;
+        const enrollmentsMap = new Map<string, any>();
+        try {
+          const snapshot = await getDocs(query(collection(db, 'enrollments'), where('teacherId', 'in', teacherIds)));
+          snapshot.forEach(d => enrollmentsMap.set(d.id, d));
+        } catch (e) {
+          console.error("Error querying enrollments:", e);
+        }
+
+        if (enrollmentsMap.size === 0 || user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
+          try {
+            // Find courses first
+            const coursesSnap = await getDocs(collection(db, 'courses'));
+            const myCourseIds: string[] = [];
+            coursesSnap.forEach(d => {
+              const data = d.data();
+              if (teacherIds.includes(data.teacherId) || (user.email && (data.teacherEmail === user.email || data.instructorEmail === user.email)) || user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
+                myCourseIds.push(d.id);
+              }
+            });
+
+            const allEnrollSnap = await getDocs(collection(db, 'enrollments'));
+            allEnrollSnap.forEach(d => {
+              const data = d.data();
+              if (teacherIds.includes(data.teacherId) || myCourseIds.includes(data.courseId)) {
+                enrollmentsMap.set(d.id, d);
+              }
+            });
+          } catch (e) {
+            console.error("Error fetching all enrollments fallback:", e);
+          }
+        }
+
+        const enrollmentDocs = Array.from(enrollmentsMap.values());
         enrollmentDocs.forEach(d => {
           if (d.data().teacherId !== user.uid) {
             updateDoc(doc(db, 'enrollments', d.id), { teacherId: user.uid }).catch(() => {});

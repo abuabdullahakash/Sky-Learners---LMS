@@ -57,6 +57,27 @@ export default function CoursesListPage() {
           console.error("Error querying courses by teacherId:", e);
         }
 
+        // Fallback: If empty or for admin/owner email, check all courses
+        if (coursesMap.size === 0 || user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
+          try {
+            const allCoursesSnap = await getDocs(collection(db, 'courses'));
+            allCoursesSnap.forEach(d => {
+              const data = d.data();
+              const isMatch = teacherIds.includes(data.teacherId) ||
+                (user.email && (data.teacherEmail === user.email || data.instructorEmail === user.email)) ||
+                (user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com');
+              if (isMatch) {
+                coursesMap.set(d.id, d);
+                if (data.teacherId !== user.uid) {
+                  updateDoc(doc(db, 'courses', d.id), { teacherId: user.uid }).catch(() => {});
+                }
+              }
+            });
+          } catch (e) {
+            console.error("Error fetching all courses fallback:", e);
+          }
+        }
+
         const enrollmentsMap = new Map<string, any>();
         try {
           const enrollSnap = await getDocs(query(collection(db, 'enrollments'), where('teacherId', 'in', teacherIds), where('status', '==', 'approved')));
@@ -68,6 +89,25 @@ export default function CoursesListPage() {
           });
         } catch (e) {
           console.error("Error querying enrollments by teacherId:", e);
+        }
+
+        // Fallback: If courses exist in coursesMap, check enrollments for those course IDs
+        const courseIdsList = Array.from(coursesMap.keys());
+        if (courseIdsList.length > 0 && enrollmentsMap.size === 0) {
+          try {
+            const allEnrollSnap = await getDocs(collection(db, 'enrollments'));
+            allEnrollSnap.forEach(d => {
+              const data = d.data();
+              if (courseIdsList.includes(data.courseId) && data.status === 'approved') {
+                enrollmentsMap.set(d.id, d);
+                if (data.teacherId !== user.uid) {
+                  updateDoc(doc(db, 'enrollments', d.id), { teacherId: user.uid }).catch(() => {});
+                }
+              }
+            });
+          } catch (e) {
+            console.error("Error fetching all enrollments fallback:", e);
+          }
         }
 
         const enrollmentCounts: Record<string, number> = {};

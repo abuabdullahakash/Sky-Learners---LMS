@@ -31,11 +31,46 @@ export default function TeacherDashboard() {
       }
 
       const enrollmentsRef = collection(db, 'enrollments');
-      let enrollmentDocs: any[] = [];
+      const coursesRef = collection(db, 'courses');
+      
+      const coursesMap = new Map<string, any>();
+      try {
+        const coursesSnap = await getDocs(query(coursesRef, where('teacherId', 'in', teacherIds)));
+        coursesSnap.forEach(d => {
+          coursesMap.set(d.id, d);
+          if (d.data().teacherId !== user.uid) {
+            updateDoc(doc(db, 'courses', d.id), { teacherId: user.uid }).catch(() => {});
+          }
+        });
+      } catch (e) {
+        console.error("Error querying courses:", e);
+      }
+
+      if (coursesMap.size === 0 || user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
+        try {
+          const allCoursesSnap = await getDocs(coursesRef);
+          allCoursesSnap.forEach(d => {
+            const data = d.data();
+            const isMatch = teacherIds.includes(data.teacherId) ||
+              (user.email && (data.teacherEmail === user.email || data.instructorEmail === user.email)) ||
+              (user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com');
+            if (isMatch) {
+              coursesMap.set(d.id, d);
+              if (data.teacherId !== user.uid) {
+                updateDoc(doc(db, 'courses', d.id), { teacherId: user.uid }).catch(() => {});
+              }
+            }
+          });
+        } catch (e) {
+          console.error("Error fetching all courses fallback:", e);
+        }
+      }
+
+      const enrollmentsMap = new Map<string, any>();
       try {
         const allSnap = await getDocs(query(enrollmentsRef, where('teacherId', 'in', teacherIds)));
-        enrollmentDocs = allSnap.docs;
-        enrollmentDocs.forEach(d => {
+        allSnap.forEach(d => {
+          enrollmentsMap.set(d.id, d);
           if (d.data().teacherId !== user.uid) {
             updateDoc(doc(db, 'enrollments', d.id), { teacherId: user.uid }).catch(() => {});
           }
@@ -43,13 +78,31 @@ export default function TeacherDashboard() {
       } catch (e) {
         console.error("Error querying enrollments:", e);
       }
+
+      const ownedCourseIds = Array.from(coursesMap.keys());
+      if (ownedCourseIds.length > 0 && enrollmentsMap.size === 0) {
+        try {
+          const allEnrollSnap = await getDocs(enrollmentsRef);
+          allEnrollSnap.forEach(d => {
+            const data = d.data();
+            if (ownedCourseIds.includes(data.courseId)) {
+              enrollmentsMap.set(d.id, d);
+              if (data.teacherId !== user.uid) {
+                updateDoc(doc(db, 'enrollments', d.id), { teacherId: user.uid }).catch(() => {});
+              }
+            }
+          });
+        } catch (e) {
+          console.error("Error fetching all enrollments fallback:", e);
+        }
+      }
       
       const pending: any[] = [];
       const recent: any[] = [];
       let totalEarnings = 0;
       let totalStudents = 0;
 
-      enrollmentDocs.forEach(docSnap => {
+      enrollmentsMap.forEach((docSnap) => {
         const data = docSnap.data();
         if (data.status === 'pending') {
           pending.push({ id: docSnap.id, ...data });
@@ -70,20 +123,12 @@ export default function TeacherDashboard() {
       });
       setRecentEnrollments(recent.slice(0, 5));
 
-      // Fetch Active Courses
-      const coursesRef = collection(db, 'courses');
       let activeCount = 0;
-      try {
-        const activeCoursesSnap = await getDocs(query(coursesRef, where('teacherId', 'in', teacherIds)));
-        activeCount = activeCoursesSnap.docs.filter(d => d.data().isPublished !== false).length;
-        activeCoursesSnap.docs.forEach(d => {
-          if (d.data().teacherId !== user.uid) {
-            updateDoc(doc(db, 'courses', d.id), { teacherId: user.uid }).catch(() => {});
-          }
-        });
-      } catch (e) {
-        console.error("Error querying active courses:", e);
-      }
+      coursesMap.forEach((docSnap) => {
+        if (docSnap.data().isPublished !== false) {
+          activeCount += 1;
+        }
+      });
       
       setDashboardStats({
         totalStudents,

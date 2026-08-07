@@ -427,6 +427,26 @@ export default function Navbar() {
                 {/* Popover Menu on Click / Hover */}
                 {showProfileMenu && (
                   <div className="absolute bottom-full left-4 right-4 mb-3 bg-background border border-foreground/10 rounded-2xl shadow-2xl p-2 space-y-1 animate-in slide-in-from-bottom-2 duration-200 z-50">
+                    <Link 
+                      href="/teacher-dashboard"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        setShowProfileMenu(false);
+                      }} 
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-orange-500/10 text-orange-500 text-sm font-bold transition-colors"
+                    >
+                      <LayoutDashboard className="w-4 h-4" /> Teacher Dashboard
+                    </Link>
+                    <Link 
+                      href="/dashboard"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        setShowProfileMenu(false);
+                      }} 
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-500/10 text-blue-500 text-sm font-bold transition-colors"
+                    >
+                      <GraduationCap className="w-4 h-4" /> Student Dashboard
+                    </Link>
                     {isTeacher && (
                       <Link 
                         href="/teacher-dashboard/profile"

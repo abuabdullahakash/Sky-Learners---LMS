@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { DollarSign, TrendingUp, Clock, CheckCircle2, AlertCircle, SlidersHorizontal, Calendar, X, Award } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 
 export default function EarningsPage() {
   const { user } = useAuth();
@@ -38,17 +38,18 @@ export default function EarningsPage() {
       if (!user) return;
       setIsLoading(true);
       try {
-        const enrollmentsQuery = query(
-          collection(db, 'enrollments'),
-          where('teacherId', '==', user.uid)
-        );
-        const snapshot = await getDocs(enrollmentsQuery);
-        let enrollmentDocs = snapshot.docs;
-
-        if (enrollmentDocs.length === 0 && user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
-          const allEnrollSnap = await getDocs(collection(db, 'enrollments'));
-          enrollmentDocs = allEnrollSnap.docs;
+        const teacherIds = [user.uid];
+        if (user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
+          teacherIds.push('Hcj812T9oIWV2kPcedQVzBEKvng1');
         }
+
+        const snapshot = await getDocs(query(collection(db, 'enrollments'), where('teacherId', 'in', teacherIds)));
+        const enrollmentDocs = snapshot.docs;
+        enrollmentDocs.forEach(d => {
+          if (d.data().teacherId !== user.uid) {
+            updateDoc(doc(db, 'enrollments', d.id), { teacherId: user.uid }).catch(() => {});
+          }
+        });
         
         const allEnrollments: any[] = [];
         enrollmentDocs.forEach(doc => {

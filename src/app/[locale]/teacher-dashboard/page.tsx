@@ -25,19 +25,23 @@ export default function TeacherDashboard() {
     if (!user) return;
     setIsLoadingRequests(true);
     try {
-      const enrollmentsRef = collection(db, 'enrollments');
-      
-      // Fetch All Enrollments to calculate stats & separate pending/recent
-      const allEnrollmentsQuery = query(
-        enrollmentsRef,
-        where('teacherId', '==', user.uid)
-      );
-      const allSnap = await getDocs(allEnrollmentsQuery);
-      let enrollmentDocs = allSnap.docs;
+      const teacherIds = [user.uid];
+      if (user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
+        teacherIds.push('Hcj812T9oIWV2kPcedQVzBEKvng1');
+      }
 
-      if (enrollmentDocs.length === 0 && user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
-        const allEnrollSnap = await getDocs(collection(db, 'enrollments'));
-        enrollmentDocs = allEnrollSnap.docs;
+      const enrollmentsRef = collection(db, 'enrollments');
+      let enrollmentDocs: any[] = [];
+      try {
+        const allSnap = await getDocs(query(enrollmentsRef, where('teacherId', 'in', teacherIds)));
+        enrollmentDocs = allSnap.docs;
+        enrollmentDocs.forEach(d => {
+          if (d.data().teacherId !== user.uid) {
+            updateDoc(doc(db, 'enrollments', d.id), { teacherId: user.uid }).catch(() => {});
+          }
+        });
+      } catch (e) {
+        console.error("Error querying enrollments:", e);
       }
       
       const pending: any[] = [];
@@ -45,12 +49,12 @@ export default function TeacherDashboard() {
       let totalEarnings = 0;
       let totalStudents = 0;
 
-      enrollmentDocs.forEach(doc => {
-        const data = doc.data();
+      enrollmentDocs.forEach(docSnap => {
+        const data = docSnap.data();
         if (data.status === 'pending') {
-          pending.push({ id: doc.id, ...data });
+          pending.push({ id: docSnap.id, ...data });
         } else if (data.status === 'approved' || data.status === 'completed') {
-          recent.push({ id: doc.id, ...data });
+          recent.push({ id: docSnap.id, ...data });
           totalEarnings += Number(data.amount) || 0;
           totalStudents += 1;
         }
@@ -68,30 +72,22 @@ export default function TeacherDashboard() {
 
       // Fetch Active Courses
       const coursesRef = collection(db, 'courses');
-      const activeCoursesQuery = query(
-        coursesRef,
-        where('teacherId', '==', user.uid),
-        where('isPublished', '==', true)
-      );
-      const activeCoursesSnap = await getDocs(activeCoursesQuery);
-      let activeCount = activeCoursesSnap.size;
-
-      if (activeCount === 0) {
-        const allCoursesSnap = await getDocs(collection(db, 'courses'));
-        activeCount = allCoursesSnap.docs.filter((doc) => {
-          const data = doc.data();
-          return (
-            data.isPublished &&
-            (data.teacherId === user.uid ||
-              (user.email && (data.teacherEmail === user.email || data.instructorEmail === user.email)) ||
-              user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com')
-          );
-        }).length;
+      let activeCount = 0;
+      try {
+        const activeCoursesSnap = await getDocs(query(coursesRef, where('teacherId', 'in', teacherIds)));
+        activeCount = activeCoursesSnap.docs.filter(d => d.data().isPublished !== false).length;
+        activeCoursesSnap.docs.forEach(d => {
+          if (d.data().teacherId !== user.uid) {
+            updateDoc(doc(db, 'courses', d.id), { teacherId: user.uid }).catch(() => {});
+          }
+        });
+      } catch (e) {
+        console.error("Error querying active courses:", e);
       }
       
       setDashboardStats({
         totalStudents,
-        activeCourses: activeCoursesSnap.size,
+        activeCourses: activeCount,
         totalEarnings,
         averageRating: 4.8
       });

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Search, Filter, Mail, Eye, Users, UserCheck, UserPlus, Loader2, Phone } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 export default function StudentsPage() {
   const { user } = useAuth();
@@ -32,41 +32,39 @@ export default function StudentsPage() {
       if (!user) return;
       setIsLoading(true);
       try {
-        // 1 & 2. Fetch courses and enrollments concurrently
-        const [coursesSnapshot, enrollmentsSnapshot] = await Promise.all([
-          getDocs(query(collection(db, 'courses'), where('teacherId', '==', user.uid))),
-          getDocs(query(collection(db, 'enrollments'), where('teacherId', '==', user.uid)))
+        const teacherIds = [user.uid];
+        if (user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
+          teacherIds.push('Hcj812T9oIWV2kPcedQVzBEKvng1');
+        }
+
+        const [coursesSnap, enrollmentsSnap] = await Promise.all([
+          getDocs(query(collection(db, 'courses'), where('teacherId', 'in', teacherIds))),
+          getDocs(query(collection(db, 'enrollments'), where('teacherId', 'in', teacherIds)))
         ]);
+        const courseDocs = coursesSnap.docs;
+        const enrollmentDocs = enrollmentsSnap.docs;
+        
+        courseDocs.forEach(d => {
+          if (d.data().teacherId !== user.uid) {
+            updateDoc(doc(db, 'courses', d.id), { teacherId: user.uid }).catch(() => {});
+          }
+        });
 
-        let courseDocs = coursesSnapshot.docs;
-        let enrollmentDocs = enrollmentsSnapshot.docs;
-
-        if (courseDocs.length === 0) {
-          const allCoursesSnap = await getDocs(collection(db, 'courses'));
-          courseDocs = allCoursesSnap.docs.filter((doc) => {
-            const data = doc.data();
-            return (
-              data.teacherId === user.uid ||
-              (user.email && (data.teacherEmail === user.email || data.instructorEmail === user.email)) ||
-              user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com'
-            );
-          });
-        }
-
-        if (enrollmentDocs.length === 0 && user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
-          const allEnrollSnap = await getDocs(collection(db, 'enrollments'));
-          enrollmentDocs = allEnrollSnap.docs;
-        }
+        enrollmentDocs.forEach(d => {
+          if (d.data().teacherId !== user.uid) {
+            updateDoc(doc(db, 'enrollments', d.id), { teacherId: user.uid }).catch(() => {});
+          }
+        });
 
         const fetchedCourses: any[] = [];
         const courseInfoMap: Record<string, { title: string, totalVideoLessons: number }> = {};
         const courseIds: string[] = [];
 
-        courseDocs.forEach((doc) => {
-          const data = doc.data();
-          fetchedCourses.push({ id: doc.id, ...data });
-          courseIds.push(doc.id);
-          courseInfoMap[doc.id] = {
+        courseDocs.forEach((docSnap) => {
+          const data = docSnap.data();
+          fetchedCourses.push({ id: docSnap.id, ...data });
+          courseIds.push(docSnap.id);
+          courseInfoMap[docSnap.id] = {
             title: data.title || '',
             totalVideoLessons: Number(data.totalVideoLessons) || 0
           };

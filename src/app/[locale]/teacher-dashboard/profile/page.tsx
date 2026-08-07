@@ -49,7 +49,15 @@ export default function ProfileBuilderPage() {
       if (user?.uid) {
         try {
           const docRef = doc(db, 'teacherProfiles', user.uid);
-          const docSnap = await getDoc(docRef);
+          let docSnap = await getDoc(docRef);
+          if (!docSnap.exists() && user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
+            const oldRef = doc(db, 'teacherProfiles', 'Hcj812T9oIWV2kPcedQVzBEKvng1');
+            const oldSnap = await getDoc(oldRef);
+            if (oldSnap.exists()) {
+              docSnap = oldSnap;
+              setDoc(docRef, oldSnap.data(), { merge: true }).catch(() => {});
+            }
+          }
           if (docSnap.exists()) {
             setProfileData((prev) => ({ ...prev, ...docSnap.data() }));
           }

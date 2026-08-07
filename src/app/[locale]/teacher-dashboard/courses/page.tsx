@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { Link, useRouter } from '@/i18n/routing';
 import { PlusCircle, Search, Video, Edit, Users, CheckSquare, Calendar, SlidersHorizontal, X } from 'lucide-react';
 import Image from 'next/image';
@@ -39,64 +39,59 @@ export default function CoursesListPage() {
     const fetchCourses = async () => {
       if (!user) return;
       try {
-        const coursesQuery = query(
-          collection(db, 'courses'),
-          where('teacherId', '==', user.uid)
-        );
-        const enrollmentsQuery = query(
-          collection(db, 'enrollments'),
-          where('teacherId', '==', user.uid),
-          where('status', '==', 'approved')
-        );
-
-        const [coursesSnap, enrollmentsSnap] = await Promise.all([
-          getDocs(query(collection(db, 'courses'), where('teacherId', '==', user.uid))),
-          getDocs(query(collection(db, 'enrollments'), where('teacherId', '==', user.uid), where('status', '==', 'approved'))),
-        ]);
-
-        let courseDocs = coursesSnap.docs;
-        let enrollmentDocs = enrollmentsSnap.docs;
-
-        // Fallback recovery if user ID changed or admin account
-        if (courseDocs.length === 0) {
-          const allCoursesSnap = await getDocs(collection(db, 'courses'));
-          courseDocs = allCoursesSnap.docs.filter((doc) => {
-            const data = doc.data();
-            return (
-              data.teacherId === user.uid ||
-              (user.email && (data.teacherEmail === user.email || data.instructorEmail === user.email)) ||
-              user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com'
-            );
-          });
+        const teacherIds = [user.uid];
+        if (user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
+          teacherIds.push('Hcj812T9oIWV2kPcedQVzBEKvng1');
         }
 
-        if (enrollmentDocs.length === 0 && user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') {
-          const allEnrollSnap = await getDocs(collection(db, 'enrollments'));
-          enrollmentDocs = allEnrollSnap.docs.filter(d => d.data().status === 'approved');
+        const coursesMap = new Map<string, any>();
+        try {
+          const coursesSnap = await getDocs(query(collection(db, 'courses'), where('teacherId', 'in', teacherIds)));
+          coursesSnap.forEach(d => {
+            coursesMap.set(d.id, d);
+            if (d.data().teacherId !== user.uid) {
+              updateDoc(doc(db, 'courses', d.id), { teacherId: user.uid }).catch(() => {});
+            }
+          });
+        } catch (e) {
+          console.error("Error querying courses by teacherId:", e);
+        }
+
+        const enrollmentsMap = new Map<string, any>();
+        try {
+          const enrollSnap = await getDocs(query(collection(db, 'enrollments'), where('teacherId', 'in', teacherIds), where('status', '==', 'approved')));
+          enrollSnap.forEach(d => {
+            enrollmentsMap.set(d.id, d);
+            if (d.data().teacherId !== user.uid) {
+              updateDoc(doc(db, 'enrollments', d.id), { teacherId: user.uid }).catch(() => {});
+            }
+          });
+        } catch (e) {
+          console.error("Error querying enrollments by teacherId:", e);
         }
 
         const enrollmentCounts: Record<string, number> = {};
-        enrollmentDocs.forEach((doc) => {
-          const data = doc.data();
+        enrollmentsMap.forEach((docSnap) => {
+          const data = docSnap.data();
           if (data.courseId) {
             enrollmentCounts[data.courseId] = (enrollmentCounts[data.courseId] || 0) + 1;
           }
         });
 
         const fetchedCourses: Course[] = [];
-        courseDocs.forEach((doc) => {
-          const data = doc.data();
+        coursesMap.forEach((docSnap) => {
+          const data = docSnap.data();
           fetchedCourses.push({
-            id: doc.id,
+            id: docSnap.id,
             ...data,
-            enrolledStudents: enrollmentCounts[doc.id] || data.enrolledStudents || 0,
+            enrolledStudents: enrollmentCounts[docSnap.id] || data.enrolledStudents || 0,
           } as Course);
         });
         
         // Sort in memory
         fetchedCourses.sort((a, b) => {
-          const dateA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
-          const dateB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+          const dateA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : (a.createdAt ? new Date(a.createdAt).getTime() : 0);
+          const dateB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : (b.createdAt ? new Date(b.createdAt).getTime() : 0);
           return dateB - dateA;
         });
 

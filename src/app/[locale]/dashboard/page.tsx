@@ -136,32 +136,52 @@ export default function DashboardOverview() {
         // 2. Fetch approved enrollments count & IDs
         const enrollmentsMap = new Map<string, any>();
         const enrollmentsRef = collection(db, 'enrollments');
+        const studentIds = [user.uid];
+        if (user.email?.toLowerCase().trim() === 'mdakash136915@gmail.com') {
+          studentIds.push('Gk2SnbBcDQ8ScmKm8GOoW2SZx0S2');
+        }
         
-        const enrollmentsUidSnap = await getDocs(query(
-          enrollmentsRef,
-          where('studentId', '==', user.uid),
-          where('status', '==', 'approved')
-        ));
-        enrollmentsUidSnap.forEach(d => enrollmentsMap.set(d.id, d.data()));
+        try {
+          const enrollmentsUidSnap = await getDocs(query(
+            enrollmentsRef,
+            where('studentId', 'in', studentIds),
+            where('status', '==', 'approved')
+          ));
+          enrollmentsUidSnap.forEach(d => {
+            enrollmentsMap.set(d.id, d.data());
+            if (d.data().studentId !== user.uid) {
+              updateDoc(doc(db, 'enrollments', d.id), { studentId: user.uid }).catch(() => {});
+            }
+          });
+        } catch (e) {
+          console.error("Error querying enrollments by studentId in dashboard overview:", e);
+        }
 
         if (user.email) {
           const userEmail = user.email.toLowerCase().trim();
-          const [bySEmail, byCEmail] = await Promise.all([
-            getDocs(query(enrollmentsRef, where('studentEmail', '==', userEmail), where('status', '==', 'approved'))),
-            getDocs(query(enrollmentsRef, where('contactEmail', '==', userEmail), where('status', '==', 'approved')))
-          ]);
-          bySEmail.forEach(d => {
-            enrollmentsMap.set(d.id, d.data());
-            if (d.data().studentId !== user.uid) {
-              updateDoc(doc(db, 'enrollments', d.id), { studentId: user.uid }).catch(() => {});
-            }
-          });
-          byCEmail.forEach(d => {
-            enrollmentsMap.set(d.id, d.data());
-            if (d.data().studentId !== user.uid) {
-              updateDoc(doc(db, 'enrollments', d.id), { studentId: user.uid }).catch(() => {});
-            }
-          });
+          try {
+            const bySEmail = await getDocs(query(enrollmentsRef, where('studentEmail', '==', userEmail), where('status', '==', 'approved')));
+            bySEmail.forEach(d => {
+              enrollmentsMap.set(d.id, d.data());
+              if (d.data().studentId !== user.uid) {
+                updateDoc(doc(db, 'enrollments', d.id), { studentId: user.uid }).catch(() => {});
+              }
+            });
+          } catch (e) {
+            console.error("Error querying enrollments by studentEmail:", e);
+          }
+
+          try {
+            const byCEmail = await getDocs(query(enrollmentsRef, where('contactEmail', '==', userEmail), where('status', '==', 'approved')));
+            byCEmail.forEach(d => {
+              enrollmentsMap.set(d.id, d.data());
+              if (d.data().studentId !== user.uid) {
+                updateDoc(doc(db, 'enrollments', d.id), { studentId: user.uid }).catch(() => {});
+              }
+            });
+          } catch (e) {
+            console.error("Error querying enrollments by contactEmail:", e);
+          }
         }
 
         const approvedEnrollments = Array.from(enrollmentsMap.values());
@@ -172,11 +192,19 @@ export default function DashboardOverview() {
         // 3. Fetch completed lessons count
         const completedMap = new Map<string, any>();
         const completedRef = collection(db, 'completed_lessons');
-        const completedUidSnap = await getDocs(query(completedRef, where('studentId', '==', user.uid)));
-        completedUidSnap.forEach(d => completedMap.set(d.id, d.data()));
+        try {
+          const completedUidSnap = await getDocs(query(completedRef, where('studentId', 'in', studentIds)));
+          completedUidSnap.forEach(d => completedMap.set(d.id, d.data()));
+        } catch (e) {
+          console.error("Error querying completed lessons by studentId:", e);
+        }
         if (user.email) {
-          const clEmail = await getDocs(query(completedRef, where('studentEmail', '==', user.email.toLowerCase().trim())));
-          clEmail.forEach(d => completedMap.set(d.id, d.data()));
+          try {
+            const clEmail = await getDocs(query(completedRef, where('studentEmail', '==', user.email.toLowerCase().trim())));
+            clEmail.forEach(d => completedMap.set(d.id, d.data()));
+          } catch (e) {
+            console.error("Error querying completed lessons by email:", e);
+          }
         }
         setCompletedCount(completedMap.size);
 
@@ -184,11 +212,19 @@ export default function DashboardOverview() {
         try {
           const completedExamsMap = new Map<string, any>();
           const completedExamsRef = collection(db, 'completed_exams');
-          const completedExamsUidSnap = await getDocs(query(completedExamsRef, where('studentId', '==', user.uid)));
-          completedExamsUidSnap.forEach(d => completedExamsMap.set(d.id, d.data()));
+          try {
+            const completedExamsUidSnap = await getDocs(query(completedExamsRef, where('studentId', 'in', studentIds)));
+            completedExamsUidSnap.forEach(d => completedExamsMap.set(d.id, d.data()));
+          } catch (e) {
+            console.error("Error querying completed exams by studentId:", e);
+          }
           if (user.email) {
-            const ceEmail = await getDocs(query(completedExamsRef, where('studentEmail', '==', user.email.toLowerCase().trim())));
-            ceEmail.forEach(d => completedExamsMap.set(d.id, d.data()));
+            try {
+              const ceEmail = await getDocs(query(completedExamsRef, where('studentEmail', '==', user.email.toLowerCase().trim())));
+              ceEmail.forEach(d => completedExamsMap.set(d.id, d.data()));
+            } catch (e) {
+              console.error("Error querying completed exams by email:", e);
+            }
           }
 
           const completedExamsList = Array.from(completedExamsMap.values());

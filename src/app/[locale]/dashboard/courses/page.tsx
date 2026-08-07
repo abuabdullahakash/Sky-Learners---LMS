@@ -36,32 +36,50 @@ export default function StudentCoursesPage() {
       try {
         // 1. Fetch enrollments by studentId AND studentEmail / contactEmail
         const enrollmentsMap = new Map<string, any>();
+        const studentIds = [user.uid];
+        if (user.email?.toLowerCase().trim() === 'mdakash136915@gmail.com') {
+          studentIds.push('Gk2SnbBcDQ8ScmKm8GOoW2SZx0S2');
+        }
         
-        // Query by studentId
-        const uidSnap = await getDocs(query(collection(db, 'enrollments'), where('studentId', '==', user.uid)));
-        uidSnap.forEach(d => enrollmentsMap.set(d.id, d));
+        // Query by studentIds
+        try {
+          const uidSnap = await getDocs(query(collection(db, 'enrollments'), where('studentId', 'in', studentIds)));
+          uidSnap.forEach(d => {
+            enrollmentsMap.set(d.id, d);
+            if (d.data().studentId !== user.uid) {
+              updateDoc(doc(db, 'enrollments', d.id), { studentId: user.uid }).catch(() => {});
+            }
+          });
+        } catch (e) {
+          console.error("Error querying enrollments by studentId:", e);
+        }
         
         // Query by email
         if (user.email) {
           const userEmail = user.email.toLowerCase().trim();
-          const [byStudentEmailSnap, byContactEmailSnap] = await Promise.all([
-            getDocs(query(collection(db, 'enrollments'), where('studentEmail', '==', userEmail))),
-            getDocs(query(collection(db, 'enrollments'), where('contactEmail', '==', userEmail)))
-          ]);
-          
-          byStudentEmailSnap.forEach(d => {
-            enrollmentsMap.set(d.id, d);
-            if (d.data().studentId !== user.uid) {
-              updateDoc(doc(db, 'enrollments', d.id), { studentId: user.uid }).catch(() => {});
-            }
-          });
-          
-          byContactEmailSnap.forEach(d => {
-            enrollmentsMap.set(d.id, d);
-            if (d.data().studentId !== user.uid) {
-              updateDoc(doc(db, 'enrollments', d.id), { studentId: user.uid }).catch(() => {});
-            }
-          });
+          try {
+            const byStudentEmailSnap = await getDocs(query(collection(db, 'enrollments'), where('studentEmail', '==', userEmail)));
+            byStudentEmailSnap.forEach(d => {
+              enrollmentsMap.set(d.id, d);
+              if (d.data().studentId !== user.uid) {
+                updateDoc(doc(db, 'enrollments', d.id), { studentId: user.uid }).catch(() => {});
+              }
+            });
+          } catch (e) {
+            console.error("Error querying enrollments by studentEmail:", e);
+          }
+
+          try {
+            const byContactEmailSnap = await getDocs(query(collection(db, 'enrollments'), where('contactEmail', '==', userEmail)));
+            byContactEmailSnap.forEach(d => {
+              enrollmentsMap.set(d.id, d);
+              if (d.data().studentId !== user.uid) {
+                updateDoc(doc(db, 'enrollments', d.id), { studentId: user.uid }).catch(() => {});
+              }
+            });
+          } catch (e) {
+            console.error("Error querying enrollments by contactEmail:", e);
+          }
         }
 
         const enrollmentDocs = Array.from(enrollmentsMap.values());

@@ -35,7 +35,8 @@ import {
   ArrowRight,
   ArrowLeft,
   Flame,
-  Target
+  Target,
+  Send
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -121,12 +122,15 @@ export default function TeacherHomePageBuilderPage() {
     { id: 'st-3', label: 'Students', value: '100K+' }
   ]);
 
-  // 7. Contact Section State ("আমাদের সাথে যোগাযোগ করো")
+  // 7. Contact Section State & Social Channels ("আমাদের সাথে যোগাযোগ করো")
   const [contactTitle, setContactTitle] = useState('আমাদের সাথে যোগাযোগ করো');
   const [contactPhone, setContactPhone] = useState('01700000000');
   const [contactWhatsapp, setContactWhatsapp] = useState('01700000000');
   const [contactEmail, setContactEmail] = useState('support@academy.com');
-  const [contactAddress, setContactAddress] = useState('ঢাকা, বাংলাদেশ');
+  const [contactFacebookPage, setContactFacebookPage] = useState('https://facebook.com');
+  const [contactFacebookGroup, setContactFacebookGroup] = useState('https://facebook.com/groups');
+  const [contactYoutube, setContactYoutube] = useState('https://youtube.com');
+  const [contactTelegram, setContactTelegram] = useState('https://t.me');
 
   // 8. Trust Banner State
   const [trustTitle, setTrustTitle] = useState('বিশ্ববিদ্যালয় ও মেডিকেল ভর্তি প্রস্তুতিতে একটি আস্থার নাম');
@@ -136,11 +140,14 @@ export default function TeacherHomePageBuilderPage() {
 
   // 9. Photo Gallery State ("সাফল্যের পথে এগিয়ে চলেছে")
   const [galleryTitle, setGalleryTitle] = useState('আমাদের হাত ধরে সাফল্যের পথে এগিয়ে চলেছে');
-  const [gallerySubtitle, setGallerySubtitle] = useState('ক্লাসরুম, সেমিনার ও শিক্ষার্থীদের আনন্দের মুহূর্তসমূহ');
+  const [gallerySubtitle, setGallerySubtitle] = useState('আমাদের শিক্ষার্থীদের অর্জন ও স্মরণীয় মুহূর্তগুলো');
   const [galleryPhotos, setGalleryPhotos] = useState<Array<{ id: string; imageUrl: string; caption?: string }>>([
-    { id: 'g-1', imageUrl: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=600&auto=format&fit=crop', caption: 'সেমিনার সেশন' },
-    { id: 'g-2', imageUrl: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=600&auto=format&fit=crop', caption: 'ডেইলি এক্সাম হল' },
-    { id: 'g-3', imageUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=600&auto=format&fit=crop', caption: 'অফলাইন ওরিয়েন্টেশন' }
+    { id: 'g-1', imageUrl: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=600&auto=format&fit=crop' },
+    { id: 'g-2', imageUrl: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=600&auto=format&fit=crop' },
+    { id: 'g-3', imageUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=600&auto=format&fit=crop' },
+    { id: 'g-4', imageUrl: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=600&auto=format&fit=crop' },
+    { id: 'g-5', imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=600&auto=format&fit=crop' },
+    { id: 'g-6', imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=600&auto=format&fit=crop' }
   ]);
   const [uploadingGalleryImg, setUploadingGalleryImg] = useState(false);
 
@@ -191,7 +198,10 @@ export default function TeacherHomePageBuilderPage() {
             if (config.contactPhone) setContactPhone(config.contactPhone);
             if (config.contactWhatsapp) setContactWhatsapp(config.contactWhatsapp);
             if (config.contactEmail) setContactEmail(config.contactEmail);
-            if (config.contactAddress) setContactAddress(config.contactAddress);
+            if (config.contactFacebookPage) setContactFacebookPage(config.contactFacebookPage);
+            if (config.contactFacebookGroup) setContactFacebookGroup(config.contactFacebookGroup);
+            if (config.contactYoutube) setContactYoutube(config.contactYoutube);
+            if (config.contactTelegram) setContactTelegram(config.contactTelegram);
             if (config.trustTitle) setTrustTitle(config.trustTitle);
             if (config.trustSubtitle) setTrustSubtitle(config.trustSubtitle);
             if (config.trustTargetCourseId) setTrustTargetCourseId(config.trustTargetCourseId);
@@ -239,7 +249,10 @@ export default function TeacherHomePageBuilderPage() {
         contactPhone,
         contactWhatsapp,
         contactEmail,
-        contactAddress,
+        contactFacebookPage,
+        contactFacebookGroup,
+        contactYoutube,
+        contactTelegram,
         trustTitle,
         trustSubtitle,
         trustTargetCourseId,
@@ -300,8 +313,7 @@ export default function TeacherHomePageBuilderPage() {
         ...prev,
         {
           id: `photo-${Date.now()}`,
-          imageUrl: url,
-          caption: 'ইভেন্ট মেমোরি'
+          imageUrl: url
         }
       ]);
       toast.success(locale === 'bn' ? 'গ্যালারি ফটো যুক্ত হয়েছে!' : 'Gallery photo added!');
@@ -319,7 +331,7 @@ export default function TeacherHomePageBuilderPage() {
     { id: 'features', label: '৪. প্রস্তুতিতে যা প্রয়োজন', icon: Award },
     { id: 'admission', label: '৫. ভর্তি তথ্য', icon: Info },
     { id: 'about', label: '৬. আমাদের সম্পর্কে', icon: Users },
-    { id: 'contact', label: '৭. যোগাযোগ', icon: Phone },
+    { id: 'contact', label: '৭. যোগাযোগ ও সোশ্যাল লিঙ্ক', icon: Phone },
     { id: 'trustBanner', label: '৮. আস্থার ব্যানার', icon: Flame },
     { id: 'gallery', label: '৯. ফটো গ্যালারি', icon: ImageIcon },
     { id: 'helpBar', label: '১০. হেল্পবার', icon: HelpCircle },
@@ -865,7 +877,7 @@ export default function TeacherHomePageBuilderPage() {
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-foreground/70 block mb-1">গুরুত্বপূর্ণ নোটিশ / হেল্প টেকস্ট</label>
+                <label className="text-[11px] font-bold text-foreground/70 block mb-1">গুরুত্বপূর্ণ নোটিশ / হেল্প টেক্সট</label>
                 <input
                   type="text"
                   value={admissionNotice}
@@ -963,16 +975,16 @@ export default function TeacherHomePageBuilderPage() {
             </div>
           )}
 
-          {/* TAB 7: CONTACT */}
+          {/* TAB 7: CONTACT & SOCIAL LINKS */}
           {activeTab === 'contact' && (
             <div className="space-y-6">
               <div className="border-b border-foreground/10 pb-4">
                 <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <Phone className="w-5 h-5 text-orange-500" />
-                  <span>৭. আমাদের সাথে যোগাযোগ করো</span>
+                  <span>৭. আমাদের সাথে যোগাযোগ ও সোশ্যাল চ্যানেল লিঙ্কস</span>
                 </h3>
                 <p className="text-xs text-foreground/60 mt-1">
-                  শিক্ষার্থীদের জন্য যোগাযোগের নাম্বার ও সাপোর্ট মাধ্যম।
+                  শিক্ষার্থীদের জন্য ফেসবুক পেজ, গ্রুপ, ইউটিউব, টেলিগ্রাম ও হেল্পলাইন লিঙ্ক কনফিগার করুন।
                 </p>
               </div>
 
@@ -1005,11 +1017,42 @@ export default function TeacherHomePageBuilderPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">অফিস / চেম্বার ঠিকানা</label>
+                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">Facebook Page লিংক</label>
                   <input
                     type="text"
-                    value={contactAddress}
-                    onChange={(e) => setContactAddress(e.target.value)}
+                    value={contactFacebookPage}
+                    onChange={(e) => setContactFacebookPage(e.target.value)}
+                    placeholder="https://facebook.com/yourpage"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">Facebook Group লিংক</label>
+                  <input
+                    type="text"
+                    value={contactFacebookGroup}
+                    onChange={(e) => setContactFacebookGroup(e.target.value)}
+                    placeholder="https://facebook.com/groups/yourgroup"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">YouTube Channel লিংক</label>
+                  <input
+                    type="text"
+                    value={contactYoutube}
+                    onChange={(e) => setContactYoutube(e.target.value)}
+                    placeholder="https://youtube.com/@yourchannel"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">Telegram Channel লিংক</label>
+                  <input
+                    type="text"
+                    value={contactTelegram}
+                    onChange={(e) => setContactTelegram(e.target.value)}
+                    placeholder="https://t.me/yourchannel"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>
@@ -1089,7 +1132,7 @@ export default function TeacherHomePageBuilderPage() {
                   <span>৯. ফটো গ্যালারি (সাফল্যের পথে এগিয়ে চলেছে)</span>
                 </h3>
                 <p className="text-xs text-foreground/60 mt-1">
-                  ক্লাসরুম, সেমিনার ও শিক্ষার্থীদের অর্জনের ফটোগুলো আপলোড করুন।
+                  ক্লাসরুম, সেমিনার ও শিক্ষার্থীদের অর্জনের ফটোগুলো আপলোড করুন (যা হোম পেজে স্বয়ংক্রিয়ভাবে দুই সারিতে স্লাইড করবে)।
                 </p>
               </div>
 

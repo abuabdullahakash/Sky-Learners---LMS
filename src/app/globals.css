@@ -212,3 +212,31 @@ body {
 .frontend-quill-render .ql-editor li.ql-indent-7 { margin-left: 21em !important; }
 .frontend-quill-render .ql-editor li.ql-indent-8 { margin-left: 24em !important; }
 .frontend-quill-render .ql-editor li.ql-indent-9 { margin-left: 27em !important; }
+
+/* Continuous Marquee Carousel for Photo Gallery */
+@keyframes marquee-left {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
+}
+
+.animate-marquee-left {
+  display: flex;
+  width: max-content;
+  animation: marquee-left 30s linear infinite;
+}
+
+.animate-marquee-right {
+  display: flex;
+  width: max-content;
+  animation: marquee-right 30s linear infinite;
+}
+
+.animate-marquee-left:hover,
+.animate-marquee-right:hover {
+  animation-play-state: paused;
+}

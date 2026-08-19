@@ -42,7 +42,8 @@ import {
   Play,
   Layers,
   ShieldCheck,
-  Target
+  Target,
+  Send
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -184,18 +185,21 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
   const aboutTitle = config.aboutTitle || 'আমাদের সম্পর্কে';
   const aboutHeadline = config.aboutHeadline || `স্বপ্ন ছোঁয়ার আশা থাকলে সেই স্বপ্নের ভিত তৈরিতে সাথে আছে "${profileData?.displayName || 'আমাদের একাডেমি'}"`;
   const aboutBio = config.aboutBio || profileData?.bio || 'অনলাইন বিশ্ববিদ্যালয় ও বোর্ড পরীক্ষার প্রস্তুতির জন্য দেশসেরা প্ল্যাটফর্ম। ভর্তি প্রস্তুতি নেওয়া শিক্ষার্থীদের সঠিক দিকনির্দেশনা, নিয়মিত পরীক্ষা, মানসম্মত ক্লাস এবং ধারাবাহিক প্রস্তুতির মাধ্যমে নিজেদের লক্ষ্যে পৌঁছাতে আমরা নিরলসভাবে কাজ করে যাচ্ছি।';
-  const founderTitle = config.founderTitle || 'প্রতিষ্ঠাতা ও পরিচালক';
+  const founderRole = config.founderTitle || 'প্রতিষ্ঠাতা ও পরিচালক';
   const aboutStats = config.aboutStats && config.aboutStats.length > 0 ? config.aboutStats : [
     { id: 'st-1', label: 'Courses', value: `${courses.length || 10}+` },
     { id: 'st-2', label: 'Exams', value: '10K+' },
     { id: 'st-3', label: 'Students', value: '100K+' }
   ];
 
-  // 7. Contact
+  // 7. Contact & Social Channels (Physics Hunters Style)
   const contactPhone = config.contactPhone || '01700000000';
   const contactWhatsapp = config.contactWhatsapp || '01700000000';
   const contactEmail = config.contactEmail || 'support@skylearners.com';
-  const contactAddress = config.contactAddress || 'ঢাকা, বাংলাদেশ';
+  const contactFacebookPage = config.contactFacebookPage || 'https://facebook.com';
+  const contactFacebookGroup = config.contactFacebookGroup || 'https://facebook.com/groups';
+  const contactYoutube = config.contactYoutube || 'https://youtube.com';
+  const contactTelegram = config.contactTelegram || 'https://t.me';
 
   // 8. Trust Banner
   const trustTitle = config.trustTitle || `বিশ্ববিদ্যালয় ও মেডিকেল ভর্তি প্রস্তুতিতে ${profileData?.displayName || 'আমাদের একাডেমি'} একটি আস্থার নাম`;
@@ -203,24 +207,28 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
   const trustBtnText = config.trustBtnText || 'কোর্সে ভর্তি হোন';
   const trustTargetCourseId = config.trustTargetCourseId || courses[0]?.id || '';
 
-  // 9. Photo Gallery
-  const galleryPhotos = config.galleryPhotos && config.galleryPhotos.length > 0 ? config.galleryPhotos : [
-    { id: 'g-1', imageUrl: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=600&auto=format&fit=crop', caption: 'সেমিনার সেশন' },
-    { id: 'g-2', imageUrl: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=600&auto=format&fit=crop', caption: 'ডেইলি এক্সাম হল' },
-    { id: 'g-3', imageUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=600&auto=format&fit=crop', caption: 'অফলাইন ওরিয়েন্টেশন' },
-    { id: 'g-4', imageUrl: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=600&auto=format&fit=crop', caption: 'উদ্বোধনী ক্লাস' }
+  // 9. Photo Gallery (Continuous Dual-Row Marquee)
+  const defaultGalleryPhotos = [
+    { id: 'g-1', imageUrl: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=600&auto=format&fit=crop' },
+    { id: 'g-2', imageUrl: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=600&auto=format&fit=crop' },
+    { id: 'g-3', imageUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=600&auto=format&fit=crop' },
+    { id: 'g-4', imageUrl: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=600&auto=format&fit=crop' },
+    { id: 'g-5', imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=600&auto=format&fit=crop' },
+    { id: 'g-6', imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=600&auto=format&fit=crop' }
   ];
+  const galleryPhotos = config.galleryPhotos && config.galleryPhotos.length > 0 ? config.galleryPhotos : defaultGalleryPhotos;
+  
+  // Split photos into 2 rows for opposite scrolling
+  const halfLen = Math.ceil(galleryPhotos.length / 2);
+  const row1Photos = galleryPhotos.slice(0, halfLen);
+  const row2Photos = galleryPhotos.slice(halfLen);
+  // Duplicate for seamless infinite marquee
+  const row1Loop = [...row1Photos, ...row1Photos, ...row1Photos];
+  const row2Loop = [...row2Photos.length > 0 ? row2Photos : row1Photos, ...row2Photos.length > 0 ? row2Photos : row1Photos, ...row2Photos.length > 0 ? row2Photos : row1Photos];
 
   // 10. Help Bar
   const helpBarTitle = config.helpBarTitle || 'সাহায্যের প্রয়োজন? আমরা পাশে আছি';
   const helpBarPhone = config.helpBarPhone || contactPhone;
-
-  const handleShare = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success(locale === 'bn' ? 'একাডেমি লিংক কপি করা হয়েছে!' : 'Academy link copied to clipboard!');
-    }
-  };
 
   if (isLoading) {
     return (
@@ -313,7 +321,7 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
       </section>
 
       {/* ========================================================================= */}
-      {/* 2. DUAL QUICK ACTION CARDS (পেইড কোর্স & ফ্রি কোর্স - Premium Height & Look) */}
+      {/* 2. DUAL QUICK ACTION CARDS (Taller & Ultra-Premium Interactive Cards)      */}
       {/* ========================================================================= */}
       <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
@@ -321,54 +329,54 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
           {/* Paid Courses Card */}
           <a
             href="#courses"
-            className="group relative min-h-[160px] sm:min-h-[180px] p-7 sm:p-9 rounded-[2rem] bg-gradient-to-br from-orange-500/[0.08] via-background to-orange-500/[0.03] border border-orange-500/30 hover:border-orange-500/70 transition-all duration-300 shadow-lg hover:shadow-2xl hover:-translate-y-1 flex items-center justify-between overflow-hidden"
+            className="group relative min-h-[190px] sm:min-h-[210px] p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-orange-500/[0.12] via-background to-orange-500/[0.04] border-2 border-orange-500/30 hover:border-orange-500/80 transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-orange-500/20 hover:-translate-y-1.5 flex items-center justify-between overflow-hidden"
           >
-            <div className="absolute -right-8 -bottom-8 w-40 h-40 bg-orange-500/10 rounded-full blur-2xl pointer-events-none group-hover:scale-150 transition-transform duration-500" />
+            <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-orange-500/15 rounded-full blur-3xl pointer-events-none group-hover:scale-150 transition-transform duration-700" />
             
-            <div className="space-y-3 relative z-10">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/15 text-orange-600 dark:text-orange-400 text-[11px] font-extrabold uppercase tracking-wider border border-orange-500/20">
-                <Flame className="w-3.5 h-3.5" />
+            <div className="space-y-3.5 relative z-10">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-black uppercase tracking-wider border border-orange-500/30 shadow-sm">
+                <Flame className="w-4 h-4 text-orange-500 animate-pulse" />
                 <span>PREMIUM BATCHES</span>
               </span>
 
-              <h3 className="text-2xl sm:text-3xl font-black text-foreground group-hover:text-orange-500 transition-colors">
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground group-hover:text-orange-500 transition-colors tracking-tight">
                 {quickCards.paidTitle}
               </h3>
 
-              <p className="text-xs sm:text-sm text-foreground/70 max-w-sm leading-relaxed">
+              <p className="text-xs sm:text-sm text-foreground/75 max-w-sm leading-relaxed font-medium">
                 {quickCards.paidSubtitle}
               </p>
             </div>
 
-            <div className="relative z-10 w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-xl shadow-orange-500/30 group-hover:scale-110 transition-transform flex-shrink-0">
-              <ArrowRight className="w-6 h-6" />
+            <div className="relative z-10 w-16 h-16 rounded-3xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-2xl shadow-orange-500/40 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 flex-shrink-0">
+              <ArrowRight className="w-7 h-7" />
             </div>
           </a>
 
           {/* Free Courses Card */}
           <a
             href={quickCards.freeLink || '#courses'}
-            className="group relative min-h-[160px] sm:min-h-[180px] p-7 sm:p-9 rounded-[2rem] bg-gradient-to-br from-blue-500/[0.08] via-background to-blue-500/[0.03] border border-blue-500/30 hover:border-blue-500/70 transition-all duration-300 shadow-lg hover:shadow-2xl hover:-translate-y-1 flex items-center justify-between overflow-hidden"
+            className="group relative min-h-[190px] sm:min-h-[210px] p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-blue-500/[0.12] via-background to-blue-500/[0.04] border-2 border-blue-500/30 hover:border-blue-500/80 transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1.5 flex items-center justify-between overflow-hidden"
           >
-            <div className="absolute -right-8 -bottom-8 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl pointer-events-none group-hover:scale-150 transition-transform duration-500" />
+            <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-500/15 rounded-full blur-3xl pointer-events-none group-hover:scale-150 transition-transform duration-700" />
             
-            <div className="space-y-3 relative z-10">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400 text-[11px] font-extrabold uppercase tracking-wider border border-blue-500/20">
-                <Sparkles className="w-3.5 h-3.5" />
+            <div className="space-y-3.5 relative z-10">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-black uppercase tracking-wider border border-blue-500/30 shadow-sm">
+                <Sparkles className="w-4 h-4 text-blue-500 animate-pulse" />
                 <span>FREE RESOURCES</span>
               </span>
 
-              <h3 className="text-2xl sm:text-3xl font-black text-foreground group-hover:text-blue-500 transition-colors">
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground group-hover:text-blue-500 transition-colors tracking-tight">
                 {quickCards.freeTitle}
               </h3>
 
-              <p className="text-xs sm:text-sm text-foreground/70 max-w-sm leading-relaxed">
+              <p className="text-xs sm:text-sm text-foreground/75 max-w-sm leading-relaxed font-medium">
                 {quickCards.freeSubtitle}
               </p>
             </div>
 
-            <div className="relative z-10 w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-xl shadow-blue-500/30 group-hover:scale-110 transition-transform flex-shrink-0">
-              <ArrowRight className="w-6 h-6" />
+            <div className="relative z-10 w-16 h-16 rounded-3xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-2xl shadow-blue-500/40 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 flex-shrink-0">
+              <ArrowRight className="w-7 h-7" />
             </div>
           </a>
 
@@ -516,7 +524,7 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
           {/* Physics Hunters Style Bento Grid Layout */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            {/* Bento Card 1: Large Featured Card (Spans 1 col on md, but rich height with mentor visual) */}
+            {/* Bento Card 1: Large Featured Card */}
             <div className="md:col-span-1 rounded-[2.5rem] bg-gradient-to-br from-[#1a0f1e] via-[#120b18] to-[#1e0f18] border border-rose-500/30 p-8 text-white flex flex-col justify-between shadow-2xl relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/15 rounded-full blur-3xl pointer-events-none" />
               
@@ -704,7 +712,7 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
       </section>
 
       {/* ========================================================================= */}
-      {/* 6. আমাদের সম্পর্কে (About Us - Premium 2-Column Founder Showcase)         */}
+      {/* 6. আমাদের সম্পর্কে (About Us - Premium Founder Showcase)                  */}
       {/* ========================================================================= */}
       <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
         
@@ -717,7 +725,7 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
         <div className="p-8 sm:p-14 rounded-[3rem] bg-gradient-to-br from-orange-500/[0.04] via-background to-orange-500/[0.02] border border-foreground/10 shadow-2xl relative overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             
-            {/* Left Column: Founder Portrait in Rounded Circle Backdrop with Nameplate */}
+            {/* Left Column: Founder Portrait & Verified Title Card */}
             <div className="lg:col-span-5 text-center space-y-4">
               <div className="relative w-60 h-60 sm:w-72 sm:h-72 mx-auto rounded-full bg-gradient-to-tr from-orange-500/20 via-pink-500/15 to-purple-500/20 p-3 flex items-center justify-center shadow-2xl">
                 <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-background bg-background shadow-inner">
@@ -728,19 +736,21 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
                   />
                 </div>
 
-                <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-background/90 border border-foreground/15 shadow-md text-[11px] font-extrabold text-orange-500 backdrop-blur-md">
-                  <span>🎓 {profileData?.displayName || 'Academy'}</span>
+                {/* Top Badge on Photo showing verified specialist badge */}
+                <div className="absolute top-4 left-4 px-3.5 py-1 rounded-full bg-background/95 border border-foreground/15 shadow-md text-[11px] font-extrabold text-orange-500 backdrop-blur-md flex items-center gap-1.5">
+                  <span>🏆</span>
+                  <span>চিফ মেন্টর</span>
                 </div>
               </div>
 
               {/* Floating Nameplate Badge */}
               <div className="inline-block px-8 py-3 rounded-2xl bg-background border border-foreground/10 shadow-lg text-center">
                 <div className="flex items-center justify-center gap-1.5">
-                  <h4 className="text-lg font-black text-foreground">{profileData?.displayName || 'মোঃ সুমন হোসেন'}</h4>
+                  <h4 className="text-lg font-black text-foreground">{profileData?.displayName || 'Instructor Name'}</h4>
                   <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />
                 </div>
                 <p className="text-xs text-orange-500 font-bold mt-0.5">
-                  {founderTitle}
+                  {founderRole}
                 </p>
               </div>
             </div>
@@ -777,52 +787,167 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
       </section>
 
       {/* ========================================================================= */}
-      {/* 7. আমাদের সাথে যোগাযোগ করো (Contact Section)                             */}
+      {/* 7. আমাদের সাথে যোগাযোগ করো (Physics Hunters Style Social & Channel Links) */}
       {/* ========================================================================= */}
-      <section className="py-16 sm:py-24 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+      <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
         
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 text-xs font-bold uppercase tracking-wider mb-2">
-            <Phone className="w-3.5 h-3.5" />
-            <span>Contact & Support</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
-            {config.contactTitle || 'আমাদের সাথে যোগাযোগ করো'}
-          </h2>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+          
+          {/* Left Column: Big Title & Narrative */}
+          <div className="lg:col-span-5 space-y-6">
+            <div>
+              <h2 className="text-4xl sm:text-5xl font-black text-foreground tracking-tight leading-tight">
+                আমাদের সাথে <br />
+                <span className="bg-gradient-to-r from-orange-500 via-rose-500 to-pink-500 bg-clip-text text-transparent">
+                  যোগাযোগ করো
+                </span>
+              </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="p-6 rounded-3xl bg-background border border-foreground/10 shadow-sm space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center">
-              <Phone className="w-5 h-5" />
+              <p className="text-foreground/75 text-sm sm:text-base mt-4 leading-relaxed font-medium">
+                {profileData?.displayName || 'আমাদের'}-এর সাথে যুক্ত থাকো, নতুন ক্লাস, আপডেট ও প্রয়োজনীয় তথ্য সবার আগে পেতে।
+              </p>
             </div>
-            <h4 className="font-bold text-sm text-foreground">সরাসরি কল</h4>
-            <p className="text-xs text-foreground/70">{contactPhone}</p>
+
+            {/* Direct Phone Call Button */}
+            <div className="p-5 rounded-2xl bg-foreground/[0.03] border border-foreground/10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center">
+                  <Phone className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-xs text-foreground/60 block font-semibold">সরাসরি হেল্পলাইন</span>
+                  <span className="text-sm font-bold text-foreground">{contactPhone}</span>
+                </div>
+              </div>
+              <a
+                href={`tel:${contactPhone}`}
+                className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-md transition-all"
+              >
+                কল করুন
+              </a>
+            </div>
           </div>
 
-          <div className="p-6 rounded-3xl bg-background border border-foreground/10 shadow-sm space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
-              <MessageCircle className="w-5 h-5" />
-            </div>
-            <h4 className="font-bold text-sm text-foreground">WhatsApp</h4>
-            <p className="text-xs text-foreground/70">{contactWhatsapp}</p>
+          {/* Right Column: 5 Rounded Pill Channel Link Cards (Physics Hunters Style) */}
+          <div className="lg:col-span-7 space-y-3.5">
+            
+            {/* 1. Facebook Page */}
+            <a
+              href={contactFacebookPage}
+              target="_blank"
+              rel="noreferrer"
+              className="group flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-background border border-foreground/10 hover:border-blue-500/50 shadow-sm hover:shadow-xl transition-all duration-300"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20 flex items-center justify-center font-black text-lg group-hover:scale-110 transition-transform">
+                  f
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm sm:text-base text-foreground group-hover:text-blue-500 transition-colors">
+                    {profileData?.displayName || 'Physics Hunters'} - ফেসবুক পেজে মেসেজ করো
+                  </h4>
+                  <p className="text-xs text-foreground/60 mt-0.5">আমাদের Facebook Page-এ যোগাযোগ করো</p>
+                </div>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-foreground/5 group-hover:bg-blue-500 group-hover:text-white flex items-center justify-center transition-all flex-shrink-0">
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </a>
+
+            {/* 2. Facebook Group */}
+            <a
+              href={contactFacebookGroup}
+              target="_blank"
+              rel="noreferrer"
+              className="group flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-background border border-foreground/10 hover:border-indigo-500/50 shadow-sm hover:shadow-xl transition-all duration-300"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm sm:text-base text-foreground group-hover:text-indigo-500 transition-colors">
+                    {profileData?.displayName || 'Physics Hunters'} Group এ যুক্ত হও
+                  </h4>
+                  <p className="text-xs text-foreground/60 mt-0.5">অন্যান্য শিক্ষার্থীদের সাথে যুক্ত থাকো</p>
+                </div>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-foreground/5 group-hover:bg-indigo-500 group-hover:text-white flex items-center justify-center transition-all flex-shrink-0">
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </a>
+
+            {/* 3. YouTube Channel */}
+            <a
+              href={contactYoutube}
+              target="_blank"
+              rel="noreferrer"
+              className="group flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-background border border-foreground/10 hover:border-red-500/50 shadow-sm hover:shadow-xl transition-all duration-300"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-500/10 text-red-500 border border-red-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm sm:text-base text-foreground group-hover:text-red-500 transition-colors">
+                    {profileData?.displayName || 'Physics Hunters'} YouTube
+                  </h4>
+                  <p className="text-xs text-foreground/60 mt-0.5">ফ্রি ক্লাস ও প্রয়োজনীয় ভিডিও দেখো</p>
+                </div>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-foreground/5 group-hover:bg-red-500 group-hover:text-white flex items-center justify-center transition-all flex-shrink-0">
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </a>
+
+            {/* 4. Telegram Channel */}
+            <a
+              href={contactTelegram}
+              target="_blank"
+              rel="noreferrer"
+              className="group flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-background border border-foreground/10 hover:border-sky-500/50 shadow-sm hover:shadow-xl transition-all duration-300"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-sky-500/10 text-sky-500 border border-sky-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Send className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm sm:text-base text-foreground group-hover:text-sky-500 transition-colors">
+                    Telegram Channel
+                  </h4>
+                  <p className="text-xs text-foreground/60 mt-0.5">গুরুত্বপূর্ণ আপডেট পেতে যুক্ত থাকো</p>
+                </div>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-foreground/5 group-hover:bg-sky-500 group-hover:text-white flex items-center justify-center transition-all flex-shrink-0">
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </a>
+
+            {/* 5. Email */}
+            <a
+              href={`mailto:${contactEmail}`}
+              className="group flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-background border border-foreground/10 hover:border-emerald-500/50 shadow-sm hover:shadow-xl transition-all duration-300"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm sm:text-base text-foreground group-hover:text-emerald-500 transition-colors">
+                    Email-এ যোগাযোগ করো
+                  </h4>
+                  <p className="text-xs text-foreground/60 mt-0.5">{contactEmail}</p>
+                </div>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-foreground/5 group-hover:bg-emerald-500 group-hover:text-white flex items-center justify-center transition-all flex-shrink-0">
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </a>
+
           </div>
 
-          <div className="p-6 rounded-3xl bg-background border border-foreground/10 shadow-sm space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
-              <Mail className="w-5 h-5" />
-            </div>
-            <h4 className="font-bold text-sm text-foreground">ইমেইল</h4>
-            <p className="text-xs text-foreground/70">{contactEmail}</p>
-          </div>
-
-          <div className="p-6 rounded-3xl bg-background border border-foreground/10 shadow-sm space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center">
-              <MapPin className="w-5 h-5" />
-            </div>
-            <h4 className="font-bold text-sm text-foreground">ঠিকানা</h4>
-            <p className="text-xs text-foreground/70">{contactAddress}</p>
-          </div>
         </div>
 
       </section>
@@ -868,36 +993,67 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
       </section>
 
       {/* ========================================================================= */}
-      {/* 9. সাফল্যের পথে এগিয়ে চলেছে (Photo Gallery)                              */}
+      {/* 9. সাফল্যের পথে এগিয়ে চলেছে (Infinite Dual-Row Auto-Marquee Gallery)     */}
       {/* ========================================================================= */}
       {galleryPhotos.length > 0 && (
-        <section className="py-16 sm:py-24 bg-black text-white border-t border-white/10">
-          <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+        <section className="py-20 sm:py-28 bg-black text-white border-t border-white/10 overflow-hidden">
+          
+          <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 mb-14 text-center">
             
-            <div className="text-center max-w-2xl mx-auto mb-14">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold uppercase tracking-wider mb-2">
-                <Trophy className="w-3.5 h-3.5" />
-                <span>Hall of Fame & Memories</span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-                {config.galleryTitle || `${profileData?.displayName || 'আমাদের'}-এর হাত ধরে সাফল্যের পথে এগিয়ে চলেছে`}
+            {/* Title with Gradient Accent Lines (Physics Hunters Style) */}
+            <div className="flex items-center justify-center gap-3 sm:gap-6 mb-3">
+              <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white">
+                {profileData?.displayName || 'Physics Hunters'}-এর হাত ধরে{' '}
+                <span className="bg-gradient-to-r from-orange-400 via-rose-400 to-pink-500 bg-clip-text text-transparent">
+                  সাফল্যের পথে এগিয়ে চলেছে
+                </span>
               </h2>
-              <p className="text-gray-400 text-sm sm:text-base mt-2">
-                {config.gallerySubtitle || 'ক্লাসরুম, সেমিনার ও শিক্ষার্থীদের আনন্দের মুহূর্তসমূহ'}
-              </p>
+              <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-pink-500" />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {galleryPhotos.map((photo: any) => (
-                <div key={photo.id} className="relative group rounded-2xl overflow-hidden aspect-video border border-white/10 bg-white/5">
-                  <img src={photo.imageUrl} alt={photo.caption || "Gallery"} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                  {photo.caption && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="text-xs font-bold text-white">{photo.caption}</span>
-                    </div>
-                  )}
-                </div>
-              ))}
+            <p className="text-gray-400 text-xs sm:text-sm font-medium">
+              {config.gallerySubtitle || 'আমাদের শিক্ষার্থীদের অর্জন ও স্মরণীয় মুহূর্তগুলো'}
+            </p>
+          </div>
+
+          {/* Dual-Row Continuous Auto-Marquee (Pure Photos without text) */}
+          <div className="space-y-4 sm:space-y-6">
+            
+            {/* Row 1: Scrolling Left (←) */}
+            <div className="w-full overflow-hidden flex">
+              <div className="animate-marquee-left flex gap-4 sm:gap-6 py-2">
+                {row1Loop.map((photo: any, idx: number) => (
+                  <div 
+                    key={`row1-${photo.id}-${idx}`} 
+                    className="relative w-64 sm:w-80 md:w-96 aspect-[16/10] rounded-2xl sm:rounded-3xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl flex-shrink-0 group"
+                  >
+                    <img 
+                      src={photo.imageUrl} 
+                      alt="Gallery" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Row 2: Scrolling Right (→) */}
+            <div className="w-full overflow-hidden flex">
+              <div className="animate-marquee-right flex gap-4 sm:gap-6 py-2">
+                {row2Loop.map((photo: any, idx: number) => (
+                  <div 
+                    key={`row2-${photo.id}-${idx}`} 
+                    className="relative w-64 sm:w-80 md:w-96 aspect-[16/10] rounded-2xl sm:rounded-3xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl flex-shrink-0 group"
+                  >
+                    <img 
+                      src={photo.imageUrl} 
+                      alt="Gallery" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
 
           </div>

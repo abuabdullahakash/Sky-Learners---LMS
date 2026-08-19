@@ -337,65 +337,67 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
       </section>
 
       {/* ========================================================================= */}
-      {/* 2. DUAL QUICK ACTION CARDS (Taller & Ultra-Premium Interactive Cards)      */}
+      {/* 2. DUAL QUICK ACTION CARDS (Contrasting Section Background & Borders)      */}
       {/* ========================================================================= */}
-      <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
-          
-          {/* Paid Courses Card */}
-          <a
-            href="#courses"
-            className="group relative min-h-[190px] sm:min-h-[210px] p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-orange-500/[0.12] via-background to-orange-500/[0.04] border-2 border-orange-500/30 hover:border-orange-500/80 transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-orange-500/20 hover:-translate-y-1.5 flex items-center justify-between overflow-hidden"
-          >
-            <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-orange-500/15 rounded-full blur-3xl pointer-events-none group-hover:scale-150 transition-transform duration-700" />
+      <section className="py-14 sm:py-20 bg-foreground/[0.02] border-y border-foreground/10">
+        <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
             
-            <div className="space-y-3.5 relative z-10">
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-black uppercase tracking-wider border border-orange-500/30 shadow-sm">
-                <Flame className="w-4 h-4 text-orange-500 animate-pulse" />
-                <span>PREMIUM BATCHES</span>
-              </span>
+            {/* Paid Courses Card */}
+            <a
+              href="#courses"
+              className="group relative min-h-[190px] sm:min-h-[210px] p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-orange-500/[0.12] via-background to-orange-500/[0.04] border-2 border-orange-500/30 hover:border-orange-500/80 transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-orange-500/20 hover:-translate-y-1.5 flex items-center justify-between overflow-hidden"
+            >
+              <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-orange-500/15 rounded-full blur-3xl pointer-events-none group-hover:scale-150 transition-transform duration-700" />
+              
+              <div className="space-y-3.5 relative z-10">
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-black uppercase tracking-wider border border-orange-500/30 shadow-sm">
+                  <Flame className="w-4 h-4 text-orange-500 animate-pulse" />
+                  <span>PREMIUM BATCHES</span>
+                </span>
 
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground group-hover:text-orange-500 transition-colors tracking-tight">
-                {quickCards.paidTitle}
-              </h3>
+                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground group-hover:text-orange-500 transition-colors tracking-tight">
+                  {quickCards.paidTitle}
+                </h3>
 
-              <p className="text-xs sm:text-sm text-foreground/75 max-w-sm leading-relaxed font-medium">
-                {quickCards.paidSubtitle}
-              </p>
-            </div>
+                <p className="text-xs sm:text-sm text-foreground/75 max-w-sm leading-relaxed font-medium">
+                  {quickCards.paidSubtitle}
+                </p>
+              </div>
 
-            <div className="relative z-10 w-16 h-16 rounded-3xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-2xl shadow-orange-500/40 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 flex-shrink-0">
-              <ArrowRight className="w-7 h-7" />
-            </div>
-          </a>
+              <div className="relative z-10 w-16 h-16 rounded-3xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-2xl shadow-orange-500/40 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 flex-shrink-0">
+                <ArrowRight className="w-7 h-7" />
+              </div>
+            </a>
 
-          {/* Free Courses Card */}
-          <a
-            href={quickCards.freeLink || '#courses'}
-            className="group relative min-h-[190px] sm:min-h-[210px] p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-blue-500/[0.12] via-background to-blue-500/[0.04] border-2 border-blue-500/30 hover:border-blue-500/80 transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1.5 flex items-center justify-between overflow-hidden"
-          >
-            <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-500/15 rounded-full blur-3xl pointer-events-none group-hover:scale-150 transition-transform duration-700" />
-            
-            <div className="space-y-3.5 relative z-10">
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-black uppercase tracking-wider border border-blue-500/30 shadow-sm">
-                <Sparkles className="w-4 h-4 text-blue-500 animate-pulse" />
-                <span>FREE RESOURCES</span>
-              </span>
+            {/* Free Courses Card */}
+            <a
+              href={quickCards.freeLink || '#courses'}
+              className="group relative min-h-[190px] sm:min-h-[210px] p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-blue-500/[0.12] via-background to-blue-500/[0.04] border-2 border-blue-500/30 hover:border-blue-500/80 transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1.5 flex items-center justify-between overflow-hidden"
+            >
+              <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-500/15 rounded-full blur-3xl pointer-events-none group-hover:scale-150 transition-transform duration-700" />
+              
+              <div className="space-y-3.5 relative z-10">
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-black uppercase tracking-wider border border-blue-500/30 shadow-sm">
+                  <Sparkles className="w-4 h-4 text-blue-500 animate-pulse" />
+                  <span>FREE RESOURCES</span>
+                </span>
 
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground group-hover:text-blue-500 transition-colors tracking-tight">
-                {quickCards.freeTitle}
-              </h3>
+                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground group-hover:text-blue-500 transition-colors tracking-tight">
+                  {quickCards.freeTitle}
+                </h3>
 
-              <p className="text-xs sm:text-sm text-foreground/75 max-w-sm leading-relaxed font-medium">
-                {quickCards.freeSubtitle}
-              </p>
-            </div>
+                <p className="text-xs sm:text-sm text-foreground/75 max-w-sm leading-relaxed font-medium">
+                  {quickCards.freeSubtitle}
+                </p>
+              </div>
 
-            <div className="relative z-10 w-16 h-16 rounded-3xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-2xl shadow-blue-500/40 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 flex-shrink-0">
-              <ArrowRight className="w-7 h-7" />
-            </div>
-          </a>
+              <div className="relative z-10 w-16 h-16 rounded-3xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-2xl shadow-blue-500/40 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 flex-shrink-0">
+                <ArrowRight className="w-7 h-7" />
+              </div>
+            </a>
 
+          </div>
         </div>
       </section>
 
@@ -738,104 +740,107 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
       </section>
 
       {/* ========================================================================= */}
-      {/* 6. আমাদের সম্পর্কে (About Us - Premium Founder Showcase with Custom Photo) */}
+      {/* 6. আমাদের সম্পর্কে (Contrasting Section Background & Separator Borders)     */}
       {/* ========================================================================= */}
-      <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        
-        {/* Title with Gradient Accent Lines */}
-        <div className="flex items-center justify-center gap-3 sm:gap-6 mb-12">
-          <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
-            {aboutTitle}
-          </h2>
-          <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
-        </div>
-
-        <div className="p-8 sm:p-14 rounded-[3rem] bg-gradient-to-br from-orange-500/[0.04] via-background to-orange-500/[0.02] border border-foreground/10 shadow-2xl relative overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-            
-            {/* Left Column: Founder Portrait & Verified Title Card */}
-            <div className="lg:col-span-5 text-center space-y-4">
-              <div className="relative w-60 h-60 sm:w-72 sm:h-72 mx-auto rounded-full bg-gradient-to-tr from-orange-500/20 via-amber-500/15 to-orange-500/20 p-3 flex items-center justify-center shadow-2xl">
-                <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-background bg-background shadow-inner">
-                  <img 
-                    src={aboutPhoto} 
-                    alt={profileData?.displayName || "Founder"} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
-                {/* Top Badge on Photo showing verified specialist badge */}
-                <div className="absolute top-4 left-4 px-3.5 py-1 rounded-full bg-background/95 border border-foreground/15 shadow-md text-[11px] font-extrabold text-orange-500 backdrop-blur-md flex items-center gap-1.5">
-                  <span>🏆</span>
-                  <span>চিফ মেন্টর</span>
-                </div>
-              </div>
-
-              {/* Floating Nameplate Badge */}
-              <div className="inline-block px-8 py-3 rounded-2xl bg-background border border-foreground/10 shadow-lg text-center">
-                <div className="flex items-center justify-center gap-1.5">
-                  <h4 className="text-lg font-black text-foreground">{profileData?.displayName || 'Instructor Name'}</h4>
-                  <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />
-                </div>
-                <p className="text-xs text-orange-500 font-bold mt-0.5">
-                  {founderRole}
-                </p>
-              </div>
-            </div>
-
-            {/* Right Column: Mission Narrative, Inspiring Headline & 3 Stat Pills */}
-            <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-500/10 text-orange-500 text-xs font-extrabold uppercase tracking-wider">
-                <Target className="w-3.5 h-3.5" />
-                <span>স্বপ্ন ছোঁয়ার প্রস্তুতি</span>
-              </div>
-
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground leading-[1.25]">
-                {aboutHeadline}
-              </h3>
-
-              <p className="text-foreground/75 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-medium">
-                {aboutBio}
-              </p>
-
-              {/* 3 Modern Stat Counter Boxes */}
-              <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-4">
-                {aboutStats.map((st: any) => (
-                  <div key={st.id} className="p-4 sm:p-5 rounded-2xl bg-background border border-foreground/10 shadow-sm text-center">
-                    <div className="text-xl sm:text-2xl md:text-3xl font-black text-orange-500">{st.value}</div>
-                    <div className="text-[11px] sm:text-xs font-bold text-foreground/60 mt-1 uppercase tracking-wider">{st.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
+      <section className="py-20 sm:py-28 bg-foreground/[0.02] border-y border-foreground/10">
+        <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+          
+          {/* Title with Gradient Accent Lines */}
+          <div className="flex items-center justify-center gap-3 sm:gap-6 mb-12">
+            <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
+              {aboutTitle}
+            </h2>
+            <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
           </div>
-        </div>
 
+          <div className="p-8 sm:p-14 rounded-[3rem] bg-gradient-to-br from-orange-500/[0.04] via-background to-orange-500/[0.02] border border-foreground/10 shadow-2xl relative overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+              
+              {/* Left Column: Founder Portrait & Verified Title Card */}
+              <div className="lg:col-span-5 text-center space-y-4">
+                <div className="relative w-60 h-60 sm:w-72 sm:h-72 mx-auto rounded-full bg-gradient-to-tr from-orange-500/20 via-amber-500/15 to-orange-500/20 p-3 flex items-center justify-center shadow-2xl">
+                  <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-background bg-background shadow-inner">
+                    <img 
+                      src={aboutPhoto} 
+                      alt={profileData?.displayName || "Founder"} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  {/* Top Badge on Photo showing verified specialist badge */}
+                  <div className="absolute top-4 left-4 px-3.5 py-1 rounded-full bg-background/95 border border-foreground/15 shadow-md text-[11px] font-extrabold text-orange-500 backdrop-blur-md flex items-center gap-1.5">
+                    <span>🏆</span>
+                    <span>চিফ মেন্টর</span>
+                  </div>
+                </div>
+
+                {/* Floating Nameplate Badge */}
+                <div className="inline-block px-8 py-3 rounded-2xl bg-background border border-foreground/10 shadow-lg text-center">
+                  <div className="flex items-center justify-center gap-1.5">
+                    <h4 className="text-lg font-black text-foreground">{profileData?.displayName || 'Instructor Name'}</h4>
+                    <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />
+                  </div>
+                  <p className="text-xs text-orange-500 font-bold mt-0.5">
+                    {founderRole}
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Column: Mission Narrative, Inspiring Headline & 3 Stat Pills */}
+              <div className="lg:col-span-7 space-y-6">
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-500/10 text-orange-500 text-xs font-extrabold uppercase tracking-wider">
+                  <Target className="w-3.5 h-3.5" />
+                  <span>স্বপ্ন ছোঁয়ার প্রস্তুতি</span>
+                </div>
+
+                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground leading-[1.25]">
+                  {aboutHeadline}
+                </h3>
+
+                <p className="text-foreground/75 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-medium">
+                  {aboutBio}
+                </p>
+
+                {/* 3 Modern Stat Counter Boxes */}
+                <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-4">
+                  {aboutStats.map((st: any) => (
+                    <div key={st.id} className="p-4 sm:p-5 rounded-2xl bg-background border border-foreground/10 shadow-sm text-center">
+                      <div className="text-xl sm:text-2xl md:text-3xl font-black text-orange-500">{st.value}</div>
+                      <div className="text-[11px] sm:text-xs font-bold text-foreground/60 mt-1 uppercase tracking-wider">{st.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
       </section>
 
       {/* ========================================================================= */}
-      {/* 7. আমাদের সাথে যোগাযোগ করো (Physics Hunters Style with Standing Image)   */}
+      {/* 7. আমাদের সাথে যোগাযোগ করো (Physics Hunters Style - Cutout Image Behind)  */}
       {/* ========================================================================= */}
       <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
-          {/* Left Column: Standing Representative Photo + Big Title & Narrative */}
-          <div className="lg:col-span-5 space-y-6">
+          {/* Left Column: Transparent Cutout Standing Image Layered Behind Text */}
+          <div className="lg:col-span-5 relative space-y-6">
             
+            {/* Cutout Standing Image: Upper half shows, lower half smoothly flows behind text */}
             {contactImage && (
-              <div className="relative w-48 sm:w-56 aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl border-2 border-orange-500/20 bg-gradient-to-tr from-orange-500/10 via-transparent to-transparent flex-shrink-0">
+              <div className="relative w-full max-w-[280px] sm:max-w-[320px] h-64 sm:h-72 -mb-28 sm:-mb-32 z-0 pointer-events-none">
                 <img 
                   src={contactImage} 
                   alt="Contact Representative" 
-                  className="w-full h-full object-cover object-top" 
+                  className="w-full h-full object-contain object-bottom [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)] drop-shadow-2xl" 
                 />
               </div>
             )}
 
-            <div>
+            <div className="relative z-10 space-y-4">
               <div className="flex items-center gap-3 mb-2">
                 <div className="h-[2px] w-10 sm:w-16 bg-gradient-to-r from-transparent to-orange-500" />
                 <span className="text-xs font-bold text-orange-500 uppercase tracking-widest">২৪/৭ সাপোর্ট</span>
@@ -848,13 +853,13 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
                 </span>
               </h2>
 
-              <p className="text-foreground/75 text-sm sm:text-base mt-4 leading-relaxed font-medium">
+              <p className="text-foreground/75 text-sm sm:text-base mt-2 leading-relaxed font-medium">
                 {profileData?.displayName || 'আমাদের'}-এর সাথে যুক্ত থাকো, নতুন ক্লাস, আপডেট ও প্রয়োজনীয় তথ্য সবার আগে পেতে।
               </p>
             </div>
 
             {/* Direct Phone Call Button */}
-            <div className="p-5 rounded-2xl bg-foreground/[0.03] border border-foreground/10 flex items-center justify-between">
+            <div className="relative z-10 p-5 rounded-2xl bg-foreground/[0.03] border border-foreground/10 flex items-center justify-between shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center">
                   <Phone className="w-5 h-5" />

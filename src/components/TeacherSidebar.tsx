@@ -1,8 +1,8 @@
 "use client";
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
-import { LayoutDashboard, Video, Users, DollarSign, Settings, UserCircle, GraduationCap, Globe, Megaphone, ExternalLink, AlertCircle, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Video, Users, DollarSign, Settings, UserCircle, GraduationCap, Globe, Megaphone, ExternalLink, AlertCircle, Sparkles, Sliders } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
@@ -10,6 +10,7 @@ import { doc, getDoc } from 'firebase/firestore';
 
 export default function TeacherSidebar() {
   const t = useTranslations('Dashboard.sidebar');
+  const locale = useLocale();
   const pathname = usePathname();
   const { user, userData, logout } = useAuth();
   
@@ -32,14 +33,22 @@ export default function TeacherSidebar() {
     }
   }, [user, userData]);
 
+  const getLabel = (key: string, fallbackBn: string, fallbackEn: string) => {
+    try {
+      const val = t(key);
+      if (val && !val.startsWith('Dashboard.sidebar')) return val;
+    } catch (_) {}
+    return locale === 'bn' ? fallbackBn : fallbackEn;
+  };
+
   const menuItems = [
-    { name: t('overview') || 'Overview', href: '/teacher-dashboard', icon: LayoutDashboard },
-    { name: t('courses') || 'My Courses', href: '/teacher-dashboard/courses', icon: Video },
-    { name: t('homeBuilder') || 'Home Page Builder', href: '/teacher-dashboard/home-builder', icon: Sparkles },
-    { name: t('myWebsite') || 'My Profile / Storefront', href: '/teacher-dashboard/profile', icon: Globe },
-    { name: t('posts') || 'Posts & Notices', href: '/teacher-dashboard/posts', icon: Megaphone },
-    { name: t('students') || 'Students', href: '/teacher-dashboard/students', icon: Users },
-    { name: t('earnings') || 'Earnings', href: '/teacher-dashboard/earnings', icon: DollarSign },
+    { name: getLabel('overview', 'ওভারভিউ', 'Overview'), href: '/teacher-dashboard', icon: LayoutDashboard },
+    { name: getLabel('courses', 'আমার কোর্স', 'My Courses'), href: '/teacher-dashboard/courses', icon: Video },
+    { name: getLabel('homeBuilder', 'হোম বিল্ডার', 'Home Builder'), href: '/teacher-dashboard/home-builder', icon: Sparkles },
+    { name: getLabel('myWebsite', 'আমার ওয়েবসাইট', 'My Website'), href: '/teacher-dashboard/profile', icon: Globe },
+    { name: getLabel('posts', 'পোস্ট ও নোটিশ', 'Posts & Notices'), href: '/teacher-dashboard/posts', icon: Megaphone },
+    { name: getLabel('students', 'শিক্ষার্থীবৃন্দ', 'Students'), href: '/teacher-dashboard/students', icon: Users },
+    { name: getLabel('earnings', 'উপার্জন ও হিসেব', 'Earnings'), href: '/teacher-dashboard/earnings', icon: DollarSign },
   ];
 
   return (

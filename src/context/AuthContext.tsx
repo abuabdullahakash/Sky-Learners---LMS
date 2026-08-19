@@ -110,18 +110,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     }
 
-    // Check 6: Existing stored role or fallback
-    if (!role) {
-      role = existingData?.role || 'student';
+    // Check 6: Check existing stored role
+    if (!role && existingData?.role) {
+      role = existingData.role;
     }
 
-    const needsUpdate = existingData?.role !== role || existingData?.onboardingComplete !== true;
-    if (needsUpdate) {
-      const userRef = doc(db, "users", uid);
-      await setDoc(userRef, { role, onboardingComplete: true, email: userEmail || existingData?.email || '' }, { merge: true }).catch(console.error);
+    // Only update and finalize role if a recognized role is determined or user is admin/teacher
+    if (role) {
+      const needsUpdate = existingData?.role !== role || (role === 'teacher' && existingData?.onboardingComplete !== true);
+      if (needsUpdate) {
+        const userRef = doc(db, "users", uid);
+        await setDoc(userRef, { role, onboardingComplete: true, email: userEmail || existingData?.email || '' }, { merge: true }).catch(console.error);
+      }
+      return { ...existingData, email: userEmail || existingData?.email, role, onboardingComplete: true };
     }
 
-    return { ...existingData, email: userEmail || existingData?.email, role, onboardingComplete: true };
+    // For brand new users without a role, preserve their uncompleted onboarding status
+    return { 
+      ...existingData, 
+      email: userEmail || existingData?.email, 
+      role: existingData?.role || undefined, 
+      onboardingComplete: Boolean(existingData?.onboardingComplete) 
+    };
   };
 
   const fetchUserData = async (uid: string, email?: string | null) => {
@@ -134,7 +144,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUserData(repairedData);
       } else {
         const repairedData = await detectUserRoleAndRepair(uid, {}, email);
-        setUserData(Object.keys(repairedData).length > 0 ? repairedData : null);
+        setUserData(repairedData);
       }
     } catch (error) {
       console.error("Error fetching user data:", error);

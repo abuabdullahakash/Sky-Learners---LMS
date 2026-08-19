@@ -1,0 +1,68 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Teacher Profiles
+    match /teacherProfiles/{teacherId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Courses Collection & Subcollections
+    match /courses/{courseId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated();
+      
+      // Allow any subcollections inside courses
+      match /{subcollection=**} {
+        allow read: if true;
+        allow write: if isAuthenticated();
+      }
+    }
+
+    // Enrollments
+    match /enrollments/{enrollmentId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated();
+    }
+
+    // Completed Lessons / Progress Tracking
+    match /completed_lessons/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Completed Exams / Submissions / Leaderboard
+    match /completed_exams/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Lesson Issues / Doubts / Q&A
+    match /lesson_issues/{issueId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Last Accessed Lesson Tracking
+    match /last_accessed/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // General fallback for all other collections
+    match /{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}

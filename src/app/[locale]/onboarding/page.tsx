@@ -17,7 +17,7 @@ export default function OnboardingPage() {
   const queryRole = searchParams.get('role') as 'student' | 'teacher' | null;
 
   const [selectedRole, setSelectedRole] = useState<'student' | 'teacher' | null>(queryRole);
-  const role = selectedRole || (userData?.role as 'student' | 'teacher' | null);
+  const role = selectedRole || (userData?.onboardingComplete ? (userData?.role as 'student' | 'teacher' | null) : null);
   
   // Form states (Student)
   const [phone, setPhone] = useState('');
@@ -39,11 +39,11 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     if (!loading) {
-      const isComplete = userData && (userData.onboardingComplete || Boolean(userData.role));
+      const isComplete = Boolean(userData?.onboardingComplete);
       if (!user) {
         router.push('/login');
       } else if (isComplete && !isSuccess) {
-        router.push(userData.role === 'teacher' ? '/teacher-dashboard' : '/dashboard');
+        router.push(userData?.role === 'teacher' ? '/teacher-dashboard' : '/dashboard');
       }
     }
   }, [user, userData, loading, router, isSuccess]);
@@ -101,7 +101,7 @@ export default function OnboardingPage() {
     }
   };
 
-  const isUserComplete = userData && (userData.onboardingComplete || Boolean(userData.role));
+  const isUserComplete = Boolean(userData?.onboardingComplete);
 
   if (loading || !user || (isUserComplete && !isSuccess)) {
     return (
@@ -157,26 +157,26 @@ export default function OnboardingPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <button 
                 onClick={() => setSelectedRole('student')}
-                className="p-4 sm:p-6 flex flex-col items-center text-center gap-3 bg-foreground/5 hover:bg-primary/10 border border-foreground/10 hover:border-primary/50 rounded-2xl transition-all group"
+                className="p-4 sm:p-6 flex flex-col items-center text-center gap-3 bg-foreground/5 hover:bg-primary/10 border border-foreground/10 hover:border-primary/50 rounded-2xl transition-all group cursor-pointer"
               >
                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <GraduationCap className="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold mb-0.5 sm:mb-1 text-foreground">{t('iAmStudent')}</h3>
+                  <h3 className="text-lg sm:text-xl font-bold mb-0.5 sm:mb-1 text-foreground group-hover:text-primary transition-colors">{t('iAmStudent')}</h3>
                   <p className="text-xs text-foreground/60">{t('wantToLearn')}</p>
                 </div>
               </button>
               
               <button 
                 onClick={() => setSelectedRole('teacher')}
-                className="p-4 sm:p-6 flex flex-col items-center text-center gap-3 bg-foreground/5 hover:bg-orange-500/10 border border-foreground/10 hover:border-orange-500/50 rounded-2xl transition-all group"
+                className="p-4 sm:p-6 flex flex-col items-center text-center gap-3 bg-foreground/5 hover:bg-orange-500/10 border border-foreground/10 hover:border-orange-500/50 rounded-2xl transition-all group cursor-pointer"
               >
                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Presentation className="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold mb-0.5 sm:mb-1 text-foreground">{t('iAmTeacher')}</h3>
+                  <h3 className="text-lg sm:text-xl font-bold mb-0.5 sm:mb-1 text-foreground group-hover:text-orange-500 transition-colors">{t('iAmTeacher')}</h3>
                   <p className="text-xs text-foreground/60">{t('wantToTeach')}</p>
                 </div>
               </button>
@@ -185,6 +185,13 @@ export default function OnboardingPage() {
         ) : (
           <div className="animate-in slide-in-from-right-8 duration-300">
             <div className="text-center mb-6 sm:mb-8">
+              <button 
+                type="button" 
+                onClick={() => setSelectedRole(null)} 
+                className="inline-flex items-center gap-1.5 text-xs text-orange-500 hover:text-orange-400 mb-3 bg-orange-500/10 hover:bg-orange-500/20 px-3 py-1.5 rounded-full transition-all font-semibold cursor-pointer"
+              >
+                {t('changeRole')}
+              </button>
               <h2 className="text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 text-foreground">{t('completeTitle')}</h2>
               <p className="text-xs sm:text-sm text-foreground/60">
                 {t('completeSubtitle', { role: role === 'teacher' ? t('teacherRole') : t('studentRole') })}

@@ -528,6 +528,7 @@
   "Onboarding": {
     "welcomeTitle": "Welcome to Sky Learners!",
     "welcomeSubtitle": "Please tell us how you plan to use the platform.",
+    "changeRole": "← Change Role",
     "iAmStudent": "I am a Student",
     "wantToLearn": "I want to learn",
     "iAmTeacher": "I am a Teacher",

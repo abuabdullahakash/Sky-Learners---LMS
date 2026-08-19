@@ -116,6 +116,8 @@ export default function TeacherHomePageBuilderPage() {
   const [aboutBio, setAboutBio] = useState(
     'আমাদের লক্ষ্য প্রতিটি শিক্ষার্থীকে কনসেপ্ট ক্লিয়ার করে মুখস্থবিদ্যার বাইরে গিয়ে বাস্তবসম্মতভাবে পড়ানো। অভিজ্ঞ মেন্টর ও উন্নত প্রযুক্তির সমন্বয়ে আমরা তৈরি করেছি সেরা প্ল্যাটফর্ম।'
   );
+  const [aboutPhoto, setAboutPhoto] = useState('https://api.dicebear.com/7.x/avataaars/svg?seed=Felix');
+  const [uploadingAboutPhoto, setUploadingAboutPhoto] = useState(false);
   const [aboutStats, setAboutStats] = useState<Array<{ id: string; label: string; value: string }>>([
     { id: 'st-1', label: 'Courses', value: '10+' },
     { id: 'st-2', label: 'Exams', value: '10K+' },
@@ -131,6 +133,8 @@ export default function TeacherHomePageBuilderPage() {
   const [contactFacebookGroup, setContactFacebookGroup] = useState('https://facebook.com/groups');
   const [contactYoutube, setContactYoutube] = useState('https://youtube.com');
   const [contactTelegram, setContactTelegram] = useState('https://t.me');
+  const [contactImage, setContactImage] = useState('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop');
+  const [uploadingContactImg, setUploadingContactImg] = useState(false);
 
   // 8. Trust Banner State (with Corner Student Image)
   const [trustTitle, setTrustTitle] = useState('বিশ্ববিদ্যালয় ও মেডিকেল ভর্তি প্রস্তুতিতে');
@@ -195,6 +199,8 @@ export default function TeacherHomePageBuilderPage() {
             if (config.aboutHeadline) setAboutHeadline(config.aboutHeadline);
             if (config.founderTitle) setFounderTitle(config.founderTitle);
             if (config.aboutBio) setAboutBio(config.aboutBio);
+            if (config.aboutPhoto) setAboutPhoto(config.aboutPhoto);
+            else if (data.profilePhoto) setAboutPhoto(data.profilePhoto);
             if (config.aboutStats && config.aboutStats.length > 0) setAboutStats(config.aboutStats);
             if (config.contactTitle) setContactTitle(config.contactTitle);
             if (config.contactPhone) setContactPhone(config.contactPhone);
@@ -204,7 +210,8 @@ export default function TeacherHomePageBuilderPage() {
             if (config.contactFacebookGroup) setContactFacebookGroup(config.contactFacebookGroup);
             if (config.contactYoutube) setContactYoutube(config.contactYoutube);
             if (config.contactTelegram) setContactTelegram(config.contactTelegram);
-            if (config.trustTitle) setTrustTitle(config.trustTitle);
+            if (config.contactImage) setContactImage(config.contactImage);
+            if (config.trustTitle) setTrustTitle(config.trustTitle.replace(/একটি\s*আস্থার\s*নাম/gi, '').trim());
             if (config.trustSubtitle) setTrustSubtitle(config.trustSubtitle);
             if (config.trustPaidBtnText) setTrustPaidBtnText(config.trustPaidBtnText);
             if (config.trustFreeBtnText) setTrustFreeBtnText(config.trustFreeBtnText);
@@ -215,6 +222,8 @@ export default function TeacherHomePageBuilderPage() {
             if (config.gallerySubtitle) setGallerySubtitle(config.gallerySubtitle);
             if (config.helpBarTitle) setHelpBarTitle(config.helpBarTitle);
             if (config.helpBarPhone) setHelpBarPhone(config.helpBarPhone);
+          } else if (data.profilePhoto) {
+            setAboutPhoto(data.profilePhoto);
           }
         }
       } catch (err) {
@@ -247,6 +256,7 @@ export default function TeacherHomePageBuilderPage() {
         aboutHeadline,
         founderTitle,
         aboutBio,
+        aboutPhoto,
         aboutStats,
         contactTitle,
         contactPhone,
@@ -256,6 +266,7 @@ export default function TeacherHomePageBuilderPage() {
         contactFacebookGroup,
         contactYoutube,
         contactTelegram,
+        contactImage,
         trustTitle,
         trustSubtitle,
         trustPaidBtnText,
@@ -303,6 +314,38 @@ export default function TeacherHomePageBuilderPage() {
       toast.error(locale === 'bn' ? 'ইমেজ আপলোড ব্যর্থ হয়েছে' : 'Failed to upload image');
     } finally {
       setUploadingSlideImg(false);
+    }
+  };
+
+  // About Photo upload handler
+  const handleUploadAboutPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAboutPhoto(true);
+    try {
+      const url = await uploadImageToImgBB(file);
+      setAboutPhoto(url);
+      toast.success(locale === 'bn' ? 'প্রোফাইল ছবি আপলোড হয়েছে!' : 'About photo uploaded!');
+    } catch (err) {
+      toast.error(locale === 'bn' ? 'ছবি আপলোড ব্যর্থ হয়েছে' : 'Failed to upload image');
+    } finally {
+      setUploadingAboutPhoto(false);
+    }
+  };
+
+  // Contact Standing image upload handler
+  const handleUploadContactImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingContactImg(true);
+    try {
+      const url = await uploadImageToImgBB(file);
+      setContactImage(url);
+      toast.success(locale === 'bn' ? 'যোগাযোগ সেকশনের ছবি আপলোড হয়েছে!' : 'Contact image uploaded!');
+    } catch (err) {
+      toast.error(locale === 'bn' ? 'ছবি আপলোড ব্যর্থ হয়েছে' : 'Failed to upload image');
+    } finally {
+      setUploadingContactImg(false);
     }
   };
 
@@ -921,6 +964,35 @@ export default function TeacherHomePageBuilderPage() {
                 </p>
               </div>
 
+              {/* Custom Instructor Photo Upload */}
+              <div className="p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3">
+                <label className="text-[11px] font-bold text-foreground/70 block">
+                  আমাদের সম্পর্কে সেকশনের ছবি (মেন্টর / শিক্ষকের ফটো)
+                </label>
+                
+                <div className="flex items-center gap-4">
+                  <div className="w-20 h-20 rounded-full overflow-hidden bg-foreground/10 border-2 border-orange-500/40 flex-shrink-0">
+                    <img src={aboutPhoto} alt="Instructor Preview" className="w-full h-full object-cover" />
+                  </div>
+
+                  <div className="flex-1 space-y-2">
+                    <input
+                      type="text"
+                      value={aboutPhoto}
+                      onChange={(e) => setAboutPhoto(e.target.value)}
+                      placeholder="ছবির সরাসরি লিংক (URL)"
+                      className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+
+                    <label className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 text-xs font-bold cursor-pointer transition-colors border border-orange-500/20">
+                      {uploadingAboutPhoto ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                      <span>{uploadingAboutPhoto ? 'আপলোড হচ্ছে...' : 'ছবি পরিবর্তন / আপলোড করুন'}</span>
+                      <input type="file" accept="image/*" onChange={handleUploadAboutPhoto} className="hidden" />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-[11px] font-bold text-foreground/70 block mb-1">সেকশন টাইটেল</label>
@@ -1006,6 +1078,35 @@ export default function TeacherHomePageBuilderPage() {
                 <p className="text-xs text-foreground/60 mt-1">
                   শিক্ষার্থীদের জন্য ফেসবুক পেজ, গ্রুপ, ইউটিউব, টেলিগ্রাম ও হেল্পলাইন লিঙ্ক কনফিগার করুন।
                 </p>
+              </div>
+
+              {/* Standing Contact Representative Image Upload */}
+              <div className="p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3">
+                <label className="text-[11px] font-bold text-foreground/70 block">
+                  যোগাযোগ সেকশনের প্রতিনিধি বা শিক্ষকের ছবি (Standing Image)
+                </label>
+                
+                <div className="flex items-center gap-4">
+                  <div className="w-20 h-24 rounded-2xl overflow-hidden bg-foreground/10 border-2 border-orange-500/40 flex-shrink-0">
+                    <img src={contactImage} alt="Contact Representative" className="w-full h-full object-cover object-top" />
+                  </div>
+
+                  <div className="flex-1 space-y-2">
+                    <input
+                      type="text"
+                      value={contactImage}
+                      onChange={(e) => setContactImage(e.target.value)}
+                      placeholder="ছবির সরাসরি লিংক (URL)"
+                      className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+
+                    <label className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 text-xs font-bold cursor-pointer transition-colors border border-orange-500/20">
+                      {uploadingContactImg ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                      <span>{uploadingContactImg ? 'আপলোড হচ্ছে...' : 'ছবি পরিবর্তন / আপলোড করুন'}</span>
+                      <input type="file" accept="image/*" onChange={handleUploadContactImage} className="hidden" />
+                    </label>
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1100,7 +1201,7 @@ export default function TeacherHomePageBuilderPage() {
                     type="text"
                     value={trustTitle}
                     onChange={(e) => setTrustTitle(e.target.value)}
-                    placeholder="যেমন: বিশ্ববিদ্যালয় ভর্তি প্রস্তুতিতে"
+                    placeholder="যেমন: বিশ্ববিদ্যালয় ও মেডিকেল ভর্তি প্রস্তুতিতে"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>
@@ -1178,7 +1279,7 @@ export default function TeacherHomePageBuilderPage() {
                   <span>৯. ফটো গ্যালারি (সাফল্যের পথে এগিয়ে চলেছে)</span>
                 </h3>
                 <p className="text-xs text-foreground/60 mt-1">
-                  ক্লাসরুম, সেমিনার ও শিক্ষার্থীদের অর্জনের ফটোগুলো আপলোড করুন (যা হোম পেজে স্বয়ংক্রিয়ভাবে দুই সারিতে ফাঁকা জায়গা ছাড়া অবিরাম স্লাইড করবে)।
+                  ক্লাসরুম, সেমিনার ও শিক্ষার্থীদের অর্জনের ফটোগুলো আপলোড করুন (যা হোম পেজে স্বয়ংক্রিয়ভাবে দুই সারিতে ফাঁকা জায়গা ছাড়া ধীরগতিতে অবিরাম স্লাইড করবে)।
                 </p>
               </div>
 

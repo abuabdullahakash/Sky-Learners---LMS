@@ -186,6 +186,7 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
   const aboutHeadline = config.aboutHeadline || `স্বপ্ন ছোঁয়ার আশা থাকলে সেই স্বপ্নের ভিত তৈরিতে সাথে আছে "${profileData?.displayName || 'আমাদের একাডেমি'}"`;
   const aboutBio = config.aboutBio || profileData?.bio || 'অনলাইন বিশ্ববিদ্যালয় ও বোর্ড পরীক্ষার প্রস্তুতির জন্য দেশসেরা প্ল্যাটফর্ম। ভর্তি প্রস্তুতি নেওয়া শিক্ষার্থীদের সঠিক দিকনির্দেশনা, নিয়মিত পরীক্ষা, মানসম্মত ক্লাস এবং ধারাবাহিক প্রস্তুতির মাধ্যমে নিজেদের লক্ষ্যে পৌঁছাতে আমরা নিরলসভাবে কাজ করে যাচ্ছি।';
   const founderRole = config.founderTitle || 'প্রতিষ্ঠাতা ও পরিচালক';
+  const aboutPhoto = config.aboutPhoto || profileData?.profilePhoto || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix';
   const aboutStats = config.aboutStats && config.aboutStats.length > 0 ? config.aboutStats : [
     { id: 'st-1', label: 'Courses', value: `${courses.length || 10}+` },
     { id: 'st-2', label: 'Exams', value: '10K+' },
@@ -200,9 +201,11 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
   const contactFacebookGroup = config.contactFacebookGroup || 'https://facebook.com/groups';
   const contactYoutube = config.contactYoutube || 'https://youtube.com';
   const contactTelegram = config.contactTelegram || 'https://t.me';
+  const contactImage = config.contactImage || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop';
 
-  // 8. Trust Banner (Physics Hunters Style with Corner Student Image)
-  const trustTitle = config.trustTitle || 'বিশ্ববিদ্যালয় ভর্তি প্রস্তুতিতে';
+  // 8. Trust Banner (Physics Hunters Style with Brand Orange Colors)
+  const rawTrustTitle = config.trustTitle || 'বিশ্ববিদ্যালয় ও মেডিকেল ভর্তি প্রস্তুতিতে';
+  const cleanTrustTitle = rawTrustTitle.replace(/একটি\s*আস্থার\s*নাম/gi, '').trim();
   const trustHighlight = profileData?.displayName || 'Physics Hunters';
   const trustSubtitle = config.trustSubtitle || 'ভর্তি প্রস্তুতির শুরু হোক আজ থেকেই। সঠিক দিকনির্দেশনা ও প্রয়োজনীয় রিসোর্সের সাথে এগিয়ে যাও তোমার লক্ষ্যের দিকে।';
   const trustPaidBtnText = config.trustPaidBtnText || 'পেইড কোর্স';
@@ -397,7 +400,7 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
       </section>
 
       {/* ========================================================================= */}
-      {/* 3. OUR COURSES WITH DYNAMIC CATEGORY TABS & SUBTITLE                      */}
+      {/* 3. OUR COURSES WITH DYNAMIC CATEGORY TABS & ACCENT LINES                  */}
       {/* ========================================================================= */}
       <section id="courses" className="py-16 sm:py-24 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
         
@@ -407,9 +410,14 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
             <span>আপনার লক্ষ্যের জন্য সঠিক কোর্সটি বেছে নাও</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
-            {locale === 'bn' ? 'আমাদের কোর্সসমূহ' : 'Our Course Catalog'}
-          </h2>
+          {/* Title with Gradient Accent Lines */}
+          <div className="flex items-center justify-center gap-3 sm:gap-6 mb-3">
+            <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
+              {locale === 'bn' ? 'আমাদের কোর্সসমূহ' : 'Our Course Catalog'}
+            </h2>
+            <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
+          </div>
 
           <p className="text-foreground/75 text-sm sm:text-base max-w-xl mx-auto leading-relaxed font-medium">
             {config.coursesSubtitle || 'সেরা মেন্টরদের সাথে ঘরে বসেই নাও শতভাগ প্রস্তুতি। সঠিক গাইডলাইনে নিশ্চিত করো তোমার সাফল্য।'}
@@ -525,9 +533,14 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
               <span>Full Preparation Ecosystem</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
-              {featuresTitle}
-            </h2>
+            {/* Title with Gradient Accent Lines */}
+            <div className="flex items-center justify-center gap-3 sm:gap-6 mb-3">
+              <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
+                {featuresTitle}
+              </h2>
+              <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
+            </div>
 
             <p className="text-foreground/75 text-sm sm:text-base max-w-xl mx-auto">
               {featuresSubtitle}
@@ -538,8 +551,8 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Bento Card 1: Large Featured Card */}
-            <div className="md:col-span-1 rounded-[2.5rem] bg-gradient-to-br from-[#1a0f1e] via-[#120b18] to-[#1e0f18] border border-rose-500/30 p-8 text-white flex flex-col justify-between shadow-2xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="md:col-span-1 rounded-[2.5rem] bg-gradient-to-br from-[#1a0f1e] via-[#120b18] to-[#1e0f18] border border-orange-500/30 p-8 text-white flex flex-col justify-between shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl pointer-events-none" />
               
               <div className="relative z-10 space-y-4">
                 <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/10 text-white/90 text-xs font-bold border border-white/20 backdrop-blur-md">
@@ -547,7 +560,7 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
                 </span>
 
                 <h3 className="text-2xl sm:text-3xl font-black leading-tight text-white">
-                  স্পেশাল <span className="text-rose-400">গাইডলাইন</span>
+                  স্পেশাল <span className="text-orange-400">গাইডলাইন</span>
                 </h3>
 
                 <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
@@ -558,9 +571,9 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
               <div className="relative z-10 pt-6 mt-6 border-t border-white/10 flex items-center justify-between">
                 <div className="space-y-0.5">
                   <span className="text-[11px] text-gray-400 font-semibold block">মটো ও মোটিভেশন</span>
-                  <span className="text-xs font-bold text-rose-300">থেমে যেও না, ট্র্যাকেই থাকো ⚡</span>
+                  <span className="text-xs font-bold text-orange-300">থেমে যেও না, ট্র্যাকেই থাকো ⚡</span>
                 </div>
-                <div className="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 rounded-2xl bg-orange-500/20 border border-orange-500/40 text-orange-400 flex items-center justify-center shadow-lg">
                   <Target className="w-6 h-6" />
                 </div>
               </div>
@@ -725,14 +738,17 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
       </section>
 
       {/* ========================================================================= */}
-      {/* 6. আমাদের সম্পর্কে (About Us - Premium Founder Showcase)                  */}
+      {/* 6. আমাদের সম্পর্কে (About Us - Premium Founder Showcase with Custom Photo) */}
       {/* ========================================================================= */}
       <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
         
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
+        {/* Title with Gradient Accent Lines */}
+        <div className="flex items-center justify-center gap-3 sm:gap-6 mb-12">
+          <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
             {aboutTitle}
           </h2>
+          <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
         </div>
 
         <div className="p-8 sm:p-14 rounded-[3rem] bg-gradient-to-br from-orange-500/[0.04] via-background to-orange-500/[0.02] border border-foreground/10 shadow-2xl relative overflow-hidden">
@@ -740,10 +756,10 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
             
             {/* Left Column: Founder Portrait & Verified Title Card */}
             <div className="lg:col-span-5 text-center space-y-4">
-              <div className="relative w-60 h-60 sm:w-72 sm:h-72 mx-auto rounded-full bg-gradient-to-tr from-orange-500/20 via-pink-500/15 to-purple-500/20 p-3 flex items-center justify-center shadow-2xl">
+              <div className="relative w-60 h-60 sm:w-72 sm:h-72 mx-auto rounded-full bg-gradient-to-tr from-orange-500/20 via-amber-500/15 to-orange-500/20 p-3 flex items-center justify-center shadow-2xl">
                 <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-background bg-background shadow-inner">
                   <img 
-                    src={profileData?.profilePhoto || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'} 
+                    src={aboutPhoto} 
                     alt={profileData?.displayName || "Founder"} 
                     className="w-full h-full object-cover"
                   />
@@ -800,18 +816,34 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
       </section>
 
       {/* ========================================================================= */}
-      {/* 7. আমাদের সাথে যোগাযোগ করো (Physics Hunters Style Social & Channel Links) */}
+      {/* 7. আমাদের সাথে যোগাযোগ করো (Physics Hunters Style with Standing Image)   */}
       {/* ========================================================================= */}
       <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
-          {/* Left Column: Big Title & Narrative */}
+          {/* Left Column: Standing Representative Photo + Big Title & Narrative */}
           <div className="lg:col-span-5 space-y-6">
+            
+            {contactImage && (
+              <div className="relative w-48 sm:w-56 aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl border-2 border-orange-500/20 bg-gradient-to-tr from-orange-500/10 via-transparent to-transparent flex-shrink-0">
+                <img 
+                  src={contactImage} 
+                  alt="Contact Representative" 
+                  className="w-full h-full object-cover object-top" 
+                />
+              </div>
+            )}
+
             <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="h-[2px] w-10 sm:w-16 bg-gradient-to-r from-transparent to-orange-500" />
+                <span className="text-xs font-bold text-orange-500 uppercase tracking-widest">২৪/৭ সাপোর্ট</span>
+              </div>
+
               <h2 className="text-4xl sm:text-5xl font-black text-foreground tracking-tight leading-tight">
                 আমাদের সাথে <br />
-                <span className="bg-gradient-to-r from-orange-500 via-rose-500 to-pink-500 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
                   যোগাযোগ করো
                 </span>
               </h2>
@@ -969,13 +1001,13 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
       {/* 8. ট্রাস্ট ও কল-টু-অ্যাকশন ব্যানার (Physics Hunters Style CTA with Image)   */}
       {/* ========================================================================= */}
       <section className="py-12 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        <div className="rounded-[2.5rem] p-8 sm:p-12 lg:p-14 bg-gradient-to-r from-sky-50/90 via-white to-pink-50/90 dark:from-slate-900 dark:via-neutral-900 dark:to-slate-900 border border-foreground/10 shadow-2xl relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8">
+        <div className="rounded-[2.5rem] p-8 sm:p-12 lg:p-14 bg-gradient-to-r from-orange-500/[0.08] via-background to-amber-500/[0.05] border-2 border-orange-500/30 shadow-2xl relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8">
           
           {/* Left Content */}
           <div className="space-y-6 flex-1 relative z-10 max-w-2xl">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground leading-[1.2] tracking-tight">
-              {trustTitle}{' '}
-              <span className="bg-gradient-to-r from-rose-500 to-pink-600 bg-clip-text text-transparent">
+              {cleanTrustTitle}{' '}
+              <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
                 {trustHighlight}
               </span>{' '}
               একটি আস্থার নাম
@@ -988,14 +1020,14 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
             <div className="flex items-center gap-4 flex-wrap pt-2">
               <a
                 href="#courses"
-                className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-black text-sm shadow-xl shadow-rose-500/25 hover:scale-105 transition-all"
+                className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm shadow-xl shadow-orange-500/30 hover:scale-105 transition-all"
               >
                 {trustPaidBtnText}
               </a>
 
               <a
                 href={trustFreeLink}
-                className="px-8 py-3.5 rounded-2xl bg-background hover:bg-foreground/5 border-2 border-rose-500/30 hover:border-rose-500 text-foreground font-black text-sm transition-all hover:scale-105"
+                className="px-8 py-3.5 rounded-2xl bg-background hover:bg-foreground/5 border-2 border-orange-500/30 hover:border-orange-500 text-foreground font-black text-sm transition-all hover:scale-105"
               >
                 {trustFreeBtnText}
               </a>
@@ -1004,7 +1036,7 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
 
           {/* Right Corner: High-Quality Student/Mentor Cutout Image */}
           <div className="relative z-10 lg:w-96 flex-shrink-0 flex items-center justify-center">
-            <div className="relative w-64 sm:w-80 aspect-[4/4.5] rounded-3xl overflow-hidden shadow-2xl border-4 border-background bg-gradient-to-tr from-rose-500/20 via-pink-500/10 to-transparent">
+            <div className="relative w-64 sm:w-80 aspect-[4/4.5] rounded-3xl overflow-hidden shadow-2xl border-4 border-background bg-gradient-to-tr from-orange-500/20 via-amber-500/10 to-transparent">
               <img 
                 src={trustCornerImage} 
                 alt="Student Success" 
@@ -1029,11 +1061,11 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
               <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
               <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white">
                 {profileData?.displayName || 'Physics Hunters'}-এর হাত ধরে{' '}
-                <span className="bg-gradient-to-r from-orange-400 via-rose-400 to-pink-500 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500 bg-clip-text text-transparent">
                   সাফল্যের পথে এগিয়ে চলেছে
                 </span>
               </h2>
-              <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-pink-500" />
+              <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
             </div>
 
             <p className="text-gray-400 text-xs sm:text-sm font-medium">
@@ -1091,17 +1123,17 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
         <div className="relative rounded-[2rem] p-6 sm:p-8 bg-background border border-foreground/10 shadow-2xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
           
           {/* Top Gradient Accent Line */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500" />
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 via-amber-500 to-blue-500" />
 
           {/* Left: Phone Icon + Title + Subtitle */}
           <div className="flex items-center gap-4 text-center md:text-left">
-            <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center justify-center flex-shrink-0 shadow-inner">
+            <div className="w-14 h-14 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-500 flex items-center justify-center flex-shrink-0 shadow-inner">
               <Phone className="w-7 h-7" />
             </div>
             <div>
               <h4 className="text-xl sm:text-2xl font-black text-foreground">
                 {helpBarTitle}{' '}
-                <span className="text-rose-500 font-black">আমরা পাশে আছি</span>
+                <span className="text-orange-500 font-black">আমরা পাশে আছি</span>
               </h4>
               <p className="text-xs sm:text-sm text-foreground/60 mt-0.5 font-medium">
                 কোর্স সম্পর্কিত যেকোনো সমস্যা বা তথ্যের জন্য আমাদের সাথে যোগাযোগ করো
@@ -1130,7 +1162,7 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
               href={`tel:${helpBarPhone}`}
               className="px-5 py-3 rounded-2xl bg-background hover:bg-foreground/5 border-2 border-foreground/15 text-foreground font-bold text-xs flex items-center gap-2 shadow-md transition-all hover:scale-105"
             >
-              <Phone className="w-4 h-4 text-rose-500" />
+              <Phone className="w-4 h-4 text-orange-500" />
               <div className="text-left leading-tight">
                 <div>{helpBarPhone}</div>
                 <div className="text-[10px] text-foreground/60 font-normal">(সকাল ১০টা - রাত ৮টা)</div>

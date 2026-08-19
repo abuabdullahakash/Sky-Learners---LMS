@@ -158,6 +158,8 @@ export default function Navbar() {
     { name: 'Help & Doubts', href: `/dashboard/courses/${courseId}/help`, icon: HelpCircle },
   ];
 
+  const avatarUrl = userData?.profilePhoto || userData?.photoURL || userData?.photoUrl || user?.photoURL;
+
   return (
     <>
       <nav className="fixed w-full top-0 z-50 bg-background/85 backdrop-blur-md border-b border-foreground/10">
@@ -192,23 +194,24 @@ export default function Navbar() {
                   <div className="relative group">
                     <Link 
                       href={userProfileLink}
-                      className={`flex items-center ${hasCompletedRole ? 'gap-2.5 px-3 py-1.5' : 'p-1'} rounded-full bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 transition-all font-medium text-xs text-foreground group`}
-                      title={hasCompletedRole ? (user?.displayName || userData?.name || 'Account') : 'Complete Setup'}
+                      className={`flex items-center ${hasCompletedRole ? 'gap-2 px-2.5 py-1.5' : 'p-1'} rounded-full bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 transition-all font-medium text-xs text-foreground group`}
+                      title={user?.displayName || userData?.name || (isTeacher ? 'Teacher' : 'Student')}
                     >
-                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden border border-primary/20">
-                        {user?.photoURL ? (
-                          <img src={user.photoURL} alt="User" className="w-full h-full object-cover" />
+                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden border border-primary/20 shrink-0">
+                        {avatarUrl ? (
+                          <img src={avatarUrl} alt="User" className="w-full h-full object-cover" />
                         ) : (
                           <UserIcon className="w-4 h-4 text-primary" />
                         )}
                       </div>
-                      {hasCompletedRole && (
-                        <>
-                          <span className="max-w-[100px] truncate">{user?.displayName || userData?.name || 'Account'}</span>
-                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isTeacher ? 'bg-orange-500/15 text-orange-500' : 'bg-blue-500/15 text-blue-500'}`}>
-                            {isTeacher ? 'Teacher' : 'Student'}
-                          </span>
-                        </>
+                      {hasCompletedRole ? (
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isTeacher ? 'bg-orange-500/15 text-orange-500' : 'bg-blue-500/15 text-blue-500'}`}>
+                          {isTeacher ? 'Teacher' : 'Student'}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500">
+                          Setup
+                        </span>
                       )}
                     </Link>
 
@@ -648,8 +651,8 @@ export default function Navbar() {
                   className="flex items-center gap-3 w-full p-3 rounded-2xl bg-background hover:bg-foreground/5 border border-foreground/10 hover:border-orange-500/30 transition-all cursor-pointer select-none shadow-sm"
                 >
                   <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center overflow-hidden shrink-0 ring-2 ring-orange-500/20">
-                    {user.photoURL ? (
-                      <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
                       <UserIcon className="w-5 h-5 text-orange-500" />
                     )}

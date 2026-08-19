@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { db } from '@/lib/firebase';
+import { db, auth } from '@/lib/firebase';
+import { updateProfile } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { uploadImageToImgBB } from '@/lib/imgbb';
 import { User, Camera, Link as LinkIcon, Save, CheckCircle2, Globe, GraduationCap, BookOpen, Presentation, Eye, Upload, Loader2, Image as ImageIcon, Plus, X, Trash2, Sparkles, ShieldCheck, Building2 } from 'lucide-react';
 
 export default function ProfileBuilderPage() {
-  const { user } = useAuth();
+  const { user, refreshUserData } = useAuth();
   
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -76,7 +77,18 @@ export default function ProfileBuilderPage() {
     setUploadingProfilePhoto(true);
     try {
       const url = await uploadImageToImgBB(file);
-      setProfileData(prev => ({ ...prev, profilePhoto: url }));
+      setProfileData(prev => ({ ...prev, profilePhoto: url, photoUrl: url }));
+
+      if (user?.uid) {
+        await setDoc(doc(db, 'teacherProfiles', user.uid), { profilePhoto: url, photoUrl: url }, { merge: true });
+        await setDoc(doc(db, 'users', user.uid), { photoURL: url, profilePhoto: url, photoUrl: url }, { merge: true });
+        if (auth.currentUser) {
+          await updateProfile(auth.currentUser, { photoURL: url }).catch(console.error);
+        }
+        if (refreshUserData) {
+          await refreshUserData();
+        }
+      }
     } catch (error) {
       console.error("Error uploading profile photo:", error);
       alert("Failed to upload profile photo. Please try again.");
@@ -206,7 +218,31 @@ export default function ProfileBuilderPage() {
     
     setIsSaving(true);
     try {
-      await setDoc(doc(db, 'teacherProfiles', user.uid), profileData);
+      const photoUrl = profileData.profilePhoto || '';
+      const dataToSave = {
+        ...profileData,
+        photoUrl: photoUrl,
+      };
+      await setDoc(doc(db, 'teacherProfiles', user.uid), dataToSave, { merge: true });
+
+      await setDoc(doc(db, 'users', user.uid), { 
+        name: profileData.displayName || user.displayName || '',
+        photoURL: photoUrl, 
+        profilePhoto: photoUrl,
+        photoUrl: photoUrl 
+      }, { merge: true });
+
+      if (auth.currentUser) {
+        await updateProfile(auth.currentUser, { 
+          displayName: profileData.displayName || user.displayName || undefined,
+          photoURL: photoUrl || undefined 
+        }).catch(console.error);
+      }
+
+      if (refreshUserData) {
+        await refreshUserData();
+      }
+
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {

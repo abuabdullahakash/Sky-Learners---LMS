@@ -51,16 +51,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       role = 'teacher';
     }
 
+    let profilePhoto = existingData?.photoURL || existingData?.profilePhoto || existingData?.photoUrl || undefined;
+
     // Check 2: Check if teacher profile document exists
-    if (!role) {
-      try {
-        const teacherProfileSnap = await getDoc(doc(db, 'teacherProfiles', uid));
-        if (teacherProfileSnap.exists()) {
+    try {
+      const teacherProfileSnap = await getDoc(doc(db, 'teacherProfiles', uid));
+      if (teacherProfileSnap.exists()) {
+        const tpData = teacherProfileSnap.data();
+        if (!role) {
           role = 'teacher';
         }
-      } catch (err) {
-        console.error("Error checking teacherProfiles:", err);
+        if (tpData.profilePhoto || tpData.photoUrl) {
+          profilePhoto = tpData.profilePhoto || tpData.photoUrl;
+        }
       }
+    } catch (err) {
+      console.error("Error checking teacherProfiles:", err);
     }
 
     // Check 3: Check if user is a creator of any course in courses collection by teacherId
@@ -122,7 +128,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const userRef = doc(db, "users", uid);
         await setDoc(userRef, { role, onboardingComplete: true, email: userEmail || existingData?.email || '' }, { merge: true }).catch(console.error);
       }
-      return { ...existingData, email: userEmail || existingData?.email, role, onboardingComplete: true };
+      return { 
+        ...existingData, 
+        email: userEmail || existingData?.email, 
+        role, 
+        onboardingComplete: true,
+        photoURL: profilePhoto || existingData?.photoURL || existingData?.profilePhoto || existingData?.photoUrl || undefined,
+        profilePhoto: profilePhoto || existingData?.photoURL || existingData?.profilePhoto || existingData?.photoUrl || undefined,
+      };
     }
 
     // For brand new users without a role, preserve their uncompleted onboarding status
@@ -130,7 +143,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       ...existingData, 
       email: userEmail || existingData?.email, 
       role: existingData?.role || undefined, 
-      onboardingComplete: Boolean(existingData?.onboardingComplete) 
+      onboardingComplete: Boolean(existingData?.onboardingComplete),
+      photoURL: profilePhoto || existingData?.photoURL || existingData?.profilePhoto || existingData?.photoUrl || undefined,
+      profilePhoto: profilePhoto || existingData?.photoURL || existingData?.profilePhoto || existingData?.photoUrl || undefined,
     };
   };
 

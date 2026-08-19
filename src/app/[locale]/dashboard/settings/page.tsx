@@ -150,6 +150,8 @@ export default function SettingsPage() {
         department,
         year,
         photoUrl: photoUrl || user.photoURL || '',
+        photoURL: photoUrl || user.photoURL || '',
+        profilePhoto: photoUrl || user.photoURL || '',
       });
       // Try to refresh user data in context if possible
       if (refreshUserData) {

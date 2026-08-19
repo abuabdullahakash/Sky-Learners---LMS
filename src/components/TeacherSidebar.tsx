@@ -24,13 +24,14 @@ export default function TeacherSidebar() {
         const docRef = doc(db, 'teacherProfiles', user.uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setProfileName(docSnap.data().displayName || '');
-          setProfileImage(docSnap.data().photoUrl || '');
+          const data = docSnap.data();
+          setProfileName(data.displayName || '');
+          setProfileImage(data.profilePhoto || data.photoUrl || '');
         }
       };
       fetchProfile();
     }
-  }, [user]);
+  }, [user, userData]);
 
   const menuItems = [
     { name: t('overview') || 'Overview', href: '/teacher-dashboard', icon: LayoutDashboard },

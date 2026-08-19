@@ -55,10 +55,102 @@
     "noParticipants": "No participants yet"
   },
   "Index": {
-    "title": "Welcome to SkyLearners",
-    "subtitle": "Get all your academic content here. The ultimate learning platform for your success.",
-    "getStarted": "Get Started",
-    "courses": "Courses"
+    "heroTag": "Learners & Educators Platform",
+    "title": "Learn from Top Teachers & Leading Coaching Centers",
+    "subtitle": "Empower your future with interactive live classes, daily exams, multi-instructor guidance, and verified certificates.",
+    "searchPlaceholder": "Search by course, topic, or instructor name...",
+    "popularSearch": "Popular:",
+    "exploreCourses": "Explore Courses",
+    "teachWithUs": "Teach with Us / Join as Coaching",
+    "stats": {
+      "students": "Active Students",
+      "teachers": "Verified Instructors & Coachings",
+      "courses": "Premium Courses",
+      "satisfaction": "Satisfaction Rate"
+    },
+    "categories": {
+      "title": "Explore Top Categories",
+      "subtitle": "Choose the best learning path matched with your goals and ambitions",
+      "academic": "Academic (HSC / SSC / Class 6-10)",
+      "programming": "Programming & Tech",
+      "design": "Graphic & Creative Design",
+      "language": "Spoken English & Languages",
+      "business": "Business & Digital Marketing",
+      "admission": "Admission & Competitive Exams",
+      "viewAll": "View All Categories"
+    },
+    "featuredCourses": {
+      "title": "Top & Trending Courses",
+      "subtitle": "Most popular courses led by nation-renowned educators and coaching centers",
+      "tabAll": "All Courses",
+      "tabCoaching": "Coaching Centers",
+      "tabIndividual": "Individual Teachers",
+      "tabPopular": "Popular Courses",
+      "noCourses": "No published courses found at this moment",
+      "viewDetails": "View Details",
+      "enrolled": "Students Enrolled",
+      "coachingBadge": "Coaching Center",
+      "individualBadge": "Individual Teacher",
+      "free": "Free",
+      "viewAllCourses": "Browse All Courses"
+    },
+    "topCoachings": {
+      "tag": "Top Institutions",
+      "title": "Leading Coaching Centers & Academies",
+      "subtitle": "Renowned coaching institutions and their expert faculty members on our platform",
+      "instructorsCount": "Instructors",
+      "coursesCount": "Courses",
+      "exploreCoaching": "View Coaching Profile"
+    },
+    "topInstructors": {
+      "tag": "Expert Mentors",
+      "title": "Meet Our Star Instructors",
+      "subtitle": "Learn directly from dedicated subject specialists and experienced mentors",
+      "viewProfile": "View Profile",
+      "rating": "Rating"
+    },
+    "features": {
+      "tag": "Why SkyLearners?",
+      "title": "Cutting-Edge Features for Modern Learners",
+      "subtitle": "Everything you need to make your learning journey seamless, engaging, and fruitful",
+      "f1Title": "Interactive Live & Recorded Classes",
+      "f1Desc": "Join live classes with top mentors and access crisp full-HD recorded lectures anytime for revision.",
+      "f2Title": "Daily Exams & Live Leaderboard",
+      "f2Desc": "Test your grasp after every lesson with topic-wise quizzes and track your national standing on the leaderboard.",
+      "f3Title": "Multi-Teacher Subject Specialization",
+      "f3Desc": "Enjoy specialized subject classes by distinct expert teachers within a single coaching course.",
+      "f4Title": "Verified Digital Certificates",
+      "f4Desc": "Earn shareable certificates with unique verification codes upon successful course completion."
+    },
+    "educatorCTA": {
+      "tag": "For Educators & Institutions",
+      "title": "Share Your Knowledge & Build Your Educational Brand",
+      "subtitle": "Reach thousands of eager students, scale your teaching, and manage complete academic batches.",
+      "individualTitle": "Teach as an Individual Instructor",
+      "individualDesc": "Create your own courses, host live classes, connect directly with students, and monetize your expertise.",
+      "individualBtn": "Register as Teacher",
+      "coachingTitle": "Bring Your Coaching Center Online",
+      "coachingDesc": "Add multiple faculty members, distribute subjects by expert teachers, and manage your entire student cohort.",
+      "coachingBtn": "Register Coaching Center"
+    },
+    "testimonials": {
+      "tag": "Success Stories",
+      "title": "What Our Students Say",
+      "subtitle": "Real experiences and feedback from thousands of successful learners"
+    },
+    "faq": {
+      "tag": "Common Inquiries",
+      "title": "Frequently Asked Questions",
+      "subtitle": "Quick answers to help you get started right away",
+      "q1": "How do I enroll in a course?",
+      "a1": "Browse to your desired course, click 'Enroll Now', complete the checkout, and the course will instantly unlock in your dashboard.",
+      "q2": "Can I launch a course as an instructor?",
+      "a2": "Yes! Register as a teacher, set up your profile, and start building and publishing your courses right from your teacher dashboard.",
+      "q3": "How do coaching centers manage multiple teachers?",
+      "a3": "In your coaching profile, add your faculty to the 'Teachers Roster' and assign specific instructors to respective subjects when designing your course.",
+      "q4": "How do daily exams and certificates work?",
+      "a4": "Participate in exams linked to each lesson to earn scores and leaderboard ranks. Complete all curriculum milestones to automatically receive your verified certificate."
+    }
   },
   "Navigation": {
     "home": "Home",

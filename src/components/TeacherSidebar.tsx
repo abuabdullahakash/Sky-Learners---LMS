@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
-import { LayoutDashboard, Video, Users, DollarSign, Settings, UserCircle, GraduationCap, Globe, Megaphone, ExternalLink, AlertCircle } from 'lucide-react';
+import { LayoutDashboard, Video, Users, DollarSign, Settings, UserCircle, GraduationCap, Globe, Megaphone, ExternalLink, AlertCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
@@ -35,7 +35,8 @@ export default function TeacherSidebar() {
   const menuItems = [
     { name: t('overview') || 'Overview', href: '/teacher-dashboard', icon: LayoutDashboard },
     { name: t('courses') || 'My Courses', href: '/teacher-dashboard/courses', icon: Video },
-    { name: t('myWebsite') || 'My Storefront / Website', href: '/teacher-dashboard/profile', icon: Globe },
+    { name: t('homeBuilder') || 'Home Page Builder', href: '/teacher-dashboard/home-builder', icon: Sparkles },
+    { name: t('myWebsite') || 'My Profile / Storefront', href: '/teacher-dashboard/profile', icon: Globe },
     { name: t('posts') || 'Posts & Notices', href: '/teacher-dashboard/posts', icon: Megaphone },
     { name: t('students') || 'Students', href: '/teacher-dashboard/students', icon: Users },
     { name: t('earnings') || 'Earnings', href: '/teacher-dashboard/earnings', icon: DollarSign },

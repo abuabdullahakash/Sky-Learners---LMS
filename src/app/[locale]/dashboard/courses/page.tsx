@@ -205,7 +205,7 @@ export default function StudentCoursesPage() {
     <div className="w-full space-y-10 animate-in fade-in duration-500">
       
       {/* Premium Hero Banner Header - Larger & Richer */}
-      <div className="relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] p-8 sm:p-12 md:p-14 bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 text-white shadow-2xl border border-white/10 min-h-[220px] sm:min-h-[260px] flex flex-col justify-center">
+      <div className="relative overflow-hidden rounded-none p-8 sm:p-12 md:p-14 bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 text-white shadow-2xl border border-white/10 min-h-[220px] sm:min-h-[260px] flex flex-col justify-center">
         <div className="absolute top-0 right-0 w-80 h-80 bg-orange-500/20 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
         <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
         <div className="absolute top-6 right-6 sm:top-10 sm:right-10 opacity-20 pointer-events-none">

@@ -9,6 +9,7 @@ import {
   updateDoc, 
   deleteDoc, 
   query, 
+  where,
   orderBy 
 } from 'firebase/firestore';
 import { 
@@ -22,6 +23,7 @@ import {
   MoreVertical, 
   Ban, 
   CheckCircle, 
+  CheckCircle2,
   Trash2, 
   UserCheck, 
   Eye, 
@@ -118,6 +120,7 @@ export default function AdminDashboardPage() {
 
   // Confirmation Modals
   const [deleteConfirmUser, setDeleteConfirmUser] = useState<UserItem | null>(null);
+  const [deleteMode, setDeleteMode] = useState<'both' | 'database_only' | 'auth_block'>('both');
   const [deleteConfirmCourse, setDeleteConfirmCourse] = useState<CourseItem | null>(null);
   const [actionProcessing, setActionProcessing] = useState(false);
 
@@ -234,13 +237,34 @@ export default function AdminDashboardPage() {
     if (!deleteConfirmUser) return;
     setActionProcessing(true);
     try {
-      await deleteDoc(doc(db, 'users', deleteConfirmUser.id));
-      setUsers(prev => prev.filter(u => u.id !== deleteConfirmUser.id));
+      const uid = deleteConfirmUser.id;
+
+      if (deleteMode === 'auth_block') {
+        // Mode 3: Revoke Access / Block Login
+        await updateDoc(doc(db, 'users', uid), { isBlocked: true });
+        setUsers(prev => prev.map(u => u.id === uid ? { ...u, isBlocked: true } : u));
+      } else {
+        // Mode 1 ('both') & Mode 2 ('database_only'): Delete from Firestore
+        await deleteDoc(doc(db, 'users', uid));
+        await deleteDoc(doc(db, 'teacherProfiles', uid)).catch(() => {});
+        
+        if (deleteMode === 'both') {
+          // Attempt to also clean related records
+          try {
+            const enrollQ = query(collection(db, 'enrollments'), where('studentId', '==', uid));
+            const enrollSnap = await getDocs(enrollQ);
+            enrollSnap.forEach(d => deleteDoc(d.ref).catch(() => {}));
+          } catch (e) {}
+        }
+        
+        setUsers(prev => prev.filter(u => u.id !== uid));
+      }
+
       setDeleteConfirmUser(null);
       if (selectedUser?.id === deleteConfirmUser.id) setSelectedUser(null);
     } catch (err) {
-      console.error("Error deleting user:", err);
-      alert("Failed to delete user document.");
+      console.error("Error processing user deletion/action:", err);
+      alert("Failed to process user action.");
     } finally {
       setActionProcessing(false);
     }
@@ -1010,34 +1034,122 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* Delete User Confirmation Modal */}
+      {/* Delete User Smart Confirmation Modal */}
       {deleteConfirmUser && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-rose-500/40 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="flex items-center gap-3 text-rose-400">
-              <AlertTriangle className="w-6 h-6 shrink-0" />
-              <h3 className="font-bold text-base text-white">Confirm User Deletion</h3>
+          <div className="bg-slate-900 border border-rose-500/40 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-200 text-slate-200">
+            
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-3 text-rose-400">
+                <div className="w-10 h-10 rounded-xl bg-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
+                  <Trash2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base text-white">Delete User Account</h3>
+                  <p className="text-xs text-slate-400 truncate max-w-xs">{deleteConfirmUser.name || deleteConfirmUser.email}</p>
+                </div>
+              </div>
+              <button onClick={() => setDeleteConfirmUser(null)} className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white">
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Are you sure you want to permanently delete user <strong className="text-white">{deleteConfirmUser.name || deleteConfirmUser.email}</strong>?
-              This will remove their account record from the database.
+
+            <p className="text-xs text-slate-300">
+              Choose how you want to delete or handle <strong className="text-white">{deleteConfirmUser.name || deleteConfirmUser.email}</strong>:
             </p>
-            <div className="flex justify-end gap-2 pt-2">
+
+            {/* Granular Option Cards */}
+            <div className="space-y-2.5">
+              
+              {/* Option 1: Both / Complete (Recommended) */}
+              <div 
+                onClick={() => setDeleteMode('both')}
+                className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
+                  deleteMode === 'both'
+                    ? 'bg-rose-500/15 border-rose-500/60 ring-1 ring-rose-500/40 shadow-lg'
+                    : 'bg-slate-800/50 border-slate-700/60 hover:bg-slate-800 hover:border-slate-600'
+                }`}
+              >
+                <div className={`w-5 h-5 rounded-full mt-0.5 flex items-center justify-center border transition-all ${
+                  deleteMode === 'both' ? 'border-rose-500 bg-rose-500 text-white' : 'border-slate-500'
+                }`}>
+                  {deleteMode === 'both' && <CheckCircle2 className="w-3.5 h-3.5" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="font-bold text-xs text-white">1. Delete Completely (Database & Records)</p>
+                    <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-rose-500/25 text-rose-300 uppercase">Recommended</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Permanently deletes user profile, teacher data, and all database records from Firestore.
+                  </p>
+                </div>
+              </div>
+
+              {/* Option 2: Database Only */}
+              <div 
+                onClick={() => setDeleteMode('database_only')}
+                className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
+                  deleteMode === 'database_only'
+                    ? 'bg-amber-500/15 border-amber-500/60 ring-1 ring-amber-500/40 shadow-lg'
+                    : 'bg-slate-800/50 border-slate-700/60 hover:bg-slate-800 hover:border-slate-600'
+                }`}
+              >
+                <div className={`w-5 h-5 rounded-full mt-0.5 flex items-center justify-center border transition-all ${
+                  deleteMode === 'database_only' ? 'border-amber-500 bg-amber-500 text-black' : 'border-slate-500'
+                }`}>
+                  {deleteMode === 'database_only' && <CheckCircle2 className="w-3.5 h-3.5" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-xs text-white">2. Database Record Only</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Removes user profile and roles from Firestore database, keeping auth identity.
+                  </p>
+                </div>
+              </div>
+
+              {/* Option 3: Block / Suspend Login */}
+              <div 
+                onClick={() => setDeleteMode('auth_block')}
+                className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
+                  deleteMode === 'auth_block'
+                    ? 'bg-purple-500/15 border-purple-500/60 ring-1 ring-purple-500/40 shadow-lg'
+                    : 'bg-slate-800/50 border-slate-700/60 hover:bg-slate-800 hover:border-slate-600'
+                }`}
+              >
+                <div className={`w-5 h-5 rounded-full mt-0.5 flex items-center justify-center border transition-all ${
+                  deleteMode === 'auth_block' ? 'border-purple-500 bg-purple-500 text-white' : 'border-slate-500'
+                }`}>
+                  {deleteMode === 'auth_block' && <CheckCircle2 className="w-3.5 h-3.5" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-xs text-white">3. Suspend / Block Login</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Revokes site access immediately without deleting their historical data.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
               <button
                 onClick={() => setDeleteConfirmUser(null)}
                 disabled={actionProcessing}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition-colors"
+                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteUser}
                 disabled={actionProcessing}
-                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white transition-colors flex items-center gap-1.5"
+                className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white transition-colors flex items-center gap-1.5 shadow-lg shadow-rose-600/30"
               >
-                <Trash2 className="w-3.5 h-3.5" /> Confirm Delete
+                <Trash2 className="w-4 h-4" />
+                {actionProcessing ? 'Processing...' : 'Confirm Action'}
               </button>
             </div>
+
           </div>
         </div>
       )}

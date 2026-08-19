@@ -4,10 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, limit, doc, getDoc, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import RoleSelectionModal from '@/components/RoleSelectionModal';
-import Image from 'next/image';
 import gsap from 'gsap';
 import { 
   Search, 
@@ -23,9 +22,7 @@ import {
   CheckCircle2, 
   ArrowRight, 
   Star, 
-  Play, 
   ChevronDown, 
-  ChevronUp, 
   Award, 
   Trophy, 
   Video, 
@@ -113,7 +110,6 @@ export default function HomePage() {
   const [coachingCenters, setCoachingCenters] = useState<CoachingProfile[]>([]);
   const [starTeachers, setStarTeachers] = useState<TeacherProfile[]>([]);
   const [teacherPosts, setTeacherPosts] = useState<TeacherPost[]>([]);
-  const [enrolledTeacherIds, setEnrolledTeacherIds] = useState<string[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
@@ -126,7 +122,6 @@ export default function HomePage() {
   const statsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Hero entrance animations
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
     
     tl.fromTo(heroTagRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, delay: 0.1 })
@@ -221,25 +216,7 @@ export default function HomePage() {
         setCoachingCenters(coachings);
         setStarTeachers(teachers);
 
-        // 3. Fetch Student's Enrolled Teachers (if logged in as student)
-        let studentEnrolledTeachers: string[] = [];
-        if (user?.uid && isStudent) {
-          try {
-            const enrollSnap = await getDocs(query(collection(db, 'enrollments'), where('studentId', '==', user.uid)));
-            const enrolledCourseIds = enrollSnap.docs.map(d => d.data().courseId).filter(Boolean);
-            for (const cId of enrolledCourseIds) {
-              const cMatch = fetchedCourses.find(c => c.id === cId);
-              if (cMatch?.teacherId && !studentEnrolledTeachers.includes(cMatch.teacherId)) {
-                studentEnrolledTeachers.push(cMatch.teacherId);
-              }
-            }
-            setEnrolledTeacherIds(studentEnrolledTeachers);
-          } catch (e) {
-            console.error('Error fetching enrollments for feed:', e);
-          }
-        }
-
-        // 4. Fetch Teacher Posts / Notices
+        // 3. Fetch Teacher Posts / Notices
         const postsRef = collection(db, 'teacher_posts');
         const postsSnap = await getDocs(query(postsRef, limit(10)));
         const fetchedPosts: TeacherPost[] = [];
@@ -247,7 +224,6 @@ export default function HomePage() {
           fetchedPosts.push({ id: d.id, ...d.data() } as TeacherPost);
         });
 
-        // Sort: Pinned first, then newest
         fetchedPosts.sort((a, b) => {
           if (a.isPinned && !b.isPinned) return -1;
           if (!a.isPinned && b.isPinned) return 1;
@@ -266,7 +242,7 @@ export default function HomePage() {
     };
 
     fetchData();
-  }, [user, isStudent]);
+  }, []);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -282,7 +258,6 @@ export default function HomePage() {
     router.push(`/onboarding?role=${role}`);
   };
 
-  // Filter courses based on active tab
   const filteredCourses = courses.filter((c) => {
     if (activeCourseTab === 'coaching') return c.isCoachingCourse;
     if (activeCourseTab === 'individual') return !c.isCoachingCourse;
@@ -290,7 +265,6 @@ export default function HomePage() {
     return true;
   });
 
-  // Categories list
   const categoryList = [
     {
       id: 'academic',
@@ -342,7 +316,6 @@ export default function HomePage() {
     },
   ];
 
-  // Features list
   const featureList = [
     {
       icon: Video,
@@ -370,7 +343,6 @@ export default function HomePage() {
     },
   ];
 
-  // Testimonials
   const testimonials = [
     {
       name: locale === 'bn' ? 'তানভীর আহমেদ' : 'Tanvir Ahmed',
@@ -404,7 +376,6 @@ export default function HomePage() {
     }
   ];
 
-  // FAQ items
   const faqItems = [
     { q: t('faq.q1'), a: t('faq.a1') },
     { q: t('faq.q2'), a: t('faq.a2') },
@@ -423,7 +394,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-white">
       
       {/* ========================================================================= */}
-      {/* 1. HERO SECTION (Dynamic Role-Based Actions & Search)                    */}
+      {/* 1. HERO SECTION (Role-Adaptive: Student vs Teacher vs Guest)              */}
       {/* ========================================================================= */}
       <section className="relative pt-24 pb-20 md:pt-32 md:pb-28 overflow-hidden">
         {/* Background Parallax & Dynamic Glowing Orbs */}
@@ -437,36 +408,68 @@ export default function HomePage() {
         <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-4xl mx-auto space-y-6">
             
-            {/* Pulsing Tag Badge */}
+            {/* Tag Badge */}
             <div ref={heroTagRef} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs sm:text-sm font-bold tracking-wide uppercase shadow-sm backdrop-blur-md">
               <Sparkles className="w-4 h-4 text-primary animate-pulse" />
               <span>
                 {user ? (
                   isTeacher 
                     ? (locale === 'bn' ? `👨‍🏫 শিক্ষক ড্যাশবোর্ড • স্বাগতম ${user.displayName || 'Teacher'}` : `👨‍🏫 Teacher Hub • Welcome ${user.displayName || 'Teacher'}`)
-                    : (locale === 'bn' ? `🎓 শিক্ষার্থী হাব • স্বাগতম ${user.displayName || 'Learner'}` : `🎓 Student Hub • Welcome ${user.displayName || 'Learner'}`)
+                    : (locale === 'bn' ? `🎓 শিক্ষার্থী পোর্টাল • স্বাগতম ${user.displayName || 'Learner'}` : `🎓 Student Portal • Welcome ${user.displayName || 'Learner'}`)
                 ) : (
                   t('heroTag')
                 )}
               </span>
             </div>
 
-            {/* Main Catchy Headline */}
+            {/* Main Headline */}
             <h1 ref={heroTitleRef} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.15] text-foreground">
-              {locale === 'bn' ? (
-                <>
-                  দেশসেরা শিক্ষক ও <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">কোচিং সেন্টারের</span> সাথে শিখুন
-                </>
+              {user && isStudent ? (
+                locale === 'bn' ? (
+                  <>
+                    আজ <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">নতুন কী শিখতে</span> চান?
+                  </>
+                ) : (
+                  <>
+                    What do you want to <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">learn today?</span>
+                  </>
+                )
+              ) : user && isTeacher ? (
+                locale === 'bn' ? (
+                  <>
+                    আপনার <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-primary bg-clip-text text-transparent">একাডেমি ও কোর্স</span> পরিচালনা করুন
+                  </>
+                ) : (
+                  <>
+                    Manage your <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-primary bg-clip-text text-transparent">Academy & Courses</span>
+                  </>
+                )
               ) : (
-                <>
-                  Learn from Top Teachers & <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">Leading Coaching Centers</span>
-                </>
+                locale === 'bn' ? (
+                  <>
+                    দেশসেরা শিক্ষক ও <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">কোচিং সেন্টারের</span> সাথে শিখুন
+                  </>
+                ) : (
+                  <>
+                    Learn from Top Teachers & <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">Leading Coaching Centers</span>
+                  </>
+                )
               )}
             </h1>
 
             {/* Subtitle */}
             <p ref={heroSubRef} className="text-base sm:text-lg md:text-xl text-foreground/75 max-w-2xl mx-auto leading-relaxed">
-              {t('subtitle')}
+              {user && isStudent ? (
+                locale === 'bn'
+                  ? 'আপনার পছন্দের বিষয় বা শিক্ষকের কোর্স খুঁজে নিন, লাইভ ক্লাসে অংশ নিন এবং নিয়মিত ডেইলি এক্সাম দিয়ে নিজেকে এগিয়ে রাখুন।'
+                  : 'Discover your favorite subjects, join live classes, and test your skills with daily exams.'
+              ) : user && isTeacher ? (
+                locale === 'bn'
+                  ? 'আপনার লাইভ ক্লাসের শিডিউল চেক করুন, নতুন কোর্স লঞ্চ করুন এবং শিক্ষার্থীদের জন্য নোটিশ ও টিপস পোস্ট করুন।'
+                  : 'Check your schedule, publish new courses, and broadcast notices to your students.'
+              ) : (
+                t('subtitle')
+              )}
             </p>
 
             {/* Course Search Bar */}
@@ -507,9 +510,9 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* DYNAMIC HERO CTA BUTTONS BASED ON USER ROLE */}
+            {/* DYNAMIC HERO ACTION BUTTONS */}
             <div ref={heroCtaRef} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-              {/* CASE 1: LOGGED IN AS TEACHER */}
+              {/* CASE 1: TEACHER */}
               {user && isTeacher ? (
                 <>
                   <Link 
@@ -517,7 +520,7 @@ export default function HomePage() {
                     className="w-full sm:w-auto px-8 py-4 rounded-xl sm:rounded-2xl bg-orange-500 text-white font-bold text-base hover:bg-orange-600 transition-all shadow-xl hover:scale-[1.02] flex items-center justify-center gap-2"
                   >
                     <LayoutDashboard className="w-5 h-5" />
-                    <span>{locale === 'bn' ? 'টিচার ড্যাশবোর্ডে যান' : 'Go to Teacher Dashboard'}</span>
+                    <span>{locale === 'bn' ? 'টিচার ড্যাশবোর্ডে যান' : 'Teacher Dashboard'}</span>
                   </Link>
 
                   <Link 
@@ -537,14 +540,14 @@ export default function HomePage() {
                   </Link>
                 </>
               ) : user && isStudent ? (
-                /* CASE 2: LOGGED IN AS STUDENT */
+                /* CASE 2: STUDENT */
                 <>
                   <Link 
                     href="/dashboard/courses"
                     className="w-full sm:w-auto px-8 py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-primary to-orange-500 text-white font-bold text-base hover:opacity-95 transition-all shadow-xl hover:scale-[1.02] flex items-center justify-center gap-2"
                   >
                     <BookOpen className="w-5 h-5" />
-                    <span>{locale === 'bn' ? 'পড়াশোনা চালিয়ে যান (আমার কোর্স)' : 'Continue Learning (My Courses)'}</span>
+                    <span>{locale === 'bn' ? 'আমার কোর্সে যান' : 'My Enrolled Courses'}</span>
                   </Link>
 
                   <Link 
@@ -552,11 +555,11 @@ export default function HomePage() {
                     className="w-full sm:w-auto px-8 py-4 rounded-xl sm:rounded-2xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/15 text-foreground font-bold text-base transition-all shadow-sm flex items-center justify-center gap-2"
                   >
                     <Compass className="w-5 h-5 text-primary" />
-                    <span>{locale === 'bn' ? 'নতুন কোর্স খুঁজুন' : 'Explore New Courses'}</span>
+                    <span>{locale === 'bn' ? 'নতুন কোর্স ব্রাউজ করুন' : 'Browse All Courses'}</span>
                   </Link>
                 </>
               ) : (
-                /* CASE 3: GUEST VISITOR */
+                /* CASE 3: GUEST */
                 <>
                   <Link 
                     href="/courses"
@@ -583,54 +586,35 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 2. PLATFORM LIVE METRICS & STATS COUNTER                                  */}
+      {/* 2. PLATFORM LIVE METRICS (For Guests & Market Proof)                      */}
       {/* ========================================================================= */}
-      <section className="py-8 border-y border-foreground/10 bg-foreground/[0.02]">
-        <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
-          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 text-center">
-            
-            <div className="p-4 rounded-2xl bg-background/50 border border-foreground/5 shadow-sm">
-              <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-primary mb-1">
-                ১০,০০০+
+      {!user && (
+        <section className="py-8 border-y border-foreground/10 bg-foreground/[0.02]">
+          <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
+            <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 text-center">
+              <div className="p-4 rounded-2xl bg-background/50 border border-foreground/5 shadow-sm">
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-primary mb-1">১০,০০০+</div>
+                <div className="text-xs sm:text-sm font-semibold text-foreground/70">{t('stats.students')}</div>
               </div>
-              <div className="text-xs sm:text-sm font-semibold text-foreground/70">
-                {t('stats.students')}
+              <div className="p-4 rounded-2xl bg-background/50 border border-foreground/5 shadow-sm">
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-orange-500 mb-1">৫০+</div>
+                <div className="text-xs sm:text-sm font-semibold text-foreground/70">{t('stats.teachers')}</div>
               </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-background/50 border border-foreground/5 shadow-sm">
-              <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-orange-500 mb-1">
-                ৫০+
+              <div className="p-4 rounded-2xl bg-background/50 border border-foreground/5 shadow-sm">
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-purple-500 mb-1">১০০+</div>
+                <div className="text-xs sm:text-sm font-semibold text-foreground/70">{t('stats.courses')}</div>
               </div>
-              <div className="text-xs sm:text-sm font-semibold text-foreground/70">
-                {t('stats.teachers')}
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-background/50 border border-foreground/5 shadow-sm">
-              <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-purple-500 mb-1">
-                ১০০+
-              </div>
-              <div className="text-xs sm:text-sm font-semibold text-foreground/70">
-                {t('stats.courses')}
+              <div className="p-4 rounded-2xl bg-background/50 border border-foreground/5 shadow-sm">
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-emerald-500 mb-1">৯৯%</div>
+                <div className="text-xs sm:text-sm font-semibold text-foreground/70">{t('stats.satisfaction')}</div>
               </div>
             </div>
-
-            <div className="p-4 rounded-2xl bg-background/50 border border-foreground/5 shadow-sm">
-              <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-emerald-500 mb-1">
-                ৯৯%
-              </div>
-              <div className="text-xs sm:text-sm font-semibold text-foreground/70">
-                {t('stats.satisfaction')}
-              </div>
-            </div>
-
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ========================================================================= */}
-      {/* 3. TEACHER POSTS & COMMUNITY NOTICES FEED (Social Learning Updates)      */}
+      {/* 3. TEACHER POSTS & COMMUNITY NOTICES FEED                                */}
       {/* ========================================================================= */}
       {teacherPosts.length > 0 && (
         <section className="py-16 md:py-24 relative bg-gradient-to-b from-orange-500/[0.03] to-transparent border-b border-foreground/10">
@@ -640,7 +624,7 @@ export default function HomePage() {
               <div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 text-xs font-bold uppercase tracking-wider mb-2">
                   <Megaphone className="w-3.5 h-3.5" />
-                  <span>{locale === 'bn' ? 'কমিউনিটি নোটিশ ও টিপস' : 'Community Notices & Tips'}</span>
+                  <span>{locale === 'bn' ? 'কমিউনিটি ও নোটিশ' : 'Community & Notices'}</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
                   {locale === 'bn' ? 'শিক্ষকদের সর্বশেষ আপডেট ও নোটিশ' : 'Latest Updates from Instructors'}
@@ -662,7 +646,6 @@ export default function HomePage() {
                   }`}
                 >
                   <div className="space-y-3">
-                    {/* Header: Teacher Avatar + Name + Type Badge */}
                     <div className="flex items-center justify-between gap-2">
                       <Link 
                         href={`/teachers/${post.teacherId}`}
@@ -695,7 +678,6 @@ export default function HomePage() {
                       </div>
                     </div>
 
-                    {/* Title & Body */}
                     <div>
                       <h3 className="font-bold text-base text-foreground mb-1 line-clamp-2">
                         {post.title}
@@ -705,7 +687,6 @@ export default function HomePage() {
                       </p>
                     </div>
 
-                    {/* Image Attachment */}
                     {post.imageUrl && (
                       <div className="relative aspect-video rounded-2xl overflow-hidden border border-foreground/10">
                         <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
@@ -713,7 +694,6 @@ export default function HomePage() {
                     )}
                   </div>
 
-                  {/* Footer: Linked Course CTA or Profile */}
                   <div className="pt-3 border-t border-foreground/10 flex items-center justify-between">
                     {post.linkedCourseId ? (
                       <Link 
@@ -729,7 +709,7 @@ export default function HomePage() {
                         href={`/teachers/${post.teacherId}`}
                         className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
                       >
-                        <span>{locale === 'bn' ? 'টিচার প্রোফাইল' : 'View Storefront'}</span>
+                        <span>{locale === 'bn' ? 'টিচার ওয়েবসাইট' : 'View Storefront'}</span>
                         <ArrowRight className="w-3 h-3" />
                       </Link>
                     )}
@@ -743,7 +723,7 @@ export default function HomePage() {
       )}
 
       {/* ========================================================================= */}
-      {/* 4. CATEGORIES EXPLORER (HSC/SSC, Programming, Design, etc.)               */}
+      {/* 4. CATEGORIES EXPLORER                                                    */}
       {/* ========================================================================= */}
       <section className="py-20 md:py-28 relative">
         <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
@@ -869,7 +849,6 @@ export default function HomePage() {
                   key={course.id}
                   className="group rounded-3xl bg-background border border-foreground/10 hover:border-primary/50 transition-all duration-300 shadow-md hover:shadow-2xl flex flex-col overflow-hidden"
                 >
-                  {/* Thumbnail */}
                   <div className="relative aspect-video w-full bg-foreground/10 overflow-hidden">
                     {course.thumbnailUrl ? (
                       <img 
@@ -883,7 +862,6 @@ export default function HomePage() {
                       </div>
                     )}
                     
-                    {/* Badge: Coaching vs Individual */}
                     <div className="absolute top-3 left-3 flex gap-2">
                       {course.isCoachingCourse ? (
                         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-orange-500/90 text-white text-[11px] font-extrabold uppercase tracking-wide backdrop-blur-md shadow-md">
@@ -899,10 +877,8 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  {/* Course Details */}
                   <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                     <div>
-                      {/* Creator info */}
                       <div className="flex items-center gap-2 text-xs font-semibold text-foreground/60 mb-2">
                         {course.isCoachingCourse ? (
                           <Building2 className="w-3.5 h-3.5 text-orange-500 flex-shrink-0" />
@@ -912,13 +888,11 @@ export default function HomePage() {
                         <span className="truncate">{course.instructorName}</span>
                       </div>
 
-                      {/* Title */}
                       <h3 className="font-bold text-base sm:text-lg text-foreground line-clamp-2 leading-snug group-hover:text-primary transition-colors">
                         {course.title}
                       </h3>
                     </div>
 
-                    {/* Stats & Price Row */}
                     <div className="pt-3 border-t border-foreground/10 space-y-3">
                       <div className="flex items-center justify-between text-xs text-foreground/70">
                         <div className="flex items-center gap-1 text-amber-500 font-bold">
@@ -980,7 +954,7 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 6. TOP COACHING CENTERS & ACADEMIES SPOTLIGHT                             */}
+      {/* 6. TOP COACHING CENTERS SHOWCASE                                          */}
       {/* ========================================================================= */}
       <section className="py-20 md:py-28 relative overflow-hidden">
         <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
@@ -1235,126 +1209,130 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 9. DUAL EDUCATOR CTA BANNER (Individual Teacher vs Coaching Center)       */}
+      {/* 9. DUAL EDUCATOR CTA BANNER (ONLY SHOWN TO GUESTS / NEW VISITORS)         */}
       {/* ========================================================================= */}
-      <section className="py-12">
-        <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            
-            {/* Left: Individual Teacher CTA */}
-            <div className="p-8 sm:p-12 rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-950 text-white shadow-2xl border border-white/10 relative overflow-hidden flex flex-col justify-between space-y-6">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
+      {!user && (
+        <section className="py-12">
+          <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               
-              <div className="relative z-10 space-y-4">
-                <div className="w-14 h-14 rounded-2xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
-                  <UserCheck className="w-8 h-8" />
-                </div>
-                <h3 className="text-2xl sm:text-3xl font-black">
-                  {t('educatorCTA.individualTitle')}
-                </h3>
-                <p className="text-gray-300 text-sm sm:text-base leading-relaxed max-w-md">
-                  {t('educatorCTA.individualDesc')}
-                </p>
-              </div>
-
-              <div className="relative z-10">
-                <button 
-                  type="button"
-                  onClick={() => handleRoleSelect('teacher')}
-                  className="px-6 py-3.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-bold text-sm transition-all shadow-lg hover:shadow-blue-500/30 flex items-center gap-2"
-                >
-                  <span>{t('educatorCTA.individualBtn')}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Right: Coaching Center CTA */}
-            <div className="p-8 sm:p-12 rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-purple-950 to-orange-950 text-white shadow-2xl border border-white/10 relative overflow-hidden flex flex-col justify-between space-y-6">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl pointer-events-none" />
-              
-              <div className="relative z-10 space-y-4">
-                <div className="w-14 h-14 rounded-2xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400">
-                  <Building2 className="w-8 h-8" />
-                </div>
-                <h3 className="text-2xl sm:text-3xl font-black">
-                  {t('educatorCTA.coachingTitle')}
-                </h3>
-                <p className="text-gray-300 text-sm sm:text-base leading-relaxed max-w-md">
-                  {t('educatorCTA.coachingDesc')}
-                </p>
-              </div>
-
-              <div className="relative z-10">
-                <button 
-                  type="button"
-                  onClick={() => handleRoleSelect('teacher')}
-                  className="px-6 py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm transition-all shadow-lg hover:shadow-orange-500/30 flex items-center gap-2"
-                >
-                  <span>{t('educatorCTA.coachingBtn')}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 10. TESTIMONIALS & SUCCESS STORIES                                        */}
-      {/* ========================================================================= */}
-      <section className="py-20 md:py-28 bg-foreground/[0.02] border-t border-foreground/10">
-        <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
-          
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider mb-2">
-              <Star className="w-3.5 h-3.5 fill-primary" />
-              <span>{t('testimonials.tag')}</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
-              {t('testimonials.title')}
-            </h2>
-            <p className="text-foreground/70 text-sm sm:text-base mt-2">
-              {t('testimonials.subtitle')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((test, idx) => (
-              <div 
-                key={idx}
-                className="p-8 rounded-3xl bg-background border border-foreground/10 shadow-md hover:shadow-xl transition-all flex flex-col justify-between space-y-6"
-              >
-                <div className="space-y-4">
-                  <div className="flex gap-1 text-amber-500">
-                    {[...Array(test.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-500" />
-                    ))}
+              {/* Left: Individual Teacher CTA */}
+              <div className="p-8 sm:p-12 rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-950 text-white shadow-2xl border border-white/10 relative overflow-hidden flex flex-col justify-between space-y-6">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
+                
+                <div className="relative z-10 space-y-4">
+                  <div className="w-14 h-14 rounded-2xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                    <UserCheck className="w-8 h-8" />
                   </div>
-                  <p className="text-foreground/80 text-sm sm:text-base leading-relaxed italic">
-                    "{test.content}"
+                  <h3 className="text-2xl sm:text-3xl font-black">
+                    {t('educatorCTA.individualTitle')}
+                  </h3>
+                  <p className="text-gray-300 text-sm sm:text-base leading-relaxed max-w-md">
+                    {t('educatorCTA.individualDesc')}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3 pt-4 border-t border-foreground/10">
-                  <img 
-                    src={test.avatar} 
-                    alt={test.name} 
-                    className="w-12 h-12 rounded-full object-cover border border-primary/30"
-                  />
-                  <div>
-                    <h4 className="font-bold text-sm text-foreground">{test.name}</h4>
-                    <p className="text-xs text-foreground/60">{test.role}</p>
-                    <span className="text-[11px] font-semibold text-primary">{test.course}</span>
-                  </div>
+                <div className="relative z-10">
+                  <button 
+                    type="button"
+                    onClick={() => handleRoleSelect('teacher')}
+                    className="px-6 py-3.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-bold text-sm transition-all shadow-lg hover:shadow-blue-500/30 flex items-center gap-2"
+                  >
+                    <span>{t('educatorCTA.individualBtn')}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
 
-        </div>
-      </section>
+              {/* Right: Coaching Center CTA */}
+              <div className="p-8 sm:p-12 rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-purple-950 to-orange-950 text-white shadow-2xl border border-white/10 relative overflow-hidden flex flex-col justify-between space-y-6">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl pointer-events-none" />
+                
+                <div className="relative z-10 space-y-4">
+                  <div className="w-14 h-14 rounded-2xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400">
+                    <Building2 className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-black">
+                    {t('educatorCTA.coachingTitle')}
+                  </h3>
+                  <p className="text-gray-300 text-sm sm:text-base leading-relaxed max-w-md">
+                    {t('educatorCTA.coachingDesc')}
+                  </p>
+                </div>
+
+                <div className="relative z-10">
+                  <button 
+                    type="button"
+                    onClick={() => handleRoleSelect('teacher')}
+                    className="px-6 py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm transition-all shadow-lg hover:shadow-orange-500/30 flex items-center gap-2"
+                  >
+                    <span>{t('educatorCTA.coachingBtn')}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 10. TESTIMONIALS & SUCCESS STORIES (For Guests & Market Proof)            */}
+      {/* ========================================================================= */}
+      {!user && (
+        <section className="py-20 md:py-28 bg-foreground/[0.02] border-t border-foreground/10">
+          <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
+            
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider mb-2">
+                <Star className="w-3.5 h-3.5 fill-primary" />
+                <span>{t('testimonials.tag')}</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
+                {t('testimonials.title')}
+              </h2>
+              <p className="text-foreground/70 text-sm sm:text-base mt-2">
+                {t('testimonials.subtitle')}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {testimonials.map((test, idx) => (
+                <div 
+                  key={idx}
+                  className="p-8 rounded-3xl bg-background border border-foreground/10 shadow-md hover:shadow-xl transition-all flex flex-col justify-between space-y-6"
+                >
+                  <div className="space-y-4">
+                    <div className="flex gap-1 text-amber-500">
+                      {[...Array(test.rating)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-amber-500" />
+                      ))}
+                    </div>
+                    <p className="text-foreground/80 text-sm sm:text-base leading-relaxed italic">
+                      "{test.content}"
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3 pt-4 border-t border-foreground/10">
+                    <img 
+                      src={test.avatar} 
+                      alt={test.name} 
+                      className="w-12 h-12 rounded-full object-cover border border-primary/30"
+                    />
+                    <div>
+                      <h4 className="font-bold text-sm text-foreground">{test.name}</h4>
+                      <p className="text-xs text-foreground/60">{test.role}</p>
+                      <span className="text-[11px] font-semibold text-primary">{test.course}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+          </div>
+        </section>
+      )}
 
       {/* ========================================================================= */}
       {/* 11. FAQ ACCORDION SECTION                                                 */}

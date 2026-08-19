@@ -60,6 +60,12 @@ service cloud.firestore {
       allow read, write: if isAuthenticated();
     }
 
+    // Teacher Posts & Community Announcements
+    match /teacher_posts/{postId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
     // General fallback for all other collections
     match /{document=**} {
       allow read, write: if isAuthenticated();

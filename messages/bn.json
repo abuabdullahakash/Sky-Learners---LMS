@@ -186,7 +186,13 @@
     "sidebar": {
       "overview": "ওভারভিউ",
       "courses": "আমার কোর্স",
+      "myWebsite": "আমার ওয়েবসাইট (স্টোরফ্রন্ট)",
+      "posts": "পোস্ট ও নোটিশ",
+      "students": "শিক্ষার্থীবৃন্দ",
+      "earnings": "উপার্জন ও হিসেব",
       "exams": "ডেইলি এক্সাম",
+      "createCourse": "+ নতুন কোর্স তৈরি",
+      "viewLiveWebsite": "ওয়েবসাইট দেখুন",
       "settings": "সেটিংস",
       "logout": "লগআউট",
       "confirmLogoutTitle": "লগআউট নিশ্চিত করুন",

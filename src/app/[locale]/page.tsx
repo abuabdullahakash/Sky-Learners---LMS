@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, limit, doc, getDoc, orderBy } from 'firebase/firestore';
+import { useAuth } from '@/context/AuthContext';
 import RoleSelectionModal from '@/components/RoleSelectionModal';
 import Image from 'next/image';
 import gsap from 'gsap';
@@ -34,7 +35,12 @@ import {
   ArrowUpRight, 
   Flame, 
   Compass,
-  Check
+  Megaphone,
+  Pin,
+  ExternalLink,
+  PlusCircle,
+  LayoutDashboard,
+  Globe
 } from 'lucide-react';
 
 interface CourseItem {
@@ -74,10 +80,31 @@ interface TeacherProfile {
   studentsCount?: number;
 }
 
+interface TeacherPost {
+  id: string;
+  teacherId: string;
+  teacherName: string;
+  teacherPhoto?: string;
+  coachingName?: string;
+  title: string;
+  content: string;
+  type: 'notice' | 'tips' | 'promo' | 'exam_alert';
+  imageUrl?: string;
+  linkedCourseId?: string;
+  linkedCourseTitle?: string;
+  isPinned?: boolean;
+  createdAt: any;
+}
+
 export default function HomePage() {
   const t = useTranslations('Index');
   const locale = useLocale();
   const router = useRouter();
+  const { user, userData } = useAuth();
+
+  const isAdmin = userData?.isAdmin || userData?.role === 'admin' || user?.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com' || Boolean(user?.email?.toLowerCase().includes('abuabdullahakash'));
+  const isTeacher = isAdmin || userData?.role === 'teacher';
+  const isStudent = !isAdmin && userData?.role === 'student';
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
@@ -85,6 +112,8 @@ export default function HomePage() {
   const [courses, setCourses] = useState<CourseItem[]>([]);
   const [coachingCenters, setCoachingCenters] = useState<CoachingProfile[]>([]);
   const [starTeachers, setStarTeachers] = useState<TeacherProfile[]>([]);
+  const [teacherPosts, setTeacherPosts] = useState<TeacherPost[]>([]);
+  const [enrolledTeacherIds, setEnrolledTeacherIds] = useState<string[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
@@ -108,7 +137,7 @@ export default function HomePage() {
       .fromTo(statsRef.current?.children || [], { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 }, "-=0.3");
   }, []);
 
-  // Fetch Firestore Courses & Teacher Profiles
+  // Fetch Firestore Courses, Profiles & Teacher Posts
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -191,6 +220,44 @@ export default function HomePage() {
 
         setCoachingCenters(coachings);
         setStarTeachers(teachers);
+
+        // 3. Fetch Student's Enrolled Teachers (if logged in as student)
+        let studentEnrolledTeachers: string[] = [];
+        if (user?.uid && isStudent) {
+          try {
+            const enrollSnap = await getDocs(query(collection(db, 'enrollments'), where('studentId', '==', user.uid)));
+            const enrolledCourseIds = enrollSnap.docs.map(d => d.data().courseId).filter(Boolean);
+            for (const cId of enrolledCourseIds) {
+              const cMatch = fetchedCourses.find(c => c.id === cId);
+              if (cMatch?.teacherId && !studentEnrolledTeachers.includes(cMatch.teacherId)) {
+                studentEnrolledTeachers.push(cMatch.teacherId);
+              }
+            }
+            setEnrolledTeacherIds(studentEnrolledTeachers);
+          } catch (e) {
+            console.error('Error fetching enrollments for feed:', e);
+          }
+        }
+
+        // 4. Fetch Teacher Posts / Notices
+        const postsRef = collection(db, 'teacher_posts');
+        const postsSnap = await getDocs(query(postsRef, limit(10)));
+        const fetchedPosts: TeacherPost[] = [];
+        postsSnap.forEach(d => {
+          fetchedPosts.push({ id: d.id, ...d.data() } as TeacherPost);
+        });
+
+        // Sort: Pinned first, then newest
+        fetchedPosts.sort((a, b) => {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+          const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+          return timeB - timeA;
+        });
+
+        setTeacherPosts(fetchedPosts);
+
       } catch (err) {
         console.error('Error fetching home page marketplace data:', err);
       } finally {
@@ -199,7 +266,7 @@ export default function HomePage() {
     };
 
     fetchData();
-  }, []);
+  }, [user, isStudent]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -345,11 +412,18 @@ export default function HomePage() {
     { q: t('faq.q4'), a: t('faq.a4') },
   ];
 
+  const typeBadges = {
+    notice: { label: locale === 'bn' ? '📢 নোটিশ' : '📢 Notice', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
+    tips: { label: locale === 'bn' ? '💡 পড়ার টিপস' : '💡 Study Tips', color: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
+    promo: { label: locale === 'bn' ? '🔥 নতুন কোর্স' : '🔥 Course Promo', color: 'bg-orange-500/10 text-orange-500 border-orange-500/20' },
+    exam_alert: { label: locale === 'bn' ? '📝 পরীক্ষার বার্তা' : '📝 Exam Alert', color: 'bg-purple-500/10 text-purple-500 border-purple-500/20' },
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-white">
       
       {/* ========================================================================= */}
-      {/* 1. HERO SECTION (Coursera/Udemy + Coaching Hybrid)                        */}
+      {/* 1. HERO SECTION (Dynamic Role-Based Actions & Search)                    */}
       {/* ========================================================================= */}
       <section className="relative pt-24 pb-20 md:pt-32 md:pb-28 overflow-hidden">
         {/* Background Parallax & Dynamic Glowing Orbs */}
@@ -366,7 +440,15 @@ export default function HomePage() {
             {/* Pulsing Tag Badge */}
             <div ref={heroTagRef} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs sm:text-sm font-bold tracking-wide uppercase shadow-sm backdrop-blur-md">
               <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-              <span>{t('heroTag')}</span>
+              <span>
+                {user ? (
+                  isTeacher 
+                    ? (locale === 'bn' ? `👨‍🏫 শিক্ষক ড্যাশবোর্ড • স্বাগতম ${user.displayName || 'Teacher'}` : `👨‍🏫 Teacher Hub • Welcome ${user.displayName || 'Teacher'}`)
+                    : (locale === 'bn' ? `🎓 শিক্ষার্থী হাব • স্বাগতম ${user.displayName || 'Learner'}` : `🎓 Student Hub • Welcome ${user.displayName || 'Learner'}`)
+                ) : (
+                  t('heroTag')
+                )}
+              </span>
             </div>
 
             {/* Main Catchy Headline */}
@@ -425,24 +507,75 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Dual CTA Action Buttons */}
+            {/* DYNAMIC HERO CTA BUTTONS BASED ON USER ROLE */}
             <div ref={heroCtaRef} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-              <Link 
-                href="/courses"
-                className="w-full sm:w-auto px-8 py-4 rounded-xl sm:rounded-2xl bg-foreground text-background dark:bg-primary dark:text-white font-bold text-base hover:opacity-95 transition-all shadow-xl hover:scale-[1.02] flex items-center justify-center gap-2 group"
-              >
-                <Compass className="w-5 h-5 text-primary dark:text-white group-hover:rotate-45 transition-transform" />
-                <span>{t('exploreCourses')}</span>
-              </Link>
-              
-              <button 
-                type="button"
-                onClick={() => setIsRoleModalOpen(true)}
-                className="w-full sm:w-auto px-8 py-4 rounded-xl sm:rounded-2xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/15 text-foreground font-bold text-base transition-all shadow-sm flex items-center justify-center gap-2 group"
-              >
-                <Building2 className="w-5 h-5 text-orange-500 group-hover:scale-110 transition-transform" />
-                <span>{t('teachWithUs')}</span>
-              </button>
+              {/* CASE 1: LOGGED IN AS TEACHER */}
+              {user && isTeacher ? (
+                <>
+                  <Link 
+                    href="/teacher-dashboard"
+                    className="w-full sm:w-auto px-8 py-4 rounded-xl sm:rounded-2xl bg-orange-500 text-white font-bold text-base hover:bg-orange-600 transition-all shadow-xl hover:scale-[1.02] flex items-center justify-center gap-2"
+                  >
+                    <LayoutDashboard className="w-5 h-5" />
+                    <span>{locale === 'bn' ? 'টিচার ড্যাশবোর্ডে যান' : 'Go to Teacher Dashboard'}</span>
+                  </Link>
+
+                  <Link 
+                    href={`/teachers/${user.uid}`}
+                    className="w-full sm:w-auto px-8 py-4 rounded-xl sm:rounded-2xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/15 text-foreground font-bold text-base transition-all shadow-sm flex items-center justify-center gap-2"
+                  >
+                    <Globe className="w-5 h-5 text-orange-500" />
+                    <span>{locale === 'bn' ? 'আমার ওয়েবসাইট দেখুন' : 'View My Website'}</span>
+                  </Link>
+
+                  <Link 
+                    href="/teacher-dashboard/courses/create"
+                    className="w-full sm:w-auto px-6 py-4 rounded-xl sm:rounded-2xl bg-primary text-white font-bold text-base hover:bg-primary/90 transition-all shadow-md flex items-center justify-center gap-2"
+                  >
+                    <PlusCircle className="w-5 h-5" />
+                    <span>{locale === 'bn' ? '+ নতুন কোর্স' : '+ Create Course'}</span>
+                  </Link>
+                </>
+              ) : user && isStudent ? (
+                /* CASE 2: LOGGED IN AS STUDENT */
+                <>
+                  <Link 
+                    href="/dashboard/courses"
+                    className="w-full sm:w-auto px-8 py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-primary to-orange-500 text-white font-bold text-base hover:opacity-95 transition-all shadow-xl hover:scale-[1.02] flex items-center justify-center gap-2"
+                  >
+                    <BookOpen className="w-5 h-5" />
+                    <span>{locale === 'bn' ? 'পড়াশোনা চালিয়ে যান (আমার কোর্স)' : 'Continue Learning (My Courses)'}</span>
+                  </Link>
+
+                  <Link 
+                    href="/courses"
+                    className="w-full sm:w-auto px-8 py-4 rounded-xl sm:rounded-2xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/15 text-foreground font-bold text-base transition-all shadow-sm flex items-center justify-center gap-2"
+                  >
+                    <Compass className="w-5 h-5 text-primary" />
+                    <span>{locale === 'bn' ? 'নতুন কোর্স খুঁজুন' : 'Explore New Courses'}</span>
+                  </Link>
+                </>
+              ) : (
+                /* CASE 3: GUEST VISITOR */
+                <>
+                  <Link 
+                    href="/courses"
+                    className="w-full sm:w-auto px-8 py-4 rounded-xl sm:rounded-2xl bg-foreground text-background dark:bg-primary dark:text-white font-bold text-base hover:opacity-95 transition-all shadow-xl hover:scale-[1.02] flex items-center justify-center gap-2 group"
+                  >
+                    <Compass className="w-5 h-5 text-primary dark:text-white group-hover:rotate-45 transition-transform" />
+                    <span>{t('exploreCourses')}</span>
+                  </Link>
+                  
+                  <button 
+                    type="button"
+                    onClick={() => setIsRoleModalOpen(true)}
+                    className="w-full sm:w-auto px-8 py-4 rounded-xl sm:rounded-2xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/15 text-foreground font-bold text-base transition-all shadow-sm flex items-center justify-center gap-2 group"
+                  >
+                    <Building2 className="w-5 h-5 text-orange-500 group-hover:scale-110 transition-transform" />
+                    <span>{t('teachWithUs')}</span>
+                  </button>
+                </>
+              )}
             </div>
 
           </div>
@@ -497,7 +630,120 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 3. CATEGORIES EXPLORER (HSC/SSC, Programming, Design, etc.)               */}
+      {/* 3. TEACHER POSTS & COMMUNITY NOTICES FEED (Social Learning Updates)      */}
+      {/* ========================================================================= */}
+      {teacherPosts.length > 0 && (
+        <section className="py-16 md:py-24 relative bg-gradient-to-b from-orange-500/[0.03] to-transparent border-b border-foreground/10">
+          <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
+            
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 text-xs font-bold uppercase tracking-wider mb-2">
+                  <Megaphone className="w-3.5 h-3.5" />
+                  <span>{locale === 'bn' ? 'কমিউনিটি নোটিশ ও টিপস' : 'Community Notices & Tips'}</span>
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
+                  {locale === 'bn' ? 'শিক্ষকদের সর্বশেষ আপডেট ও নোটিশ' : 'Latest Updates from Instructors'}
+                </h2>
+                <p className="text-foreground/70 text-sm sm:text-base mt-2 max-w-xl">
+                  {locale === 'bn' 
+                    ? 'আপনার প্রিয় শিক্ষকদের দেওয়া গুরুত্বপূর্ণ নোটিশ, পরীক্ষার টিপস এবং নতুন কোর্স ঘোষণার সাথে আপডেট থাকুন।'
+                    : 'Stay updated with important exam tips, class notices, and announcements from our instructors.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {teacherPosts.slice(0, 6).map((post) => (
+                <div 
+                  key={post.id}
+                  className={`p-6 rounded-3xl bg-background border transition-all duration-300 hover:shadow-2xl flex flex-col justify-between space-y-4 ${
+                    post.isPinned ? 'border-orange-500/50 shadow-orange-500/5' : 'border-foreground/10'
+                  }`}
+                >
+                  <div className="space-y-3">
+                    {/* Header: Teacher Avatar + Name + Type Badge */}
+                    <div className="flex items-center justify-between gap-2">
+                      <Link 
+                        href={`/teachers/${post.teacherId}`}
+                        className="flex items-center gap-3 group/teacher"
+                      >
+                        <div className="w-10 h-10 rounded-full bg-orange-500/10 overflow-hidden border border-orange-500/30 flex-shrink-0">
+                          <img 
+                            src={post.teacherPhoto || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + post.teacherId} 
+                            alt={post.teacherName}
+                            className="w-full h-full object-cover" 
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-sm text-foreground group-hover/teacher:text-orange-500 transition-colors truncate">
+                            {post.teacherName}
+                          </h4>
+                          {post.coachingName && (
+                            <p className="text-[11px] text-foreground/50 truncate">🏛️ {post.coachingName}</p>
+                          )}
+                        </div>
+                      </Link>
+
+                      <div className="flex items-center gap-1">
+                        {post.isPinned && (
+                          <Pin className="w-3.5 h-3.5 text-orange-500 fill-orange-500" />
+                        )}
+                        <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${typeBadges[post.type]?.color}`}>
+                          {typeBadges[post.type]?.label}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Title & Body */}
+                    <div>
+                      <h3 className="font-bold text-base text-foreground mb-1 line-clamp-2">
+                        {post.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-foreground/75 line-clamp-3 leading-relaxed whitespace-pre-line">
+                        {post.content}
+                      </p>
+                    </div>
+
+                    {/* Image Attachment */}
+                    {post.imageUrl && (
+                      <div className="relative aspect-video rounded-2xl overflow-hidden border border-foreground/10">
+                        <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Footer: Linked Course CTA or Profile */}
+                  <div className="pt-3 border-t border-foreground/10 flex items-center justify-between">
+                    {post.linkedCourseId ? (
+                      <Link 
+                        href={`/courses/${post.linkedCourseId}`}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-500 hover:text-orange-600 transition-colors"
+                      >
+                        <BookOpen className="w-3.5 h-3.5" />
+                        <span className="truncate">{post.linkedCourseTitle || (locale === 'bn' ? 'কোর্সে যান' : 'View Course')}</span>
+                        <ArrowRight className="w-3 h-3 flex-shrink-0" />
+                      </Link>
+                    ) : (
+                      <Link 
+                        href={`/teachers/${post.teacherId}`}
+                        className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+                      >
+                        <span>{locale === 'bn' ? 'টিচার প্রোফাইল' : 'View Storefront'}</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+          </div>
+        </section>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 4. CATEGORIES EXPLORER (HSC/SSC, Programming, Design, etc.)               */}
       {/* ========================================================================= */}
       <section className="py-20 md:py-28 relative">
         <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
@@ -563,7 +809,7 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 4. FEATURED & TRENDING COURSES SHOWCASE                                  */}
+      {/* 5. FEATURED & TRENDING COURSES SHOWCASE                                  */}
       {/* ========================================================================= */}
       <section className="py-20 md:py-28 bg-foreground/[0.02] border-t border-foreground/10">
         <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
@@ -734,7 +980,7 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 5. TOP COACHING CENTERS & ACADEMIES SPOTLIGHT                             */}
+      {/* 6. TOP COACHING CENTERS & ACADEMIES SPOTLIGHT                             */}
       {/* ========================================================================= */}
       <section className="py-20 md:py-28 relative overflow-hidden">
         <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
@@ -840,7 +1086,7 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 6. STAR INSTRUCTORS SPOTLIGHT                                            */}
+      {/* 7. STAR INSTRUCTORS SPOTLIGHT                                            */}
       {/* ========================================================================= */}
       <section className="py-20 md:py-28 bg-foreground/[0.02] border-y border-foreground/10">
         <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
@@ -943,7 +1189,7 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 7. PLATFORM CORE FEATURES (Why SkyLearners?)                              */}
+      {/* 8. PLATFORM CORE FEATURES (Why SkyLearners?)                              */}
       {/* ========================================================================= */}
       <section className="py-20 md:py-28 relative">
         <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
@@ -989,7 +1235,7 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 8. DUAL EDUCATOR CTA BANNER (Individual Teacher vs Coaching Center)       */}
+      {/* 9. DUAL EDUCATOR CTA BANNER (Individual Teacher vs Coaching Center)       */}
       {/* ========================================================================= */}
       <section className="py-12">
         <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
@@ -1056,7 +1302,7 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 9. TESTIMONIALS & SUCCESS STORIES                                         */}
+      {/* 10. TESTIMONIALS & SUCCESS STORIES                                        */}
       {/* ========================================================================= */}
       <section className="py-20 md:py-28 bg-foreground/[0.02] border-t border-foreground/10">
         <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
@@ -1111,7 +1357,7 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 10. FAQ ACCORDION SECTION                                                 */}
+      {/* 11. FAQ ACCORDION SECTION                                                 */}
       {/* ========================================================================= */}
       <section className="py-20 md:py-28">
         <div className="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8">

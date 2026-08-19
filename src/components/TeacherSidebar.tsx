@@ -2,12 +2,11 @@
 
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
-import { LayoutDashboard, Video, Users, DollarSign, Settings, UserCircle, GraduationCap } from 'lucide-react';
+import { LayoutDashboard, Video, Users, DollarSign, Settings, UserCircle, GraduationCap, Globe, Megaphone, ExternalLink, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import { AlertCircle } from 'lucide-react';
 
 export default function TeacherSidebar() {
   const t = useTranslations('Dashboard.sidebar');
@@ -35,9 +34,11 @@ export default function TeacherSidebar() {
 
   const menuItems = [
     { name: t('overview') || 'Overview', href: '/teacher-dashboard', icon: LayoutDashboard },
-    { name: 'My Courses', href: '/teacher-dashboard/courses', icon: Video },
-    { name: 'Students', href: '/teacher-dashboard/students', icon: Users },
-    { name: 'Earnings', href: '/teacher-dashboard/earnings', icon: DollarSign },
+    { name: t('courses') || 'My Courses', href: '/teacher-dashboard/courses', icon: Video },
+    { name: t('myWebsite') || 'My Storefront / Website', href: '/teacher-dashboard/profile', icon: Globe },
+    { name: t('posts') || 'Posts & Notices', href: '/teacher-dashboard/posts', icon: Megaphone },
+    { name: t('students') || 'Students', href: '/teacher-dashboard/students', icon: Users },
+    { name: t('earnings') || 'Earnings', href: '/teacher-dashboard/earnings', icon: DollarSign },
   ];
 
   return (
@@ -61,6 +62,23 @@ export default function TeacherSidebar() {
             </Link>
           );
         })}
+
+        {/* Live Public Website Link */}
+        {user?.uid && (
+          <div className="pt-2">
+            <Link
+              href={`/teachers/${user.uid}`}
+              target="_blank"
+              className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/20 text-xs font-bold transition-all group"
+            >
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4" />
+                <span>{t('viewLiveWebsite') || 'View Live Website'}</span>
+              </div>
+              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </Link>
+          </div>
+        )}
       </div>
 
       <div className="p-4 mt-auto border-t border-foreground/5 relative group">

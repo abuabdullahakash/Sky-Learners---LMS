@@ -34,7 +34,9 @@ import {
   UserCircle,
   PlusCircle,
   HelpCircle,
-  ShieldCheck
+  ShieldCheck,
+  Globe,
+  Megaphone
 } from 'lucide-react';
 import RoleSelectionModal from './RoleSelectionModal';
 
@@ -130,6 +132,8 @@ export default function Navbar() {
     { name: 'Overview', href: '/teacher-dashboard', icon: LayoutDashboard },
     { name: '+ Create New Course', href: '/teacher-dashboard/courses/create', icon: PlusCircle, isHighlight: true },
     { name: 'My Courses', href: '/teacher-dashboard/courses', icon: Video },
+    { name: 'My Website', href: '/teacher-dashboard/profile', icon: Globe },
+    { name: 'Posts & Notices', href: '/teacher-dashboard/posts', icon: Megaphone },
     { name: 'Students', href: '/teacher-dashboard/students', icon: Users },
     { name: 'Earnings', href: '/teacher-dashboard/earnings', icon: DollarSign },
   ];

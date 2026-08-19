@@ -186,7 +186,13 @@
     "sidebar": {
       "overview": "Overview",
       "courses": "My Courses",
+      "myWebsite": "My Website / Storefront",
+      "posts": "Posts & Notices",
+      "students": "Students",
+      "earnings": "Earnings",
       "exams": "Daily Exams",
+      "createCourse": "+ Create Course",
+      "viewLiveWebsite": "View Live Website",
       "settings": "Settings",
       "logout": "Logout",
       "confirmLogoutTitle": "Confirm Logout",

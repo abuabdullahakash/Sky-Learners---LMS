@@ -579,5 +579,43 @@
     "browseCourses": "উপলব্ধ কোর্সসমূহ দেখুন",
     "goToDashboard": "ড্যাশবোর্ডে যান",
     "goToTeacherDashboard": "টিচার ড্যাশবোর্ডে যান"
+  },
+  "Admin": {
+    "title": "সুপার অ্যাডমিন কন্ট্রোল সেন্টার",
+    "subtitle": "সরাসরি ডাটাবেস ওভারভিউ, ইউজার ম্যানেজমেন্ট ও শিক্ষক পর্যবেক্ষণ",
+    "totalUsers": "মোট ব্যবহারকারী",
+    "totalStudents": "মোট শিক্ষার্থী",
+    "totalTeachers": "মোট শিক্ষক",
+    "totalCourses": "মোট কোর্স",
+    "totalEnrollments": "মোট এনরোলমেন্ট",
+    "totalRevenue": "প্ল্যাটফর্ম আয়",
+    "tabs": {
+      "overview": "ওভারভিউ ও পরিসংখ্যান",
+      "users": "ইউজার কন্ট্রোল",
+      "teachers": "শিক্ষক ও কোর্স বিশ্লেষণ",
+      "courses": "সমস্ত কোর্স"
+    },
+    "usersTab": {
+      "searchPlaceholder": "নাম, ইমেইল বা ফোন নম্বর দিয়ে খুঁজুন...",
+      "filterAll": "সকল ইউজার",
+      "filterStudents": "শিক্ষার্থী",
+      "filterTeachers": "শিক্ষক",
+      "filterBlocked": "ব্লকড",
+      "colName": "ইউজার",
+      "colRole": "রোল",
+      "colContact": "যোগাযোগ",
+      "colStatus": "স্ট্যাটাস",
+      "colJoined": "যুক্ত হয়েছেন",
+      "colActions": "অ্যাকশন",
+      "active": "সক্রিয়",
+      "blocked": "ব্লক করা",
+      "viewDetails": "বিস্তারিত দেখুন",
+      "block": "ইউজার ব্লক করুন",
+      "unblock": "আনব্লক করুন",
+      "makeTeacher": "শিক্ষক বানান",
+      "makeStudent": "শিক্ষার্থী বানান",
+      "delete": "ইউজার মুছুন",
+      "deleteConfirm": "আপনি কি নিশ্চিতভাবে এই ইউজারের ডাটাবেস রেকর্ড মুছে ফেলতে চান? এটি আর ফিরিয়ে আনা যাবে না।"
+    }
   }
 }

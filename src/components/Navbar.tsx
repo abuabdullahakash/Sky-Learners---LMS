@@ -33,7 +33,8 @@ import {
   MoreVertical,
   UserCircle,
   PlusCircle,
-  HelpCircle
+  HelpCircle,
+  ShieldCheck
 } from 'lucide-react';
 import RoleSelectionModal from './RoleSelectionModal';
 
@@ -112,10 +113,11 @@ export default function Navbar() {
     router.push(`/onboarding?role=${role}`);
   };
 
-  const isTeacher = userData?.role === 'teacher' || user?.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com' || Boolean(user?.email?.toLowerCase().includes('abuabdullahakash'));
-  const isStudent = userData?.role === 'student' && Boolean(userData?.onboardingComplete);
-  const hasCompletedRole = isTeacher || isStudent;
-  const userProfileLink = isTeacher ? '/teacher-dashboard' : (isStudent ? '/dashboard' : '/onboarding');
+  const isAdmin = userData?.isAdmin || userData?.role === 'admin' || user?.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com' || Boolean(user?.email?.toLowerCase().includes('abuabdullahakash'));
+  const isTeacher = isAdmin || userData?.role === 'teacher';
+  const isStudent = !isAdmin && userData?.role === 'student' && Boolean(userData?.onboardingComplete);
+  const hasCompletedRole = isAdmin || isTeacher || isStudent;
+  const userProfileLink = isAdmin ? '/admin' : (isTeacher ? '/teacher-dashboard' : (isStudent ? '/dashboard' : '/onboarding'));
 
   // Dashboard Nav Links (Account Settings is handled in the bottom profile popup menu)
   const studentDashboardLinks = [
@@ -205,8 +207,12 @@ export default function Navbar() {
                         )}
                       </div>
                       {hasCompletedRole ? (
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isTeacher ? 'bg-orange-500/15 text-orange-500' : 'bg-blue-500/15 text-blue-500'}`}>
-                          {isTeacher ? 'Teacher' : 'Student'}
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          isAdmin 
+                            ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30 shadow-[0_0_8px_rgba(168,85,247,0.2)]'
+                            : (isTeacher ? 'bg-orange-500/15 text-orange-500' : 'bg-blue-500/15 text-blue-500')
+                        }`}>
+                          {isAdmin ? 'Admin' : (isTeacher ? 'Teacher' : 'Student')}
                         </span>
                       ) : (
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500">
@@ -221,6 +227,23 @@ export default function Navbar() {
                         <p className="text-xs font-bold text-foreground truncate">{user?.displayName || userData?.name || 'User'}</p>
                         <p className="text-[11px] text-foreground/50 truncate">{user?.email}</p>
                       </div>
+
+                      {isAdmin && (
+                        <Link 
+                          href="/admin" 
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-purple-500/15 to-indigo-500/15 hover:from-purple-500/25 hover:to-indigo-500/25 border border-purple-500/30 text-purple-400 font-bold text-xs transition-all shadow-sm"
+                        >
+                          <div className="w-7 h-7 rounded-lg bg-purple-500/30 flex items-center justify-center text-purple-300">
+                            <ShieldCheck className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <p className="font-bold leading-tight flex items-center gap-1.5 text-purple-300">
+                              Admin Panel <Sparkles className="w-3 h-3 text-amber-400" />
+                            </p>
+                            <p className="text-[10px] text-purple-300/70 leading-tight">Database & Controls</p>
+                          </div>
+                        </Link>
+                      )}
 
                       {isTeacher ? (
                         <>

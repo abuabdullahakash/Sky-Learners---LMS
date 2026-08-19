@@ -6,9 +6,14 @@ import { doc, getDoc, onSnapshot, setDoc, collection, query, where, getDocs, lim
 import { auth, db } from '@/lib/firebase';
 
 export interface UserData {
-  role?: 'student' | 'teacher';
+  role?: 'student' | 'teacher' | 'admin';
   name?: string;
   email?: string;
+  isAdmin?: boolean;
+  isBlocked?: boolean;
+  profilePhoto?: string;
+  photoURL?: string;
+  photoUrl?: string;
   [key: string]: any;
 }
 
@@ -38,7 +43,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   const detectUserRoleAndRepair = async (uid: string, existingData?: UserData, email?: string | null): Promise<UserData> => {
-    let role: 'student' | 'teacher' | undefined = undefined;
+    let role: 'student' | 'teacher' | 'admin' | undefined = undefined;
     const userEmail = (email || existingData?.email || user?.email || auth.currentUser?.email || '').toLowerCase().trim();
 
     // Check 0: Platform Creator / Owner / Admin email
@@ -121,17 +126,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       role = existingData.role;
     }
 
+    const isAdmin = userEmail === 'abuabdullahakash@gmail.com' || userEmail.includes('abuabdullahakash') || existingData?.isAdmin === true || existingData?.role === 'admin';
+    const isBlocked = Boolean(existingData?.isBlocked);
+
     // Only update and finalize role if a recognized role is determined or user is admin/teacher
     if (role) {
       const needsUpdate = existingData?.role !== role || (role === 'teacher' && existingData?.onboardingComplete !== true);
       if (needsUpdate) {
         const userRef = doc(db, "users", uid);
-        await setDoc(userRef, { role, onboardingComplete: true, email: userEmail || existingData?.email || '' }, { merge: true }).catch(console.error);
+        await setDoc(userRef, { role, onboardingComplete: true, email: userEmail || existingData?.email || '', isAdmin: isAdmin || undefined }, { merge: true }).catch(console.error);
       }
       return { 
         ...existingData, 
         email: userEmail || existingData?.email, 
         role, 
+        isAdmin,
+        isBlocked,
         onboardingComplete: true,
         photoURL: profilePhoto || existingData?.photoURL || existingData?.profilePhoto || existingData?.photoUrl || undefined,
         profilePhoto: profilePhoto || existingData?.photoURL || existingData?.profilePhoto || existingData?.photoUrl || undefined,
@@ -143,6 +153,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       ...existingData, 
       email: userEmail || existingData?.email, 
       role: existingData?.role || undefined, 
+      isAdmin,
+      isBlocked,
       onboardingComplete: Boolean(existingData?.onboardingComplete),
       photoURL: profilePhoto || existingData?.photoURL || existingData?.profilePhoto || existingData?.photoUrl || undefined,
       profilePhoto: profilePhoto || existingData?.photoURL || existingData?.profilePhoto || existingData?.photoUrl || undefined,

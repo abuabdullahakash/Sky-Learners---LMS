@@ -579,5 +579,43 @@
     "browseCourses": "Browse Available Courses",
     "goToDashboard": "Go to Dashboard",
     "goToTeacherDashboard": "Go to Teacher Dashboard"
+  },
+  "Admin": {
+    "title": "Super Admin Control Center",
+    "subtitle": "Direct platform database overview, user management & teacher deep dive",
+    "totalUsers": "Total Users",
+    "totalStudents": "Total Students",
+    "totalTeachers": "Total Teachers",
+    "totalCourses": "Total Courses",
+    "totalEnrollments": "Total Enrollments",
+    "totalRevenue": "Platform Revenue",
+    "tabs": {
+      "overview": "Overview & Stats",
+      "users": "User Management",
+      "teachers": "Teachers & Courses",
+      "courses": "All Courses"
+    },
+    "usersTab": {
+      "searchPlaceholder": "Search by name, email, phone...",
+      "filterAll": "All Users",
+      "filterStudents": "Students",
+      "filterTeachers": "Teachers",
+      "filterBlocked": "Blocked",
+      "colName": "User",
+      "colRole": "Role",
+      "colContact": "Contact",
+      "colStatus": "Status",
+      "colJoined": "Joined",
+      "colActions": "Actions",
+      "active": "Active",
+      "blocked": "Blocked",
+      "viewDetails": "View Details",
+      "block": "Block User",
+      "unblock": "Unblock User",
+      "makeTeacher": "Make Teacher",
+      "makeStudent": "Make Student",
+      "delete": "Delete User",
+      "deleteConfirm": "Are you sure you want to permanently delete this user document? This action cannot be undone."
+    }
   }
 }

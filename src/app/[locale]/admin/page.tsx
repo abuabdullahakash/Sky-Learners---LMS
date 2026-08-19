@@ -490,7 +490,7 @@ export default function AdminDashboardPage() {
                       </div>
                       <div className="min-w-0">
                         <p className="text-xs font-bold text-white truncate">{u.name || u.displayName || 'No Name'}</p>
-                        <p className="text-[11px] text-slate-400 truncate">{u.email}</p>
+                        <p className="text-[11px] text-slate-400 truncate">{u.email || u.phone || 'No Contact'}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
@@ -658,7 +658,7 @@ export default function AdminDashboardPage() {
                                     <span className="text-[9px] bg-purple-500/20 text-purple-300 px-1 rounded font-black">Owner</span>
                                   )}
                                 </p>
-                                <p className="text-[11px] text-slate-400 truncate">{u.email}</p>
+                                <p className="text-[11px] text-slate-400 truncate">{u.email || u.phone || 'No Contact'}</p>
                               </div>
                             </div>
                           </td>
@@ -784,7 +784,7 @@ export default function AdminDashboardPage() {
                       </div>
                       <div className="min-w-0">
                         <p className="font-bold text-white truncate text-sm">{teacher.name || teacher.displayName || tp.displayName || 'Instructor'}</p>
-                        <p className="text-xs text-slate-400 truncate">{teacher.email}</p>
+                        <p className="text-xs text-slate-400 truncate">{teacher.email || teacher.phone || 'No Contact'}</p>
                         <p className="text-[11px] text-orange-400 font-medium truncate mt-0.5">{tp.headline || teacher.subject || 'Academic Instructor'}</p>
                       </div>
                     </div>
@@ -896,7 +896,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <div>
                   <h3 className="font-extrabold text-white text-base">{selectedUser.name || selectedUser.displayName || 'User Profile'}</h3>
-                  <p className="text-xs text-slate-400">{selectedUser.email}</p>
+                  <p className="text-xs text-slate-400">{selectedUser.email || selectedUser.phone || 'No Contact'}</p>
                 </div>
               </div>
               <button onClick={() => setSelectedUser(null)} className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white">
@@ -976,7 +976,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <div>
                   <h3 className="font-extrabold text-white text-base">{selectedTeacher.name || selectedTeacher.displayName || 'Instructor'}</h3>
-                  <p className="text-xs text-slate-400">{selectedTeacher.email}</p>
+                  <p className="text-xs text-slate-400">{selectedTeacher.email || selectedTeacher.phone || 'No Contact'}</p>
                 </div>
               </div>
               <button onClick={() => setSelectedTeacher(null)} className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white">

@@ -168,8 +168,12 @@ export default function AuthModal({ initialMode }: AuthModalProps) {
       
       if (mode === 'login') {
         if (!userDoc.exists()) {
-          // User tried to login with an unregistered social account -> Block auto-creation & sign out!
-          await signOut(auth);
+          // User tried to login with an unregistered social account -> Delete orphaned auth entry & sign out!
+          try {
+            await userCredential.user.delete();
+          } catch (e) {
+            await signOut(auth);
+          }
           setError(
             locale === 'bn' 
               ? 'এই গুগল/সোশ্যাল অ্যাকাউন্ট দিয়ে কোনো অ্যাকাউন্ট খোলা নেই। অনুগ্রহ করে রেজিস্টার করুন।' 

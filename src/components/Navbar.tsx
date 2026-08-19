@@ -113,6 +113,9 @@ export default function Navbar() {
   };
 
   const isTeacher = userData?.role === 'teacher' || user?.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com' || Boolean(user?.email?.toLowerCase().includes('abuabdullahakash'));
+  const isStudent = userData?.role === 'student' && Boolean(userData?.onboardingComplete);
+  const hasCompletedRole = isTeacher || isStudent;
+  const userProfileLink = isTeacher ? '/teacher-dashboard' : (isStudent ? '/dashboard' : '/onboarding');
 
   // Dashboard Nav Links (Account Settings is handled in the bottom profile popup menu)
   const studentDashboardLinks = [
@@ -188,10 +191,10 @@ export default function Navbar() {
                 ) : user ? (
                   <div className="relative group">
                     <Link 
-                      href={isTeacher ? '/teacher-dashboard' : '/dashboard'} 
-                      className="flex items-center gap-2.5 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-full font-medium transition-colors border border-foreground/10 text-sm"
+                      href={userProfileLink}
+                      className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 transition-all font-medium text-xs text-foreground group"
                     >
-                      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden border border-primary/20">
                         {user?.photoURL ? (
                           <img src={user.photoURL} alt="User" className="w-full h-full object-cover" />
                         ) : (
@@ -199,9 +202,15 @@ export default function Navbar() {
                         )}
                       </div>
                       <span className="max-w-[100px] truncate">{user?.displayName || userData?.name || 'Account'}</span>
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isTeacher ? 'bg-orange-500/15 text-orange-500' : 'bg-blue-500/15 text-blue-500'}`}>
-                        {isTeacher ? 'Teacher' : 'Student'}
-                      </span>
+                      {hasCompletedRole ? (
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isTeacher ? 'bg-orange-500/15 text-orange-500' : 'bg-blue-500/15 text-blue-500'}`}>
+                          {isTeacher ? 'Teacher' : 'Student'}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-500">
+                          Setup
+                        </span>
+                      )}
                     </Link>
 
                     {/* Desktop Hover Dropdown Menu */}
@@ -247,7 +256,7 @@ export default function Navbar() {
                             <DollarSign className="w-3.5 h-3.5 text-foreground/60" /> Earnings & Revenue
                           </Link>
                         </>
-                      ) : (
+                      ) : isStudent ? (
                         <>
                           <Link 
                             href="/dashboard" 
@@ -276,6 +285,19 @@ export default function Navbar() {
                             <GraduationCap className="w-3.5 h-3.5 text-foreground/60" /> Daily Exams
                           </Link>
                         </>
+                      ) : (
+                        <Link 
+                          href="/onboarding" 
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium text-xs transition-colors"
+                        >
+                          <div className="w-7 h-7 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                          </div>
+                          <div>
+                            <p className="font-bold leading-tight">Complete Setup</p>
+                            <p className="text-[10px] text-foreground/50 leading-tight">Select your role</p>
+                          </div>
+                        </Link>
                       )}
 
                       <div className="h-px bg-foreground/10 my-1"></div>
@@ -504,13 +526,13 @@ export default function Navbar() {
 
                 {user && (
                   <Link
-                    href={isTeacher ? '/teacher-dashboard' : '/dashboard'}
+                    href={userProfileLink}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center justify-between px-4 py-3 mt-3 rounded-xl font-bold text-sm bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 transition-all shadow-sm"
                   >
                     <span className="flex items-center gap-2">
                       <LayoutDashboard className="w-4 h-4" />
-                      {isTeacher ? 'Teacher Dashboard' : 'Student Dashboard'}
+                      {isTeacher ? 'Teacher Dashboard' : (isStudent ? 'Student Dashboard' : 'Complete Setup')}
                     </span>
                     <ChevronRight className="w-4 h-4" />
                   </Link>

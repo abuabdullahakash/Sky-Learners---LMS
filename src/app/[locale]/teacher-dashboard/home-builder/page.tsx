@@ -132,11 +132,14 @@ export default function TeacherHomePageBuilderPage() {
   const [contactYoutube, setContactYoutube] = useState('https://youtube.com');
   const [contactTelegram, setContactTelegram] = useState('https://t.me');
 
-  // 8. Trust Banner State
-  const [trustTitle, setTrustTitle] = useState('বিশ্ববিদ্যালয় ও মেডিকেল ভর্তি প্রস্তুতিতে একটি আস্থার নাম');
-  const [trustSubtitle, setTrustSubtitle] = useState('স্বপ্নপূরণের এই যাত্রায় আজই যুক্ত হোন আমাদের প্রিমিয়াম কোর্সে।');
-  const [trustTargetCourseId, setTrustTargetCourseId] = useState('');
-  const [trustBtnText, setTrustBtnText] = useState('কোর্সে ভর্তি হোন');
+  // 8. Trust Banner State (with Corner Student Image)
+  const [trustTitle, setTrustTitle] = useState('বিশ্ববিদ্যালয় ও মেডিকেল ভর্তি প্রস্তুতিতে');
+  const [trustSubtitle, setTrustSubtitle] = useState('ভর্তি প্রস্তুতির শুরু হোক আজ থেকেই। সঠিক দিকনির্দেশনা ও প্রয়োজনীয় রিসোর্সের সাথে এগিয়ে যাও তোমার লক্ষ্যের দিকে।');
+  const [trustPaidBtnText, setTrustPaidBtnText] = useState('পেইড কোর্স');
+  const [trustFreeBtnText, setTrustFreeBtnText] = useState('ফ্রি কোর্স');
+  const [trustFreeLink, setTrustFreeLink] = useState('#courses');
+  const [trustCornerImage, setTrustCornerImage] = useState('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop');
+  const [uploadingTrustImg, setUploadingTrustImg] = useState(false);
 
   // 9. Photo Gallery State ("সাফল্যের পথে এগিয়ে চলেছে")
   const [galleryTitle, setGalleryTitle] = useState('আমাদের হাত ধরে সাফল্যের পথে এগিয়ে চলেছে');
@@ -152,9 +155,8 @@ export default function TeacherHomePageBuilderPage() {
   const [uploadingGalleryImg, setUploadingGalleryImg] = useState(false);
 
   // 10. Help Bar State
-  const [helpBarTitle, setHelpBarTitle] = useState('সাহায্যের প্রয়োজন? আমরা পাশে আছি');
+  const [helpBarTitle, setHelpBarTitle] = useState('সাহায্যের প্রয়োজন?');
   const [helpBarPhone, setHelpBarPhone] = useState('01700000000');
-  const [helpBarBtnText, setHelpBarBtnText] = useState('সরাসরি কল করুন');
 
   // Fetch initial data
   useEffect(() => {
@@ -204,14 +206,15 @@ export default function TeacherHomePageBuilderPage() {
             if (config.contactTelegram) setContactTelegram(config.contactTelegram);
             if (config.trustTitle) setTrustTitle(config.trustTitle);
             if (config.trustSubtitle) setTrustSubtitle(config.trustSubtitle);
-            if (config.trustTargetCourseId) setTrustTargetCourseId(config.trustTargetCourseId);
-            if (config.trustBtnText) setTrustBtnText(config.trustBtnText);
+            if (config.trustPaidBtnText) setTrustPaidBtnText(config.trustPaidBtnText);
+            if (config.trustFreeBtnText) setTrustFreeBtnText(config.trustFreeBtnText);
+            if (config.trustFreeLink) setTrustFreeLink(config.trustFreeLink);
+            if (config.trustCornerImage) setTrustCornerImage(config.trustCornerImage);
             if (config.galleryPhotos && config.galleryPhotos.length > 0) setGalleryPhotos(config.galleryPhotos);
             if (config.galleryTitle) setGalleryTitle(config.galleryTitle);
             if (config.gallerySubtitle) setGallerySubtitle(config.gallerySubtitle);
             if (config.helpBarTitle) setHelpBarTitle(config.helpBarTitle);
             if (config.helpBarPhone) setHelpBarPhone(config.helpBarPhone);
-            if (config.helpBarBtnText) setHelpBarBtnText(config.helpBarBtnText);
           }
         }
       } catch (err) {
@@ -255,14 +258,15 @@ export default function TeacherHomePageBuilderPage() {
         contactTelegram,
         trustTitle,
         trustSubtitle,
-        trustTargetCourseId,
-        trustBtnText,
+        trustPaidBtnText,
+        trustFreeBtnText,
+        trustFreeLink,
+        trustCornerImage,
         galleryTitle,
         gallerySubtitle,
         galleryPhotos,
         helpBarTitle,
         helpBarPhone,
-        helpBarBtnText,
         updatedAt: new Date().toISOString()
       };
 
@@ -299,6 +303,22 @@ export default function TeacherHomePageBuilderPage() {
       toast.error(locale === 'bn' ? 'ইমেজ আপলোড ব্যর্থ হয়েছে' : 'Failed to upload image');
     } finally {
       setUploadingSlideImg(false);
+    }
+  };
+
+  // Trust Banner Corner image upload handler
+  const handleUploadTrustCornerImg = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingTrustImg(true);
+    try {
+      const url = await uploadImageToImgBB(file);
+      setTrustCornerImage(url);
+      toast.success(locale === 'bn' ? 'ব্যানার ইমেজ আপলোড হয়েছে!' : 'Banner image uploaded!');
+    } catch (err) {
+      toast.error(locale === 'bn' ? 'ইমেজ আপলোড ব্যর্থ হয়েছে' : 'Failed to upload image');
+    } finally {
+      setUploadingTrustImg(false);
     }
   };
 
@@ -1066,26 +1086,27 @@ export default function TeacherHomePageBuilderPage() {
               <div className="border-b border-foreground/10 pb-4">
                 <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <Flame className="w-5 h-5 text-orange-500" />
-                  <span>৮. আস্থার নাম ও কল-টু-অ্যাকশন ব্যানার</span>
+                  <span>৮. আস্থার নাম ও কল-টু-অ্যাকশন ব্যানার (Physics Hunters Style)</span>
                 </h3>
                 <p className="text-xs text-foreground/60 mt-1">
-                  যেমন: "বিশ্ববিদ্যালয় ভর্তি প্রস্তুতিতে [একাডেমি নাম] একটি আস্থার নাম" সেকশন।
+                  যেমন: "বিশ্ববিদ্যালয় ভর্তি প্রস্তুতিতে [একাডেমি নাম] একটি আস্থার নাম" ব্যানার এবং কর্নারের ছবি কাস্টমাইজ করুন।
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">প্রধান শিরোনাম</label>
+                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">প্রধান শিরোনাম প্রিফিক্স</label>
                   <input
                     type="text"
                     value={trustTitle}
                     onChange={(e) => setTrustTitle(e.target.value)}
+                    placeholder="যেমন: বিশ্ববিদ্যালয় ভর্তি প্রস্তুতিতে"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">সাবটাইটেল</label>
+                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">সাবটাইটেল / বিবরণ</label>
                   <input
                     type="text"
                     value={trustSubtitle}
@@ -1096,27 +1117,52 @@ export default function TeacherHomePageBuilderPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">বাটন টেক্সট</label>
+                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">পেইড বাটন টেক্সট</label>
                     <input
                       type="text"
-                      value={trustBtnText}
-                      onChange={(e) => setTrustBtnText(e.target.value)}
+                      value={trustPaidBtnText}
+                      onChange={(e) => setTrustPaidBtnText(e.target.value)}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">টার্গেট কোর্স</label>
-                    <select
-                      value={trustTargetCourseId}
-                      onChange={(e) => setTrustTargetCourseId(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs font-semibold focus:outline-none focus:border-orange-500"
-                    >
-                      <option value="">-- প্রথম কোর্স বা ক্যাটালগ --</option>
-                      {courses.map(c => (
-                        <option key={c.id} value={c.id}>{c.title}</option>
-                      ))}
-                    </select>
+                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">ফ্রি বাটন টেক্সট</label>
+                    <input
+                      type="text"
+                      value={trustFreeBtnText}
+                      onChange={(e) => setTrustFreeBtnText(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Trust Corner Image Upload */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3">
+                  <label className="text-[11px] font-bold text-foreground/70 block">
+                    ব্যানারের কর্নার ছবি (শিক্ষার্থী বা মেন্টরের ছবি)
+                  </label>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 rounded-2xl overflow-hidden bg-foreground/10 border border-foreground/10 flex-shrink-0">
+                      <img src={trustCornerImage} alt="Corner Preview" className="w-full h-full object-cover" />
+                    </div>
+
+                    <div className="flex-1 space-y-2">
+                      <input
+                        type="text"
+                        value={trustCornerImage}
+                        onChange={(e) => setTrustCornerImage(e.target.value)}
+                        placeholder="ইমেজ URL"
+                        className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                      />
+
+                      <label className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 text-xs font-bold cursor-pointer transition-colors border border-orange-500/20">
+                        {uploadingTrustImg ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                        <span>{uploadingTrustImg ? 'আপলোড হচ্ছে...' : 'ছবি পরিবর্তন / আপলোড করুন'}</span>
+                        <input type="file" accept="image/*" onChange={handleUploadTrustCornerImg} className="hidden" />
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1132,7 +1178,7 @@ export default function TeacherHomePageBuilderPage() {
                   <span>৯. ফটো গ্যালারি (সাফল্যের পথে এগিয়ে চলেছে)</span>
                 </h3>
                 <p className="text-xs text-foreground/60 mt-1">
-                  ক্লাসরুম, সেমিনার ও শিক্ষার্থীদের অর্জনের ফটোগুলো আপলোড করুন (যা হোম পেজে স্বয়ংক্রিয়ভাবে দুই সারিতে স্লাইড করবে)।
+                  ক্লাসরুম, সেমিনার ও শিক্ষার্থীদের অর্জনের ফটোগুলো আপলোড করুন (যা হোম পেজে স্বয়ংক্রিয়ভাবে দুই সারিতে ফাঁকা জায়গা ছাড়া অবিরাম স্লাইড করবে)।
                 </p>
               </div>
 
@@ -1170,13 +1216,13 @@ export default function TeacherHomePageBuilderPage() {
                   <span>১০. সাহায্যের প্রয়োজন হেল্পবার</span>
                 </h3>
                 <p className="text-xs text-foreground/60 mt-1">
-                  পেজের নিচে প্রদর্শিত হওয়া সাপোর্ট স্ট্রিপ।
+                  পেজের নিচে ভাসমান সাপোর্ট স্ট্রিপ।
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">হেল্পবার টেক্সট</label>
+                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">হেল্পবার প্রধান টেক্সট</label>
                   <input
                     type="text"
                     value={helpBarTitle}

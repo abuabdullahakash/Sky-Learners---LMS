@@ -201,13 +201,16 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
   const contactYoutube = config.contactYoutube || 'https://youtube.com';
   const contactTelegram = config.contactTelegram || 'https://t.me';
 
-  // 8. Trust Banner
-  const trustTitle = config.trustTitle || `বিশ্ববিদ্যালয় ও মেডিকেল ভর্তি প্রস্তুতিতে ${profileData?.displayName || 'আমাদের একাডেমি'} একটি আস্থার নাম`;
-  const trustSubtitle = config.trustSubtitle || 'স্বপ্নপূরণের এই যাত্রায় আজই যুক্ত হোন আমাদের প্রিমিয়াম কোর্সে।';
-  const trustBtnText = config.trustBtnText || 'কোর্সে ভর্তি হোন';
-  const trustTargetCourseId = config.trustTargetCourseId || courses[0]?.id || '';
+  // 8. Trust Banner (Physics Hunters Style with Corner Student Image)
+  const trustTitle = config.trustTitle || 'বিশ্ববিদ্যালয় ভর্তি প্রস্তুতিতে';
+  const trustHighlight = profileData?.displayName || 'Physics Hunters';
+  const trustSubtitle = config.trustSubtitle || 'ভর্তি প্রস্তুতির শুরু হোক আজ থেকেই। সঠিক দিকনির্দেশনা ও প্রয়োজনীয় রিসোর্সের সাথে এগিয়ে যাও তোমার লক্ষ্যের দিকে।';
+  const trustPaidBtnText = config.trustPaidBtnText || 'পেইড কোর্স';
+  const trustFreeBtnText = config.trustFreeBtnText || 'ফ্রি কোর্স';
+  const trustFreeLink = config.trustFreeLink || '#courses';
+  const trustCornerImage = config.trustCornerImage || 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop';
 
-  // 9. Photo Gallery (Continuous Dual-Row Marquee)
+  // 9. Photo Gallery (Continuous Dual-Row Seamless Infinite Marquee)
   const defaultGalleryPhotos = [
     { id: 'g-1', imageUrl: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=600&auto=format&fit=crop' },
     { id: 'g-2', imageUrl: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=600&auto=format&fit=crop' },
@@ -218,16 +221,26 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
   ];
   const galleryPhotos = config.galleryPhotos && config.galleryPhotos.length > 0 ? config.galleryPhotos : defaultGalleryPhotos;
   
-  // Split photos into 2 rows for opposite scrolling
+  // Helper to ensure a row has at least 12 items for seamless 100vw infinite looping without gaps
+  const buildMarqueeSet = (items: any[]) => {
+    if (!items || items.length === 0) return [];
+    let set: any[] = [];
+    while (set.length < 12) {
+      set = [...set, ...items];
+    }
+    // Return two identical halves for smooth infinite animation
+    return [...set, ...set];
+  };
+
   const halfLen = Math.ceil(galleryPhotos.length / 2);
   const row1Photos = galleryPhotos.slice(0, halfLen);
-  const row2Photos = galleryPhotos.slice(halfLen);
-  // Duplicate for seamless infinite marquee
-  const row1Loop = [...row1Photos, ...row1Photos, ...row1Photos];
-  const row2Loop = [...row2Photos.length > 0 ? row2Photos : row1Photos, ...row2Photos.length > 0 ? row2Photos : row1Photos, ...row2Photos.length > 0 ? row2Photos : row1Photos];
+  const row2Photos = galleryPhotos.slice(halfLen).length > 0 ? galleryPhotos.slice(halfLen) : galleryPhotos;
+
+  const row1Loop = buildMarqueeSet(row1Photos);
+  const row2Loop = buildMarqueeSet(row2Photos);
 
   // 10. Help Bar
-  const helpBarTitle = config.helpBarTitle || 'সাহায্যের প্রয়োজন? আমরা পাশে আছি';
+  const helpBarTitle = config.helpBarTitle || 'সাহায্যের প্রয়োজন?';
   const helpBarPhone = config.helpBarPhone || contactPhone;
 
   if (isLoading) {
@@ -953,47 +966,58 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
       </section>
 
       {/* ========================================================================= */}
-      {/* 8. ট্রাস্ট ও কল-টু-অ্যাকশন ব্যানার (CTA Banner)                           */}
+      {/* 8. ট্রাস্ট ও কল-টু-অ্যাকশন ব্যানার (Physics Hunters Style CTA with Image)   */}
       {/* ========================================================================= */}
-      <section className="py-8 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        <div className="p-8 sm:p-12 rounded-[2.5rem] bg-gradient-to-r from-orange-950 via-slate-900 to-indigo-950 border border-orange-500/30 text-white shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="space-y-3 flex-1">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold uppercase tracking-wider">
-              <Flame className="w-3.5 h-3.5" />
-              <span>{profileData?.displayName || 'Academy'}</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black leading-tight">
-              {trustTitle}
+      <section className="py-12 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+        <div className="rounded-[2.5rem] p-8 sm:p-12 lg:p-14 bg-gradient-to-r from-sky-50/90 via-white to-pink-50/90 dark:from-slate-900 dark:via-neutral-900 dark:to-slate-900 border border-foreground/10 shadow-2xl relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8">
+          
+          {/* Left Content */}
+          <div className="space-y-6 flex-1 relative z-10 max-w-2xl">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground leading-[1.2] tracking-tight">
+              {trustTitle}{' '}
+              <span className="bg-gradient-to-r from-rose-500 to-pink-600 bg-clip-text text-transparent">
+                {trustHighlight}
+              </span>{' '}
+              একটি আস্থার নাম
             </h2>
-            <p className="text-sm text-gray-300 max-w-xl">
+
+            <p className="text-foreground/75 text-sm sm:text-base leading-relaxed font-medium">
               {trustSubtitle}
             </p>
-          </div>
 
-          <div className="flex-shrink-0">
-            {trustTargetCourseId ? (
-              <Link
-                href={`/courses/${trustTargetCourseId}`}
-                className="px-8 py-4 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-black text-sm transition-all shadow-xl hover:scale-105 flex items-center gap-2"
-              >
-                <span>{trustBtnText}</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            ) : (
+            <div className="flex items-center gap-4 flex-wrap pt-2">
               <a
                 href="#courses"
-                className="px-8 py-4 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-black text-sm transition-all shadow-xl hover:scale-105 flex items-center gap-2"
+                className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-black text-sm shadow-xl shadow-rose-500/25 hover:scale-105 transition-all"
               >
-                <span>{trustBtnText}</span>
-                <ArrowRight className="w-4 h-4" />
+                {trustPaidBtnText}
               </a>
-            )}
+
+              <a
+                href={trustFreeLink}
+                className="px-8 py-3.5 rounded-2xl bg-background hover:bg-foreground/5 border-2 border-rose-500/30 hover:border-rose-500 text-foreground font-black text-sm transition-all hover:scale-105"
+              >
+                {trustFreeBtnText}
+              </a>
+            </div>
           </div>
+
+          {/* Right Corner: High-Quality Student/Mentor Cutout Image */}
+          <div className="relative z-10 lg:w-96 flex-shrink-0 flex items-center justify-center">
+            <div className="relative w-64 sm:w-80 aspect-[4/4.5] rounded-3xl overflow-hidden shadow-2xl border-4 border-background bg-gradient-to-tr from-rose-500/20 via-pink-500/10 to-transparent">
+              <img 
+                src={trustCornerImage} 
+                alt="Student Success" 
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
+          </div>
+
         </div>
       </section>
 
       {/* ========================================================================= */}
-      {/* 9. সাফল্যের পথে এগিয়ে চলেছে (Infinite Dual-Row Auto-Marquee Gallery)     */}
+      {/* 9. সাফল্যের পথে এগিয়ে চলেছে (Infinite Dual-Row Seamless Marquee Gallery)  */}
       {/* ========================================================================= */}
       {galleryPhotos.length > 0 && (
         <section className="py-20 sm:py-28 bg-black text-white border-t border-white/10 overflow-hidden">
@@ -1017,7 +1041,7 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
             </p>
           </div>
 
-          {/* Dual-Row Continuous Auto-Marquee (Pure Photos without text) */}
+          {/* Dual-Row Continuous Auto-Marquee (Pure Photos without text and zero gaps) */}
           <div className="space-y-4 sm:space-y-6">
             
             {/* Row 1: Scrolling Left (←) */}
@@ -1025,7 +1049,7 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
               <div className="animate-marquee-left flex gap-4 sm:gap-6 py-2">
                 {row1Loop.map((photo: any, idx: number) => (
                   <div 
-                    key={`row1-${photo.id}-${idx}`} 
+                    key={`row1-${idx}`} 
                     className="relative w-64 sm:w-80 md:w-96 aspect-[16/10] rounded-2xl sm:rounded-3xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl flex-shrink-0 group"
                   >
                     <img 
@@ -1043,7 +1067,7 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
               <div className="animate-marquee-right flex gap-4 sm:gap-6 py-2">
                 {row2Loop.map((photo: any, idx: number) => (
                   <div 
-                    key={`row2-${photo.id}-${idx}`} 
+                    key={`row2-${idx}`} 
                     className="relative w-64 sm:w-80 md:w-96 aspect-[16/10] rounded-2xl sm:rounded-3xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl flex-shrink-0 group"
                   >
                     <img 
@@ -1061,36 +1085,61 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
       )}
 
       {/* ========================================================================= */}
-      {/* 10. সাহায্যের প্রয়োজন? আমরা পাশে আছি (Support Strip & Footer)             */}
+      {/* 10. সাহায্যের প্রয়োজন? আমরা পাশে আছি (Floating Support Strip)             */}
       {/* ========================================================================= */}
-      <section className="py-8 bg-gradient-to-r from-orange-500/10 via-background to-orange-500/10 border-t border-foreground/10">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-orange-500 text-white flex items-center justify-center">
-              <HelpCircle className="w-5 h-5" />
+      <section className="py-12 max-w-5xl mx-auto px-3.5 sm:px-6">
+        <div className="relative rounded-[2rem] p-6 sm:p-8 bg-background border border-foreground/10 shadow-2xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+          
+          {/* Top Gradient Accent Line */}
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500" />
+
+          {/* Left: Phone Icon + Title + Subtitle */}
+          <div className="flex items-center gap-4 text-center md:text-left">
+            <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center justify-center flex-shrink-0 shadow-inner">
+              <Phone className="w-7 h-7" />
             </div>
             <div>
-              <h4 className="font-bold text-sm text-foreground">{helpBarTitle}</h4>
-              <p className="text-xs text-foreground/60">যেকোনো প্রশ্ন বা তথ্যের জন্য কল করুন</p>
+              <h4 className="text-xl sm:text-2xl font-black text-foreground">
+                {helpBarTitle}{' '}
+                <span className="text-rose-500 font-black">আমরা পাশে আছি</span>
+              </h4>
+              <p className="text-xs sm:text-sm text-foreground/60 mt-0.5 font-medium">
+                কোর্স সম্পর্কিত যেকোনো সমস্যা বা তথ্যের জন্য আমাদের সাথে যোগাযোগ করো
+              </p>
             </div>
           </div>
 
-          <a
-            href={`tel:${helpBarPhone}`}
-            className="px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all"
-          >
-            <Phone className="w-3.5 h-3.5" />
-            <span>{helpBarPhone}</span>
-          </a>
+          {/* Right: Dual Buttons (Facebook Message + Hotline Phone) */}
+          <div className="flex items-center gap-3 flex-wrap justify-center md:justify-end flex-shrink-0">
+            {contactFacebookPage && (
+              <a
+                href={contactFacebookPage}
+                target="_blank"
+                rel="noreferrer"
+                className="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all hover:scale-105"
+              >
+                <span className="font-black text-base">f</span>
+                <div className="text-left leading-tight">
+                  <div>Facebook মেসেজ</div>
+                  <div className="text-[10px] text-white/80 font-normal">(মেসেজের সময় ২৪/৭)</div>
+                </div>
+              </a>
+            )}
+
+            <a
+              href={`tel:${helpBarPhone}`}
+              className="px-5 py-3 rounded-2xl bg-background hover:bg-foreground/5 border-2 border-foreground/15 text-foreground font-bold text-xs flex items-center gap-2 shadow-md transition-all hover:scale-105"
+            >
+              <Phone className="w-4 h-4 text-rose-500" />
+              <div className="text-left leading-tight">
+                <div>{helpBarPhone}</div>
+                <div className="text-[10px] text-foreground/60 font-normal">(সকাল ১০টা - রাত ৮টা)</div>
+              </div>
+            </a>
+          </div>
+
         </div>
       </section>
-
-      {/* Academy Footer */}
-      <footer className="py-8 border-t border-foreground/10 text-center text-xs text-foreground/60 bg-background">
-        <div className="max-w-6xl mx-auto px-4">
-          <p>© {new Date().getFullYear()} {profileData?.displayName || 'Academy'}. Powered by SkyLearners LMS.</p>
-        </div>
-      </footer>
 
     </div>
   );

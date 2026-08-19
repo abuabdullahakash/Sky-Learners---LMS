@@ -192,24 +192,23 @@ export default function Navbar() {
                   <div className="relative group">
                     <Link 
                       href={userProfileLink}
-                      className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 transition-all font-medium text-xs text-foreground group"
+                      className={`flex items-center ${hasCompletedRole ? 'gap-2.5 px-3 py-1.5' : 'p-1'} rounded-full bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 transition-all font-medium text-xs text-foreground group`}
+                      title={hasCompletedRole ? (user?.displayName || userData?.name || 'Account') : 'Complete Setup'}
                     >
-                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden border border-primary/20">
+                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden border border-primary/20">
                         {user?.photoURL ? (
                           <img src={user.photoURL} alt="User" className="w-full h-full object-cover" />
                         ) : (
-                          <UserIcon className="w-3.5 h-3.5 text-primary" />
+                          <UserIcon className="w-4 h-4 text-primary" />
                         )}
                       </div>
-                      <span className="max-w-[100px] truncate">{user?.displayName || userData?.name || 'Account'}</span>
-                      {hasCompletedRole ? (
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isTeacher ? 'bg-orange-500/15 text-orange-500' : 'bg-blue-500/15 text-blue-500'}`}>
-                          {isTeacher ? 'Teacher' : 'Student'}
-                        </span>
-                      ) : (
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-500">
-                          Setup
-                        </span>
+                      {hasCompletedRole && (
+                        <>
+                          <span className="max-w-[100px] truncate">{user?.displayName || userData?.name || 'Account'}</span>
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isTeacher ? 'bg-orange-500/15 text-orange-500' : 'bg-blue-500/15 text-blue-500'}`}>
+                            {isTeacher ? 'Teacher' : 'Student'}
+                          </span>
+                        </>
                       )}
                     </Link>
 
@@ -300,14 +299,17 @@ export default function Navbar() {
                         </Link>
                       )}
 
-                      <div className="h-px bg-foreground/10 my-1"></div>
-
-                      <Link 
-                        href={isTeacher ? '/teacher-dashboard/settings' : '/dashboard/settings'} 
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
-                      >
-                        <Settings className="w-3.5 h-3.5 text-foreground/60" /> Account Settings
-                      </Link>
+                      {hasCompletedRole && (
+                        <>
+                          <div className="h-px bg-foreground/10 my-1"></div>
+                          <Link 
+                            href={isTeacher ? '/teacher-dashboard/settings' : '/dashboard/settings'} 
+                            className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
+                          >
+                            <Settings className="w-3.5 h-3.5 text-foreground/60" /> Account Settings
+                          </Link>
+                        </>
+                      )}
 
                       <button 
                         onClick={() => setShowLogoutConfirm(true)} 
@@ -582,7 +584,7 @@ export default function Navbar() {
                           <UserCircle className="w-4 h-4 text-foreground/70" /> View Profile
                         </Link>
                       </>
-                    ) : (
+                    ) : isStudent ? (
                       <>
                         <Link 
                           href="/dashboard"
@@ -605,17 +607,31 @@ export default function Navbar() {
                           <BookOpen className="w-3.5 h-3.5 text-foreground/60" /> My Courses
                         </Link>
                       </>
+                    ) : (
+                      <Link 
+                        href="/onboarding"
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          setShowProfileMenu(false);
+                        }} 
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm font-bold transition-colors"
+                      >
+                        <Sparkles className="w-4 h-4" /> Complete Setup
+                      </Link>
                     )}
-                    <Link 
-                      href={isTeacher ? "/teacher-dashboard/settings" : "/dashboard/settings"}
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        setShowProfileMenu(false);
-                      }} 
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
-                    >
-                      <Settings className="w-4 h-4 text-foreground/70" /> Account Settings
-                    </Link>
+
+                    {hasCompletedRole && (
+                      <Link 
+                        href={isTeacher ? "/teacher-dashboard/settings" : "/dashboard/settings"}
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          setShowProfileMenu(false);
+                        }} 
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
+                      >
+                        <Settings className="w-4 h-4 text-foreground/70" /> Account Settings
+                      </Link>
+                    )}
                     <div className="h-px bg-foreground/10 my-1 mx-2"></div>
                     <button 
                       onClick={() => setShowLogoutConfirm(true)} 

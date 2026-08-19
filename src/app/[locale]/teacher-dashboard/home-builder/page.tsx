@@ -34,7 +34,8 @@ import {
   ChevronRight,
   ArrowRight,
   ArrowLeft,
-  Flame
+  Flame,
+  Target
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -71,7 +72,8 @@ export default function TeacherHomePageBuilderPage() {
     freeLink: '#courses'
   });
 
-  // 3. Custom Categories State
+  // 3. Custom Categories & Course Section Subtitle
+  const [coursesSubtitle, setCoursesSubtitle] = useState('সেরা মেন্টরদের সাথে ঘরে বসেই নাও শতভাগ প্রস্তুতি। সঠিক গাইডলাইনে নিশ্চিত করো তোমার সাফল্য।');
   const [customCategories, setCustomCategories] = useState<string[]>([
     'সকল কোর্স',
     'এইচএসসি সাইকেল',
@@ -108,13 +110,15 @@ export default function TeacherHomePageBuilderPage() {
 
   // 6. About Section State ("আমাদের সম্পর্কে")
   const [aboutTitle, setAboutTitle] = useState('আমাদের সম্পর্কে');
+  const [aboutHeadline, setAboutHeadline] = useState('স্বপ্ন ছোঁয়ার আশা থাকলে সেই স্বপ্নের ভিত তৈরিতে সাথে আছি আমরা');
+  const [founderTitle, setFounderTitle] = useState('প্রতিষ্ঠাতা ও পরিচালক');
   const [aboutBio, setAboutBio] = useState(
     'আমাদের লক্ষ্য প্রতিটি শিক্ষার্থীকে কনসেপ্ট ক্লিয়ার করে মুখস্থবিদ্যার বাইরে গিয়ে বাস্তবসম্মতভাবে পড়ানো। অভিজ্ঞ মেন্টর ও উন্নত প্রযুক্তির সমন্বয়ে আমরা তৈরি করেছি সেরা প্ল্যাটফর্ম।'
   );
   const [aboutStats, setAboutStats] = useState<Array<{ id: string; label: string; value: string }>>([
-    { id: 'st-1', label: 'মোট শিক্ষার্থী', value: '১০,০০০+' },
-    { id: 'st-2', label: 'সফলতার হার', value: '৯৯%' },
-    { id: 'st-3', label: 'মোট ক্লাস লেকচার', value: '৫০০+' }
+    { id: 'st-1', label: 'Courses', value: '10+' },
+    { id: 'st-2', label: 'Exams', value: '10K+' },
+    { id: 'st-3', label: 'Students', value: '100K+' }
   ]);
 
   // 7. Contact Section State ("আমাদের সাথে যোগাযোগ করো")
@@ -169,6 +173,7 @@ export default function TeacherHomePageBuilderPage() {
           if (config) {
             if (config.heroSliders && config.heroSliders.length > 0) setHeroSliders(config.heroSliders);
             if (config.quickCards) setQuickCards(config.quickCards);
+            if (config.coursesSubtitle) setCoursesSubtitle(config.coursesSubtitle);
             if (config.customCategories && config.customCategories.length > 0) setCustomCategories(config.customCategories);
             if (config.featureCards && config.featureCards.length > 0) setFeatureCards(config.featureCards);
             if (config.featuresTitle) setFeaturesTitle(config.featuresTitle);
@@ -178,6 +183,8 @@ export default function TeacherHomePageBuilderPage() {
             if (config.admissionSubtitle) setAdmissionSubtitle(config.admissionSubtitle);
             if (config.admissionNotice) setAdmissionNotice(config.admissionNotice);
             if (config.aboutTitle) setAboutTitle(config.aboutTitle);
+            if (config.aboutHeadline) setAboutHeadline(config.aboutHeadline);
+            if (config.founderTitle) setFounderTitle(config.founderTitle);
             if (config.aboutBio) setAboutBio(config.aboutBio);
             if (config.aboutStats && config.aboutStats.length > 0) setAboutStats(config.aboutStats);
             if (config.contactTitle) setContactTitle(config.contactTitle);
@@ -214,6 +221,7 @@ export default function TeacherHomePageBuilderPage() {
       const fullConfig = {
         heroSliders,
         quickCards,
+        coursesSubtitle,
         customCategories,
         featuresTitle,
         featuresSubtitle,
@@ -223,6 +231,8 @@ export default function TeacherHomePageBuilderPage() {
         admissionSteps,
         admissionNotice,
         aboutTitle,
+        aboutHeadline,
+        founderTitle,
         aboutBio,
         aboutStats,
         contactTitle,
@@ -305,7 +315,7 @@ export default function TeacherHomePageBuilderPage() {
   const tabs = [
     { id: 'sliders', label: '১. ব্যানার স্লাইডার', icon: Sliders },
     { id: 'quickCards', label: '২. পেইড/ফ্রি কার্ডস', icon: Layers },
-    { id: 'categories', label: '৩. কাস্টম ক্যাটাগরি', icon: Grid },
+    { id: 'categories', label: '৩. কোর্স ও ক্যাটাগরি', icon: Grid },
     { id: 'features', label: '৪. প্রস্তুতিতে যা প্রয়োজন', icon: Award },
     { id: 'admission', label: '৫. ভর্তি তথ্য', icon: Info },
     { id: 'about', label: '৬. আমাদের সম্পর্কে', icon: Users },
@@ -626,60 +636,78 @@ export default function TeacherHomePageBuilderPage() {
             </div>
           )}
 
-          {/* TAB 3: CUSTOM CATEGORIES */}
+          {/* TAB 3: CUSTOM CATEGORIES & SUBTITLE */}
           {activeTab === 'categories' && (
             <div className="space-y-6">
               <div className="border-b border-foreground/10 pb-4">
                 <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <Grid className="w-5 h-5 text-orange-500" />
-                  <span>৩. কাস্টম ক্যাটাগরি ম্যানেজার</span>
+                  <span>৩. আমাদের কোর্সসমূহ ও ক্যাটাগরি ম্যানেজার</span>
                 </h3>
                 <p className="text-xs text-foreground/60 mt-1">
-                  আপনার "আমাদের কোর্সসমূহ" সেকশনের ফিল্টার ট্যাবগুলো তৈরি ও সাজান।
+                  আপনার "আমাদের কোর্সসমূহ" সেকশনের সাবটাইটেল এবং ফিল্টার ক্যাটাগরিগুলো তৈরি ও সাজান।
                 </p>
               </div>
 
-              <div className="flex gap-2">
+              <div>
+                <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                  কোর্স সেকশনের সাবটাইটেল
+                </label>
                 <input
                   type="text"
-                  placeholder="নতুন ক্যাটাগরি নাম লিখুন (যেমন: মেডিকেল এডমিশন, ভার্সিটি ক ইউনিট)"
-                  value={newCatInput}
-                  onChange={(e) => setNewCatInput(e.target.value)}
-                  className="flex-1 px-4 py-3 rounded-2xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                  value={coursesSubtitle}
+                  onChange={(e) => setCoursesSubtitle(e.target.value)}
+                  placeholder="যেমন: সেরা মেন্টরদের সাথে ঘরে বসেই নাও শতভাগ প্রস্তুতি।"
+                  className="w-full px-4 py-3 rounded-2xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-medium"
                 />
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (newCatInput.trim() && !customCategories.includes(newCatInput.trim())) {
-                      setCustomCategories([...customCategories, newCatInput.trim()]);
-                      setNewCatInput('');
-                    }
-                  }}
-                  className="px-6 py-3 rounded-2xl bg-orange-500 text-white font-bold text-xs hover:bg-orange-600 transition-colors flex items-center gap-1.5"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>যোগ করুন</span>
-                </button>
               </div>
 
-              <div className="flex flex-wrap gap-3 pt-2">
-                {customCategories.map((cat, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-foreground/5 border border-foreground/10 text-xs font-bold text-foreground shadow-sm"
+              <div className="space-y-3 pt-2">
+                <label className="text-[11px] font-bold text-foreground/70 block">
+                  ক্যাটাগরি ফিল্টারসমূহ
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="নতুন ক্যাটাগরি নাম লিখুন (যেমন: মেডিকেল এডমিশন, ভার্সিটি ক ইউনিট)"
+                    value={newCatInput}
+                    onChange={(e) => setNewCatInput(e.target.value)}
+                    className="flex-1 px-4 py-3 rounded-2xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (newCatInput.trim() && !customCategories.includes(newCatInput.trim())) {
+                        setCustomCategories([...customCategories, newCatInput.trim()]);
+                        setNewCatInput('');
+                      }
+                    }}
+                    className="px-6 py-3 rounded-2xl bg-orange-500 text-white font-bold text-xs hover:bg-orange-600 transition-colors flex items-center gap-1.5"
                   >
-                    <span>{cat}</span>
-                    {cat !== 'সকল কোর্স' && (
-                      <button
-                        type="button"
-                        onClick={() => setCustomCategories(customCategories.filter(c => c !== cat))}
-                        className="text-red-500 hover:text-red-600"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                ))}
+                    <Plus className="w-4 h-4" />
+                    <span>যোগ করুন</span>
+                  </button>
+                </div>
+
+                <div className="flex flex-wrap gap-3 pt-2">
+                  {customCategories.map((cat, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-foreground/5 border border-foreground/10 text-xs font-bold text-foreground shadow-sm"
+                    >
+                      <span>{cat}</span>
+                      {cat !== 'সকল কোর্স' && (
+                        <button
+                          type="button"
+                          onClick={() => setCustomCategories(customCategories.filter(c => c !== cat))}
+                          className="text-red-500 hover:text-red-600"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
@@ -693,7 +721,7 @@ export default function TeacherHomePageBuilderPage() {
                   <span>৪. একজন শিক্ষার্থীর পূর্ণাঙ্গ প্রস্তুতিতে যা যা প্রয়োজন</span>
                 </h3>
                 <p className="text-xs text-foreground/60 mt-1">
-                  এই সেকশনের কার্ডগুলো যোগ, এডিট বা ডিলিট করুন।
+                  এই সেকশনের কার্ডগুলো ও টেক্সট কনফিগার করুন।
                 </p>
               </div>
 
@@ -837,7 +865,7 @@ export default function TeacherHomePageBuilderPage() {
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-foreground/70 block mb-1">গুরুত্বপূর্ণ নোটিশ / হেল্প টেক্সট</label>
+                <label className="text-[11px] font-bold text-foreground/70 block mb-1">গুরুত্বপূর্ণ নোটিশ / হেল্প টেকস্ট</label>
                 <input
                   type="text"
                   value={admissionNotice}
@@ -854,25 +882,57 @@ export default function TeacherHomePageBuilderPage() {
               <div className="border-b border-foreground/10 pb-4">
                 <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <Users className="w-5 h-5 text-orange-500" />
-                  <span>৬. আমাদের সম্পর্কে (About Us & Stats)</span>
+                  <span>৬. আমাদের সম্পর্কে (About Us & Founder Showcase)</span>
                 </h3>
                 <p className="text-xs text-foreground/60 mt-1">
-                  শিক্ষক বা একাডেমির পরিচিতি ও অর্জনের পরিসংখ্যান।
+                  শিক্ষক বা একাডেমির পরিচিতি, অনুপ্রেরণামূলক শিরোনাম ও অর্জনের পরিসংখ্যান।
                 </p>
               </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">সেকশন টাইটেল</label>
+                  <input
+                    type="text"
+                    value={aboutTitle}
+                    onChange={(e) => setAboutTitle(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">পদবী / রোল (যেমন: প্রতিষ্ঠাতা ও পরিচালক)</label>
+                  <input
+                    type="text"
+                    value={founderTitle}
+                    onChange={(e) => setFounderTitle(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+              </div>
+
               <div>
-                <label className="text-[11px] font-bold text-foreground/70 block mb-1">পরিচিতি বিবরণ</label>
+                <label className="text-[11px] font-bold text-foreground/70 block mb-1">অনুপ্রেরণামূলক প্রধান শিরোনাম</label>
+                <input
+                  type="text"
+                  value={aboutHeadline}
+                  onChange={(e) => setAboutHeadline(e.target.value)}
+                  placeholder='যেমন: স্বপ্ন ছোঁয়ার আশা থাকলে সেই স্বপ্নের ভিত তৈরিতে সাথে আছি আমরা'
+                  className="w-full px-4 py-3 rounded-2xl bg-background border border-foreground/10 text-xs font-semibold focus:outline-none focus:border-orange-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] font-bold text-foreground/70 block mb-1">পরিচিতি ও প্ল্যাটফর্মের মিশন বিবরণ</label>
                 <textarea
                   rows={4}
                   value={aboutBio}
                   onChange={(e) => setAboutBio(e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl bg-background border border-foreground/10 text-xs leading-relaxed focus:outline-none focus:border-orange-500"
+                  className="w-full px-4 py-3 rounded-2xl bg-background border border-foreground/10 text-xs leading-relaxed focus:outline-none focus:border-orange-500 font-medium"
                 />
               </div>
 
               <div className="space-y-3">
-                <label className="text-[11px] font-bold text-foreground/70 block">পরিসংখ্যান কাউন্টার</label>
+                <label className="text-[11px] font-bold text-foreground/70 block">পরিসংখ্যান কাউন্টার বক্সসমূহ</label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {aboutStats.map((st) => (
                     <div key={st.id} className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2">
@@ -883,7 +943,7 @@ export default function TeacherHomePageBuilderPage() {
                           const val = e.target.value;
                           setAboutStats(aboutStats.map(s => s.id === st.id ? { ...s, value: val } : s));
                         }}
-                        placeholder="মান (যেমন: ১০,০০০+)"
+                        placeholder="মান (যেমন: 10+, 100K+)"
                         className="w-full px-3 py-1.5 rounded-xl bg-background border border-foreground/10 text-xs font-black text-orange-500 focus:outline-none"
                       />
                       <input
@@ -893,7 +953,7 @@ export default function TeacherHomePageBuilderPage() {
                           const val = e.target.value;
                           setAboutStats(aboutStats.map(s => s.id === st.id ? { ...s, label: val } : s));
                         }}
-                        placeholder="লেবেল (যেমন: মোট শিক্ষার্থী)"
+                        placeholder="লেবেল (যেমন: Courses, Students)"
                         className="w-full px-3 py-1.5 rounded-xl bg-background border border-foreground/10 text-[11px] font-semibold text-foreground/70 focus:outline-none"
                       />
                     </div>

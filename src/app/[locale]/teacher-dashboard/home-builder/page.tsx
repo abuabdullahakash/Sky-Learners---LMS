@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { uploadImageToImgBB } from '@/lib/imgbb';
 import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
@@ -33,6 +33,7 @@ import {
   Check,
   ChevronRight,
   ArrowRight,
+  ArrowLeft,
   Flame
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -301,14 +302,6 @@ export default function TeacherHomePageBuilderPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-10 h-10 animate-spin text-orange-500" />
-      </div>
-    );
-  }
-
   const tabs = [
     { id: 'sliders', label: '১. ব্যানার স্লাইডার', icon: Sliders },
     { id: 'quickCards', label: '২. পেইড/ফ্রি কার্ডস', icon: Layers },
@@ -322,34 +315,84 @@ export default function TeacherHomePageBuilderPage() {
     { id: 'helpBar', label: '১০. হেল্পবার', icon: HelpCircle },
   ];
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-orange-500" />
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-8 pb-20 max-w-6xl mx-auto">
+    <div className="w-full relative min-h-screen">
       
-      {/* Top Header & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-background border border-foreground/10 shadow-sm">
+      {/* ========================================================================= */}
+      {/* DEDICATED HOME PAGE BUILDER SIDEBAR (Replaces Main Sidebar on Desktop)     */}
+      {/* ========================================================================= */}
+      <aside className="hidden md:flex w-64 lg:w-[280px] flex-shrink-0 bg-background border-r border-foreground/10 fixed left-0 top-[80px] h-[calc(100vh-80px)] z-40 overflow-y-auto custom-scrollbar flex-col justify-between">
+        
+        {/* Top Header & Back Button */}
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 text-xs font-bold uppercase tracking-wider mb-2">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Storefront Website Builder</span>
+          <div className="p-4 border-b border-foreground/10 space-y-3">
+            <Link 
+              href="/teacher-dashboard" 
+              className="inline-flex items-center gap-2 text-xs font-bold text-foreground/60 hover:text-orange-500 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to Dashboard</span>
+            </Link>
+
+            <div>
+              <h3 className="font-extrabold text-base text-foreground flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-orange-500" />
+                <span>হোম পেজ বিল্ডার</span>
+              </h3>
+              <p className="text-[11px] text-foreground/50 mt-0.5">
+                আপনার ওয়েবসাইট কাস্টমাইজ করুন
+              </p>
+            </div>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-            হোম পেজ বিল্ডার
-          </h1>
-          <p className="text-sm text-foreground/60 mt-1">
-            আপনার একাডেমি বা টিচার হোম পেজের সমস্ত সেকশন কোডিং ছাড়াই কাস্টমাইজ করুন।
-          </p>
+
+          {/* 10 Builder Section Items */}
+          <div className="p-2.5 space-y-1">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-left ${
+                    isActive
+                      ? 'bg-orange-500 text-white shadow-md font-bold'
+                      : 'hover:bg-foreground/5 text-foreground/75 hover:text-foreground'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{tab.label}</span>
+                  </div>
+                  <ChevronRight className={`w-3.5 h-3.5 flex-shrink-0 ${isActive ? 'text-white' : 'text-foreground/30'}`} />
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* Bottom Sidebar Action Buttons */}
+        <div className="p-3 border-t border-foreground/10 space-y-2">
           {user?.uid && (
             <Link
               href={`/teachers/${user.uid}`}
               target="_blank"
-              className="px-4 py-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-xs font-bold flex items-center gap-2 transition-colors"
+              className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-[11px] font-bold text-foreground transition-colors"
             >
-              <Eye className="w-4 h-4 text-orange-500" />
-              <span>লাইভ সাইট দেখুন</span>
-              <ExternalLink className="w-3.5 h-3.5 text-foreground/40" />
+              <div className="flex items-center gap-2">
+                <Eye className="w-3.5 h-3.5 text-orange-500" />
+                <span>লাইভ ওয়েবসাইট</span>
+              </div>
+              <ExternalLink className="w-3 h-3 text-foreground/40" />
             </Link>
           )}
 
@@ -357,49 +400,84 @@ export default function TeacherHomePageBuilderPage() {
             type="button"
             onClick={handleSaveConfig}
             disabled={saving}
-            className="px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-orange-500/30 transition-all disabled:opacity-50"
+            className="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition-all disabled:opacity-50"
           >
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            <span>{saving ? 'সংরক্ষণ হচ্ছে...' : 'সেটিংস সংরক্ষণ করুন'}</span>
+            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+            <span>{saving ? 'সংরক্ষণ হচ্ছে...' : 'সেটিংস সেভ করুন'}</span>
           </button>
         </div>
-      </div>
 
-      {/* Main Grid: Tabs on Left, Content on Right */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      </aside>
+
+      {/* ========================================================================= */}
+      {/* MAIN FULL-WIDTH CONTENT AREA (Shifted by sidebar width on Desktop)        */}
+      {/* ========================================================================= */}
+      <div className="md:ml-64 lg:ml-[280px] p-2 sm:p-4 md:p-6 space-y-6">
         
-        {/* Navigation Sidebar */}
-        <div className="lg:col-span-1 space-y-1">
-          {tabs.map(tab => {
+        {/* Mobile Horizontal Tabs Bar */}
+        <div className="md:hidden flex items-center gap-2 overflow-x-auto pb-2 border-b border-foreground/10">
+          {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
-                type="button"
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${
-                  isActive
-                    ? 'bg-orange-500 text-white shadow-md'
-                    : 'bg-background hover:bg-foreground/5 text-foreground/70 hover:text-foreground border border-foreground/5'
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex-shrink-0 transition-all ${
+                  isActive ? 'bg-orange-500 text-white' : 'bg-foreground/5 text-foreground/70'
                 }`}
               >
-                <div className="flex items-center gap-2.5 truncate">
-                  <Icon className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">{tab.label}</span>
-                </div>
-                <ChevronRight className={`w-3.5 h-3.5 flex-shrink-0 ${isActive ? 'text-white' : 'text-foreground/30'}`} />
+                <Icon className="w-3.5 h-3.5" />
+                <span>{tab.label}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Builder Content Container */}
-        <div className="lg:col-span-3 bg-background border border-foreground/10 rounded-3xl p-6 sm:p-8 shadow-sm">
+        {/* Top Hero / Action Card */}
+        <div className="p-6 rounded-3xl bg-background border border-foreground/10 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 text-xs font-bold uppercase tracking-wider mb-2">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Storefront Website Builder</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
+              {tabs.find(t => t.id === activeTab)?.label}
+            </h1>
+            <p className="text-xs sm:text-sm text-foreground/60 mt-1">
+              আপনার ওয়েবসাইটের এই সেকশনটির তথ্য ও ডিজাইন কাস্টমাইজ করুন।
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {user?.uid && (
+              <Link
+                href={`/teachers/${user.uid}`}
+                target="_blank"
+                className="px-4 py-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-xs font-bold flex items-center gap-2 transition-colors"
+              >
+                <Eye className="w-4 h-4 text-orange-500" />
+                <span>লাইভ প্রিভিউ</span>
+                <ExternalLink className="w-3.5 h-3.5 text-foreground/40" />
+              </Link>
+            )}
+
+            <button
+              type="button"
+              onClick={handleSaveConfig}
+              disabled={saving}
+              className="px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-orange-500/30 transition-all disabled:opacity-50"
+            >
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              <span>{saving ? 'সংরক্ষণ হচ্ছে...' : 'সেটিংস সংরক্ষণ করুন'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Full Width Active Tab Form Container */}
+        <div className="w-full bg-background border border-foreground/10 rounded-3xl p-6 sm:p-8 shadow-sm">
           
-          {/* ========================================================================= */}
-          {/* TAB 1: HERO SLIDERS                                                      */}
-          {/* ========================================================================= */}
+          {/* TAB 1: HERO SLIDERS */}
           {activeTab === 'sliders' && (
             <div className="space-y-6">
               <div className="border-b border-foreground/10 pb-4">
@@ -414,7 +492,7 @@ export default function TeacherHomePageBuilderPage() {
 
               <div className="space-y-4">
                 {heroSliders.map((slide, index) => (
-                  <div key={slide.id} className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3">
+                  <div key={slide.id} className="p-4 sm:p-6 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-orange-500">ব্যানার #{index + 1}</span>
                       {heroSliders.length > 1 && (
@@ -428,12 +506,12 @@ export default function TeacherHomePageBuilderPage() {
                       )}
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
-                      <div className="relative aspect-video rounded-xl overflow-hidden bg-foreground/10 border border-foreground/10">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                      <div className="relative aspect-[21/9] sm:aspect-video rounded-2xl overflow-hidden bg-foreground/10 border border-foreground/10">
                         <img src={slide.imageUrl} alt="Slide Preview" className="w-full h-full object-cover" />
                       </div>
 
-                      <div className="sm:col-span-2 space-y-3">
+                      <div className="md:col-span-2 space-y-3">
                         <div>
                           <label className="text-[11px] font-bold text-foreground/70 block mb-1">
                             টার্গেট কোর্স লিঙ্ক (ক্লিক করলে যেখানে যাবে)
@@ -444,7 +522,7 @@ export default function TeacherHomePageBuilderPage() {
                               const val = e.target.value;
                               setHeroSliders(heroSliders.map(s => s.id === slide.id ? { ...s, targetCourseId: val } : s));
                             }}
-                            className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs font-semibold focus:outline-none focus:border-orange-500"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs font-semibold focus:outline-none focus:border-orange-500"
                           >
                             <option value="">-- কোনো কোর্স লিঙ্ক নেই --</option>
                             {courses.map(c => (
@@ -464,7 +542,7 @@ export default function TeacherHomePageBuilderPage() {
                               const val = e.target.value;
                               setHeroSliders(heroSliders.map(s => s.id === slide.id ? { ...s, imageUrl: val } : s));
                             }}
-                            className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                           />
                         </div>
                       </div>
@@ -472,9 +550,8 @@ export default function TeacherHomePageBuilderPage() {
                   </div>
                 ))}
 
-                {/* Add New Slide Button */}
                 <div className="pt-2">
-                  <label className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/30 text-xs font-bold cursor-pointer transition-colors">
+                  <label className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/30 text-xs font-bold cursor-pointer transition-colors">
                     {uploadingSlideImg ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                     <span>{uploadingSlideImg ? 'ইমেজ আপলোড হচ্ছে...' : '+ নতুন ব্যানার ইমেজ আপলোড করুন'}</span>
                     <input type="file" accept="image/*" onChange={handleAddSlideImage} className="hidden" />
@@ -484,9 +561,7 @@ export default function TeacherHomePageBuilderPage() {
             </div>
           )}
 
-          {/* ========================================================================= */}
-          {/* TAB 2: QUICK CARDS                                                       */}
-          {/* ========================================================================= */}
+          {/* TAB 2: QUICK CARDS */}
           {activeTab === 'quickCards' && (
             <div className="space-y-6">
               <div className="border-b border-foreground/10 pb-4">
@@ -499,9 +574,8 @@ export default function TeacherHomePageBuilderPage() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {/* Paid Card */}
-                <div className="p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="p-6 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-4">
                   <h4 className="font-bold text-sm text-foreground flex items-center gap-2">
                     <span>🎓 পেইড কোর্স কার্ড</span>
                   </h4>
@@ -511,7 +585,7 @@ export default function TeacherHomePageBuilderPage() {
                       type="text"
                       value={quickCards.paidTitle}
                       onChange={(e) => setQuickCards({ ...quickCards, paidTitle: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                     />
                   </div>
                   <div>
@@ -520,13 +594,12 @@ export default function TeacherHomePageBuilderPage() {
                       type="text"
                       value={quickCards.paidSubtitle}
                       onChange={(e) => setQuickCards({ ...quickCards, paidSubtitle: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                     />
                   </div>
                 </div>
 
-                {/* Free Card */}
-                <div className="p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3">
+                <div className="p-6 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-4">
                   <h4 className="font-bold text-sm text-foreground flex items-center gap-2">
                     <span>🎁 ফ্রি কোর্স কার্ড</span>
                   </h4>
@@ -536,7 +609,7 @@ export default function TeacherHomePageBuilderPage() {
                       type="text"
                       value={quickCards.freeTitle}
                       onChange={(e) => setQuickCards({ ...quickCards, freeTitle: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                     />
                   </div>
                   <div>
@@ -545,7 +618,7 @@ export default function TeacherHomePageBuilderPage() {
                       type="text"
                       value={quickCards.freeSubtitle}
                       onChange={(e) => setQuickCards({ ...quickCards, freeSubtitle: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                     />
                   </div>
                 </div>
@@ -553,9 +626,7 @@ export default function TeacherHomePageBuilderPage() {
             </div>
           )}
 
-          {/* ========================================================================= */}
-          {/* TAB 3: CUSTOM CATEGORIES                                                 */}
-          {/* ========================================================================= */}
+          {/* TAB 3: CUSTOM CATEGORIES */}
           {activeTab === 'categories' && (
             <div className="space-y-6">
               <div className="border-b border-foreground/10 pb-4">
@@ -571,10 +642,10 @@ export default function TeacherHomePageBuilderPage() {
               <div className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="নতুন ক্যাটাগরি নাম লিখুন (যেমন: মেডিকেল এডমিশন)"
+                  placeholder="নতুন ক্যাটাগরি নাম লিখুন (যেমন: মেডিকেল এডমিশন, ভার্সিটি ক ইউনিট)"
                   value={newCatInput}
                   onChange={(e) => setNewCatInput(e.target.value)}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                  className="flex-1 px-4 py-3 rounded-2xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                 />
                 <button
                   type="button"
@@ -584,18 +655,18 @@ export default function TeacherHomePageBuilderPage() {
                       setNewCatInput('');
                     }
                   }}
-                  className="px-5 py-2.5 rounded-xl bg-orange-500 text-white font-bold text-xs hover:bg-orange-600 transition-colors flex items-center gap-1.5"
+                  className="px-6 py-3 rounded-2xl bg-orange-500 text-white font-bold text-xs hover:bg-orange-600 transition-colors flex items-center gap-1.5"
                 >
                   <Plus className="w-4 h-4" />
                   <span>যোগ করুন</span>
                 </button>
               </div>
 
-              <div className="flex flex-wrap gap-2.5 pt-2">
+              <div className="flex flex-wrap gap-3 pt-2">
                 {customCategories.map((cat, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-foreground/5 border border-foreground/10 text-xs font-bold text-foreground"
+                    className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-foreground/5 border border-foreground/10 text-xs font-bold text-foreground shadow-sm"
                   >
                     <span>{cat}</span>
                     {cat !== 'সকল কোর্স' && (
@@ -613,9 +684,7 @@ export default function TeacherHomePageBuilderPage() {
             </div>
           )}
 
-          {/* ========================================================================= */}
-          {/* TAB 4: FEATURE CARDS ("যা যা প্রয়োজন")                                     */}
-          {/* ========================================================================= */}
+          {/* TAB 4: FEATURE CARDS */}
           {activeTab === 'features' && (
             <div className="space-y-6">
               <div className="border-b border-foreground/10 pb-4">
@@ -635,7 +704,7 @@ export default function TeacherHomePageBuilderPage() {
                     type="text"
                     value={featuresTitle}
                     onChange={(e) => setFeaturesTitle(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>
                 <div>
@@ -644,15 +713,15 @@ export default function TeacherHomePageBuilderPage() {
                     type="text"
                     value={featuresSubtitle}
                     onChange={(e) => setFeaturesSubtitle(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>
               </div>
 
               <div className="space-y-3 pt-2">
-                {featureCards.map((card, index) => (
-                  <div key={card.id} className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 flex items-start gap-4">
-                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {featureCards.map((card) => (
+                  <div key={card.id} className="p-4 sm:p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 flex items-start gap-4">
+                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="text-[10px] font-bold text-foreground/50 block mb-1">কার্ড টাইটেল</label>
                         <input
@@ -662,7 +731,7 @@ export default function TeacherHomePageBuilderPage() {
                             const val = e.target.value;
                             setFeatureCards(featureCards.map(c => c.id === card.id ? { ...c, title: val } : c));
                           }}
-                          className="w-full px-3 py-1.5 rounded-lg bg-background border border-foreground/10 text-xs font-semibold focus:outline-none focus:border-orange-500"
+                          className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs font-semibold focus:outline-none focus:border-orange-500"
                         />
                       </div>
                       <div>
@@ -674,7 +743,7 @@ export default function TeacherHomePageBuilderPage() {
                             const val = e.target.value;
                             setFeatureCards(featureCards.map(c => c.id === card.id ? { ...c, desc: val } : c));
                           }}
-                          className="w-full px-3 py-1.5 rounded-lg bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                          className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                         />
                       </div>
                     </div>
@@ -692,7 +761,7 @@ export default function TeacherHomePageBuilderPage() {
                 <button
                   type="button"
                   onClick={() => setFeatureCards([...featureCards, { id: `f-${Date.now()}`, icon: 'Check', title: 'নতুন ফিচার', desc: 'ফিচারের বিবরণ লিখুন' }])}
-                  className="px-4 py-2.5 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/20 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                  className="px-5 py-3 rounded-2xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/20 text-xs font-bold flex items-center gap-1.5 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   <span>+ নতুন ফিচার কার্ড যোগ করুন</span>
@@ -701,9 +770,7 @@ export default function TeacherHomePageBuilderPage() {
             </div>
           )}
 
-          {/* ========================================================================= */}
-          {/* TAB 5: ADMISSION INFO ("ভর্তি তথ্য")                                       */}
-          {/* ========================================================================= */}
+          {/* TAB 5: ADMISSION INFO */}
           {activeTab === 'admission' && (
             <div className="space-y-6">
               <div className="border-b border-foreground/10 pb-4">
@@ -723,7 +790,7 @@ export default function TeacherHomePageBuilderPage() {
                     type="text"
                     value={admissionTitle}
                     onChange={(e) => setAdmissionTitle(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>
                 <div>
@@ -732,7 +799,7 @@ export default function TeacherHomePageBuilderPage() {
                     type="text"
                     value={admissionSubtitle}
                     onChange={(e) => setAdmissionSubtitle(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>
               </div>
@@ -740,7 +807,7 @@ export default function TeacherHomePageBuilderPage() {
               <div className="space-y-3 pt-2">
                 {admissionSteps.map((step, idx) => (
                   <div key={step.id} className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-orange-500 text-white text-xs font-black flex items-center justify-center shrink-0">
+                    <span className="w-7 h-7 rounded-full bg-orange-500 text-white text-xs font-black flex items-center justify-center shrink-0">
                       {idx + 1}
                     </span>
                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -752,7 +819,7 @@ export default function TeacherHomePageBuilderPage() {
                           setAdmissionSteps(admissionSteps.map(s => s.id === step.id ? { ...s, title: val } : s));
                         }}
                         placeholder="ধাপের নাম"
-                        className="w-full px-3 py-1.5 rounded-lg bg-background border border-foreground/10 text-xs font-semibold focus:outline-none focus:border-orange-500"
+                        className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs font-semibold focus:outline-none focus:border-orange-500"
                       />
                       <input
                         type="text"
@@ -762,7 +829,7 @@ export default function TeacherHomePageBuilderPage() {
                           setAdmissionSteps(admissionSteps.map(s => s.id === step.id ? { ...s, desc: val } : s));
                         }}
                         placeholder="ধাপের বিবরণ"
-                        className="w-full px-3 py-1.5 rounded-lg bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                        className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                       />
                     </div>
                   </div>
@@ -775,15 +842,13 @@ export default function TeacherHomePageBuilderPage() {
                   type="text"
                   value={admissionNotice}
                   onChange={(e) => setAdmissionNotice(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                 />
               </div>
             </div>
           )}
 
-          {/* ========================================================================= */}
-          {/* TAB 6: ABOUT SECTION                                                     */}
-          {/* ========================================================================= */}
+          {/* TAB 6: ABOUT */}
           {activeTab === 'about' && (
             <div className="space-y-6">
               <div className="border-b border-foreground/10 pb-4">
@@ -802,15 +867,15 @@ export default function TeacherHomePageBuilderPage() {
                   rows={4}
                   value={aboutBio}
                   onChange={(e) => setAboutBio(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-background border border-foreground/10 text-xs leading-relaxed focus:outline-none focus:border-orange-500"
+                  className="w-full px-4 py-3 rounded-2xl bg-background border border-foreground/10 text-xs leading-relaxed focus:outline-none focus:border-orange-500"
                 />
               </div>
 
               <div className="space-y-3">
                 <label className="text-[11px] font-bold text-foreground/70 block">পরিসংখ্যান কাউন্টার</label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {aboutStats.map((st, idx) => (
-                    <div key={st.id} className="p-3 rounded-xl bg-foreground/[0.02] border border-foreground/10 space-y-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {aboutStats.map((st) => (
+                    <div key={st.id} className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2">
                       <input
                         type="text"
                         value={st.value}
@@ -819,7 +884,7 @@ export default function TeacherHomePageBuilderPage() {
                           setAboutStats(aboutStats.map(s => s.id === st.id ? { ...s, value: val } : s));
                         }}
                         placeholder="মান (যেমন: ১০,০০০+)"
-                        className="w-full px-2.5 py-1 rounded-lg bg-background border border-foreground/10 text-xs font-black text-orange-500 focus:outline-none"
+                        className="w-full px-3 py-1.5 rounded-xl bg-background border border-foreground/10 text-xs font-black text-orange-500 focus:outline-none"
                       />
                       <input
                         type="text"
@@ -829,7 +894,7 @@ export default function TeacherHomePageBuilderPage() {
                           setAboutStats(aboutStats.map(s => s.id === st.id ? { ...s, label: val } : s));
                         }}
                         placeholder="লেবেল (যেমন: মোট শিক্ষার্থী)"
-                        className="w-full px-2.5 py-1 rounded-lg bg-background border border-foreground/10 text-[11px] font-semibold text-foreground/70 focus:outline-none"
+                        className="w-full px-3 py-1.5 rounded-xl bg-background border border-foreground/10 text-[11px] font-semibold text-foreground/70 focus:outline-none"
                       />
                     </div>
                   ))}
@@ -838,9 +903,7 @@ export default function TeacherHomePageBuilderPage() {
             </div>
           )}
 
-          {/* ========================================================================= */}
-          {/* TAB 7: CONTACT                                                           */}
-          {/* ========================================================================= */}
+          {/* TAB 7: CONTACT */}
           {activeTab === 'contact' && (
             <div className="space-y-6">
               <div className="border-b border-foreground/10 pb-4">
@@ -860,7 +923,7 @@ export default function TeacherHomePageBuilderPage() {
                     type="text"
                     value={contactPhone}
                     onChange={(e) => setContactPhone(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>
                 <div>
@@ -869,7 +932,7 @@ export default function TeacherHomePageBuilderPage() {
                     type="text"
                     value={contactWhatsapp}
                     onChange={(e) => setContactWhatsapp(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>
                 <div>
@@ -878,7 +941,7 @@ export default function TeacherHomePageBuilderPage() {
                     type="email"
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>
                 <div>
@@ -887,16 +950,14 @@ export default function TeacherHomePageBuilderPage() {
                     type="text"
                     value={contactAddress}
                     onChange={(e) => setContactAddress(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>
               </div>
             </div>
           )}
 
-          {/* ========================================================================= */}
-          {/* TAB 8: TRUST CTA BANNER                                                  */}
-          {/* ========================================================================= */}
+          {/* TAB 8: TRUST BANNER */}
           {activeTab === 'trustBanner' && (
             <div className="space-y-6">
               <div className="border-b border-foreground/10 pb-4">
@@ -916,7 +977,7 @@ export default function TeacherHomePageBuilderPage() {
                     type="text"
                     value={trustTitle}
                     onChange={(e) => setTrustTitle(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>
 
@@ -926,7 +987,7 @@ export default function TeacherHomePageBuilderPage() {
                     type="text"
                     value={trustSubtitle}
                     onChange={(e) => setTrustSubtitle(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>
 
@@ -937,7 +998,7 @@ export default function TeacherHomePageBuilderPage() {
                       type="text"
                       value={trustBtnText}
                       onChange={(e) => setTrustBtnText(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                     />
                   </div>
 
@@ -946,7 +1007,7 @@ export default function TeacherHomePageBuilderPage() {
                     <select
                       value={trustTargetCourseId}
                       onChange={(e) => setTrustTargetCourseId(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs font-semibold focus:outline-none focus:border-orange-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs font-semibold focus:outline-none focus:border-orange-500"
                     >
                       <option value="">-- প্রথম কোর্স বা ক্যাটালগ --</option>
                       {courses.map(c => (
@@ -959,9 +1020,7 @@ export default function TeacherHomePageBuilderPage() {
             </div>
           )}
 
-          {/* ========================================================================= */}
-          {/* TAB 9: GALLERY PHOTOS ("সাফল্যের পথে")                                    */}
-          {/* ========================================================================= */}
+          {/* TAB 9: GALLERY PHOTOS */}
           {activeTab === 'gallery' && (
             <div className="space-y-6">
               <div className="border-b border-foreground/10 pb-4">
@@ -975,7 +1034,7 @@ export default function TeacherHomePageBuilderPage() {
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {galleryPhotos.map((photo, idx) => (
+                {galleryPhotos.map((photo) => (
                   <div key={photo.id} className="relative group rounded-2xl overflow-hidden aspect-video border border-foreground/10 bg-foreground/5">
                     <img src={photo.imageUrl} alt="Gallery Photo" className="w-full h-full object-cover" />
                     <button
@@ -990,7 +1049,7 @@ export default function TeacherHomePageBuilderPage() {
               </div>
 
               <div className="pt-2">
-                <label className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/30 text-xs font-bold cursor-pointer transition-colors">
+                <label className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/30 text-xs font-bold cursor-pointer transition-colors">
                   {uploadingGalleryImg ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                   <span>{uploadingGalleryImg ? 'ফটো আপলোড হচ্ছে...' : '+ নতুন গ্যালারি ফটো আপলোড করুন'}</span>
                   <input type="file" accept="image/*" onChange={handleAddGalleryPhoto} className="hidden" />
@@ -999,9 +1058,7 @@ export default function TeacherHomePageBuilderPage() {
             </div>
           )}
 
-          {/* ========================================================================= */}
-          {/* TAB 10: HELP BAR STRIP                                                   */}
-          {/* ========================================================================= */}
+          {/* TAB 10: HELP BAR */}
           {activeTab === 'helpBar' && (
             <div className="space-y-6">
               <div className="border-b border-foreground/10 pb-4">
@@ -1021,7 +1078,7 @@ export default function TeacherHomePageBuilderPage() {
                     type="text"
                     value={helpBarTitle}
                     onChange={(e) => setHelpBarTitle(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>
                 <div>
@@ -1030,7 +1087,7 @@ export default function TeacherHomePageBuilderPage() {
                     type="text"
                     value={helpBarPhone}
                     onChange={(e) => setHelpBarPhone(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>
               </div>
@@ -1038,6 +1095,7 @@ export default function TeacherHomePageBuilderPage() {
           )}
 
         </div>
+
       </div>
 
     </div>

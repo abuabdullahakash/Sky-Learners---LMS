@@ -1,4 +1,17 @@
 {
+  "Dashboard": {
+    "sidebar": {
+      "overview": "ওভারভিউ",
+      "courses": "আমার কোর্স",
+      "homeBuilder": "হোম পেজ বিল্ডার",
+      "myWebsite": "আমার ওয়েবসাইট (স্টোরফ্রন্ট)",
+      "posts": "পোস্ট ও নোটিশ",
+      "students": "শিক্ষার্থীবৃন্দ",
+      "earnings": "উপার্জন ও হিসেব",
+      "viewLiveWebsite": "ওয়েবসাইট দেখুন",
+      "logout": "লগআউট"
+    }
+  },
   "Exam": {
     "examsAndQuizzes": "কুইজ ও এক্সাম",
     "takeYourExams": "আপনার এক্সামগুলো দিন এবং প্রোগ্রেস ট্র্যাক করুন।",

@@ -1,4 +1,17 @@
 {
+  "Dashboard": {
+    "sidebar": {
+      "overview": "Overview",
+      "courses": "My Courses",
+      "homeBuilder": "Home Page Builder",
+      "myWebsite": "My Storefront / Website",
+      "posts": "Posts & Notices",
+      "students": "Students",
+      "earnings": "Earnings",
+      "viewLiveWebsite": "View Live Website",
+      "logout": "Log Out"
+    }
+  },
   "Exam": {
     "examsAndQuizzes": "Exams & Quizzes",
     "takeYourExams": "Take your exams and track your progress.",

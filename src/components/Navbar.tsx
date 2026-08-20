@@ -120,6 +120,8 @@ export default function Navbar() {
   const isStudent = !isAdmin && userData?.role === 'student' && Boolean(userData?.onboardingComplete);
   const hasCompletedRole = isAdmin || isTeacher || isStudent;
   const userProfileLink = isAdmin ? '/admin' : (isTeacher ? '/teacher-dashboard' : (isStudent ? '/dashboard' : '/onboarding'));
+  const homeLink = isTeacher && user?.uid ? `/teachers/${user.uid}` : '/';
+  const isHomeActive = pathname === '/' || (Boolean(isTeacher) && Boolean(user?.uid) && pathname === `/teachers/${user?.uid}`);
 
   // Dashboard Nav Links (Account Settings is handled in the bottom profile popup menu)
   const studentDashboardLinks = [
@@ -132,7 +134,8 @@ export default function Navbar() {
     { name: 'Overview', href: '/teacher-dashboard', icon: LayoutDashboard },
     { name: '+ Create New Course', href: '/teacher-dashboard/courses/create', icon: PlusCircle, isHighlight: true },
     { name: 'My Courses', href: '/teacher-dashboard/courses', icon: Video },
-    { name: 'My Website', href: '/teacher-dashboard/profile', icon: Globe },
+    { name: 'Home Builder', href: '/teacher-dashboard/home-builder', icon: Sparkles },
+    { name: 'My Website', href: user?.uid ? `/teachers/${user.uid}` : '/teacher-dashboard/profile', icon: Globe },
     { name: 'Posts & Notices', href: '/teacher-dashboard/posts', icon: Megaphone },
     { name: 'Students', href: '/teacher-dashboard/students', icon: Users },
     { name: 'Earnings', href: '/teacher-dashboard/earnings', icon: DollarSign },
@@ -172,7 +175,7 @@ export default function Navbar() {
         <div className={`${isDashboard ? 'w-full' : 'max-w-[1280px]'} mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px]`}>
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 z-10">
+            <Link href={homeLink} className="flex items-center gap-2 z-10">
               <div className="relative w-[150px] h-[40px] sm:w-[180px] sm:h-[48px] md:w-[220px] md:h-[56px] flex items-center justify-start">
                 <Image src="/Skylearnars Academy logo.png" alt="Sky Learners Logo" fill className="object-contain object-left" priority />
               </div>
@@ -180,7 +183,7 @@ export default function Navbar() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className={`font-medium transition-colors hover:text-primary ${pathname === '/' ? 'text-primary' : 'text-foreground/80'}`}>
+              <Link href={homeLink} className={`font-medium transition-colors hover:text-primary ${isHomeActive ? 'text-primary' : 'text-foreground/80'}`}>
                 {t('home')}
               </Link>
               <Link href="/courses" className={`font-medium transition-colors hover:text-primary ${pathname === '/courses' ? 'text-primary' : 'text-foreground/80'}`}>
@@ -262,6 +265,22 @@ export default function Navbar() {
                               <p className="font-bold leading-tight">Teacher Dashboard</p>
                               <p className="text-[10px] text-foreground/50 leading-tight">Overview & Analytics</p>
                             </div>
+                          </Link>
+
+                          {user?.uid && (
+                            <Link 
+                              href={`/teachers/${user.uid}`}
+                              className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
+                            >
+                              <Globe className="w-3.5 h-3.5 text-orange-500" /> View Live Website
+                            </Link>
+                          )}
+
+                          <Link 
+                            href="/teacher-dashboard/home-builder" 
+                            className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
+                          >
+                            <Sparkles className="w-3.5 h-3.5 text-orange-500" /> Home Builder
                           </Link>
 
                           <Link 
@@ -511,19 +530,19 @@ export default function Navbar() {
                   Navigation
                 </div>
                 <Link
-                  href="/"
+                  href={homeLink}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
-                    pathname === '/' 
+                    isHomeActive 
                       ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 border-orange-400/40 ring-1 ring-orange-400/30' 
                       : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
                   }`}
                 >
                   <span className="flex items-center gap-2.5">
-                    <span className={`w-2 h-2 rounded-full ${pathname === '/' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
+                    <span className={`w-2 h-2 rounded-full ${isHomeActive ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
                     <span>{t('home')}</span>
                   </span>
-                  <ChevronRight className={`w-4 h-4 transition-transform ${pathname === '/' ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
+                  <ChevronRight className={`w-4 h-4 transition-transform ${isHomeActive ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
                 </Link>
                 <Link
                   href="/courses"
@@ -604,14 +623,24 @@ export default function Navbar() {
                           <Video className="w-3.5 h-3.5 text-foreground/60" /> My Created Courses
                         </Link>
                         <Link 
-                          href="/teacher-dashboard/profile"
+                          href={user?.uid ? `/teachers/${user.uid}` : '/teacher-dashboard/home-builder'}
                           onClick={() => {
                             setIsMobileMenuOpen(false);
                             setShowProfileMenu(false);
                           }} 
                           className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
                         >
-                          <UserCircle className="w-4 h-4 text-foreground/70" /> View Profile
+                          <Globe className="w-4 h-4 text-orange-500" /> View Live Website
+                        </Link>
+                        <Link 
+                          href="/teacher-dashboard/home-builder"
+                          onClick={() => {
+                            setIsMobileMenuOpen(false);
+                            setShowProfileMenu(false);
+                          }} 
+                          className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
+                        >
+                          <Sparkles className="w-4 h-4 text-orange-500" /> Home Builder
                         </Link>
                       </>
                     ) : isStudent ? (

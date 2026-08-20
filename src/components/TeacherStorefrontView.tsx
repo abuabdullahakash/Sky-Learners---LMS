@@ -463,7 +463,11 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
           <div className="flex items-center justify-center gap-3 sm:gap-6 mb-3">
             <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
-              {locale === 'bn' ? 'আমাদের কোর্সসমূহ' : 'Our Course Catalog'}
+              {locale === 'bn' ? (
+                <>আমাদের <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">কোর্সসমূহ</span></>
+              ) : (
+                <>Our <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">Courses</span></>
+              )}
             </h2>
             <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
           </div>
@@ -579,7 +583,9 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             <div className="flex items-center justify-center gap-3 sm:gap-6 mb-3">
               <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
-                {featuresTitle}
+                <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
+                  {featuresTitle}
+                </span>
               </h2>
               <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
             </div>
@@ -736,10 +742,10 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       </section>
 
       {/* ========================================================================= */}
-      {/* 5. ভর্তি নির্দেশিকা (Step-by-Step Admission Guide)                         */}
+      {/* 5. ভর্তি নির্দেশিকা (Step-by-Step Admission Guide - Light/Dark Harmonized) */}
       {/* ========================================================================= */}
       <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        <div className="rounded-[3rem] p-8 sm:p-12 lg:p-16 bg-gradient-to-br from-neutral-900 via-zinc-950 to-black text-white border border-white/10 shadow-2xl relative overflow-hidden">
+        <div className="rounded-[3rem] p-8 sm:p-12 lg:p-16 bg-gradient-to-br from-orange-500/[0.04] via-card to-amber-500/[0.02] dark:from-neutral-900 dark:via-zinc-950 dark:to-black text-foreground dark:text-white border border-foreground/10 dark:border-white/10 shadow-2xl relative overflow-hidden">
           
           {/* Ambient Glow */}
           <div className="absolute top-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -749,14 +755,14 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             {/* Left: Steps Flow */}
             <div className="lg:col-span-7 space-y-8">
               <div>
-                <span className="px-4 py-1.5 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-400 text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span className="px-4 py-1.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 border border-orange-500/30 text-orange-600 dark:text-orange-400 text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 shadow-sm">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                   <span>সহজ ৩ ধাপের প্রক্রিয়া</span>
                 </span>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black mt-3 text-white tracking-tight">
-                  কীভাবে কোর্সে ভর্তি হবেন?
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black mt-3 text-foreground dark:text-white tracking-tight">
+                  কীভাবে কোর্সে <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">ভর্তি হবেন?</span>
                 </h2>
-                <p className="text-gray-400 text-sm sm:text-base mt-2 font-medium">
+                <p className="text-foreground/70 dark:text-gray-400 text-sm sm:text-base mt-2 font-medium leading-relaxed">
                   মাত্র ৩টি সহজ ধাপে ঘরে বসেই আপনার কাঙ্ক্ষিত কোর্সে যুক্ত হয়ে সেরা প্রস্তুতি শুরু করুন।
                 </p>
               </div>
@@ -774,14 +780,14 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
                   return (
                     <div key={st.id || idx} className="flex items-start gap-5 relative group">
-                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${colorClass} font-black text-lg flex items-center justify-center shrink-0 shadow-xl ring-4 ring-neutral-900 z-10 group-hover:scale-110 transition-transform`}>
+                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${colorClass} font-black text-lg flex items-center justify-center shrink-0 shadow-xl ring-4 ring-background dark:ring-neutral-900 z-10 group-hover:scale-110 transition-transform`}>
                         0{stepNum}
                       </div>
-                      <div className="p-5 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-orange-500/40 transition-colors flex-1 space-y-1">
-                        <h4 className="font-extrabold text-base sm:text-lg text-white group-hover:text-orange-400 transition-colors">
+                      <div className="p-5 rounded-2xl bg-card dark:bg-white/[0.04] border border-foreground/10 dark:border-white/10 hover:border-orange-500/40 transition-colors flex-1 space-y-1 shadow-md">
+                        <h4 className="font-extrabold text-base sm:text-lg text-foreground dark:text-white group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors">
                           {st.title}
                         </h4>
-                        <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-medium">
+                        <p className="text-xs sm:text-sm text-foreground/70 dark:text-gray-300 leading-relaxed font-medium">
                           {st.desc}
                         </p>
                       </div>
@@ -792,7 +798,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             </div>
 
             {/* Right: Quick Counseling & Payment Widget */}
-            <div className="lg:col-span-5 p-8 sm:p-10 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl shadow-2xl space-y-6 text-center relative overflow-hidden">
+            <div className="lg:col-span-5 p-8 sm:p-10 rounded-3xl bg-card/90 dark:bg-white/[0.03] border border-foreground/10 dark:border-white/10 backdrop-blur-xl shadow-2xl space-y-6 text-center relative overflow-hidden">
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-orange-500/15 rounded-full blur-2xl pointer-events-none" />
               
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center mx-auto shadow-xl shadow-orange-500/30">
@@ -800,13 +806,13 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               </div>
 
               <div>
-                <span className="px-3 py-1 rounded-full bg-white/10 text-orange-400 text-xs font-extrabold uppercase tracking-wider">
+                <span className="px-3 py-1 rounded-full bg-orange-500/10 dark:bg-white/10 text-orange-600 dark:text-orange-400 text-xs font-extrabold uppercase tracking-wider">
                   হেল্প ও ভর্তি সহায়তা
                 </span>
-                <h3 className="text-xl sm:text-2xl font-black text-white mt-2">
+                <h3 className="text-xl sm:text-2xl font-black text-foreground dark:text-white mt-2">
                   ভর্তি সংক্রান্ত যেকোনো তথ্যে
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-300 mt-1 font-medium">
+                <p className="text-xs sm:text-sm text-foreground/70 dark:text-gray-300 mt-1 font-medium">
                   আমাদের এক্সপার্ট কাউন্সিলরদের সাথে সরাসরি কথা বলে সঠিক কোর্স বেছে নিন
                 </p>
               </div>
@@ -833,13 +839,13 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 )}
               </div>
 
-              <div className="pt-4 border-t border-white/10">
-                <p className="text-[11px] text-gray-400 font-bold mb-2">সমর্থিত পেমেন্ট মাধ্যমসমূহ</p>
-                <div className="flex items-center justify-center gap-2 flex-wrap text-xs text-gray-300 font-extrabold">
-                  <span className="px-2.5 py-1 rounded-lg bg-pink-500/20 text-pink-300 border border-pink-500/30">bKash</span>
-                  <span className="px-2.5 py-1 rounded-lg bg-orange-500/20 text-orange-300 border border-orange-500/30">Nagad</span>
-                  <span className="px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30">Rocket</span>
-                  <span className="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30">Cards</span>
+              <div className="pt-4 border-t border-foreground/10 dark:border-white/10">
+                <p className="text-[11px] text-foreground/60 dark:text-gray-400 font-bold mb-2">সমর্থিত পেমেন্ট মাধ্যমসমূহ</p>
+                <div className="flex items-center justify-center gap-2 flex-wrap text-xs text-foreground/80 dark:text-gray-300 font-extrabold">
+                  <span className="px-2.5 py-1 rounded-lg bg-pink-500/10 text-pink-600 dark:bg-pink-500/20 dark:text-pink-300 border border-pink-500/20 dark:border-pink-500/30">bKash</span>
+                  <span className="px-2.5 py-1 rounded-lg bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-300 border border-orange-500/20 dark:border-orange-500/30">Nagad</span>
+                  <span className="px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-300 border border-purple-500/20 dark:border-purple-500/30">Rocket</span>
+                  <span className="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300 border border-blue-500/20 dark:border-blue-500/30">Cards</span>
                 </div>
               </div>
 
@@ -968,7 +974,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       )}
 
       {/* ========================================================================= */}
-      {/* 6. আমাদের সম্পর্কে (About Section - Premium & Animated)                     */}
+      {/* 6. আমাদের সম্পর্কে (About Section - Light/Dark Harmonized & Premium)       */}
       {/* ========================================================================= */}
       <section className="py-20 sm:py-28 bg-foreground/[0.02] border-y border-foreground/10 relative overflow-hidden">
         {/* Ambient floating lights */}
@@ -980,18 +986,20 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
           <div className="flex items-center justify-center gap-3 sm:gap-6 mb-12">
             <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
-              {aboutTitle}
+              <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
+                {aboutTitle}
+              </span>
             </h2>
             <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
           </div>
 
-          <div className="p-8 sm:p-14 rounded-[3.5rem] bg-gradient-to-br from-neutral-900 via-zinc-950 to-black text-white border border-white/10 shadow-2xl relative overflow-hidden">
+          <div className="p-8 sm:p-14 rounded-[3.5rem] bg-gradient-to-br from-orange-500/[0.05] via-card to-amber-500/[0.03] dark:from-neutral-900 dark:via-zinc-950 dark:to-black text-foreground dark:text-white border border-foreground/10 dark:border-white/10 shadow-2xl relative overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
               
               {/* Left: Founder Avatar with glowing rings */}
               <div className="lg:col-span-5 text-center space-y-5">
                 <div className="relative w-64 h-64 sm:w-76 sm:h-76 mx-auto rounded-full bg-gradient-to-tr from-orange-500 via-amber-400 to-orange-600 p-2.5 flex items-center justify-center shadow-2xl shadow-orange-500/20 group">
-                  <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-neutral-950 bg-neutral-900 shadow-inner">
+                  <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-background dark:border-neutral-950 bg-card dark:bg-neutral-900 shadow-inner">
                     <img 
                       src={aboutPhoto} 
                       alt={profileData?.displayName || "Founder"} 
@@ -1000,23 +1008,23 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   </div>
 
                   {/* Floating Badges */}
-                  <div className="absolute -top-2 left-0 px-4 py-1.5 rounded-full bg-neutral-900/90 border border-orange-500/40 shadow-xl text-xs font-black text-orange-400 backdrop-blur-md flex items-center gap-1.5">
+                  <div className="absolute -top-2 left-0 px-4 py-1.5 rounded-full bg-card/90 dark:bg-neutral-900/90 border border-orange-500/40 shadow-xl text-xs font-black text-orange-600 dark:text-orange-400 backdrop-blur-md flex items-center gap-1.5">
                     <span>🏆</span>
                     <span>চিফ মেন্টর</span>
                   </div>
 
-                  <div className="absolute -bottom-2 right-0 px-4 py-1.5 rounded-full bg-neutral-900/90 border border-amber-500/40 shadow-xl text-xs font-black text-amber-300 backdrop-blur-md flex items-center gap-1.5">
+                  <div className="absolute -bottom-2 right-0 px-4 py-1.5 rounded-full bg-card/90 dark:bg-neutral-900/90 border border-amber-500/40 shadow-xl text-xs font-black text-amber-600 dark:text-amber-300 backdrop-blur-md flex items-center gap-1.5">
                     <span>⚡</span>
                     <span>১০+ বছর অভিজ্ঞতা</span>
                   </div>
                 </div>
 
-                <div className="inline-block px-8 py-3.5 rounded-2xl bg-white/[0.05] border border-white/10 shadow-xl text-center backdrop-blur-md">
+                <div className="inline-block px-8 py-3.5 rounded-2xl bg-card/90 dark:bg-white/[0.05] border border-foreground/10 dark:border-white/10 shadow-xl text-center backdrop-blur-md">
                   <div className="flex items-center justify-center gap-2">
-                    <h4 className="text-xl font-black text-white">{profileData?.displayName || 'Instructor Name'}</h4>
-                    <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
+                    <h4 className="text-xl font-black text-foreground dark:text-white">{profileData?.displayName || 'Instructor Name'}</h4>
+                    <CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" />
                   </div>
-                  <p className="text-xs text-orange-400 font-bold mt-1 tracking-wide">
+                  <p className="text-xs text-orange-600 dark:text-orange-400 font-bold mt-1 tracking-wide">
                     {founderRole}
                   </p>
                 </div>
@@ -1024,46 +1032,46 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
               {/* Right: Story & Animated Stats */}
               <div className="lg:col-span-7 space-y-6">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-black uppercase tracking-wider">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 text-xs font-black uppercase tracking-wider">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                   <span>স্বপ্ন ছোঁয়ার প্রস্তুতি</span>
                 </div>
 
-                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-[1.25] tracking-tight">
+                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground dark:text-white leading-[1.25] tracking-tight">
                   {aboutHeadline}
                 </h3>
 
                 <div className="relative">
                   <Quote className="w-8 h-8 text-orange-500/20 absolute -top-4 -left-3 pointer-events-none" />
-                  <p className="text-gray-300 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-medium pl-4 border-l-2 border-orange-500/40">
+                  <p className="text-foreground/75 dark:text-gray-300 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-medium pl-4 border-l-2 border-orange-500/40">
                     {aboutBio}
                   </p>
                 </div>
 
                 {/* 3 Rich Animated Stats Cards */}
                 <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-4">
-                  <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-orange-500/40 shadow-xl transition-all text-center group hover:-translate-y-1">
-                    <div className="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-orange-500/40 shadow-md hover:shadow-xl transition-all text-center group hover:-translate-y-1">
+                    <div className="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-600 dark:text-orange-400 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
                       <Users className="w-4 h-4" />
                     </div>
-                    <div className="text-xl sm:text-2xl md:text-3xl font-black text-orange-400">১০,০০০+</div>
-                    <div className="text-[11px] sm:text-xs font-bold text-gray-400 mt-1 uppercase tracking-wider">মোট শিক্ষার্থী</div>
+                    <div className="text-xl sm:text-2xl md:text-3xl font-black text-orange-600 dark:text-orange-400">১০,০০০+</div>
+                    <div className="text-[11px] sm:text-xs font-bold text-foreground/60 dark:text-gray-400 mt-1 uppercase tracking-wider">মোট শিক্ষার্থী</div>
                   </div>
 
-                  <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-emerald-500/40 shadow-xl transition-all text-center group hover:-translate-y-1">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-emerald-500/40 shadow-md hover:shadow-xl transition-all text-center group hover:-translate-y-1">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
                       <Trophy className="w-4 h-4" />
                     </div>
-                    <div className="text-xl sm:text-2xl md:text-3xl font-black text-emerald-400">৯৯%</div>
-                    <div className="text-[11px] sm:text-xs font-bold text-gray-400 mt-1 uppercase tracking-wider">সফলতার হার</div>
+                    <div className="text-xl sm:text-2xl md:text-3xl font-black text-emerald-600 dark:text-emerald-400">৯৯%</div>
+                    <div className="text-[11px] sm:text-xs font-bold text-foreground/60 dark:text-gray-400 mt-1 uppercase tracking-wider">সফলতার হার</div>
                   </div>
 
-                  <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-amber-500/40 shadow-xl transition-all text-center group hover:-translate-y-1">
-                    <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-amber-500/40 shadow-md hover:shadow-xl transition-all text-center group hover:-translate-y-1">
+                    <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
                       <Video className="w-4 h-4" />
                     </div>
-                    <div className="text-xl sm:text-2xl md:text-3xl font-black text-amber-400">৫০০+</div>
-                    <div className="text-[11px] sm:text-xs font-bold text-gray-400 mt-1 uppercase tracking-wider">মোট ক্লাস লেকচার</div>
+                    <div className="text-xl sm:text-2xl md:text-3xl font-black text-amber-600 dark:text-amber-400">৫০০+</div>
+                    <div className="text-[11px] sm:text-xs font-bold text-foreground/60 dark:text-gray-400 mt-1 uppercase tracking-wider">মোট ক্লাস লেকচার</div>
                   </div>
                 </div>
               </div>
@@ -1103,12 +1111,16 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               </div>
 
               {contactImage && (
-                <div className="relative w-full sm:w-80 md:w-96 lg:w-[380px] h-48 sm:h-56 md:h-64 lg:h-72 -mb-6 lg:-mb-10 flex-shrink-0 flex items-end justify-center lg:justify-end pointer-events-none">
-                  <img 
-                    src={contactImage} 
-                    alt="Support Representative" 
-                    className="w-full h-full object-contain object-bottom drop-shadow-[0_20px_30px_rgba(0,0,0,0.8)]" 
-                  />
+                <div className="relative w-full sm:w-80 md:w-96 lg:w-[380px] h-48 sm:h-56 md:h-64 lg:h-72 flex-shrink-0 flex items-end justify-center lg:justify-end pointer-events-none -mb-6 lg:-mb-10">
+                  <div className="relative w-full h-full">
+                    <img 
+                      src={contactImage} 
+                      alt="Support Representative" 
+                      className="w-full h-full object-contain object-bottom drop-shadow-[0_20px_30px_rgba(0,0,0,0.8)]" 
+                    />
+                    {/* Bottom-to-top shadow / fade overlay so feet seamlessly fade into the background */}
+                    <div className="absolute inset-x-0 bottom-0 h-16 sm:h-20 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-transparent pointer-events-none" />
+                  </div>
                 </div>
               )}
             </div>
@@ -1289,10 +1301,10 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       </section>
 
       {/* ========================================================================= */}
-      {/* 8. ট্রাস্ট ও কল-টু-অ্যাকশন ব্যানার (Equal Height & Image Slider)            */}
+      {/* 8. ট্রাস্ট ও কল-টু-অ্যাকশন ব্যানার (Light/Dark Harmonized & Slider)         */}
       {/* ========================================================================= */}
       <section className="py-16 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        <div className="rounded-[3.5rem] p-8 sm:p-14 lg:p-16 bg-gradient-to-br from-neutral-900 via-zinc-950 to-black text-white border-2 border-orange-500/30 shadow-2xl relative overflow-hidden">
+        <div className="rounded-[3.5rem] p-8 sm:p-14 lg:p-16 bg-gradient-to-br from-orange-500/[0.06] via-card to-amber-500/[0.03] dark:from-neutral-900 dark:via-zinc-950 dark:to-black text-foreground dark:text-white border-2 border-orange-500/30 shadow-2xl relative overflow-hidden">
           
           {/* Ambient Glow */}
           <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-96 h-96 bg-orange-500/15 rounded-full blur-3xl pointer-events-none" />
@@ -1302,34 +1314,34 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             {/* Left Content Column */}
             <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
               <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-black uppercase tracking-wider">
-                  <Award className="w-3.5 h-3.5 text-amber-300" />
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 text-xs font-black uppercase tracking-wider">
+                  <Award className="w-3.5 h-3.5 text-amber-500" />
                   <span>শীর্ষস্থানীয় এডটেক একাডেমি</span>
                 </div>
 
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-[1.2] tracking-tight">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground dark:text-white leading-[1.2] tracking-tight">
                   {cleanTrustTitle}{' '}
-                  <span className="bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
                     {trustHighlight}
                   </span>{' '}
                   একটি আস্থার নাম
                 </h2>
 
-                <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-medium">
+                <p className="text-foreground/75 dark:text-gray-300 text-sm sm:text-base leading-relaxed font-medium">
                   {trustSubtitle}
                 </p>
 
-                <div className="flex items-center gap-3 flex-wrap text-xs font-bold text-gray-300 pt-1">
-                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.05] border border-white/10">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <div className="flex items-center gap-3 flex-wrap text-xs font-bold text-foreground/80 dark:text-gray-300 pt-1">
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-foreground/[0.04] dark:bg-white/[0.05] border border-foreground/10 dark:border-white/10">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
                     <span>১০০% লাইভ ইন্টারঅ্যাকশন</span>
                   </span>
-                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.05] border border-white/10">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-foreground/[0.04] dark:bg-white/[0.05] border border-foreground/10 dark:border-white/10">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
                     <span>রিভিশন ও এক্সাম ব্যাচ</span>
                   </span>
-                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.05] border border-white/10">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-foreground/[0.04] dark:bg-white/[0.05] border border-foreground/10 dark:border-white/10">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
                     <span>ডেডিকেটেড মেন্টরশিপ</span>
                   </span>
                 </div>
@@ -1346,7 +1358,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
                 <a
                   href={trustFreeLink}
-                  className="px-8 py-4 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/20 text-white font-black text-sm transition-all hover:scale-105 backdrop-blur-md cursor-pointer"
+                  className="px-8 py-4 rounded-2xl bg-foreground/5 hover:bg-foreground/10 dark:bg-white/[0.08] dark:hover:bg-white/[0.15] border border-foreground/15 dark:border-white/20 text-foreground dark:text-white font-black text-sm transition-all hover:scale-105 backdrop-blur-md cursor-pointer"
                 >
                   {trustFreeBtnText}
                 </a>
@@ -1355,7 +1367,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
             {/* Right Equal-Height Image Slider Column */}
             <div className="lg:col-span-5 flex flex-col">
-              <div className="relative w-full h-full min-h-[360px] sm:min-h-[420px] rounded-3xl overflow-hidden shadow-2xl border-2 border-white/20 bg-gradient-to-tr from-orange-500/20 via-white/5 to-transparent group flex flex-col justify-between">
+              <div className="relative w-full h-full min-h-[360px] sm:min-h-[420px] rounded-3xl overflow-hidden shadow-2xl border-2 border-foreground/10 dark:border-white/20 bg-gradient-to-tr from-orange-500/20 via-foreground/5 dark:via-white/5 to-transparent group flex flex-col justify-between">
                 
                 {/* Active Image */}
                 <img 
@@ -1427,12 +1439,12 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       {/* 9. ফটো গ্যালারি ও সাফল্যের মুহূর্ত (Continuous Dual-Row Seamless Marquee)   */}
       {/* ========================================================================= */}
       {galleryPhotos.length > 0 && (
-        <section className="py-20 sm:py-28 bg-black text-white border-t border-white/10 overflow-hidden">
+        <section className="py-20 sm:py-28 bg-foreground/[0.02] dark:bg-black text-foreground dark:text-white border-t border-foreground/10 dark:border-white/10 overflow-hidden">
           
           <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 mb-14 text-center">
             <div className="flex items-center justify-center gap-3 sm:gap-6 mb-3">
               <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
-              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white">
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground dark:text-white">
                 {profileData?.displayName || 'Physics Hunters'}-এর হাত ধরে{' '}
                 <span className="bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500 bg-clip-text text-transparent">
                   সাফল্যের পথে এগিয়ে চলেছে
@@ -1441,7 +1453,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
             </div>
 
-            <p className="text-gray-400 text-xs sm:text-sm font-medium">
+            <p className="text-foreground/60 dark:text-gray-400 text-xs sm:text-sm font-medium">
               {config.gallerySubtitle || 'আমাদের শিক্ষার্থীদের অর্জন ও স্মরণীয় মুহূর্তগুলো'}
             </p>
           </div>
@@ -1452,7 +1464,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 {row1Loop.map((photo: any, idx: number) => (
                   <div 
                     key={`row1-${idx}`} 
-                    className="relative w-64 sm:w-80 md:w-96 aspect-[16/10] rounded-2xl sm:rounded-3xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl flex-shrink-0 group"
+                    className="relative w-64 sm:w-80 md:w-96 aspect-[16/10] rounded-2xl sm:rounded-3xl overflow-hidden bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 shadow-2xl flex-shrink-0 group"
                   >
                     <img 
                       src={photo.imageUrl} 
@@ -1469,7 +1481,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 {row2Loop.map((photo: any, idx: number) => (
                   <div 
                     key={`row2-${idx}`} 
-                    className="relative w-64 sm:w-80 md:w-96 aspect-[16/10] rounded-2xl sm:rounded-3xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl flex-shrink-0 group"
+                    className="relative w-64 sm:w-80 md:w-96 aspect-[16/10] rounded-2xl sm:rounded-3xl overflow-hidden bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 shadow-2xl flex-shrink-0 group"
                   >
                     <img 
                       src={photo.imageUrl} 
@@ -1488,7 +1500,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       {/* 10. সাহায্যের প্রয়োজন? আমরা পাশে আছি                                       */}
       {/* ========================================================================= */}
       <section className="py-12 max-w-5xl mx-auto px-3.5 sm:px-6">
-        <div className="relative rounded-[2rem] p-6 sm:p-8 bg-background border border-foreground/10 shadow-2xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="relative rounded-[2rem] p-6 sm:p-8 bg-card border border-foreground/10 shadow-2xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
           
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 via-amber-500 to-blue-500" />
 
@@ -1499,7 +1511,9 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             <div>
               <h4 className="text-xl sm:text-2xl font-black text-foreground">
                 {helpBarTitle}{' '}
-                <span className="text-orange-500 font-black">আমরা পাশে আছি</span>
+                <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent font-black">
+                  আমরা পাশে আছি
+                </span>
               </h4>
               <p className="text-xs sm:text-sm text-foreground/60 mt-0.5 font-medium">
                 কোর্স সম্পর্কিত যেকোনো সমস্যা বা তথ্যের জন্য আমাদের সাথে যোগাযোগ করো
@@ -1558,12 +1572,12 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.92, y: 20 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                className="bg-neutral-950 border border-white/15 rounded-[2.5rem] w-full max-w-2xl overflow-hidden shadow-2xl shadow-orange-500/10 pointer-events-auto relative flex flex-col max-h-[90vh] text-white"
+                className="bg-card dark:bg-neutral-950 border border-foreground/10 dark:border-white/15 rounded-[2.5rem] w-full max-w-2xl overflow-hidden shadow-2xl shadow-orange-500/10 pointer-events-auto relative flex flex-col max-h-[90vh] text-foreground dark:text-white"
               >
                 {/* Close Button */}
                 <button
                   onClick={() => setSelectedTeacherModal(null)}
-                  className="absolute top-4 right-4 z-20 p-2.5 bg-black/60 hover:bg-black/90 backdrop-blur-md rounded-full text-white border border-white/10 transition-colors cursor-pointer"
+                  className="absolute top-4 right-4 z-20 p-2.5 bg-background/80 dark:bg-black/60 hover:bg-background dark:hover:bg-black/90 backdrop-blur-md rounded-full text-foreground dark:text-white border border-foreground/10 dark:border-white/10 transition-colors cursor-pointer shadow-md"
                   title="Close"
                 >
                   <X className="w-5 h-5" />
@@ -1572,7 +1586,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 {/* Header Banner */}
                 <div className="relative h-36 sm:h-44 bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 shrink-0 overflow-hidden">
                   <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.3),transparent_70%)]" />
-                  <div className="absolute bottom-3 right-4 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-xs font-bold text-amber-200 flex items-center gap-1.5">
+                  <div className="absolute bottom-3 right-4 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-xs font-bold text-amber-200 flex items-center gap-1.5 shadow-sm">
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>এক্সপার্ট ফ্যাকাল্টি প্রোফাইল</span>
                   </div>
@@ -1582,7 +1596,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 <div className="px-6 sm:px-8 relative -mt-16 sm:-mt-20 z-10">
                   <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
                     <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-full p-1.5 bg-gradient-to-tr from-orange-500 via-amber-400 to-orange-600 shadow-2xl shrink-0">
-                      <div className="w-full h-full rounded-full overflow-hidden border-4 border-neutral-950 bg-neutral-900">
+                      <div className="w-full h-full rounded-full overflow-hidden border-4 border-background dark:border-neutral-950 bg-card dark:bg-neutral-900">
                         <img
                           src={selectedTeacherModal.image || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(selectedTeacherModal.name)}
                           alt={selectedTeacherModal.name}
@@ -1592,13 +1606,13 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                     </div>
                     <div className="space-y-1 pb-1 flex-1">
                       <div className="flex items-center justify-center sm:justify-start gap-2">
-                        <h2 className="text-2xl sm:text-3xl font-black text-white">{selectedTeacherModal.name}</h2>
-                        <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
+                        <h2 className="text-2xl sm:text-3xl font-black text-foreground dark:text-white">{selectedTeacherModal.name}</h2>
+                        <CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" />
                       </div>
-                      <p className="text-sm sm:text-base font-bold text-orange-400">{selectedTeacherModal.role || 'Senior Faculty'}</p>
+                      <p className="text-sm sm:text-base font-bold text-orange-600 dark:text-orange-400">{selectedTeacherModal.role || 'Senior Faculty'}</p>
                       {selectedTeacherModal.university && (
-                        <div className="inline-flex items-center gap-1.5 text-xs text-gray-300 font-medium">
-                          <GraduationCap className="w-4 h-4 text-amber-400 shrink-0" />
+                        <div className="inline-flex items-center gap-1.5 text-xs text-foreground/70 dark:text-gray-300 font-medium">
+                          <GraduationCap className="w-4 h-4 text-amber-500 shrink-0" />
                           <span>{selectedTeacherModal.university}</span>
                         </div>
                       )}
@@ -1611,13 +1625,13 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   
                   {/* Subjects / Department */}
                   {selectedTeacherModal.subjects && (
-                    <div className="p-4 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center shrink-0">
+                    <div className="p-4 rounded-2xl bg-foreground/[0.04] dark:bg-white/[0.04] border border-foreground/10 dark:border-white/10 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-orange-500/15 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0">
                         <BookOpen className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">পাঠদানের বিষয়সমূহ</h4>
-                        <p className="text-sm sm:text-base font-extrabold text-white mt-0.5">{selectedTeacherModal.subjects}</p>
+                        <h4 className="text-xs font-bold text-foreground/60 dark:text-gray-400 uppercase tracking-wider">পাঠদানের বিষয়সমূহ</h4>
+                        <p className="text-sm sm:text-base font-extrabold text-foreground dark:text-white mt-0.5">{selectedTeacherModal.subjects}</p>
                       </div>
                     </div>
                   )}
@@ -1625,11 +1639,11 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   {/* Bio & Details */}
                   {selectedTeacherModal.bio && (
                     <div className="space-y-2">
-                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <User className="w-3.5 h-3.5 text-orange-400" />
+                      <h4 className="text-xs font-bold text-foreground/60 dark:text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-orange-500" />
                         <span>শিক্ষকের বিস্তারিত পরিচিতি ও অভিজ্ঞতা</span>
                       </h4>
-                      <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 text-gray-200 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-medium">
+                      <div className="p-5 rounded-2xl bg-foreground/[0.03] dark:bg-white/[0.03] border border-foreground/10 dark:border-white/10 text-foreground/90 dark:text-gray-200 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-medium">
                         {selectedTeacherModal.bio}
                       </div>
                     </div>
@@ -1637,19 +1651,19 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
                   {/* Highlights / Features */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 flex items-center gap-2.5 text-xs text-gray-300">
-                      <Award className="w-4 h-4 text-amber-400 shrink-0" />
+                    <div className="p-3.5 rounded-xl bg-foreground/[0.03] dark:bg-white/[0.02] border border-foreground/10 dark:border-white/10 flex items-center gap-2.5 text-xs text-foreground/80 dark:text-gray-300">
+                      <Award className="w-4 h-4 text-amber-500 shrink-0" />
                       <span>অভিজ্ঞ ও পেশাদার মেন্টরশিপ</span>
                     </div>
-                    <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 flex items-center gap-2.5 text-xs text-gray-300">
-                      <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <div className="p-3.5 rounded-xl bg-foreground/[0.03] dark:bg-white/[0.02] border border-foreground/10 dark:border-white/10 flex items-center gap-2.5 text-xs text-foreground/80 dark:text-gray-300">
+                      <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
                       <span>ভেরিফাইড একাডেমি ফ্যাকাল্টি</span>
                     </div>
                   </div>
 
                   {/* Social & Contact Channels */}
                   {(selectedTeacherModal.facebookUrl || selectedTeacherModal.youtubeUrl || selectedTeacherModal.email || selectedTeacherModal.phone) && (
-                    <div className="pt-4 border-t border-white/10 flex flex-wrap items-center gap-3">
+                    <div className="pt-4 border-t border-foreground/10 dark:border-white/10 flex flex-wrap items-center gap-3">
                       {selectedTeacherModal.facebookUrl && (
                         <a
                           href={selectedTeacherModal.facebookUrl}

@@ -181,11 +181,15 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
     { id: 's-3', stepNumber: 3, title: 'ক্লাস ও এক্সামে যুক্ত হোন', desc: 'ড্যাশবোর্ড থেকে তাৎক্ষণিক লাইভ ক্লাস ও এক্সামে অংশ নিন।' }
   ];
 
+  // 5.5 Institution & Faculty State
+  const isInstitution = profileData?.type === 'institution' || (profileData?.teachersRoster && profileData.teachersRoster.length > 0);
+  const teachersRoster = profileData?.teachersRoster || [];
+
   // 6. About Section
-  const aboutTitle = config.aboutTitle || 'আমাদের সম্পর্কে';
+  const aboutTitle = config.aboutTitle || (isInstitution ? 'আমাদের প্রতিষ্ঠান সম্পর্কে' : 'আমাদের সম্পর্কে');
   const aboutHeadline = config.aboutHeadline || `স্বপ্ন ছোঁয়ার আশা থাকলে সেই স্বপ্নের ভিত তৈরিতে সাথে আছে "${profileData?.displayName || 'আমাদের একাডেমি'}"`;
   const aboutBio = config.aboutBio || profileData?.bio || 'অনলাইন বিশ্ববিদ্যালয় ও বোর্ড পরীক্ষার প্রস্তুতির জন্য দেশসেরা প্ল্যাটফর্ম। ভর্তি প্রস্তুতি নেওয়া শিক্ষার্থীদের সঠিক দিকনির্দেশনা, নিয়মিত পরীক্ষা, মানসম্মত ক্লাস এবং ধারাবাহিক প্রস্তুতির মাধ্যমে নিজেদের লক্ষ্যে পৌঁছাতে আমরা নিরলসভাবে কাজ করে যাচ্ছি।';
-  const founderRole = config.founderTitle || 'প্রতিষ্ঠাতা ও পরিচালক';
+  const founderRole = config.founderTitle || (isInstitution ? 'প্রতিষ্ঠাতা ও পরিচালক' : 'চিফ মেন্টর ও পরিচালক');
   const aboutPhoto = config.aboutPhoto || profileData?.profilePhoto || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix';
   const aboutStats = config.aboutStats && config.aboutStats.length > 0 ? config.aboutStats : [
     { id: 'st-1', label: 'Courses', value: `${courses.length || 10}+` },
@@ -738,6 +742,117 @@ export default function TeacherPhysicsHuntersStorefrontPage({ params }: { params
           </div>
         </div>
       </section>
+
+      {/* ========================================================================= */}
+      {/* 5.5 আমাদের শিক্ষক মণ্ডলী (Faculty Showcase for Institutions)              */}
+      {/* ========================================================================= */}
+      {isInstitution && teachersRoster.length > 0 && (
+        <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-500/10 text-orange-500 text-xs font-extrabold uppercase tracking-wider">
+              <Users className="w-3.5 h-3.5" />
+              <span>Expert Faculty & Mentors</span>
+            </div>
+
+            <div className="flex items-center justify-center gap-3 sm:gap-6 mb-3">
+              <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
+                আমাদের <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">শিক্ষক মণ্ডলী</span>
+              </h2>
+              <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
+            </div>
+
+            <p className="text-foreground/75 text-sm sm:text-base max-w-xl mx-auto">
+              দেশের সেরা বিশ্ববিদ্যালয় ও শীর্ষস্থানীয় প্রতিষ্ঠানসমূহের অভিজ্ঞ মেন্টরদের সাথে নাও তোমার সেরা প্রস্তুতি
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {teachersRoster.map((teacher: any, idx: number) => (
+              <div
+                key={teacher.id || idx}
+                className="group rounded-3xl bg-background border border-foreground/10 hover:border-orange-500/50 p-6 flex flex-col justify-between space-y-5 transition-all duration-300 shadow-md hover:shadow-2xl relative overflow-hidden"
+              >
+                {/* Top subtle glow */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-orange-500/20 transition-colors" />
+
+                <div>
+                  {/* Teacher Image Avatar */}
+                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full p-1 bg-gradient-to-tr from-orange-500 via-amber-500 to-orange-400 shadow-xl mb-4">
+                    <div className="w-full h-full rounded-full overflow-hidden border-2 border-background bg-foreground/10">
+                      <img
+                        src={teacher.image || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(teacher.name)}
+                        alt={teacher.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Name & Role */}
+                  <div className="text-center space-y-1">
+                    <h3 className="font-extrabold text-base sm:text-lg text-foreground group-hover:text-orange-500 transition-colors line-clamp-1">
+                      {teacher.name}
+                    </h3>
+                    <p className="text-xs font-bold text-orange-500 line-clamp-1">
+                      {teacher.role || 'Senior Faculty'}
+                    </p>
+                    {teacher.university && (
+                      <div className="inline-flex items-center gap-1 text-[11px] text-foreground/60 font-medium">
+                        <GraduationCap className="w-3.5 h-3.5 text-foreground/40 shrink-0" />
+                        <span className="truncate">{teacher.university}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Subjects Taught Pill */}
+                  {teacher.subjects && (
+                    <div className="mt-3 text-center">
+                      <span className="inline-block px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/20 text-[11px] font-semibold max-w-full truncate">
+                        📚 {teacher.subjects}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Bio if available */}
+                  {teacher.bio && (
+                    <p className="text-xs text-foreground/70 mt-3 text-center line-clamp-2 leading-relaxed">
+                      {teacher.bio}
+                    </p>
+                  )}
+                </div>
+
+                {/* Social Links Footer */}
+                {(teacher.facebookUrl || teacher.youtubeUrl) && (
+                  <div className="pt-3 border-t border-foreground/10 flex items-center justify-center gap-2">
+                    {teacher.facebookUrl && (
+                      <a
+                        href={teacher.facebookUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="w-8 h-8 rounded-full bg-foreground/5 hover:bg-blue-600 hover:text-white flex items-center justify-center text-foreground/70 transition-colors text-xs font-bold"
+                        title="Facebook"
+                      >
+                        f
+                      </a>
+                    )}
+                    {teacher.youtubeUrl && (
+                      <a
+                        href={teacher.youtubeUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="w-8 h-8 rounded-full bg-foreground/5 hover:bg-red-600 hover:text-white flex items-center justify-center text-foreground/70 transition-colors text-xs"
+                        title="YouTube"
+                      >
+                        <Video className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ========================================================================= */}
       {/* 6. আমাদের সম্পর্কে (Contrasting Section Background & Separator Borders)     */}

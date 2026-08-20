@@ -36,7 +36,14 @@ import {
   ArrowLeft,
   Flame,
   Target,
-  Send
+  Send,
+  Building2,
+  User,
+  GraduationCap,
+  Upload,
+  Edit2,
+  Camera,
+  X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -48,8 +55,42 @@ export default function TeacherHomePageBuilderPage() {
   const [saving, setSaving] = useState(false);
   const [courses, setCourses] = useState<{ id: string; title: string }[]>([]);
   const [activeTab, setActiveTab] = useState<
-    'sliders' | 'quickCards' | 'categories' | 'features' | 'admission' | 'about' | 'contact' | 'trustBanner' | 'gallery' | 'helpBar'
-  >('sliders');
+    'branding' | 'faculty' | 'sliders' | 'quickCards' | 'categories' | 'features' | 'admission' | 'about' | 'contact' | 'trustBanner' | 'gallery' | 'helpBar'
+  >('branding');
+
+  // 0. Branding & Identity State
+  const [profileType, setProfileType] = useState<'individual' | 'institution'>('individual');
+  const [displayName, setDisplayName] = useState('');
+  const [headline, setHeadline] = useState('');
+  const [bio, setBio] = useState('');
+  const [profilePhoto, setProfilePhoto] = useState('https://api.dicebear.com/7.x/avataaars/svg?seed=Felix');
+  const [coverPhoto, setCoverPhoto] = useState('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop');
+  const [uploadingProfilePhoto, setUploadingProfilePhoto] = useState(false);
+  const [uploadingCoverPhoto, setUploadingCoverPhoto] = useState(false);
+
+  // 0.1 Faculty / Teachers Roster State (For Institutions)
+  const [teachersRoster, setTeachersRoster] = useState<Array<{
+    id: string;
+    name: string;
+    image: string;
+    university: string;
+    subjects: string;
+    role?: string;
+    bio?: string;
+    facebookUrl?: string;
+    youtubeUrl?: string;
+  }>>([]);
+  const [isAddingFaculty, setIsAddingFaculty] = useState(false);
+  const [editingFacultyId, setEditingFacultyId] = useState<string | null>(null);
+  const [facultyName, setFacultyName] = useState('');
+  const [facultyRole, setFacultyRole] = useState('');
+  const [facultyUniversity, setFacultyUniversity] = useState('');
+  const [facultySubjects, setFacultySubjects] = useState('');
+  const [facultyBio, setFacultyBio] = useState('');
+  const [facultyImage, setFacultyImage] = useState('');
+  const [facultyFacebook, setFacultyFacebook] = useState('');
+  const [facultyYoutube, setFacultyYoutube] = useState('');
+  const [uploadingFacultyImg, setUploadingFacultyImg] = useState(false);
 
   // 1. Sliders State
   const [heroSliders, setHeroSliders] = useState<
@@ -177,11 +218,23 @@ export default function TeacherHomePageBuilderPage() {
         });
         setCourses(courseList);
 
-        // Fetch existing home page config
+        // Fetch existing teacher profile & home page config
         const profileRef = doc(db, 'teacherProfiles', user.uid);
         const profileSnap = await getDoc(profileRef);
         if (profileSnap.exists()) {
           const data = profileSnap.data();
+          if (data.type) setProfileType(data.type);
+          if (data.displayName) setDisplayName(data.displayName);
+          else if (user.displayName) setDisplayName(user.displayName);
+          if (data.headline) setHeadline(data.headline);
+          if (data.bio) setBio(data.bio);
+          if (data.profilePhoto || data.photoUrl) setProfilePhoto(data.profilePhoto || data.photoUrl);
+          else if (user.photoURL) setProfilePhoto(user.photoURL);
+          if (data.coverPhoto) setCoverPhoto(data.coverPhoto);
+          if (data.teachersRoster && Array.isArray(data.teachersRoster)) {
+            setTeachersRoster(data.teachersRoster);
+          }
+
           const config = data.homePageConfig;
           if (config) {
             if (config.heroSliders && config.heroSliders.length > 0) setHeroSliders(config.heroSliders);
@@ -200,7 +253,7 @@ export default function TeacherHomePageBuilderPage() {
             if (config.founderTitle) setFounderTitle(config.founderTitle);
             if (config.aboutBio) setAboutBio(config.aboutBio);
             if (config.aboutPhoto) setAboutPhoto(config.aboutPhoto);
-            else if (data.profilePhoto) setAboutPhoto(data.profilePhoto);
+            else if (data.profilePhoto || data.photoUrl) setAboutPhoto(data.profilePhoto || data.photoUrl);
             if (config.aboutStats && config.aboutStats.length > 0) setAboutStats(config.aboutStats);
             if (config.contactTitle) setContactTitle(config.contactTitle);
             if (config.contactPhone) setContactPhone(config.contactPhone);
@@ -222,8 +275,14 @@ export default function TeacherHomePageBuilderPage() {
             if (config.gallerySubtitle) setGallerySubtitle(config.gallerySubtitle);
             if (config.helpBarTitle) setHelpBarTitle(config.helpBarTitle);
             if (config.helpBarPhone) setHelpBarPhone(config.helpBarPhone);
-          } else if (data.profilePhoto) {
-            setAboutPhoto(data.profilePhoto);
+          } else if (data.profilePhoto || data.photoUrl) {
+            setAboutPhoto(data.profilePhoto || data.photoUrl);
+          }
+        } else {
+          if (user.displayName) setDisplayName(user.displayName);
+          if (user.photoURL) {
+            setProfilePhoto(user.photoURL);
+            setAboutPhoto(user.photoURL);
           }
         }
       } catch (err) {
@@ -282,7 +341,24 @@ export default function TeacherHomePageBuilderPage() {
       };
 
       const profileRef = doc(db, 'teacherProfiles', user.uid);
-      await setDoc(profileRef, { homePageConfig: fullConfig }, { merge: true });
+      await setDoc(profileRef, { 
+        type: profileType,
+        displayName: displayName || user.displayName || 'Instructor',
+        headline: headline || '',
+        bio: bio || '',
+        profilePhoto,
+        photoUrl: profilePhoto,
+        coverPhoto,
+        teachersRoster,
+        homePageConfig: fullConfig 
+      }, { merge: true });
+
+      // Also update users collection if displayName or photo changed
+      await setDoc(doc(db, 'users', user.uid), {
+        displayName: displayName || user.displayName,
+        photoURL: profilePhoto || user.photoURL,
+        profilePhoto: profilePhoto || user.photoURL,
+      }, { merge: true }).catch(() => {});
 
       toast.success(locale === 'bn' ? 'হোম পেজের সেটিংস সফলভাবে সংরক্ষিত হয়েছে!' : 'Home page configuration saved successfully!');
     } catch (err) {
@@ -291,6 +367,118 @@ export default function TeacherHomePageBuilderPage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  // Profile Photo upload handler
+  const handleUploadProfilePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingProfilePhoto(true);
+    try {
+      const url = await uploadImageToImgBB(file);
+      setProfilePhoto(url);
+      if (!aboutPhoto || aboutPhoto.includes('dicebear')) setAboutPhoto(url);
+      toast.success(locale === 'bn' ? 'প্রোফাইল/লোগো ছবি আপলোড হয়েছে!' : 'Profile/Logo uploaded!');
+    } catch (err) {
+      toast.error(locale === 'bn' ? 'ছবি আপলোড ব্যর্থ হয়েছে' : 'Failed to upload photo');
+    } finally {
+      setUploadingProfilePhoto(false);
+    }
+  };
+
+  // Cover Photo upload handler
+  const handleUploadCoverPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingCoverPhoto(true);
+    try {
+      const url = await uploadImageToImgBB(file);
+      setCoverPhoto(url);
+      toast.success(locale === 'bn' ? 'কভার ব্যানার আপলোড হয়েছে!' : 'Cover photo uploaded!');
+    } catch (err) {
+      toast.error(locale === 'bn' ? 'ছবি আপলোড ব্যর্থ হয়েছে' : 'Failed to upload cover');
+    } finally {
+      setUploadingCoverPhoto(false);
+    }
+  };
+
+  // Faculty Photo upload handler
+  const handleUploadFacultyPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingFacultyImg(true);
+    try {
+      const url = await uploadImageToImgBB(file);
+      setFacultyImage(url);
+      toast.success(locale === 'bn' ? 'শিক্ষকের ছবি আপলোড হয়েছে!' : 'Teacher photo uploaded!');
+    } catch (err) {
+      toast.error(locale === 'bn' ? 'ছবি আপলোড ব্যর্থ হয়েছে' : 'Failed to upload image');
+    } finally {
+      setUploadingFacultyImg(false);
+    }
+  };
+
+  // Faculty Management Helpers
+  const resetFacultyForm = () => {
+    setIsAddingFaculty(false);
+    setEditingFacultyId(null);
+    setFacultyName('');
+    setFacultyRole('');
+    setFacultyUniversity('');
+    setFacultySubjects('');
+    setFacultyBio('');
+    setFacultyImage('');
+    setFacultyFacebook('');
+    setFacultyYoutube('');
+  };
+
+  const handleSaveFacultyMember = () => {
+    if (!facultyName.trim()) {
+      toast.error(locale === 'bn' ? 'শিক্ষকের নাম প্রয়োজন' : 'Teacher name is required');
+      return;
+    }
+    if (editingFacultyId) {
+      setTeachersRoster(prev => prev.map(t => t.id === editingFacultyId ? {
+        ...t,
+        name: facultyName,
+        role: facultyRole,
+        university: facultyUniversity,
+        subjects: facultySubjects,
+        bio: facultyBio,
+        image: facultyImage || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(facultyName),
+        facebookUrl: facultyFacebook,
+        youtubeUrl: facultyYoutube
+      } : t));
+      toast.success(locale === 'bn' ? 'শিক্ষকের তথ্য আপডেট হয়েছে!' : 'Teacher updated!');
+    } else {
+      const newTeacher = {
+        id: `faculty-${Date.now()}`,
+        name: facultyName,
+        role: facultyRole,
+        university: facultyUniversity,
+        subjects: facultySubjects,
+        bio: facultyBio,
+        image: facultyImage || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(facultyName),
+        facebookUrl: facultyFacebook,
+        youtubeUrl: facultyYoutube
+      };
+      setTeachersRoster(prev => [...prev, newTeacher]);
+      toast.success(locale === 'bn' ? 'নতুন শিক্ষক যুক্ত হয়েছেন!' : 'New teacher added!');
+    }
+    resetFacultyForm();
+  };
+
+  const handleEditFaculty = (teacher: any) => {
+    setEditingFacultyId(teacher.id);
+    setFacultyName(teacher.name || '');
+    setFacultyRole(teacher.role || '');
+    setFacultyUniversity(teacher.university || '');
+    setFacultySubjects(teacher.subjects || '');
+    setFacultyBio(teacher.bio || '');
+    setFacultyImage(teacher.image || '');
+    setFacultyFacebook(teacher.facebookUrl || '');
+    setFacultyYoutube(teacher.youtubeUrl || '');
+    setIsAddingFaculty(true);
   };
 
   // Slider image upload handler
@@ -388,16 +576,18 @@ export default function TeacherHomePageBuilderPage() {
   };
 
   const tabs = [
-    { id: 'sliders', label: '১. ব্যানার স্লাইডার', icon: Sliders },
-    { id: 'quickCards', label: '২. পেইড/ফ্রি কার্ডস', icon: Layers },
-    { id: 'categories', label: '৩. কোর্স ও ক্যাটাগরি', icon: Grid },
-    { id: 'features', label: '৪. প্রস্তুতিতে যা প্রয়োজন', icon: Award },
-    { id: 'admission', label: '৫. ভর্তি তথ্য', icon: Info },
-    { id: 'about', label: '৬. আমাদের সম্পর্কে', icon: Users },
-    { id: 'contact', label: '৭. যোগাযোগ ও সোশ্যাল লিঙ্ক', icon: Phone },
-    { id: 'trustBanner', label: '৮. আস্থার ব্যানার', icon: Flame },
-    { id: 'gallery', label: '৯. ফটো গ্যালারি', icon: ImageIcon },
-    { id: 'helpBar', label: '১০. হেল্পবার', icon: HelpCircle },
+    { id: 'branding', label: '১. ব্র্যান্ডিং ও পরিচিতি', icon: Building2 },
+    ...(profileType === 'institution' ? [{ id: 'faculty', label: '২. শিক্ষক মণ্ডলী', icon: Users }] : []),
+    { id: 'sliders', label: profileType === 'institution' ? '৩. ব্যানার স্লাইডার' : '২. ব্যানার স্লাইডার', icon: Sliders },
+    { id: 'quickCards', label: profileType === 'institution' ? '৪. পেইড/ফ্রি কার্ডস' : '৩. পেইড/ফ্রি কার্ডস', icon: Layers },
+    { id: 'categories', label: profileType === 'institution' ? '৫. কোর্স ও ক্যাটাগরি' : '৪. কোর্স ও ক্যাটাগরি', icon: Grid },
+    { id: 'features', label: profileType === 'institution' ? '৬. প্রস্তুতিতে যা প্রয়োজন' : '৫. প্রস্তুতিতে যা প্রয়োজন', icon: Award },
+    { id: 'admission', label: profileType === 'institution' ? '৭. ভর্তি তথ্য' : '৬. ভর্তি তথ্য', icon: Info },
+    { id: 'about', label: profileType === 'institution' ? '৮. আমাদের সম্পর্কে' : '৭. আমাদের সম্পর্কে', icon: Users },
+    { id: 'contact', label: profileType === 'institution' ? '৯. যোগাযোগ ও সোশ্যাল লিঙ্ক' : '৮. যোগাযোগ ও সোশ্যাল লিঙ্ক', icon: Phone },
+    { id: 'trustBanner', label: profileType === 'institution' ? '১০. আস্থার ব্যানার' : '৯. আস্থার ব্যানার', icon: Flame },
+    { id: 'gallery', label: profileType === 'institution' ? '১১. ফটো গ্যালারি' : '১০. ফটো গ্যালারি', icon: ImageIcon },
+    { id: 'helpBar', label: profileType === 'institution' ? '১২. হেল্পবার' : '১১. হেল্পবার', icon: HelpCircle },
   ];
 
   if (loading) {
@@ -562,13 +752,438 @@ export default function TeacherHomePageBuilderPage() {
         {/* Full Width Active Tab Form Container */}
         <div className="w-full bg-background border border-foreground/10 rounded-3xl p-6 sm:p-8 shadow-sm">
           
+          {/* TAB 0: BRANDING & IDENTITY */}
+          {activeTab === 'branding' && (
+            <div className="space-y-8">
+              <div className="border-b border-foreground/10 pb-4">
+                <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-orange-500" />
+                  <span>১. ব্র্যান্ডিং ও পরিচিতি (Branding & Identity)</span>
+                </h3>
+                <p className="text-xs text-foreground/60 mt-1">
+                  আপনার প্ল্যাটফর্ম বা অ্যাকাডেমির ধরন, ব্র্যান্ড লোগো, কভার ব্যানার এবং মূল পরিচয় নির্ধারণ করুন।
+                </p>
+              </div>
+
+              {/* Account Type Selector Cards */}
+              <div className="space-y-3">
+                <label className="text-xs font-bold text-foreground/80 block uppercase tracking-wider">
+                  প্ল্যাটফর্মের ধরন (Account Mode)
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Option 1: Individual Teacher */}
+                  <div
+                    onClick={() => setProfileType('individual')}
+                    className={`cursor-pointer p-5 rounded-2xl border-2 transition-all flex items-start gap-4 ${
+                      profileType === 'individual'
+                        ? 'border-orange-500 bg-orange-500/[0.06] shadow-lg shadow-orange-500/10'
+                        : 'border-foreground/10 bg-foreground/[0.02] hover:border-foreground/25'
+                    }`}
+                  >
+                    <div className={`p-3 rounded-xl ${profileType === 'individual' ? 'bg-orange-500 text-white' : 'bg-foreground/10 text-foreground/70'}`}>
+                      <User className="w-6 h-6" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-bold text-sm text-foreground">একক শিক্ষক (Individual Mentor)</h4>
+                        {profileType === 'individual' && <CheckCircle2 className="w-4 h-4 text-orange-500" />}
+                      </div>
+                      <p className="text-xs text-foreground/60 mt-1 leading-relaxed">
+                        ব্যক্তিগত শিক্ষক প্রোফাইল। হোম পেজে আপনার একক পরিচয়, শিক্ষাগত যোগ্যতা ও বায়ো প্রদর্শিত হবে।
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Option 2: Institution / Academy */}
+                  <div
+                    onClick={() => setProfileType('institution')}
+                    className={`cursor-pointer p-5 rounded-2xl border-2 transition-all flex items-start gap-4 ${
+                      profileType === 'institution'
+                        ? 'border-orange-500 bg-orange-500/[0.06] shadow-lg shadow-orange-500/10'
+                        : 'border-foreground/10 bg-foreground/[0.02] hover:border-foreground/25'
+                    }`}
+                  >
+                    <div className={`p-3 rounded-xl ${profileType === 'institution' ? 'bg-orange-500 text-white' : 'bg-foreground/10 text-foreground/70'}`}>
+                      <Building2 className="w-6 h-6" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-bold text-sm text-foreground">প্রতিষ্ঠান / একাডেমি (Institution / Academy)</h4>
+                        {profileType === 'institution' && <CheckCircle2 className="w-4 h-4 text-orange-500" />}
+                      </div>
+                      <p className="text-xs text-foreground/60 mt-1 leading-relaxed">
+                        একাধিক শিক্ষক ও কোচিং সেন্টার। হোম পেজে “শিক্ষক মণ্ডলী” সেকশন এবং কোর্সে শিক্ষক অ্যাসাইন করার সুবিধা পাবেন।
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Media / Photos Section (Cover Banner & Profile Photo / Logo) */}
+              <div className="space-y-6 pt-4 border-t border-foreground/10">
+                <h4 className="text-sm font-bold text-foreground">ব্র্যান্ড মিডিয়া ও ব্যানার</h4>
+
+                {/* Cover Banner */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-foreground/70 block">
+                    কভার ব্যানার ফটো (Cover Banner Photo) - ১২০০ × ৪০০ পিক্সেল রেকমেন্ডেড
+                  </label>
+                  <div className="relative aspect-[21/7] sm:aspect-[21/6] rounded-2xl overflow-hidden bg-foreground/5 border border-foreground/10 group">
+                    <img src={coverPhoto} alt="Cover Banner" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                      <label className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold cursor-pointer transition-all flex items-center gap-2 shadow-lg">
+                        {uploadingCoverPhoto ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
+                        <span>{uploadingCoverPhoto ? 'আপলোড হচ্ছে...' : 'কভার পরিবর্তন করুন'}</span>
+                        <input type="file" accept="image/*" onChange={handleUploadCoverPhoto} className="hidden" />
+                      </label>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={coverPhoto}
+                      onChange={(e) => setCoverPhoto(e.target.value)}
+                      placeholder="কভার ফটো URL"
+                      className="flex-1 px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                    <label className="px-3.5 py-2 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/20 text-xs font-bold cursor-pointer transition-colors shrink-0">
+                      <span>ফাইল সিলেক্ট</span>
+                      <input type="file" accept="image/*" onChange={handleUploadCoverPhoto} className="hidden" />
+                    </label>
+                  </div>
+                </div>
+
+                {/* Profile Photo / Brand Logo */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10">
+                  <div className="relative w-24 h-24 rounded-2xl overflow-hidden bg-foreground/10 border-2 border-orange-500/40 shrink-0 group">
+                    <img src={profilePhoto} alt="Profile / Logo" className="w-full h-full object-cover" />
+                    <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer">
+                      <Camera className="w-5 h-5 mb-1" />
+                      <span className="text-[10px] font-bold">পরিবর্তন</span>
+                      <input type="file" accept="image/*" onChange={handleUploadProfilePhoto} className="hidden" />
+                    </label>
+                  </div>
+
+                  <div className="flex-1 space-y-2">
+                    <div>
+                      <h5 className="text-xs font-bold text-foreground">
+                        {profileType === 'institution' ? 'প্রতিষ্ঠানের লোগো (Brand Logo)' : 'প্রোফাইল ছবি (Teacher Portrait)'}
+                      </h5>
+                      <p className="text-[11px] text-foreground/60 mt-0.5">
+                        PNG বা JPG ফরম্যাটে ১:১ স্কয়ার ছবি ব্যবহার করুন।
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={profilePhoto}
+                        onChange={(e) => setProfilePhoto(e.target.value)}
+                        placeholder="ছবির সরাসরি লিঙ্ক বা URL"
+                        className="flex-1 px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                      />
+                      <label className="px-4 py-2 rounded-xl bg-orange-500 text-white text-xs font-bold cursor-pointer hover:bg-orange-600 transition-colors flex items-center gap-1.5 shrink-0">
+                        {uploadingProfilePhoto ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                        <span>{uploadingProfilePhoto ? 'আপলোড হচ্ছে...' : 'ছবি আপলোড'}</span>
+                        <input type="file" accept="image/*" onChange={handleUploadProfilePhoto} className="hidden" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Basic Information */}
+              <div className="space-y-4 pt-4 border-t border-foreground/10">
+                <h4 className="text-sm font-bold text-foreground">প্রাথমিক তথ্য</h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                      {profileType === 'institution' ? 'প্রতিষ্ঠানের নাম (Institution Name) *' : 'শিক্ষকের নাম (Display Name) *'}
+                    </label>
+                    <input
+                      type="text"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      placeholder={profileType === 'institution' ? 'যেমন: SkyLearners Academy' : 'যেমন: Abu Abdullah Akash'}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-semibold"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                      {profileType === 'institution' ? 'ট্যাগলাইন বা স্লোগান (Tagline)' : 'পদবি বা বিষয় (Headline / Designation)'}
+                    </label>
+                    <input
+                      type="text"
+                      value={headline}
+                      onChange={(e) => setHeadline(e.target.value)}
+                      placeholder={profileType === 'institution' ? 'যেমন: Empowering Students to Succeed' : 'যেমন: Senior Physics Lecturer'}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-semibold"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                    সংক্ষিপ্ত পরিচিতি বা বায়ো (Short Bio / Overview)
+                  </label>
+                  <textarea
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    rows={3}
+                    placeholder="আপনার অভিজ্ঞতা, উদ্দেশ্য ও শিক্ষার্থীদের প্রতি বার্তা..."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 custom-scrollbar leading-relaxed"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 0.1: FACULTY / TEACHERS ROSTER (INSTITUTION MODE ONLY) */}
+          {activeTab === 'faculty' && profileType === 'institution' && (
+            <div className="space-y-6">
+              <div className="border-b border-foreground/10 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                    <Users className="w-5 h-5 text-orange-500" />
+                    <span>২. শিক্ষক মণ্ডলী ব্যবস্থাপনা (Our Faculty Roster)</span>
+                  </h3>
+                  <p className="text-xs text-foreground/60 mt-1">
+                    আপনার একাডেমির সকল শিক্ষক ও মেন্টরদের তালিকা তৈরি করুন। এরা হোম পেজে প্রদর্শিত হবে এবং কোর্সে সরাসরি অ্যাসাইন করা যাবে।
+                  </p>
+                </div>
+
+                {!isAddingFaculty && (
+                  <button
+                    type="button"
+                    onClick={() => { resetFacultyForm(); setIsAddingFaculty(true); }}
+                    className="px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-md transition-all shrink-0"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>+ নতুন শিক্ষক যোগ করুন</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Add / Edit Faculty Form Modal / Card */}
+              {isAddingFaculty && (
+                <div className="p-6 rounded-2xl bg-foreground/[0.03] border-2 border-orange-500/30 space-y-4 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between pb-3 border-b border-foreground/10">
+                    <h4 className="font-bold text-sm text-foreground flex items-center gap-2">
+                      <GraduationCap className="w-4 h-4 text-orange-500" />
+                      <span>{editingFacultyId ? 'শিক্ষকের তথ্য সম্পাদনা করুন' : 'নতুন শিক্ষক যোগ করুন'}</span>
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={resetFacultyForm}
+                      className="p-1 rounded-lg text-foreground/50 hover:text-foreground hover:bg-foreground/10"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                    {/* Photo upload */}
+                    <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-background border border-foreground/10">
+                      <div className="relative w-28 h-28 rounded-2xl overflow-hidden bg-foreground/10 border border-foreground/15">
+                        <img
+                          src={facultyImage || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(facultyName || 'Mentor')}
+                          alt="Faculty"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <label className="w-full py-2 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/20 text-xs font-bold cursor-pointer transition-colors flex items-center justify-center gap-1.5">
+                        {uploadingFacultyImg ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                        <span>{uploadingFacultyImg ? 'আপলোড হচ্ছে...' : 'ছবি আপলোড করুন'}</span>
+                        <input type="file" accept="image/*" onChange={handleUploadFacultyPhoto} className="hidden" />
+                      </label>
+                      <input
+                        type="text"
+                        value={facultyImage}
+                        onChange={(e) => setFacultyImage(e.target.value)}
+                        placeholder="বা ছবির URL দিন"
+                        className="w-full px-2.5 py-1.5 rounded-lg bg-background border border-foreground/10 text-[11px] focus:outline-none focus:border-orange-500"
+                      />
+                    </div>
+
+                    {/* Form Fields */}
+                    <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[11px] font-bold text-foreground/70 block mb-1">শিক্ষকের নাম *</label>
+                        <input
+                          type="text"
+                          value={facultyName}
+                          onChange={(e) => setFacultyName(e.target.value)}
+                          placeholder="যেমন: ড. রফিকুল ইসলাম"
+                          className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-semibold"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-foreground/70 block mb-1">পদবি / ভূমিকা (Role) *</label>
+                        <input
+                          type="text"
+                          value={facultyRole}
+                          onChange={(e) => setFacultyRole(e.target.value)}
+                          placeholder="যেমন: Senior Physics Instructor"
+                          className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-foreground/70 block mb-1">শিক্ষাগত ব্যাকগ্রাউন্ড / বিশ্ববিদ্যালয়</label>
+                        <input
+                          type="text"
+                          value={facultyUniversity}
+                          onChange={(e) => setFacultyUniversity(e.target.value)}
+                          placeholder="যেমন: BSc & MSc in Physics, BUET"
+                          className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-foreground/70 block mb-1">পাঠদানের বিষয় (Subjects / Classes)</label>
+                        <input
+                          type="text"
+                          value={facultySubjects}
+                          onChange={(e) => setFacultySubjects(e.target.value)}
+                          placeholder="যেমন: Physics 1st & 2nd Paper (HSC & Admission)"
+                          className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="text-[11px] font-bold text-foreground/70 block mb-1">সংক্ষিপ্ত পরিচিতি বা বায়ো</label>
+                        <textarea
+                          value={facultyBio}
+                          onChange={(e) => setFacultyBio(e.target.value)}
+                          rows={2}
+                          placeholder="অভিজ্ঞতা, পড়ানোর স্টাইল বা শিক্ষার্থীদের উদ্দেশ্যে বার্তা..."
+                          className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 custom-scrollbar"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-foreground/70 block mb-1">Facebook প্রোফাইল লিংক (ঐচ্ছিক)</label>
+                        <input
+                          type="text"
+                          value={facultyFacebook}
+                          onChange={(e) => setFacultyFacebook(e.target.value)}
+                          placeholder="https://facebook.com/..."
+                          className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-foreground/70 block mb-1">YouTube বা অন্যান্য লিংক (ঐচ্ছিক)</label>
+                        <input
+                          type="text"
+                          value={facultyYoutube}
+                          onChange={(e) => setFacultyYoutube(e.target.value)}
+                          placeholder="https://youtube.com/..."
+                          className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-foreground/10">
+                    <button
+                      type="button"
+                      onClick={resetFacultyForm}
+                      className="px-4 py-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-xs font-bold text-foreground/70 transition-colors"
+                    >
+                      বাতিল
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveFacultyMember}
+                      className="px-5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-md transition-all"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                      <span>{editingFacultyId ? 'আপডেট সম্পন্ন করুন' : 'তালিকায় যুক্ত করুন'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Faculty List Grid */}
+              {teachersRoster.length === 0 ? (
+                <div className="p-10 rounded-2xl bg-foreground/[0.02] border-2 border-dashed border-foreground/15 text-center space-y-3">
+                  <div className="w-14 h-14 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center mx-auto">
+                    <Users className="w-7 h-7" />
+                  </div>
+                  <h4 className="font-bold text-sm text-foreground">এখনও কোনো শিক্ষক যুক্ত করা হয়নি</h4>
+                  <p className="text-xs text-foreground/60 max-w-md mx-auto">
+                    আপনার একাডেমি বা প্ল্যাটফর্মের সম্মানিত শিক্ষক ও ইন্সট্রাক্টরদের যোগ করতে উপরের “+ নতুন শিক্ষক যোগ করুন” বাটনে ক্লিক করুন।
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {teachersRoster.map((teacher, idx) => (
+                    <div
+                      key={teacher.id || idx}
+                      className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 hover:border-orange-500/40 transition-all flex flex-col justify-between space-y-4 group"
+                    >
+                      <div className="flex items-start gap-3.5">
+                        <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-foreground/10 border border-foreground/15 shrink-0">
+                          <img
+                            src={teacher.image || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(teacher.name)}
+                            alt={teacher.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-bold text-sm text-foreground truncate">{teacher.name}</h4>
+                          <p className="text-xs text-orange-500 font-semibold truncate">{teacher.role || 'Instructor'}</p>
+                          {teacher.university && (
+                            <p className="text-[11px] text-foreground/60 truncate mt-0.5">{teacher.university}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {teacher.subjects && (
+                        <div className="px-3 py-1.5 rounded-lg bg-orange-500/10 text-orange-500 text-[11px] font-semibold truncate">
+                          📚 {teacher.subjects}
+                        </div>
+                      )}
+
+                      <div className="pt-2 border-t border-foreground/10 flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleEditFaculty(teacher)}
+                          className="p-1.5 rounded-lg bg-foreground/5 hover:bg-orange-500/10 text-foreground/70 hover:text-orange-500 text-xs font-bold transition-colors flex items-center gap-1"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                          <span>এডিট</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm(locale === 'bn' ? 'এই শিক্ষককে কি তালিকা থেকে মুছতে চান?' : 'Are you sure you want to remove this teacher?')) {
+                              setTeachersRoster(prev => prev.filter(t => t.id !== teacher.id));
+                            }
+                          }}
+                          className="p-1.5 rounded-lg bg-foreground/5 hover:bg-red-500/10 text-foreground/70 hover:text-red-500 transition-colors"
+                          title="Remove"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* TAB 1: HERO SLIDERS */}
           {activeTab === 'sliders' && (
             <div className="space-y-6">
               <div className="border-b border-foreground/10 pb-4">
                 <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <Sliders className="w-5 h-5 text-orange-500" />
-                  <span>১. ব্যানার ইমেজ স্লাইডার (Hero Carousel)</span>
+                  <span>{profileType === 'institution' ? '৩. ব্যানার ইমেজ স্লাইডার (Hero Carousel)' : '২. ব্যানার ইমেজ স্লাইডার (Hero Carousel)'}</span>
                 </h3>
                 <p className="text-xs text-foreground/60 mt-1">
                   এখানে আপলোড করা বড় ব্যানারগুলো আপনার হোম পেজের শীর্ষে স্লাইডারে ঘুরবে। ব্যানারে ক্লিক করলে শিক্ষার্থীকে নির্দিষ্ট কোর্সে নিয়ে যাওয়া হবে।

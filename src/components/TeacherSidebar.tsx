@@ -45,7 +45,6 @@ export default function TeacherSidebar() {
     { name: getLabel('overview', 'ওভারভিউ', 'Overview'), href: '/teacher-dashboard', icon: LayoutDashboard },
     { name: getLabel('courses', 'আমার কোর্স', 'My Courses'), href: '/teacher-dashboard/courses', icon: Video },
     { name: getLabel('homeBuilder', 'হোম বিল্ডার', 'Home Builder'), href: '/teacher-dashboard/home-builder', icon: Sparkles },
-    { name: getLabel('myWebsite', 'আমার ওয়েবসাইট', 'My Website'), href: '/teacher-dashboard/profile', icon: Globe },
     { name: getLabel('posts', 'পোস্ট ও নোটিশ', 'Posts & Notices'), href: '/teacher-dashboard/posts', icon: Megaphone },
     { name: getLabel('students', 'শিক্ষার্থীবৃন্দ', 'Students'), href: '/teacher-dashboard/students', icon: Users },
     { name: getLabel('earnings', 'উপার্জন ও হিসেব', 'Earnings'), href: '/teacher-dashboard/earnings', icon: DollarSign },
@@ -96,8 +95,8 @@ export default function TeacherSidebar() {
         {/* Hover Popover Menu */}
         <div className="absolute bottom-full left-4 right-4 mb-2 bg-background border border-foreground/10 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0 overflow-hidden z-50">
           <div className="p-2 space-y-1">
-            <Link href="/teacher-dashboard/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors">
-              <UserCircle className="w-4 h-4 text-foreground/70" /> View Profile
+            <Link href={user?.uid ? `/teachers/${user.uid}` : '/teacher-dashboard/home-builder'} target="_blank" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors">
+              <UserCircle className="w-4 h-4 text-foreground/70" /> View Live Profile
             </Link>
             <Link href="/teacher-dashboard/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors">
               <Settings className="w-4 h-4 text-foreground/70" /> Account Settings

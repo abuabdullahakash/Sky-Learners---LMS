@@ -5,10 +5,11 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import { Plus, Trash2, Save, Users, ImagePlus, User, Edit2 } from 'lucide-react';
+import { Plus, Trash2, Save, Users, ImagePlus, User, Edit2, Check, Sparkles, Building2, GraduationCap } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import Image from 'next/image';
 import { uploadImageToImgBB } from '@/lib/imgbb';
+import toast from 'react-hot-toast';
 
 type Instructor = {
   id: string;
@@ -35,6 +36,7 @@ export default function CourseInstructorsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [course, setCourse] = useState<any>(null);
   const [instructors, setInstructors] = useState<Instructor[]>([]);
+  const [facultyRoster, setFacultyRoster] = useState<any[]>([]);
 
   // New Instructor Form State
   const [isAdding, setIsAdding] = useState(false);
@@ -55,9 +57,10 @@ export default function CourseInstructorsPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchCourse = async () => {
+    const fetchCourseAndProfile = async () => {
       if (!user) return;
       try {
+        // Fetch course
         const docRef = doc(db, 'courses', courseId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
@@ -79,14 +82,58 @@ export default function CourseInstructorsPage() {
         } else {
           router.push('/teacher-dashboard/courses');
         }
+
+        // Fetch Academy / Teacher Profile to get faculty roster
+        const profileRef = doc(db, 'teacherProfiles', user.uid);
+        const profileSnap = await getDoc(profileRef);
+        if (profileSnap.exists()) {
+          const pData = profileSnap.data();
+          if (pData.teachersRoster && Array.isArray(pData.teachersRoster)) {
+            setFacultyRoster(pData.teachersRoster);
+          }
+        }
       } catch (err) {
-        console.error("Error fetching course", err);
+        console.error("Error fetching course or profile", err);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchCourse();
+    fetchCourseAndProfile();
   }, [user, courseId, router]);
+
+  // One-click assign from Faculty Roster
+  const handleAssignFromRoster = async (faculty: any) => {
+    const isAlreadyAdded = instructors.some(
+      (inst) => inst.name.trim().toLowerCase() === faculty.name.trim().toLowerCase()
+    );
+
+    if (isAlreadyAdded) {
+      toast('এই শিক্ষক ইতোমধ্যে কোর্সে যুক্ত আছেন।');
+      return;
+    }
+
+    try {
+      const newInstructor: Instructor = {
+        id: `roster-${faculty.id || Date.now()}`,
+        name: faculty.name,
+        background: faculty.university || 'Faculty Member',
+        role: faculty.role || 'Course Instructor',
+        photoUrl: faculty.image || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(faculty.name),
+        bio: faculty.bio || '',
+        responsibility: faculty.subjects ? `বিষয়: ${faculty.subjects}` : '',
+        facebookUrl: faculty.facebookUrl || '',
+        youtubeUrl: faculty.youtubeUrl || '',
+      };
+
+      const updated = [...instructors, newInstructor];
+      await updateDoc(doc(db, 'courses', courseId), { instructors: updated });
+      setInstructors(updated);
+      toast.success(`${faculty.name} কোর্সে যুক্ত হয়েছেন!`);
+    } catch (err) {
+      console.error('Error assigning from roster:', err);
+      toast.error('শিক্ষক যুক্ত করতে সমস্যা হয়েছে।');
+    }
+  };
 
   const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -247,6 +294,71 @@ export default function CourseInstructorsPage() {
           )}
         </div>
       </div>
+
+      {/* Faculty Roster Quick Assignment Widget (For Institutions) */}
+      {facultyRoster.length > 0 && (
+        <div className="p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-orange-500" />
+              <h3 className="font-bold text-sm text-foreground">
+                একাডেমির শিক্ষক মণ্ডলী থেকে নির্বাচন করুন (Assign from Faculty Roster)
+              </h3>
+            </div>
+            <span className="text-[11px] text-foreground/50">
+              ১-ক্লিকে কোর্সে শিক্ষক যুক্ত করুন
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+            {facultyRoster.map((fac: any, idx: number) => {
+              const isAssigned = instructors.some(
+                (inst) => inst.name.trim().toLowerCase() === fac.name.trim().toLowerCase()
+              );
+
+              return (
+                <div
+                  key={fac.id || idx}
+                  className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-all ${
+                    isAssigned
+                      ? 'bg-emerald-500/[0.04] border-emerald-500/30'
+                      : 'bg-background border-foreground/10 hover:border-orange-500/40'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="relative w-10 h-10 rounded-full overflow-hidden bg-foreground/10 border border-foreground/10 shrink-0">
+                      <img
+                        src={fac.image || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(fac.name)}
+                        alt={fac.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="font-bold text-xs text-foreground truncate">{fac.name}</h4>
+                      <p className="text-[11px] text-orange-500 truncate">{fac.role || fac.subjects || 'Faculty'}</p>
+                    </div>
+                  </div>
+
+                  {isAssigned ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-500 text-[11px] font-bold shrink-0">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>যুক্ত আছেন</span>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleAssignFromRoster(fac)}
+                      className="px-3 py-1 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-bold transition-colors shrink-0 shadow-sm"
+                    >
+                      + যুক্ত করুন
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {isAdding && (
         <form onSubmit={handleSaveInstructor} className="bg-background border border-foreground/10 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm space-y-6">

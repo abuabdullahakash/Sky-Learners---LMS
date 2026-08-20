@@ -528,11 +528,14 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       {/* ========================================================================= */}
       {/* 4. পূর্ণাঙ্গ প্রস্তুতিতে যা যা প্রয়োজন (Modern Bento Ecosystem Grid)         */}
       {/* ========================================================================= */}
-      <section className="py-20 sm:py-28 bg-foreground/[0.02] border-y border-foreground/10">
-        <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+      <section className="py-20 sm:py-28 bg-gradient-to-b from-background via-foreground/[0.02] to-background border-y border-foreground/10 relative overflow-hidden">
+        {/* Background ambient lighting */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-orange-500/10 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 relative z-10">
           
-          <div className="text-center max-w-3xl mx-auto mb-16 space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-500/10 text-orange-500 text-xs font-extrabold uppercase tracking-wider mb-1">
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/20 text-xs font-extrabold uppercase tracking-wider mb-1 shadow-sm">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Full Ecosystem</span>
             </div>
@@ -545,62 +548,152 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
             </div>
 
-            <p className="text-foreground/75 text-sm sm:text-base max-w-xl mx-auto">
+            <p className="text-foreground/75 text-sm sm:text-base max-w-xl mx-auto font-medium leading-relaxed">
               {featuresSubtitle}
             </p>
           </div>
 
           {/* Bento Grid Layout */}
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <div className="md:col-span-2 p-8 rounded-3xl bg-background border border-foreground/10 shadow-sm space-y-4 hover:border-orange-500/40 transition-colors">
-              <div className="w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center">
-                <Video className="w-6 h-6" />
+            
+            {/* Card 1 (Span 2) - Live & Recorded Classes */}
+            <div className="md:col-span-2 p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-orange-500/[0.08] via-background to-amber-500/[0.04] border border-orange-500/20 hover:border-orange-500/50 shadow-xl hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
+              
+              <div className="space-y-4 relative z-10">
+                <div className="flex items-center justify-between">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform">
+                    <Video className="w-7 h-7" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-orange-500/15 text-orange-500 text-xs font-bold border border-orange-500/30 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping" />
+                    <span>HD Live & Recording</span>
+                  </span>
+                </div>
+
+                <h3 className="text-2xl sm:text-3xl font-black text-foreground group-hover:text-orange-500 transition-colors">
+                  ইন্টারেক্টিভ লাইভ ও রেকর্ডেড ক্লাস
+                </h3>
+                <p className="text-foreground/75 text-sm sm:text-base leading-relaxed">
+                  প্রতিটি বিষয়ের কনসেপ্ট ক্লিয়ার করতে রয়েছে সর্বোচ্চ মানের ডিজিটাল স্মার্টবোর্ড লেকচার, লাইভ ডিসকাশন এবং আনলিমিটেড রিভিশনের সুযোগ।
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-foreground">ইন্টারেক্টিভ লাইভ ও রেকর্ডেড ক্লাস</h3>
-              <p className="text-foreground/70 text-sm leading-relaxed">
-                প্রতিটি বিষয়ের কনসেপ্ট ক্লিয়ার করতে রয়েছে সর্বোচ্চ মানের ভিডিও লেকচার ও লাইভ ডিসকাশন।
-              </p>
+
+              <div className="flex items-center gap-2 flex-wrap pt-2 relative z-10">
+                <span className="px-3.5 py-1.5 rounded-xl bg-background/80 border border-foreground/10 text-xs font-bold text-foreground/80 shadow-sm">
+                  ✨ 4K আল্ট্রা HD ক্লাস
+                </span>
+                <span className="px-3.5 py-1.5 rounded-xl bg-background/80 border border-foreground/10 text-xs font-bold text-foreground/80 shadow-sm">
+                  🎥 স্মার্টবোর্ড ডিজিটাল লেকচার
+                </span>
+                <span className="px-3.5 py-1.5 rounded-xl bg-background/80 border border-foreground/10 text-xs font-bold text-foreground/80 shadow-sm">
+                  🔄 আনলিমিটেড রিভিশন
+                </span>
+              </div>
             </div>
 
-            <div className="p-8 rounded-3xl bg-background border border-foreground/10 shadow-sm space-y-4 hover:border-orange-500/40 transition-colors">
-              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
-                <FileText className="w-6 h-6" />
+            {/* Card 2 - Online Exam & Leaderboard */}
+            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-500/[0.08] via-background to-blue-500/[0.02] border border-blue-500/20 hover:border-blue-500/50 shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
+              <div className="space-y-4 relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                  <FileText className="w-7 h-7" />
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-foreground group-hover:text-blue-500 transition-colors">
+                  অনলাইন এক্সাম ও লিডারবোর্ড
+                </h3>
+                <p className="text-foreground/75 text-sm leading-relaxed">
+                  নিয়মিত এমসিকিউ ও স্ট্যান্ডার্ড রিটেন পরীক্ষা দিয়ে দেশব্যাপী রিয়েলটাইম মেরিট লিস্টে নিজের অবস্থান যাচাই করুন।
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-foreground">অনলাইন এক্সাম ও লিডারবোর্ড</h3>
-              <p className="text-foreground/70 text-sm leading-relaxed">
-                নিয়মিত এমসিকিউ ও রিটেন পরীক্ষা দিয়ে দেশব্যাপী নিজের অবস্থান যাচাই করুন।
-              </p>
+
+              <div className="space-y-2 relative z-10 pt-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-foreground/80">
+                  <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />
+                  <span>তাৎক্ষণিক ফলাফল ও মেধা তালিকা</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs font-bold text-foreground/80">
+                  <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />
+                  <span>নেগেটিভ মার্কিং অ্যানালাইসিস</span>
+                </div>
+              </div>
             </div>
 
-            <div className="p-8 rounded-3xl bg-background border border-foreground/10 shadow-sm space-y-4 hover:border-orange-500/40 transition-colors">
-              <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center">
-                <BookOpen className="w-6 h-6" />
+            {/* Card 3 - Lecture Sheet & Practice Book */}
+            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-purple-500/[0.08] via-background to-purple-500/[0.02] border border-purple-500/20 hover:border-purple-500/50 shadow-xl hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
+              <div className="space-y-4 relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 text-white flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
+                  <BookOpen className="w-7 h-7" />
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-foreground group-hover:text-purple-500 transition-colors">
+                  লেকচার শিট ও প্র্যাকটিস বুক
+                </h3>
+                <p className="text-foreground/75 text-sm leading-relaxed">
+                  প্রতিটি চ্যাপ্টারের পূর্ণাঙ্গ টাইপভিত্তিক গোছানো রঙিন পিডিএফ নোটস ও স্ট্যান্ডার্ড প্রশ্নব্যাংক।
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-foreground">লেকচার শিট ও প্র্যাকটিস বুক</h3>
-              <p className="text-foreground/70 text-sm leading-relaxed">
-                প্রতিটি চ্যাপ্টারের গোছানো পিডিএফ নোটস ও স্ট্যান্ডার্ড প্রশ্নব্যাংক।
-              </p>
+
+              <div className="space-y-2 relative z-10 pt-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-foreground/80">
+                  <CheckCircle2 className="w-4 h-4 text-purple-500 shrink-0" />
+                  <span>প্রিন্ট উপযোগী অধ্যায়ভিত্তিক PDF</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs font-bold text-foreground/80">
+                  <CheckCircle2 className="w-4 h-4 text-purple-500 shrink-0" />
+                  <span>টপিকওয়াইজ ফর্মুলা শিট</span>
+                </div>
+              </div>
             </div>
 
-            <div className="p-8 rounded-3xl bg-background border border-foreground/10 shadow-sm space-y-4 hover:border-orange-500/40 transition-colors">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
-                <MessageCircle className="w-6 h-6" />
+            {/* Card 4 - 24/7 Doubt Solving */}
+            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-emerald-500/[0.08] via-background to-emerald-500/[0.02] border border-emerald-500/20 hover:border-emerald-500/50 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
+              <div className="space-y-4 relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+                  <MessageCircle className="w-7 h-7" />
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-foreground group-hover:text-emerald-500 transition-colors">
+                  ২৪/৭ ডাউট সলভিং
+                </h3>
+                <p className="text-foreground/75 text-sm leading-relaxed">
+                  পড়াশোনায় যেকোনো সমস্যায় সরাসরি ডেডিকেটেড এক্সপার্ট মেন্টরদের থেকে দ্রুত সমাধান পাওয়ার সুবিধা।
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-foreground">২৪/৭ ডাউট সলভিং</h3>
-              <p className="text-foreground/70 text-sm leading-relaxed">
-                পড়াশোনায় যেকোনো সমস্যায় সরাসরি ডেডিকেটেড টিচারদের থেকে সমাধান পাওয়ার সুযোগ।
-              </p>
+
+              <div className="space-y-2 relative z-10 pt-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-foreground/80">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>সরাসরি শিক্ষকদের সহায়তা</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs font-bold text-foreground/80">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>প্রাইভেট ডিসকাশন গ্রুপ অ্যাক্সেস</span>
+                </div>
+              </div>
             </div>
 
-            <div className="md:col-span-3 p-8 rounded-3xl bg-gradient-to-r from-orange-500/10 via-amber-500/10 to-transparent border border-orange-500/20 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="space-y-2">
-                <h3 className="text-xl sm:text-2xl font-black text-foreground">সেরা মেন্টরদের সাথে তোমার সাফল্য সুনিশ্চিত করো</h3>
-                <p className="text-foreground/75 text-sm">হাজারো সফল শিক্ষার্থীর কাতারে যুক্ত হতে এখনই তোমার কোর্সে এনরোল করো।</p>
+            {/* Card 5 (Span 3) - Success CTA Banner */}
+            <div className="md:col-span-3 p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-r from-orange-500/15 via-amber-500/10 to-orange-600/15 border-2 border-orange-500/30 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+              <div className="space-y-2 relative z-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 text-orange-500 text-xs font-bold border border-orange-500/30 mb-1">
+                  <Flame className="w-3.5 h-3.5 animate-pulse" />
+                  <span>স্বপ্ন জয়ের সেরা প্ল্যাটফর্ম</span>
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-black text-foreground">
+                  সেরা মেন্টরদের সাথে তোমার সাফল্য সুনিশ্চিত করো
+                </h3>
+                <p className="text-foreground/75 text-sm sm:text-base font-medium">
+                  হাজারো সফল শিক্ষার্থীর কাতারে যুক্ত হতে এখনই তোমার কাঙ্ক্ষিত কোর্সে এনরোল করো।
+                </p>
               </div>
-              <a href="#courses" className="px-8 py-3.5 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm shadow-xl shrink-0">
-                কোর্সসমূহ দেখুন
+
+              <a 
+                href="#courses" 
+                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm shadow-xl shadow-orange-500/30 hover:scale-105 transition-all shrink-0 flex items-center gap-2"
+              >
+                <span>কোর্সসমূহ দেখুন</span>
+                <ArrowRight className="w-4 h-4" />
               </a>
             </div>
+
           </div>
 
         </div>
@@ -610,50 +703,85 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       {/* 5. ভর্তি নির্দেশিকা (Step-by-Step Admission Guide)                         */}
       {/* ========================================================================= */}
       <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        <div className="rounded-[3rem] p-8 sm:p-14 bg-gradient-to-br from-slate-900 via-neutral-900 to-black text-white border border-white/10 shadow-2xl relative overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+        <div className="rounded-[3rem] p-8 sm:p-12 lg:p-16 bg-gradient-to-br from-neutral-900 via-zinc-950 to-black text-white border border-white/10 shadow-2xl relative overflow-hidden">
+          
+          {/* Ambient Glow */}
+          <div className="absolute top-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center relative z-10">
             
-            {/* Left: Steps */}
+            {/* Left: Steps Flow */}
             <div className="lg:col-span-7 space-y-8">
               <div>
-                <span className="px-3.5 py-1 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-400 text-xs font-bold uppercase tracking-wider">
-                  সহজ ৩ ধাপ
+                <span className="px-4 py-1.5 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-400 text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  <span>সহজ ৩ ধাপের প্রক্রিয়া</span>
                 </span>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black mt-3">কীভাবে কোর্সে ভর্তি হবেন?</h2>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black mt-3 text-white tracking-tight">
+                  কীভাবে কোর্সে ভর্তি হবেন?
+                </h2>
+                <p className="text-gray-400 text-sm sm:text-base mt-2 font-medium">
+                  মাত্র ৩টি সহজ ধাপে ঘরে বসেই আপনার কাঙ্ক্ষিত কোর্সে যুক্ত হয়ে সেরা প্রস্তুতি শুরু করুন।
+                </p>
               </div>
 
-              <div className="space-y-6">
-                {admissionSteps.map((st: any, idx: number) => (
-                  <div key={st.id || idx} className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-2xl bg-orange-500 text-white font-black flex items-center justify-center shrink-0 shadow-lg shadow-orange-500/30">
-                      {st.stepNumber || idx + 1}
+              {/* Connected Timeline Steps */}
+              <div className="space-y-6 relative before:absolute before:left-6 before:top-4 before:bottom-4 before:w-0.5 before:bg-gradient-to-b before:from-orange-500 before:via-amber-500 before:to-emerald-500">
+                {admissionSteps.map((st: any, idx: number) => {
+                  const stepNum = st.stepNumber || idx + 1;
+                  const stepColors = [
+                    'from-orange-500 to-amber-500 shadow-orange-500/40 text-white',
+                    'from-amber-500 to-orange-600 shadow-amber-500/40 text-white',
+                    'from-emerald-500 to-teal-600 shadow-emerald-500/40 text-white'
+                  ];
+                  const colorClass = stepColors[idx % stepColors.length];
+
+                  return (
+                    <div key={st.id || idx} className="flex items-start gap-5 relative group">
+                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${colorClass} font-black text-lg flex items-center justify-center shrink-0 shadow-xl ring-4 ring-neutral-900 z-10 group-hover:scale-110 transition-transform`}>
+                        0{stepNum}
+                      </div>
+                      <div className="p-5 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-orange-500/40 transition-colors flex-1 space-y-1">
+                        <h4 className="font-extrabold text-base sm:text-lg text-white group-hover:text-orange-400 transition-colors">
+                          {st.title}
+                        </h4>
+                        <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-medium">
+                          {st.desc}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-base sm:text-lg text-white">{st.title}</h4>
-                      <p className="text-xs sm:text-sm text-gray-300 mt-0.5 leading-relaxed">{st.desc}</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
-            {/* Right: Quick Action Widget */}
-            <div className="lg:col-span-5 p-6 sm:p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md space-y-6 text-center">
-              <div className="w-16 h-16 rounded-full bg-orange-500/20 border border-orange-500/40 text-orange-400 flex items-center justify-center mx-auto">
-                <Sparkles className="w-8 h-8" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-white">ভর্তি সংক্রান্ত যেকোনো তথ্যে</h3>
-                <p className="text-xs text-gray-300 mt-1">আমাদের এক্সপার্ট কাউন্সিলরদের সাথে সরাসরি কথা বলুন</p>
+            {/* Right: Quick Counseling & Payment Widget */}
+            <div className="lg:col-span-5 p-8 sm:p-10 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl shadow-2xl space-y-6 text-center relative overflow-hidden">
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-orange-500/15 rounded-full blur-2xl pointer-events-none" />
+              
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center mx-auto shadow-xl shadow-orange-500/30">
+                <Phone className="w-8 h-8" />
               </div>
 
-              <div className="space-y-3">
+              <div>
+                <span className="px-3 py-1 rounded-full bg-white/10 text-orange-400 text-xs font-extrabold uppercase tracking-wider">
+                  হেল্প ও ভর্তি সহায়তা
+                </span>
+                <h3 className="text-xl sm:text-2xl font-black text-white mt-2">
+                  ভর্তি সংক্রান্ত যেকোনো তথ্যে
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-300 mt-1 font-medium">
+                  আমাদের এক্সপার্ট কাউন্সিলরদের সাথে সরাসরি কথা বলে সঠিক কোর্স বেছে নিন
+                </p>
+              </div>
+
+              <div className="space-y-3 pt-2">
                 <a
                   href={`tel:${contactPhone}`}
-                  className="w-full py-3.5 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-xl"
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm flex items-center justify-center gap-2.5 transition-all shadow-xl shadow-orange-500/30 hover:scale-[1.02]"
                 >
                   <Phone className="w-4 h-4" />
-                  <span>কল করুন: {contactPhone}</span>
+                  <span>সরাসরি কল করুন: {contactPhone}</span>
                 </a>
 
                 {contactWhatsapp && (
@@ -661,13 +789,24 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                     href={`https://wa.me/${String(contactWhatsapp).replace(/[^0-9]/g, '')}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md"
+                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-sm flex items-center justify-center gap-2.5 transition-all shadow-xl shadow-emerald-500/20 hover:scale-[1.02]"
                   >
                     <MessageCircle className="w-4 h-4" />
-                    <span>WhatsApp মেসেজ দিন</span>
+                    <span>WhatsApp-এ মেসেজ দিন</span>
                   </a>
                 )}
               </div>
+
+              <div className="pt-4 border-t border-white/10">
+                <p className="text-[11px] text-gray-400 font-bold mb-2">সমর্থিত পেমেন্ট মাধ্যমসমূহ</p>
+                <div className="flex items-center justify-center gap-2 flex-wrap text-xs text-gray-300 font-extrabold">
+                  <span className="px-2.5 py-1 rounded-lg bg-pink-500/20 text-pink-300 border border-pink-500/30">bKash</span>
+                  <span className="px-2.5 py-1 rounded-lg bg-orange-500/20 text-orange-300 border border-orange-500/30">Nagad</span>
+                  <span className="px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30">Rocket</span>
+                  <span className="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30">Cards</span>
+                </div>
+              </div>
+
             </div>
 
           </div>
@@ -857,128 +996,155 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       {/* 7. যোগাযোগ ও সোশ্যাল চ্যানেল (Contact Section)                            */}
       {/* ========================================================================= */}
       <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+        <div className="rounded-[3rem] p-8 sm:p-12 lg:p-14 bg-gradient-to-br from-neutral-900/90 via-black to-neutral-900/80 border border-white/10 shadow-2xl relative overflow-hidden">
           
-          <div className="lg:col-span-5 relative space-y-6">
-            {contactImage && (
-              <div className="relative w-full max-w-[280px] sm:max-w-[320px] h-64 sm:h-72 -mb-28 sm:-mb-32 z-0 pointer-events-none">
-                <img 
-                  src={contactImage} 
-                  alt="Contact Representative" 
-                  className="w-full h-full object-contain object-bottom [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)] drop-shadow-2xl" 
-                />
-              </div>
-            )}
-
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="h-[2px] w-10 sm:w-16 bg-gradient-to-r from-transparent to-orange-500" />
-                <span className="text-xs font-bold text-orange-500 uppercase tracking-widest">২৪/৭ সাপোর্ট</span>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            
+            {/* Left side: Heading & Info */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>২৪/৭ হেল্প ও সাপোর্ট সক্রিয়</span>
               </div>
 
-              <h2 className="text-4xl sm:text-5xl font-black text-foreground tracking-tight leading-tight">
-                আমাদের সাথে <br />
-                <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
-                  যোগাযোগ করো
-                </span>
-              </h2>
+              <div className="space-y-3">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
+                  আমাদের সাথে <br />
+                  <span className="bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500 bg-clip-text text-transparent">
+                    যোগাযোগ করো
+                  </span>
+                </h2>
 
-              <p className="text-foreground/75 text-sm sm:text-base mt-2 leading-relaxed font-medium">
-                {profileData?.displayName || 'আমাদের'}-এর সাথে যুক্ত থাকো, নতুন ক্লাস, আপডেট ও প্রয়োজনীয় তথ্য সবার আগে পেতে।
-              </p>
+                <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-medium">
+                  {profileData?.displayName || 'আমাদের একাডেমি'}-এর সাথে যুক্ত থাকো, নতুন ক্লাস, নোটিশ, আপডেট ও প্রয়োজনীয় দিকনির্দেশনা সবার আগে পেতে।
+                </p>
+              </div>
+
+              {contactImage && (
+                <div className="relative w-full max-w-[260px] h-52 rounded-2xl overflow-hidden bg-white/5 border border-white/10 shadow-xl">
+                  <img 
+                    src={contactImage} 
+                    alt="Support Representative" 
+                    className="w-full h-full object-cover" 
+                  />
+                </div>
+              )}
             </div>
-          </div>
 
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <a
-              href={`tel:${contactPhone}`}
-              className="p-6 rounded-3xl bg-background border border-foreground/10 hover:border-orange-500/40 transition-all shadow-sm hover:shadow-xl flex items-center justify-between group"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-colors">
-                  <Phone className="w-5 h-5" />
+            {/* Right side: 4 Rich Contact Action Cards */}
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+              
+              {/* Phone Call Card */}
+              <a
+                href={`tel:${contactPhone}`}
+                className="p-6 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-orange-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-orange-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform">
+                    <Phone className="w-6 h-6" />
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full bg-orange-500/20 text-orange-300 text-[10px] font-bold border border-orange-500/30">
+                    সরাসরি কল
+                  </span>
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm sm:text-base text-foreground group-hover:text-orange-500 transition-colors">
+                  <h4 className="font-extrabold text-base text-white group-hover:text-orange-400 transition-colors">
                     সরাসরি কল করো
                   </h4>
-                  <p className="text-xs text-foreground/60 mt-0.5">{contactPhone}</p>
+                  <p className="text-xs text-gray-400 font-semibold mt-0.5">{contactPhone}</p>
                 </div>
-              </div>
-              <div className="w-8 h-8 rounded-full bg-foreground/5 group-hover:bg-orange-500 group-hover:text-white flex items-center justify-center transition-all flex-shrink-0">
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </a>
+                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-orange-400 font-bold">
+                  <span>কল করতে ট্যাপ করুন</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </a>
 
-            {contactWhatsapp && (
-              <a
-                href={`https://wa.me/${String(contactWhatsapp).replace(/[^0-9]/g, '')}`}
-                target="_blank"
-                rel="noreferrer"
-                className="p-6 rounded-3xl bg-background border border-foreground/10 hover:border-emerald-500/40 transition-all shadow-sm hover:shadow-xl flex items-center justify-between group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                    <MessageCircle className="w-5 h-5" />
+              {/* WhatsApp Message Card */}
+              {contactWhatsapp && (
+                <a
+                  href={`https://wa.me/${String(contactWhatsapp).replace(/[^0-9]/g, '')}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-6 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-emerald-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+                      <MessageCircle className="w-6 h-6" />
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
+                      ইনস্ট্যান্ট চ্যাট
+                    </span>
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm sm:text-base text-foreground group-hover:text-emerald-500 transition-colors">
+                    <h4 className="font-extrabold text-base text-white group-hover:text-emerald-400 transition-colors">
                       WhatsApp মেসেজ
                     </h4>
-                    <p className="text-xs text-foreground/60 mt-0.5">{contactWhatsapp}</p>
+                    <p className="text-xs text-gray-400 font-semibold mt-0.5">{contactWhatsapp}</p>
                   </div>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-foreground/5 group-hover:bg-emerald-500 group-hover:text-white flex items-center justify-center transition-all flex-shrink-0">
-                  <ArrowRight className="w-4 h-4" />
-                </div>
-              </a>
-            )}
+                  <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-emerald-400 font-bold">
+                    <span>মেসেজ দিন</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </a>
+              )}
 
-            {contactFacebookGroup && (
-              <a
-                href={contactFacebookGroup}
-                target="_blank"
-                rel="noreferrer"
-                className="p-6 rounded-3xl bg-background border border-foreground/10 hover:border-blue-500/40 transition-all shadow-sm hover:shadow-xl flex items-center justify-between group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                    <Users className="w-5 h-5" />
+              {/* Facebook Group Card */}
+              {contactFacebookGroup && (
+                <a
+                  href={contactFacebookGroup}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-6 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-blue-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                      <Users className="w-6 h-6" />
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-500/30">
+                      কমিউনিটি
+                    </span>
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm sm:text-base text-foreground group-hover:text-blue-500 transition-colors">
+                    <h4 className="font-extrabold text-base text-white group-hover:text-blue-400 transition-colors">
                       Facebook গ্রুপ
                     </h4>
-                    <p className="text-xs text-foreground/60 mt-0.5">কমিউনিটিতে যুক্ত হও</p>
+                    <p className="text-xs text-gray-400 font-semibold mt-0.5">কমিউনিটিতে যুক্ত হও</p>
                   </div>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-foreground/5 group-hover:bg-blue-500 group-hover:text-white flex items-center justify-center transition-all flex-shrink-0">
-                  <ArrowRight className="w-4 h-4" />
-                </div>
-              </a>
-            )}
+                  <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-blue-400 font-bold">
+                    <span>গ্রুপে যুক্ত হোন</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </a>
+              )}
 
-            <a
-              href={`mailto:${contactEmail}`}
-              className="p-6 rounded-3xl bg-background border border-foreground/10 hover:border-emerald-500/40 transition-all shadow-sm hover:shadow-xl flex items-center justify-between group"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                  <Mail className="w-5 h-5" />
+              {/* Email Contact Card */}
+              <a
+                href={`mailto:${contactEmail}`}
+                className="p-6 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-purple-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
+                    <Mail className="w-6 h-6" />
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30">
+                    ইমেইল
+                  </span>
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm sm:text-base text-foreground group-hover:text-emerald-500 transition-colors">
-                    Email-এ যোগাযোগ করো
+                  <h4 className="font-extrabold text-base text-white group-hover:text-purple-400 transition-colors">
+                    অফিসিয়াল ইমেইল
                   </h4>
-                  <p className="text-xs text-foreground/60 mt-0.5">{contactEmail}</p>
+                  <p className="text-xs text-gray-400 font-semibold mt-0.5 truncate">{contactEmail}</p>
                 </div>
-              </div>
-              <div className="w-8 h-8 rounded-full bg-foreground/5 group-hover:bg-emerald-500 group-hover:text-white flex items-center justify-center transition-all flex-shrink-0">
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </a>
-          </div>
+                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-purple-400 font-bold">
+                  <span>ইমেইল পাঠান</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </a>
 
+            </div>
+
+          </div>
         </div>
       </section>
 

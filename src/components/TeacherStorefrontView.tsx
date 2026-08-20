@@ -322,23 +322,36 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       {/* 1. HERO IMAGE CAROUSEL SLIDER (Physics Hunters Style)                     */}
       {/* ========================================================================= */}
       <section className="relative max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-8 sm:pb-12">
-        <div className="relative aspect-[16/7] sm:aspect-[21/9] lg:aspect-[2.4/1] w-full rounded-2xl sm:rounded-[2.5rem] overflow-hidden bg-black shadow-2xl border border-foreground/10 group">
+        <div className="relative aspect-[16/9] sm:aspect-[21/9] lg:aspect-[2.4/1] w-full rounded-2xl sm:rounded-[2.5rem] overflow-hidden bg-zinc-950 shadow-md border border-foreground/10 group">
           
-          {/* Active Banner Image with Link */}
+          {/* Ambient blurred backdrop for seamless aspect ratio fit */}
+          {currentSlide.imageUrl && (
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <img 
+                src={currentSlide.imageUrl} 
+                alt="" 
+                className="w-full h-full object-cover blur-2xl opacity-30 scale-110" 
+              />
+            </div>
+          )}
+
+          {/* Active Banner Image with Link (object-contain ensures zero cutoff) */}
           {currentSlide.targetCourseId ? (
-            <Link href={`/courses/${currentSlide.targetCourseId}`} className="w-full h-full block">
+            <Link href={`/courses/${currentSlide.targetCourseId}`} className="w-full h-full relative z-10 flex items-center justify-center">
               <img 
                 src={currentSlide.imageUrl} 
                 alt={currentSlide.title || "Banner"} 
-                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105 cursor-pointer"
+                className="w-full h-full object-contain object-center transition-transform duration-700 group-hover:scale-[1.02] cursor-pointer"
               />
             </Link>
           ) : (
-            <img 
-              src={currentSlide.imageUrl} 
-              alt={currentSlide.title || "Banner"} 
-              className="w-full h-full object-cover object-center"
-            />
+            <div className="w-full h-full relative z-10 flex items-center justify-center">
+              <img 
+                src={currentSlide.imageUrl} 
+                alt={currentSlide.title || "Banner"} 
+                className="w-full h-full object-contain object-center"
+              />
+            </div>
           )}
 
           {/* Slider Navigation Arrows (Left / Right) */}
@@ -574,17 +587,30 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
         <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 relative z-10">
           
-          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 text-xs font-extrabold uppercase tracking-wider shadow-sm">
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 text-xs font-extrabold uppercase tracking-wider shadow-sm mb-1">
               <Sparkles className="w-3.5 h-3.5 text-orange-500" />
               <span>Full Ecosystem</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-snug sm:leading-tight">
-              <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
-                {featuresTitle}
-              </span>
-            </h2>
+            <div className="flex items-center justify-center gap-3 sm:gap-6 mb-3">
+              <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500 shrink-0" />
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-snug sm:leading-tight">
+                {featuresTitle.includes('যা যা প্রয়োজন') ? (
+                  <>
+                    {featuresTitle.replace('যা যা প্রয়োজন', '').trim()}{' '}
+                    <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
+                      যা যা প্রয়োজন
+                    </span>
+                  </>
+                ) : (
+                  <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
+                    {featuresTitle}
+                  </span>
+                )}
+              </h2>
+              <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500 shrink-0" />
+            </div>
 
             <p className="text-foreground/75 text-sm sm:text-base max-w-xl mx-auto font-medium leading-relaxed">
               {featuresSubtitle}

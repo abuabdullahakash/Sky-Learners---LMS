@@ -220,7 +220,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
   const contactTelegram = config.contactTelegram || 'https://t.me';
   const contactImage = config.contactImage || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop';
 
-  // 8. Trust Banner
+  // 8. Trust Banner & Image Slider
   const rawTrustTitle = String(config.trustTitle || 'বিশ্ববিদ্যালয় ও মেডিকেল ভর্তি প্রস্তুতিতে');
   const cleanTrustTitle = rawTrustTitle.replace(/একটি\s*আস্থার\s*নাম/gi, '').trim();
   const trustHighlight = profileData?.displayName || 'Physics Hunters';
@@ -229,6 +229,38 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
   const trustFreeBtnText = config.trustFreeBtnText || 'ফ্রি কোর্স';
   const trustFreeLink = config.trustFreeLink || '#courses';
   const trustCornerImage = config.trustCornerImage || 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop';
+
+  const trustSlidersList: string[] = config.trustSliders && Array.isArray(config.trustSliders) && config.trustSliders.length > 0
+    ? config.trustSliders
+    : [
+        trustCornerImage,
+        'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=800&auto=format&fit=crop'
+      ];
+  
+  const [currentTrustIndex, setCurrentTrustIndex] = useState(0);
+  const trustTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (trustSlidersList.length > 1) {
+      trustTimerRef.current = setInterval(() => {
+        setCurrentTrustIndex(prev => (prev + 1) % trustSlidersList.length);
+      }, 4500);
+      return () => {
+        if (trustTimerRef.current) clearInterval(trustTimerRef.current);
+      };
+    }
+  }, [trustSlidersList.length]);
+
+  const handleNextTrustSlide = () => {
+    if (trustTimerRef.current) clearInterval(trustTimerRef.current);
+    setCurrentTrustIndex(prev => (prev + 1) % trustSlidersList.length);
+  };
+
+  const handlePrevTrustSlide = () => {
+    if (trustTimerRef.current) clearInterval(trustTimerRef.current);
+    setCurrentTrustIndex(prev => (prev - 1 + trustSlidersList.length) % trustSlidersList.length);
+  };
 
   // 9. Photo Gallery
   const defaultGalleryPhotos = [
@@ -284,13 +316,13 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
   const currentSlide = (heroSliders && heroSliders.length > 0) ? (heroSliders[currentSlideIndex] || heroSliders[0]) : { id: 'default', imageUrl: '', targetCourseId: '', title: '' };
 
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-orange-500 selection:text-white w-full max-w-full overflow-x-hidden pt-16 sm:pt-20">
+    <div className="min-h-screen bg-background text-foreground selection:bg-orange-500 selection:text-white w-full max-w-full overflow-x-hidden pt-24 sm:pt-28 lg:pt-32">
       
       {/* ========================================================================= */}
       {/* 1. HERO IMAGE CAROUSEL SLIDER (Physics Hunters Style)                     */}
       {/* ========================================================================= */}
-      <section className="relative max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 pt-4 pb-8">
-        <div className="relative aspect-[21/9] sm:aspect-[2.4/1] w-full rounded-2xl sm:rounded-[2rem] overflow-hidden bg-black shadow-2xl border border-foreground/10 group">
+      <section className="relative max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-8 sm:pb-12">
+        <div className="relative aspect-[16/7] sm:aspect-[21/9] lg:aspect-[2.4/1] w-full rounded-2xl sm:rounded-[2.5rem] overflow-hidden bg-black shadow-2xl border border-foreground/10 group">
           
           {/* Active Banner Image with Link */}
           {currentSlide.targetCourseId ? (
@@ -298,14 +330,14 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               <img 
                 src={currentSlide.imageUrl} 
                 alt={currentSlide.title || "Banner"} 
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 cursor-pointer"
+                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105 cursor-pointer"
               />
             </Link>
           ) : (
             <img 
               src={currentSlide.imageUrl} 
               alt={currentSlide.title || "Banner"} 
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-center"
             />
           )}
 
@@ -858,9 +890,6 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="absolute -bottom-1 -right-1 p-1 rounded-full bg-blue-500 text-white shadow-md border-2 border-background">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                    </div>
                   </div>
 
                   <div className="text-center space-y-1">
@@ -1053,9 +1082,9 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
           
           <div className="space-y-12">
             
-            {/* Heading & Intro */}
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-white/10">
-              <div className="space-y-3 max-w-2xl">
+            {/* Heading & Intro + Large Transparent Representative Image */}
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-white/10 relative">
+              <div className="space-y-3 max-w-2xl relative z-10">
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span>২৪/৭ হেল্প ও সাপোর্ট সক্রিয়</span>
@@ -1074,11 +1103,11 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               </div>
 
               {contactImage && (
-                <div className="hidden lg:block relative w-48 h-32 rounded-2xl overflow-hidden bg-white/5 border border-white/10 shadow-xl shrink-0">
+                <div className="relative w-full sm:w-80 md:w-96 lg:w-[380px] h-48 sm:h-56 md:h-64 lg:h-72 -mb-6 lg:-mb-10 flex-shrink-0 flex items-end justify-center lg:justify-end pointer-events-none">
                   <img 
                     src={contactImage} 
                     alt="Support Representative" 
-                    className="w-full h-full object-cover" 
+                    className="w-full h-full object-contain object-bottom drop-shadow-[0_20px_30px_rgba(0,0,0,0.8)]" 
                   />
                 </div>
               )}
@@ -1260,85 +1289,137 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       </section>
 
       {/* ========================================================================= */}
-      {/* 8. ট্রাস্ট ও কল-টু-অ্যাকশন ব্যানার (Ultra-Premium Redesign)                   */}
+      {/* 8. ট্রাস্ট ও কল-টু-অ্যাকশন ব্যানার (Equal Height & Image Slider)            */}
       {/* ========================================================================= */}
       <section className="py-16 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        <div className="rounded-[3.5rem] p-8 sm:p-14 lg:p-16 bg-gradient-to-br from-neutral-900 via-zinc-950 to-black text-white border-2 border-orange-500/30 shadow-2xl relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-10">
+        <div className="rounded-[3.5rem] p-8 sm:p-14 lg:p-16 bg-gradient-to-br from-neutral-900 via-zinc-950 to-black text-white border-2 border-orange-500/30 shadow-2xl relative overflow-hidden">
           
           {/* Ambient Glow */}
           <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-96 h-96 bg-orange-500/15 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="space-y-6 flex-1 relative z-10 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-black uppercase tracking-wider">
-              <Award className="w-3.5 h-3.5 text-amber-300" />
-              <span>শীর্ষস্থানীয় এডটেক একাডেমি</span>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch relative z-10">
+            
+            {/* Left Content Column */}
+            <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-black uppercase tracking-wider">
+                  <Award className="w-3.5 h-3.5 text-amber-300" />
+                  <span>শীর্ষস্থানীয় এডটেক একাডেমি</span>
+                </div>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-[1.2] tracking-tight">
-              {cleanTrustTitle}{' '}
-              <span className="bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500 bg-clip-text text-transparent">
-                {trustHighlight}
-              </span>{' '}
-              একটি আস্থার নাম
-            </h2>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-[1.2] tracking-tight">
+                  {cleanTrustTitle}{' '}
+                  <span className="bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500 bg-clip-text text-transparent">
+                    {trustHighlight}
+                  </span>{' '}
+                  একটি আস্থার নাম
+                </h2>
 
-            <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-medium">
-              {trustSubtitle}
-            </p>
+                <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-medium">
+                  {trustSubtitle}
+                </p>
 
-            <div className="flex items-center gap-3 flex-wrap text-xs font-bold text-gray-300 pt-1">
-              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.05] border border-white/10">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>১০০% লাইভ ইন্টারঅ্যাকশন</span>
-              </span>
-              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.05] border border-white/10">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>রিভিশন ও এক্সাম ব্যাচ</span>
-              </span>
-              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.05] border border-white/10">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>ডেডিকেটেড মেন্টরশিপ</span>
-              </span>
-            </div>
-
-            <div className="flex items-center gap-4 flex-wrap pt-2">
-              <a
-                href="#courses"
-                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm shadow-xl shadow-orange-500/40 hover:scale-105 transition-all flex items-center gap-2"
-              >
-                <span>{trustPaidBtnText}</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
-
-              <a
-                href={trustFreeLink}
-                className="px-8 py-4 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/20 text-white font-black text-sm transition-all hover:scale-105 backdrop-blur-md"
-              >
-                {trustFreeBtnText}
-              </a>
-            </div>
-          </div>
-
-          <div className="relative z-10 lg:w-96 flex-shrink-0 flex items-center justify-center">
-            <div className="relative w-72 sm:w-84 aspect-[4/4.5] rounded-3xl overflow-hidden shadow-2xl border-2 border-white/20 bg-gradient-to-tr from-orange-500/20 via-white/5 to-transparent group">
-              <img 
-                src={trustCornerImage} 
-                alt="Student Success" 
-                className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
-              />
-
-              <div className="absolute top-4 left-4 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-xs font-black text-amber-300 flex items-center gap-1.5">
-                <Trophy className="w-3.5 h-3.5" />
-                <span>সফল শিক্ষার্থী</span>
+                <div className="flex items-center gap-3 flex-wrap text-xs font-bold text-gray-300 pt-1">
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.05] border border-white/10">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span>১০০% লাইভ ইন্টারঅ্যাকশন</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.05] border border-white/10">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span>রিভিশন ও এক্সাম ব্যাচ</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.05] border border-white/10">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span>ডেডিকেটেড মেন্টরশিপ</span>
+                  </span>
+                </div>
               </div>
 
-              <div className="absolute bottom-4 right-4 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-xs font-black text-orange-400 flex items-center gap-1.5">
-                <Star className="w-3.5 h-3.5 fill-current text-amber-400" />
-                <span>৪.৯/৫ রেটিং</span>
+              <div className="flex items-center gap-4 flex-wrap pt-2">
+                <a
+                  href="#courses"
+                  className="px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm shadow-xl shadow-orange-500/40 hover:scale-105 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <span>{trustPaidBtnText}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+
+                <a
+                  href={trustFreeLink}
+                  className="px-8 py-4 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/20 text-white font-black text-sm transition-all hover:scale-105 backdrop-blur-md cursor-pointer"
+                >
+                  {trustFreeBtnText}
+                </a>
               </div>
             </div>
-          </div>
 
+            {/* Right Equal-Height Image Slider Column */}
+            <div className="lg:col-span-5 flex flex-col">
+              <div className="relative w-full h-full min-h-[360px] sm:min-h-[420px] rounded-3xl overflow-hidden shadow-2xl border-2 border-white/20 bg-gradient-to-tr from-orange-500/20 via-white/5 to-transparent group flex flex-col justify-between">
+                
+                {/* Active Image */}
+                <img 
+                  src={trustSlidersList[currentTrustIndex] || trustCornerImage} 
+                  alt="Student Success" 
+                  className="absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 group-hover:scale-105"
+                />
+
+                {/* Floating Top Badge */}
+                <div className="relative z-10 m-4 self-start px-3.5 py-1.5 rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-xs font-black text-amber-300 flex items-center gap-1.5 shadow-lg">
+                  <Trophy className="w-3.5 h-3.5" />
+                  <span>সফল শিক্ষার্থী</span>
+                </div>
+
+                {/* Slider Navigation Controls (Left/Right Arrows) */}
+                {trustSlidersList.length > 1 && (
+                  <div className="absolute inset-x-3 top-1/2 -translate-y-1/2 flex items-center justify-between z-20 pointer-events-none">
+                    <button
+                      type="button"
+                      onClick={handlePrevTrustSlide}
+                      className="w-9 h-9 rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center backdrop-blur-md transition-all shadow-xl hover:scale-110 pointer-events-auto cursor-pointer"
+                      aria-label="Previous Trust Slide"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleNextTrustSlide}
+                      className="w-9 h-9 rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center backdrop-blur-md transition-all shadow-xl hover:scale-110 pointer-events-auto cursor-pointer"
+                      aria-label="Next Trust Slide"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Floating Bottom Badge & Dots */}
+                <div className="relative z-10 m-4 flex items-center justify-between gap-2">
+                  {/* Dots indicator */}
+                  {trustSlidersList.length > 1 ? (
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20">
+                      {trustSlidersList.map((_, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => setCurrentTrustIndex(idx)}
+                          className={`rounded-full transition-all ${
+                            currentTrustIndex === idx ? 'w-5 h-1.5 bg-orange-500' : 'w-1.5 h-1.5 bg-white/50'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  ) : <div />}
+
+                  <div className="px-3.5 py-1.5 rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-xs font-black text-orange-400 flex items-center gap-1.5 shadow-lg">
+                    <Star className="w-3.5 h-3.5 fill-current text-amber-400" />
+                    <span>৪.৯/৫ রেটিং</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
         </div>
       </section>
 

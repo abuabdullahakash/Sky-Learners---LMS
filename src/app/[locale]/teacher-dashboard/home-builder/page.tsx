@@ -1180,14 +1180,22 @@ export default function TeacherHomePageBuilderPage() {
           {/* TAB 1: HERO SLIDERS */}
           {activeTab === 'sliders' && (
             <div className="space-y-6">
-              <div className="border-b border-foreground/10 pb-4">
+              <div className="border-b border-foreground/10 pb-4 space-y-2">
                 <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <Sliders className="w-5 h-5 text-orange-500" />
                   <span>{profileType === 'institution' ? '৩. ব্যানার ইমেজ স্লাইডার (Hero Carousel)' : '২. ব্যানার ইমেজ স্লাইডার (Hero Carousel)'}</span>
                 </h3>
-                <p className="text-xs text-foreground/60 mt-1">
+                <p className="text-xs text-foreground/60">
                   এখানে আপলোড করা বড় ব্যানারগুলো আপনার হোম পেজের শীর্ষে স্লাইডারে ঘুরবে। ব্যানারে ক্লিক করলে শিক্ষার্থীকে নির্দিষ্ট কোর্সে নিয়ে যাওয়া হবে।
                 </p>
+
+                {/* Dimension & Aspect Ratio Guideline Alert */}
+                <div className="p-3.5 rounded-xl bg-orange-500/10 border border-orange-500/30 text-xs text-orange-600 dark:text-orange-400 font-medium flex items-start gap-2.5">
+                  <Info className="w-4 h-4 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold">📐 প্রস্তাবিত ব্যানার সাইজ:</span> ১৯২০ × ৮০০ পিক্সেল (Aspect Ratio 2.4:1 বা 21:9) অথবা ১২০০ × ৫০০ পিক্সেল। এই রেজুলেশনের ছবি ব্যবহার করলে মোবাইলে ও কম্পিউটারে কোনো অংশ কাটা যাবে না।
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-4">
@@ -1697,13 +1705,20 @@ export default function TeacherHomePageBuilderPage() {
 
               {/* Standing Contact Representative Image Upload */}
               <div className="p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3">
-                <label className="text-[11px] font-bold text-foreground/70 block">
-                  যোগাযোগ সেকশনের প্রতিনিধি বা শিক্ষকের ছবি (Standing Image)
-                </label>
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <label className="text-[11px] font-bold text-foreground/70 block">
+                      যোগাযোগ সেকশনের প্রতিনিধি বা শিক্ষকের ছবি (Transparent PNG Image)
+                    </label>
+                    <p className="text-[11px] text-orange-500 font-semibold mt-0.5">
+                      💡 প্রস্তাবিত: ব্যাকগ্রাউন্ড ছাড়া ট্রান্সপারেন্ট PNG ছবি (যেমন: ৮০০ × ৮০০ বা ৬০০ × ৮০০ পিক্সেল)। এটি কোনো বর্ডার বা ব্যাকগ্রাউন্ড বক্স ছাড়াই হোম পেজে স্বচ্ছভাবে ফুটে উঠবে।
+                    </p>
+                  </div>
+                </div>
                 
                 <div className="flex items-center gap-4">
-                  <div className="w-20 h-24 rounded-2xl overflow-hidden bg-foreground/10 border-2 border-orange-500/40 flex-shrink-0">
-                    <img src={contactImage} alt="Contact Representative" className="w-full h-full object-cover object-top" />
+                  <div className="w-20 h-24 rounded-2xl overflow-hidden bg-foreground/10 border-2 border-orange-500/40 flex-shrink-0 flex items-center justify-center p-1">
+                    <img src={contactImage} alt="Contact Representative" className="w-full h-full object-contain object-bottom" />
                   </div>
 
                   <div className="flex-1 space-y-2">
@@ -1855,9 +1870,14 @@ export default function TeacherHomePageBuilderPage() {
 
                 {/* Trust Corner Image Upload */}
                 <div className="p-4 sm:p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3">
-                  <label className="text-[11px] font-bold text-foreground/70 block">
-                    ব্যানারের কর্নার ছবি (শিক্ষার্থী বা মেন্টরের ছবি)
-                  </label>
+                  <div>
+                    <label className="text-[11px] font-bold text-foreground/70 block">
+                      ব্যানারের স্লাইডার ছবি (শিক্ষার্থী বা মেন্টরের ছবি)
+                    </label>
+                    <p className="text-[11px] text-foreground/60 mt-0.5">
+                      📐 প্রস্তাবিত সাইজ: ৮০০ × ৯০০ পিক্সেল বা ৪:৫ অনুপাত (Portrait Photo)।
+                    </p>
+                  </div>
                   
                   <div className="flex items-center gap-4">
                     <div className="w-20 h-20 rounded-2xl overflow-hidden bg-foreground/10 border border-foreground/10 flex-shrink-0">

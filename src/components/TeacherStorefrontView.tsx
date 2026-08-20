@@ -523,41 +523,76 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             {filteredCourses.map((course) => (
               <div 
                 key={course.id}
-                className="group rounded-3xl bg-background border border-foreground/10 hover:border-orange-500/50 flex flex-col justify-between overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 shadow-sm"
+                className="group relative rounded-[2rem] bg-card/90 dark:bg-neutral-900/90 border border-foreground/10 dark:border-white/10 hover:border-orange-500/50 dark:hover:border-orange-500/50 flex flex-col justify-between overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1.5 shadow-sm"
               >
-                {/* Thumbnail */}
+                {/* Ambient glow on hover */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl pointer-events-none group-hover:scale-150 transition-transform duration-500" />
+
+                {/* Thumbnail Area */}
                 <div className="relative aspect-[16/9] w-full bg-foreground/5 overflow-hidden">
                   <img 
                     src={course.thumbnailUrl || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop'} 
                     alt={course.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  {course.category && (
-                    <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/70 backdrop-blur-md text-white text-[11px] font-bold border border-white/10">
-                      {course.category}
-                    </span>
-                  )}
-                </div>
+                  
+                  {/* Subtle gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent pointer-events-none" />
 
-                {/* Content */}
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                  <div className="space-y-2">
-                    <h3 className="font-extrabold text-base text-foreground group-hover:text-orange-500 transition-colors line-clamp-2 leading-snug">
-                      {course.title}
-                    </h3>
-                    <p className="text-xs text-foreground/60 line-clamp-1 font-medium">
-                      👨‍🏫 {course.instructorName}
-                    </p>
+                  {/* Top Badges */}
+                  <div className="absolute top-3 inset-x-3 flex items-center justify-between pointer-events-none">
+                    {course.category ? (
+                      <span className="px-3 py-1 rounded-full bg-black/70 backdrop-blur-md text-white text-[11px] font-bold border border-white/15 shadow-sm flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />
+                        {course.category}
+                      </span>
+                    ) : <span />}
+
+                    {course.regularPrice && course.regularPrice > (course.price || 0) && (
+                      <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-red-600 to-rose-600 text-white text-[10px] font-black shadow-md">
+                        {Math.round(((course.regularPrice - (course.price || 0)) / course.regularPrice) * 100)}% ছাড়
+                      </span>
+                    )}
                   </div>
 
-                  {/* Pricing and Action */}
-                  <div className="pt-3 border-t border-foreground/10 flex items-center justify-between">
+                  {/* Bottom Image Info */}
+                  <div className="absolute bottom-2.5 left-3.5 right-3.5 flex items-center justify-between text-white text-[11px] font-bold">
+                    <span className="flex items-center gap-1 text-amber-300 drop-shadow">
+                      <Sparkles className="w-3 h-3 text-amber-400" />
+                      <span>ফুল কোর্স ব্যাচ</span>
+                    </span>
+                    <span className="flex items-center gap-1 text-white/90 drop-shadow">
+                      <Users className="w-3 h-3 text-white/80" />
+                      <span>অনলাইন</span>
+                    </span>
+                  </div>
+                </div>
+
+                {/* Content Area */}
+                <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4 relative z-10">
+                  <div className="space-y-2.5">
+                    <h3 className="font-black text-base sm:text-lg text-foreground group-hover:text-orange-500 transition-colors line-clamp-2 leading-snug">
+                      {course.title}
+                    </h3>
+                    
+                    <div className="flex items-center gap-2 pt-0.5">
+                      <div className="w-6 h-6 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center text-[10px] font-black shrink-0 border border-orange-500/30">
+                        👨‍🏫
+                      </div>
+                      <p className="text-xs text-foreground/75 font-bold truncate">
+                        {course.instructorName || profileData?.displayName || 'Instructors'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Pricing and Action Button */}
+                  <div className="pt-4 border-t border-foreground/10 flex items-center justify-between gap-3">
                     <div>
-                      <div className="text-lg font-black text-orange-500">
+                      <div className="text-lg sm:text-xl font-black text-orange-500 dark:text-orange-400">
                         {course.price ? `৳ ${course.price}` : 'ফ্রি'}
                       </div>
                       {course.regularPrice && course.regularPrice > (course.price || 0) && (
-                        <div className="text-[11px] text-foreground/40 line-through">
+                        <div className="text-[11px] text-foreground/45 line-through font-semibold">
                           ৳ {course.regularPrice}
                         </div>
                       )}
@@ -565,10 +600,10 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
                     <Link
                       href={`/courses/${course.id}`}
-                      className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition-all shadow-md flex items-center gap-1"
+                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-black transition-all shadow-md hover:shadow-orange-500/25 flex items-center gap-1.5 group/btn shrink-0"
                     >
                       <span>বিস্তারিত</span>
-                      <ArrowRight className="w-3 h-3" />
+                      <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
                     </Link>
                   </div>
                 </div>
@@ -1008,9 +1043,18 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
           <div className="flex items-center justify-center gap-3 sm:gap-6 mb-12">
             <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
-              <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
-                {aboutTitle}
-              </span>
+              {aboutTitle.includes('সম্পর্কে') ? (
+                <>
+                  {aboutTitle.replace('সম্পর্কে', '').trim()}{' '}
+                  <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
+                    সম্পর্কে
+                  </span>
+                </>
+              ) : (
+                <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
+                  {aboutTitle}
+                </span>
+              )}
             </h2>
             <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
           </div>

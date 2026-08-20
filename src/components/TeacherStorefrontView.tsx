@@ -574,21 +574,17 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
         <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 relative z-10">
           
-          <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/20 text-xs font-extrabold uppercase tracking-wider mb-1 shadow-sm">
-              <Sparkles className="w-3.5 h-3.5" />
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 text-xs font-extrabold uppercase tracking-wider shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-orange-500" />
               <span>Full Ecosystem</span>
             </div>
 
-            <div className="flex items-center justify-center gap-3 sm:gap-6 mb-3">
-              <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
-                <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
-                  {featuresTitle}
-                </span>
-              </h2>
-              <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
-            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-snug sm:leading-tight">
+              <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
+                {featuresTitle}
+              </span>
+            </h2>
 
             <p className="text-foreground/75 text-sm sm:text-base max-w-xl mx-auto font-medium leading-relaxed">
               {featuresSubtitle}
@@ -1083,44 +1079,40 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       </section>
 
       {/* ========================================================================= */}
-      {/* 7. যোগাযোগ ও সোশ্যাল চ্যানেল (Contact Section with Telegram, YouTube, etc.) */}
+      {/* 7. যোগাযোগ ও সোশ্যাল চ্যানেল (Contact Section - Light & Dark Harmonized)   */}
       {/* ========================================================================= */}
       <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        <div className="rounded-[3.5rem] p-8 sm:p-12 lg:p-16 bg-gradient-to-br from-neutral-900/95 via-black to-neutral-900/90 border border-white/10 shadow-2xl relative overflow-hidden">
+        <div className="rounded-[3.5rem] p-8 sm:p-12 lg:p-16 bg-gradient-to-br from-orange-500/[0.04] via-card to-amber-500/[0.02] dark:from-neutral-900/95 dark:via-black dark:to-neutral-900/90 text-foreground dark:text-white border border-foreground/10 dark:border-white/10 shadow-2xl relative overflow-hidden">
           
           <div className="space-y-12">
             
             {/* Heading & Intro + Large Transparent Representative Image */}
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-white/10 relative">
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-foreground/10 dark:border-white/10 relative">
               <div className="space-y-3 max-w-2xl relative z-10">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold shadow-sm">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span>২৪/৭ হেল্প ও সাপোর্ট সক্রিয়</span>
                 </div>
 
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground dark:text-white tracking-tight leading-tight">
                   আমাদের সাথে{' '}
-                  <span className="bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
                     যোগাযোগ করো
                   </span>
                 </h2>
 
-                <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-medium">
+                <p className="text-foreground/75 dark:text-gray-300 text-sm sm:text-base leading-relaxed font-medium">
                   {profileData?.displayName || 'আমাদের একাডেমি'}-এর সাথে যুক্ত থাকো, নতুন ক্লাস, নোটিশ, আপডেট ও প্রয়োজনীয় দিকনির্দেশনা সবার আগে পেতে।
                 </p>
               </div>
 
               {contactImage && (
                 <div className="relative w-full sm:w-80 md:w-96 lg:w-[380px] h-48 sm:h-56 md:h-64 lg:h-72 flex-shrink-0 flex items-end justify-center lg:justify-end pointer-events-none -mb-6 lg:-mb-10">
-                  <div className="relative w-full h-full">
-                    <img 
-                      src={contactImage} 
-                      alt="Support Representative" 
-                      className="w-full h-full object-contain object-bottom drop-shadow-[0_20px_30px_rgba(0,0,0,0.8)]" 
-                    />
-                    {/* Bottom-to-top shadow / fade overlay so feet seamlessly fade into the background */}
-                    <div className="absolute inset-x-0 bottom-0 h-16 sm:h-20 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-transparent pointer-events-none" />
-                  </div>
+                  <img 
+                    src={contactImage} 
+                    alt="Support Representative" 
+                    className="w-full h-full object-contain object-bottom drop-shadow-[0_15px_25px_rgba(0,0,0,0.15)] dark:drop-shadow-[0_20px_30px_rgba(0,0,0,0.8)]" 
+                  />
                 </div>
               )}
             </div>
@@ -1131,23 +1123,23 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               {/* 1. Phone Call Card */}
               <a
                 href={`tel:${contactPhone}`}
-                className="p-6 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-orange-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-orange-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-orange-500/50 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-orange-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
               >
                 <div className="flex items-center justify-between">
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform">
                     <Phone className="w-6 h-6" />
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full bg-orange-500/20 text-orange-300 text-[10px] font-bold border border-orange-500/30">
+                  <span className="px-2.5 py-0.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-300 text-[10px] font-bold border border-orange-500/20 dark:border-orange-500/30">
                     সরাসরি কল
                   </span>
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-base text-white group-hover:text-orange-400 transition-colors">
+                  <h4 className="font-extrabold text-base text-foreground dark:text-white group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors">
                     সরাসরি কল করো
                   </h4>
-                  <p className="text-xs text-gray-400 font-semibold mt-0.5">{contactPhone}</p>
+                  <p className="text-xs text-foreground/60 dark:text-gray-400 font-semibold mt-0.5">{contactPhone}</p>
                 </div>
-                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-orange-400 font-bold">
+                <div className="pt-2 border-t border-foreground/10 dark:border-white/10 flex items-center justify-between text-xs text-orange-600 dark:text-orange-400 font-bold">
                   <span>কল করতে ট্যাপ করুন</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
@@ -1159,23 +1151,23 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   href={`https://wa.me/${String(contactWhatsapp).replace(/[^0-9]/g, '')}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="p-6 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-emerald-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                  className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-emerald-500/50 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-emerald-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
                 >
                   <div className="flex items-center justify-between">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
                       <MessageCircle className="w-6 h-6" />
                     </div>
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 text-[10px] font-bold border border-emerald-500/20 dark:border-emerald-500/30">
                       ইনস্ট্যান্ট চ্যাট
                     </span>
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-base text-white group-hover:text-emerald-400 transition-colors">
+                    <h4 className="font-extrabold text-base text-foreground dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                       WhatsApp মেসেজ
                     </h4>
-                    <p className="text-xs text-gray-400 font-semibold mt-0.5">{contactWhatsapp}</p>
+                    <p className="text-xs text-foreground/60 dark:text-gray-400 font-semibold mt-0.5">{contactWhatsapp}</p>
                   </div>
-                  <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-emerald-400 font-bold">
+                  <div className="pt-2 border-t border-foreground/10 dark:border-white/10 flex items-center justify-between text-xs text-emerald-600 dark:text-emerald-400 font-bold">
                     <span>মেসেজ দিন</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -1188,23 +1180,23 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   href={contactTelegram}
                   target="_blank"
                   rel="noreferrer"
-                  className="p-6 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-sky-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-sky-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                  className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-sky-500/50 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-sky-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
                 >
                   <div className="flex items-center justify-between">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-lg shadow-sky-500/30 group-hover:scale-110 transition-transform">
                       <Send className="w-6 h-6" />
                     </div>
-                    <span className="px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[10px] font-bold border border-sky-500/30">
+                    <span className="px-2.5 py-0.5 rounded-full bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-300 text-[10px] font-bold border border-sky-500/20 dark:border-sky-500/30">
                       নোটিশ ও ফাইল
                     </span>
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-base text-white group-hover:text-sky-400 transition-colors">
+                    <h4 className="font-extrabold text-base text-foreground dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                       Telegram চ্যানেল
                     </h4>
-                    <p className="text-xs text-gray-400 font-semibold mt-0.5">নিয়মিত আপডেট পেতে</p>
+                    <p className="text-xs text-foreground/60 dark:text-gray-400 font-semibold mt-0.5">নিয়মিত আপডেট পেতে</p>
                   </div>
-                  <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-sky-400 font-bold">
+                  <div className="pt-2 border-t border-foreground/10 dark:border-white/10 flex items-center justify-between text-xs text-sky-600 dark:text-sky-400 font-bold">
                     <span>চ্যানেলে যুক্ত হোন</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -1217,23 +1209,23 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   href={contactYoutube}
                   target="_blank"
                   rel="noreferrer"
-                  className="p-6 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-red-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-red-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                  className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-red-500/50 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-red-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
                 >
                   <div className="flex items-center justify-between">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-600 text-white flex items-center justify-center shadow-lg shadow-red-500/30 group-hover:scale-110 transition-transform">
                       <Play className="w-6 h-6 fill-current" />
                     </div>
-                    <span className="px-2.5 py-0.5 rounded-full bg-red-500/20 text-red-300 text-[10px] font-bold border border-red-500/30">
+                    <span className="px-2.5 py-0.5 rounded-full bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-300 text-[10px] font-bold border border-red-500/20 dark:border-red-500/30">
                       ফ্রি ভিডিও
                     </span>
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-base text-white group-hover:text-red-400 transition-colors">
+                    <h4 className="font-extrabold text-base text-foreground dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                       YouTube চ্যানেল
                     </h4>
-                    <p className="text-xs text-gray-400 font-semibold mt-0.5">ফ্রি ক্লাস ও টিপস দেখুন</p>
+                    <p className="text-xs text-foreground/60 dark:text-gray-400 font-semibold mt-0.5">ফ্রি ক্লাস ও টিপস দেখুন</p>
                   </div>
-                  <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-red-400 font-bold">
+                  <div className="pt-2 border-t border-foreground/10 dark:border-white/10 flex items-center justify-between text-xs text-red-600 dark:text-red-400 font-bold">
                     <span>সাবস্ক্রাইব করুন</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -1246,23 +1238,23 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   href={contactFacebookGroup}
                   target="_blank"
                   rel="noreferrer"
-                  className="p-6 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-blue-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                  className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-blue-500/50 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-blue-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
                 >
                   <div className="flex items-center justify-between">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
                       <Users className="w-6 h-6" />
                     </div>
-                    <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-500/30">
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-300 text-[10px] font-bold border border-blue-500/20 dark:border-blue-500/30">
                       কমিউনিটি
                     </span>
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-base text-white group-hover:text-blue-400 transition-colors">
+                    <h4 className="font-extrabold text-base text-foreground dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       Facebook গ্রুপ
                     </h4>
-                    <p className="text-xs text-gray-400 font-semibold mt-0.5">কমিউনিটিতে যুক্ত হও</p>
+                    <p className="text-xs text-foreground/60 dark:text-gray-400 font-semibold mt-0.5">কমিউনিটিতে যুক্ত হও</p>
                   </div>
-                  <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-blue-400 font-bold">
+                  <div className="pt-2 border-t border-foreground/10 dark:border-white/10 flex items-center justify-between text-xs text-blue-600 dark:text-blue-400 font-bold">
                     <span>গ্রুপে যুক্ত হোন</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -1272,23 +1264,23 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               {/* 6. Email Contact Card */}
               <a
                 href={`mailto:${contactEmail}`}
-                className="p-6 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-purple-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-purple-500/50 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-purple-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
               >
                 <div className="flex items-center justify-between">
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
                     <Mail className="w-6 h-6" />
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30">
+                  <span className="px-2.5 py-0.5 rounded-full bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-300 text-[10px] font-bold border border-purple-500/20 dark:border-purple-500/30">
                     ইমেইল
                   </span>
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-base text-white group-hover:text-purple-400 transition-colors">
+                  <h4 className="font-extrabold text-base text-foreground dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                     অফিসিয়াল ইমেইল
                   </h4>
-                  <p className="text-xs text-gray-400 font-semibold mt-0.5 truncate">{contactEmail}</p>
+                  <p className="text-xs text-foreground/60 dark:text-gray-400 font-semibold mt-0.5 truncate">{contactEmail}</p>
                 </div>
-                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-purple-400 font-bold">
+                <div className="pt-2 border-t border-foreground/10 dark:border-white/10 flex items-center justify-between text-xs text-purple-600 dark:text-purple-400 font-bold">
                   <span>ইমেইল পাঠান</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>

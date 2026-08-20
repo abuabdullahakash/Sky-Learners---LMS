@@ -7,6 +7,7 @@ import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import RoleSelectionModal from '@/components/RoleSelectionModal';
+import TeacherStorefrontView from '@/components/TeacherStorefrontView';
 import gsap from 'gsap';
 import { 
   Search, 
@@ -97,11 +98,16 @@ export default function HomePage() {
   const t = useTranslations('Index');
   const locale = useLocale();
   const router = useRouter();
-  const { user, userData } = useAuth();
+  const { user, userData, loading } = useAuth();
 
   const isAdmin = userData?.isAdmin || userData?.role === 'admin' || user?.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com' || Boolean(user?.email?.toLowerCase().includes('abuabdullahakash'));
   const isTeacher = isAdmin || userData?.role === 'teacher';
   const isStudent = !isAdmin && userData?.role === 'student';
+
+  // If logged in as teacher, render their personal storefront directly on Home
+  if (!loading && user && isTeacher) {
+    return <TeacherStorefrontView teacherId={user.uid} isOwner={true} />;
+  }
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
@@ -614,116 +620,7 @@ export default function HomePage() {
       )}
 
       {/* ========================================================================= */}
-      {/* 3. TEACHER POSTS & COMMUNITY NOTICES FEED                                */}
-      {/* ========================================================================= */}
-      {teacherPosts.length > 0 && (
-        <section className="py-16 md:py-24 relative bg-gradient-to-b from-orange-500/[0.03] to-transparent border-b border-foreground/10">
-          <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
-            
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
-              <div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 text-xs font-bold uppercase tracking-wider mb-2">
-                  <Megaphone className="w-3.5 h-3.5" />
-                  <span>{locale === 'bn' ? 'কমিউনিটি ও নোটিশ' : 'Community & Notices'}</span>
-                </div>
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
-                  {locale === 'bn' ? 'শিক্ষকদের সর্বশেষ আপডেট ও নোটিশ' : 'Latest Updates from Instructors'}
-                </h2>
-                <p className="text-foreground/70 text-sm sm:text-base mt-2 max-w-xl">
-                  {locale === 'bn' 
-                    ? 'আপনার প্রিয় শিক্ষকদের দেওয়া গুরুত্বপূর্ণ নোটিশ, পরীক্ষার টিপস এবং নতুন কোর্স ঘোষণার সাথে আপডেট থাকুন।'
-                    : 'Stay updated with important exam tips, class notices, and announcements from our instructors.'}
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {teacherPosts.slice(0, 6).map((post) => (
-                <div 
-                  key={post.id}
-                  className={`p-6 rounded-3xl bg-background border transition-all duration-300 hover:shadow-2xl flex flex-col justify-between space-y-4 ${
-                    post.isPinned ? 'border-orange-500/50 shadow-orange-500/5' : 'border-foreground/10'
-                  }`}
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <Link 
-                        href={`/teachers/${post.teacherId}`}
-                        className="flex items-center gap-3 group/teacher"
-                      >
-                        <div className="w-10 h-10 rounded-full bg-orange-500/10 overflow-hidden border border-orange-500/30 flex-shrink-0">
-                          <img 
-                            src={post.teacherPhoto || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + post.teacherId} 
-                            alt={post.teacherName}
-                            className="w-full h-full object-cover" 
-                          />
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="font-bold text-sm text-foreground group-hover/teacher:text-orange-500 transition-colors truncate">
-                            {post.teacherName}
-                          </h4>
-                          {post.coachingName && (
-                            <p className="text-[11px] text-foreground/50 truncate">🏛️ {post.coachingName}</p>
-                          )}
-                        </div>
-                      </Link>
-
-                      <div className="flex items-center gap-1">
-                        {post.isPinned && (
-                          <Pin className="w-3.5 h-3.5 text-orange-500 fill-orange-500" />
-                        )}
-                        <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${typeBadges[post.type]?.color}`}>
-                          {typeBadges[post.type]?.label}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h3 className="font-bold text-base text-foreground mb-1 line-clamp-2">
-                        {post.title}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-foreground/75 line-clamp-3 leading-relaxed whitespace-pre-line">
-                        {post.content}
-                      </p>
-                    </div>
-
-                    {post.imageUrl && (
-                      <div className="relative aspect-video rounded-2xl overflow-hidden border border-foreground/10">
-                        <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="pt-3 border-t border-foreground/10 flex items-center justify-between">
-                    {post.linkedCourseId ? (
-                      <Link 
-                        href={`/courses/${post.linkedCourseId}`}
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-500 hover:text-orange-600 transition-colors"
-                      >
-                        <BookOpen className="w-3.5 h-3.5" />
-                        <span className="truncate">{post.linkedCourseTitle || (locale === 'bn' ? 'কোর্সে যান' : 'View Course')}</span>
-                        <ArrowRight className="w-3 h-3 flex-shrink-0" />
-                      </Link>
-                    ) : (
-                      <Link 
-                        href={`/teachers/${post.teacherId}`}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
-                      >
-                        <span>{locale === 'bn' ? 'টিচার ওয়েবসাইট' : 'View Storefront'}</span>
-                        <ArrowRight className="w-3 h-3" />
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-          </div>
-        </section>
-      )}
-
-      {/* ========================================================================= */}
-      {/* 4. CATEGORIES EXPLORER                                                    */}
+      {/* 2. CATEGORIES EXPLORER                                                    */}
       {/* ========================================================================= */}
       <section className="py-20 md:py-28 relative">
         <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">

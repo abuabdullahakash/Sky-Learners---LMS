@@ -393,7 +393,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             {/* Paid Courses Card */}
             <a
               href="#courses"
-              className="group relative min-h-[190px] sm:min-h-[210px] p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-orange-500/[0.12] via-background to-orange-500/[0.04] border-2 border-orange-500/30 hover:border-orange-500/80 transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-orange-500/20 hover:-translate-y-1.5 flex items-center justify-between overflow-hidden"
+              className="group relative min-h-[190px] sm:min-h-[210px] p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-orange-500/[0.12] via-background to-orange-500/[0.04] border-2 border-orange-500/30 hover:border-orange-500/80 transition-all duration-500 shadow-sm hover:shadow-md hover:-translate-y-1 flex items-center justify-between overflow-hidden"
             >
               <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-orange-500/15 rounded-full blur-3xl pointer-events-none group-hover:scale-150 transition-transform duration-700" />
               
@@ -412,7 +412,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 </p>
               </div>
 
-              <div className="relative z-10 w-16 h-16 rounded-3xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-2xl shadow-orange-500/40 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 flex-shrink-0">
+              <div className="relative z-10 w-16 h-16 rounded-3xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-md group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 flex-shrink-0">
                 <ArrowRight className="w-7 h-7" />
               </div>
             </a>
@@ -420,7 +420,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             {/* Free Courses Card */}
             <a
               href={quickCards.freeLink || '#courses'}
-              className="group relative min-h-[190px] sm:min-h-[210px] p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-blue-500/[0.12] via-background to-blue-500/[0.04] border-2 border-blue-500/30 hover:border-blue-500/80 transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1.5 flex items-center justify-between overflow-hidden"
+              className="group relative min-h-[190px] sm:min-h-[210px] p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-blue-500/[0.12] via-background to-blue-500/[0.04] border-2 border-blue-500/30 hover:border-blue-500/80 transition-all duration-500 shadow-sm hover:shadow-md hover:-translate-y-1 flex items-center justify-between overflow-hidden"
             >
               <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-500/15 rounded-full blur-3xl pointer-events-none group-hover:scale-150 transition-transform duration-700" />
               
@@ -439,7 +439,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 </p>
               </div>
 
-              <div className="relative z-10 w-16 h-16 rounded-3xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-2xl shadow-blue-500/40 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 flex-shrink-0">
+              <div className="relative z-10 w-16 h-16 rounded-3xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-md group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 flex-shrink-0">
                 <ArrowRight className="w-7 h-7" />
               </div>
             </a>
@@ -485,7 +485,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               onClick={() => setActiveCategory(cat)}
               className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold transition-all ${
                 activeCategory === cat
-                  ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/30 scale-105'
+                  ? 'bg-orange-500 text-white shadow-sm scale-105'
                   : 'bg-foreground/5 hover:bg-foreground/10 text-foreground/70 hover:text-foreground border border-foreground/10'
               }`}
             >
@@ -500,7 +500,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             <BookOpen className="w-12 h-12 text-foreground/30 mx-auto mb-3" />
             <p className="text-foreground/60 text-sm font-semibold">এই ক্যাটাগরিতে বর্তমানে কোনো সক্রিয় কোর্স নেই।</p>
             {isOwner && (
-              <Link href="/teacher-dashboard/courses/create" className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-orange-500 text-white font-bold text-xs shadow-lg">
+              <Link href="/teacher-dashboard/courses/create" className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-orange-500 text-white font-bold text-xs shadow-sm">
                 <span>+ নতুন কোর্স যুক্ত করুন</span>
               </Link>
             )}
@@ -510,7 +510,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             {filteredCourses.map((course) => (
               <div 
                 key={course.id}
-                className="group rounded-3xl bg-background border border-foreground/10 hover:border-orange-500/50 flex flex-col justify-between overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 shadow-md"
+                className="group rounded-3xl bg-background border border-foreground/10 hover:border-orange-500/50 flex flex-col justify-between overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 shadow-sm"
               >
                 {/* Thumbnail */}
                 <div className="relative aspect-[16/9] w-full bg-foreground/5 overflow-hidden">
@@ -595,12 +595,12 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             
             {/* Card 1 (Span 2) - Live & Recorded Classes */}
-            <div className="md:col-span-2 p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-orange-500/[0.08] via-background to-amber-500/[0.04] border border-orange-500/20 hover:border-orange-500/50 shadow-xl hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
+            <div className="md:col-span-2 p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-orange-500/[0.08] via-background to-amber-500/[0.04] border border-orange-500/20 hover:border-orange-500/50 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
               <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
               
               <div className="space-y-4 relative z-10">
                 <div className="flex items-center justify-between">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                     <Video className="w-7 h-7" />
                   </div>
                   <span className="px-3 py-1 rounded-full bg-orange-500/15 text-orange-500 text-xs font-bold border border-orange-500/30 flex items-center gap-1.5">
@@ -631,9 +631,9 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             </div>
 
             {/* Card 2 - Online Exam & Leaderboard */}
-            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-500/[0.08] via-background to-blue-500/[0.02] border border-blue-500/20 hover:border-blue-500/50 shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
+            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-500/[0.08] via-background to-blue-500/[0.02] border border-blue-500/20 hover:border-blue-500/50 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
               <div className="space-y-4 relative z-10">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                   <FileText className="w-7 h-7" />
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-foreground group-hover:text-blue-500 transition-colors">
@@ -657,9 +657,9 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             </div>
 
             {/* Card 3 - Lecture Sheet & Practice Book */}
-            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-purple-500/[0.08] via-background to-purple-500/[0.02] border border-purple-500/20 hover:border-purple-500/50 shadow-xl hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
+            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-purple-500/[0.08] via-background to-purple-500/[0.02] border border-purple-500/20 hover:border-purple-500/50 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
               <div className="space-y-4 relative z-10">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 text-white flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                   <BookOpen className="w-7 h-7" />
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-foreground group-hover:text-purple-500 transition-colors">
@@ -683,9 +683,9 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             </div>
 
             {/* Card 4 - 24/7 Doubt Solving */}
-            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-emerald-500/[0.08] via-background to-emerald-500/[0.02] border border-emerald-500/20 hover:border-emerald-500/50 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
+            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-emerald-500/[0.08] via-background to-emerald-500/[0.02] border border-emerald-500/20 hover:border-emerald-500/50 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
               <div className="space-y-4 relative z-10">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                   <MessageCircle className="w-7 h-7" />
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-foreground group-hover:text-emerald-500 transition-colors">
@@ -709,7 +709,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             </div>
 
             {/* Card 5 (Span 3) - Success CTA Banner */}
-            <div className="md:col-span-3 p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-r from-orange-500/15 via-amber-500/10 to-orange-600/15 border-2 border-orange-500/30 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+            <div className="md:col-span-3 p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-r from-orange-500/15 via-amber-500/10 to-orange-600/15 border-2 border-orange-500/30 shadow-md flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
               <div className="space-y-2 relative z-10">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 text-orange-500 text-xs font-bold border border-orange-500/30 mb-1">
                   <Flame className="w-3.5 h-3.5 animate-pulse" />
@@ -725,7 +725,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
               <a 
                 href="#courses" 
-                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm shadow-xl shadow-orange-500/30 hover:scale-105 transition-all shrink-0 flex items-center gap-2"
+                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm shadow-sm hover:scale-105 transition-all shrink-0 flex items-center gap-2"
               >
                 <span>কোর্সসমূহ দেখুন</span>
                 <ArrowRight className="w-4 h-4" />
@@ -741,7 +741,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       {/* 5. ভর্তি নির্দেশিকা (Step-by-Step Admission Guide - Light/Dark Harmonized) */}
       {/* ========================================================================= */}
       <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        <div className="rounded-[3rem] p-8 sm:p-12 lg:p-16 bg-gradient-to-br from-orange-500/[0.04] via-card to-amber-500/[0.02] dark:from-neutral-900 dark:via-zinc-950 dark:to-black text-foreground dark:text-white border border-foreground/10 dark:border-white/10 shadow-2xl relative overflow-hidden">
+        <div className="rounded-[3rem] p-8 sm:p-12 lg:p-16 bg-gradient-to-br from-orange-500/[0.04] via-card to-amber-500/[0.02] dark:from-neutral-900 dark:via-zinc-950 dark:to-black text-foreground dark:text-white border border-foreground/10 dark:border-white/10 shadow-md relative overflow-hidden">
           
           {/* Ambient Glow */}
           <div className="absolute top-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -768,18 +768,18 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 {admissionSteps.map((st: any, idx: number) => {
                   const stepNum = st.stepNumber || idx + 1;
                   const stepColors = [
-                    'from-orange-500 to-amber-500 shadow-orange-500/40 text-white',
-                    'from-amber-500 to-orange-600 shadow-amber-500/40 text-white',
-                    'from-emerald-500 to-teal-600 shadow-emerald-500/40 text-white'
+                    'from-orange-500 to-amber-500 shadow-sm text-white',
+                    'from-amber-500 to-orange-600 shadow-sm text-white',
+                    'from-emerald-500 to-teal-600 shadow-sm text-white'
                   ];
                   const colorClass = stepColors[idx % stepColors.length];
 
                   return (
                     <div key={st.id || idx} className="flex items-start gap-5 relative group">
-                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${colorClass} font-black text-lg flex items-center justify-center shrink-0 shadow-xl ring-4 ring-background dark:ring-neutral-900 z-10 group-hover:scale-110 transition-transform`}>
+                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${colorClass} font-black text-lg flex items-center justify-center shrink-0 shadow-sm ring-4 ring-background dark:ring-neutral-900 z-10 group-hover:scale-110 transition-transform`}>
                         0{stepNum}
                       </div>
-                      <div className="p-5 rounded-2xl bg-card dark:bg-white/[0.04] border border-foreground/10 dark:border-white/10 hover:border-orange-500/40 transition-colors flex-1 space-y-1 shadow-md">
+                      <div className="p-5 rounded-2xl bg-card dark:bg-white/[0.04] border border-foreground/10 dark:border-white/10 hover:border-orange-500/40 transition-colors flex-1 space-y-1 shadow-sm">
                         <h4 className="font-extrabold text-base sm:text-lg text-foreground dark:text-white group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors">
                           {st.title}
                         </h4>
@@ -794,10 +794,10 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             </div>
 
             {/* Right: Quick Counseling & Payment Widget */}
-            <div className="lg:col-span-5 p-8 sm:p-10 rounded-3xl bg-card/90 dark:bg-white/[0.03] border border-foreground/10 dark:border-white/10 backdrop-blur-xl shadow-2xl space-y-6 text-center relative overflow-hidden">
+            <div className="lg:col-span-5 p-8 sm:p-10 rounded-3xl bg-card/90 dark:bg-white/[0.03] border border-foreground/10 dark:border-white/10 backdrop-blur-xl shadow-md space-y-6 text-center relative overflow-hidden">
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-orange-500/15 rounded-full blur-2xl pointer-events-none" />
               
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center mx-auto shadow-xl shadow-orange-500/30">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center mx-auto shadow-sm">
                 <Phone className="w-8 h-8" />
               </div>
 
@@ -816,7 +816,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               <div className="space-y-3 pt-2">
                 <a
                   href={`tel:${contactPhone}`}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm flex items-center justify-center gap-2.5 transition-all shadow-xl shadow-orange-500/30 hover:scale-[1.02]"
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm flex items-center justify-center gap-2.5 transition-all shadow-sm hover:scale-[1.02]"
                 >
                   <Phone className="w-4 h-4" />
                   <span>সরাসরি কল করুন: {contactPhone}</span>
@@ -827,7 +827,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                     href={`https://wa.me/${String(contactWhatsapp).replace(/[^0-9]/g, '')}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-sm flex items-center justify-center gap-2.5 transition-all shadow-xl shadow-emerald-500/20 hover:scale-[1.02]"
+                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-sm flex items-center justify-center gap-2.5 transition-all shadow-sm hover:scale-[1.02]"
                   >
                     <MessageCircle className="w-4 h-4" />
                     <span>WhatsApp-এ মেসেজ দিন</span>
@@ -989,12 +989,12 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
           </div>
 
-          <div className="p-8 sm:p-14 rounded-[3.5rem] bg-gradient-to-br from-orange-500/[0.05] via-card to-amber-500/[0.03] dark:from-neutral-900 dark:via-zinc-950 dark:to-black text-foreground dark:text-white border border-foreground/10 dark:border-white/10 shadow-2xl relative overflow-hidden">
+          <div className="p-8 sm:p-14 rounded-[3.5rem] bg-gradient-to-br from-orange-500/[0.05] via-card to-amber-500/[0.03] dark:from-neutral-900 dark:via-zinc-950 dark:to-black text-foreground dark:text-white border border-foreground/10 dark:border-white/10 shadow-md relative overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
               
               {/* Left: Founder Avatar with glowing rings */}
               <div className="lg:col-span-5 text-center space-y-5">
-                <div className="relative w-64 h-64 sm:w-76 sm:h-76 mx-auto rounded-full bg-gradient-to-tr from-orange-500 via-amber-400 to-orange-600 p-2.5 flex items-center justify-center shadow-2xl shadow-orange-500/20 group">
+                <div className="relative w-64 h-64 sm:w-76 sm:h-76 mx-auto rounded-full bg-gradient-to-tr from-orange-500 via-amber-400 to-orange-600 p-2.5 flex items-center justify-center shadow-md group">
                   <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-background dark:border-neutral-950 bg-card dark:bg-neutral-900 shadow-inner">
                     <img 
                       src={aboutPhoto} 
@@ -1004,18 +1004,18 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   </div>
 
                   {/* Floating Badges */}
-                  <div className="absolute -top-2 left-0 px-4 py-1.5 rounded-full bg-card/90 dark:bg-neutral-900/90 border border-orange-500/40 shadow-xl text-xs font-black text-orange-600 dark:text-orange-400 backdrop-blur-md flex items-center gap-1.5">
+                  <div className="absolute -top-2 left-0 px-4 py-1.5 rounded-full bg-card/90 dark:bg-neutral-900/90 border border-orange-500/40 shadow-sm text-xs font-black text-orange-600 dark:text-orange-400 backdrop-blur-md flex items-center gap-1.5">
                     <span>🏆</span>
                     <span>চিফ মেন্টর</span>
                   </div>
 
-                  <div className="absolute -bottom-2 right-0 px-4 py-1.5 rounded-full bg-card/90 dark:bg-neutral-900/90 border border-amber-500/40 shadow-xl text-xs font-black text-amber-600 dark:text-amber-300 backdrop-blur-md flex items-center gap-1.5">
+                  <div className="absolute -bottom-2 right-0 px-4 py-1.5 rounded-full bg-card/90 dark:bg-neutral-900/90 border border-amber-500/40 shadow-sm text-xs font-black text-amber-600 dark:text-amber-300 backdrop-blur-md flex items-center gap-1.5">
                     <span>⚡</span>
                     <span>১০+ বছর অভিজ্ঞতা</span>
                   </div>
                 </div>
 
-                <div className="inline-block px-8 py-3.5 rounded-2xl bg-card/90 dark:bg-white/[0.05] border border-foreground/10 dark:border-white/10 shadow-xl text-center backdrop-blur-md">
+                <div className="inline-block px-8 py-3.5 rounded-2xl bg-card/90 dark:bg-white/[0.05] border border-foreground/10 dark:border-white/10 shadow-sm text-center backdrop-blur-md">
                   <div className="flex items-center justify-center gap-2">
                     <h4 className="text-xl font-black text-foreground dark:text-white">{profileData?.displayName || 'Instructor Name'}</h4>
                     <CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" />
@@ -1046,7 +1046,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
                 {/* 3 Rich Animated Stats Cards */}
                 <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-4">
-                  <div className="p-4 sm:p-5 rounded-2xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-orange-500/40 shadow-md hover:shadow-xl transition-all text-center group hover:-translate-y-1">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-orange-500/40 shadow-sm hover:shadow-md transition-all text-center group hover:-translate-y-1">
                     <div className="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-600 dark:text-orange-400 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
                       <Users className="w-4 h-4" />
                     </div>
@@ -1054,7 +1054,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                     <div className="text-[11px] sm:text-xs font-bold text-foreground/60 dark:text-gray-400 mt-1 uppercase tracking-wider">মোট শিক্ষার্থী</div>
                   </div>
 
-                  <div className="p-4 sm:p-5 rounded-2xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-emerald-500/40 shadow-md hover:shadow-xl transition-all text-center group hover:-translate-y-1">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-emerald-500/40 shadow-sm hover:shadow-md transition-all text-center group hover:-translate-y-1">
                     <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
                       <Trophy className="w-4 h-4" />
                     </div>
@@ -1062,7 +1062,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                     <div className="text-[11px] sm:text-xs font-bold text-foreground/60 dark:text-gray-400 mt-1 uppercase tracking-wider">সফলতার হার</div>
                   </div>
 
-                  <div className="p-4 sm:p-5 rounded-2xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-amber-500/40 shadow-md hover:shadow-xl transition-all text-center group hover:-translate-y-1">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-amber-500/40 shadow-sm hover:shadow-md transition-all text-center group hover:-translate-y-1">
                     <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
                       <Video className="w-4 h-4" />
                     </div>
@@ -1082,7 +1082,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       {/* 7. যোগাযোগ ও সোশ্যাল চ্যানেল (Contact Section - Light & Dark Harmonized)   */}
       {/* ========================================================================= */}
       <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        <div className="rounded-[3.5rem] p-8 sm:p-12 lg:p-16 bg-gradient-to-br from-orange-500/[0.04] via-card to-amber-500/[0.02] dark:from-neutral-900/95 dark:via-black dark:to-neutral-900/90 text-foreground dark:text-white border border-foreground/10 dark:border-white/10 shadow-2xl relative overflow-hidden">
+        <div className="rounded-[3.5rem] p-8 sm:p-12 lg:p-16 bg-gradient-to-br from-orange-500/[0.04] via-card to-amber-500/[0.02] dark:from-neutral-900/95 dark:via-black dark:to-neutral-900/90 text-foreground dark:text-white border border-foreground/10 dark:border-white/10 shadow-md relative overflow-hidden">
           
           <div className="space-y-12">
             
@@ -1111,7 +1111,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   <img 
                     src={contactImage} 
                     alt="Support Representative" 
-                    className="w-full h-full object-contain object-bottom drop-shadow-[0_15px_25px_rgba(0,0,0,0.15)] dark:drop-shadow-[0_20px_30px_rgba(0,0,0,0.8)]" 
+                    className="w-full h-full object-contain object-bottom drop-shadow-[0_10px_20px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_15px_25px_rgba(0,0,0,0.5)] [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)]" 
                   />
                 </div>
               )}
@@ -1123,10 +1123,10 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               {/* 1. Phone Call Card */}
               <a
                 href={`tel:${contactPhone}`}
-                className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-orange-500/50 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-orange-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-orange-500/50 transition-all duration-300 shadow-sm hover:shadow-md flex flex-col justify-between space-y-4 group hover:-translate-y-1"
               >
                 <div className="flex items-center justify-between">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                     <Phone className="w-6 h-6" />
                   </div>
                   <span className="px-2.5 py-0.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-300 text-[10px] font-bold border border-orange-500/20 dark:border-orange-500/30">
@@ -1151,10 +1151,10 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   href={`https://wa.me/${String(contactWhatsapp).replace(/[^0-9]/g, '')}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-emerald-500/50 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-emerald-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                  className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-emerald-500/50 transition-all duration-300 shadow-sm hover:shadow-md flex flex-col justify-between space-y-4 group hover:-translate-y-1"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                       <MessageCircle className="w-6 h-6" />
                     </div>
                     <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 text-[10px] font-bold border border-emerald-500/20 dark:border-emerald-500/30">
@@ -1180,10 +1180,10 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   href={contactTelegram}
                   target="_blank"
                   rel="noreferrer"
-                  className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-sky-500/50 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-sky-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                  className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-sky-500/50 transition-all duration-300 shadow-sm hover:shadow-md flex flex-col justify-between space-y-4 group hover:-translate-y-1"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-lg shadow-sky-500/30 group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                       <Send className="w-6 h-6" />
                     </div>
                     <span className="px-2.5 py-0.5 rounded-full bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-300 text-[10px] font-bold border border-sky-500/20 dark:border-sky-500/30">
@@ -1209,10 +1209,10 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   href={contactYoutube}
                   target="_blank"
                   rel="noreferrer"
-                  className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-red-500/50 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-red-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                  className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-red-500/50 transition-all duration-300 shadow-sm hover:shadow-md flex flex-col justify-between space-y-4 group hover:-translate-y-1"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-600 text-white flex items-center justify-center shadow-lg shadow-red-500/30 group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-600 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                       <Play className="w-6 h-6 fill-current" />
                     </div>
                     <span className="px-2.5 py-0.5 rounded-full bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-300 text-[10px] font-bold border border-red-500/20 dark:border-red-500/30">
@@ -1238,10 +1238,10 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   href={contactFacebookGroup}
                   target="_blank"
                   rel="noreferrer"
-                  className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-blue-500/50 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-blue-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                  className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-blue-500/50 transition-all duration-300 shadow-sm hover:shadow-md flex flex-col justify-between space-y-4 group hover:-translate-y-1"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                       <Users className="w-6 h-6" />
                     </div>
                     <span className="px-2.5 py-0.5 rounded-full bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-300 text-[10px] font-bold border border-blue-500/20 dark:border-blue-500/30">
@@ -1264,10 +1264,10 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               {/* 6. Email Contact Card */}
               <a
                 href={`mailto:${contactEmail}`}
-                className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-purple-500/50 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-purple-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                className="p-6 rounded-3xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-purple-500/50 transition-all duration-300 shadow-sm hover:shadow-md flex flex-col justify-between space-y-4 group hover:-translate-y-1"
               >
                 <div className="flex items-center justify-between">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-600 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                     <Mail className="w-6 h-6" />
                   </div>
                   <span className="px-2.5 py-0.5 rounded-full bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-300 text-[10px] font-bold border border-purple-500/20 dark:border-purple-500/30">
@@ -1296,7 +1296,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       {/* 8. ট্রাস্ট ও কল-টু-অ্যাকশন ব্যানার (Light/Dark Harmonized & Slider)         */}
       {/* ========================================================================= */}
       <section className="py-16 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        <div className="rounded-[3.5rem] p-8 sm:p-14 lg:p-16 bg-gradient-to-br from-orange-500/[0.06] via-card to-amber-500/[0.03] dark:from-neutral-900 dark:via-zinc-950 dark:to-black text-foreground dark:text-white border-2 border-orange-500/30 shadow-2xl relative overflow-hidden">
+        <div className="rounded-[3.5rem] p-8 sm:p-14 lg:p-16 bg-gradient-to-br from-orange-500/[0.06] via-card to-amber-500/[0.03] dark:from-neutral-900 dark:via-zinc-950 dark:to-black text-foreground dark:text-white border-2 border-orange-500/30 shadow-md relative overflow-hidden">
           
           {/* Ambient Glow */}
           <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-96 h-96 bg-orange-500/15 rounded-full blur-3xl pointer-events-none" />
@@ -1342,7 +1342,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               <div className="flex items-center gap-4 flex-wrap pt-2">
                 <a
                   href="#courses"
-                  className="px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm shadow-xl shadow-orange-500/40 hover:scale-105 transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm shadow-sm hover:scale-105 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <span>{trustPaidBtnText}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -1359,7 +1359,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
             {/* Right Equal-Height Image Slider Column */}
             <div className="lg:col-span-5 flex flex-col">
-              <div className="relative w-full h-full min-h-[360px] sm:min-h-[420px] rounded-3xl overflow-hidden shadow-2xl border-2 border-foreground/10 dark:border-white/20 bg-gradient-to-tr from-orange-500/20 via-foreground/5 dark:via-white/5 to-transparent group flex flex-col justify-between">
+              <div className="relative w-full h-full min-h-[360px] sm:min-h-[420px] rounded-3xl overflow-hidden shadow-md border-2 border-foreground/10 dark:border-white/20 bg-gradient-to-tr from-orange-500/20 via-foreground/5 dark:via-white/5 to-transparent group flex flex-col justify-between">
                 
                 {/* Active Image */}
                 <img 
@@ -1369,7 +1369,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 />
 
                 {/* Floating Top Badge */}
-                <div className="relative z-10 m-4 self-start px-3.5 py-1.5 rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-xs font-black text-amber-300 flex items-center gap-1.5 shadow-lg">
+                <div className="relative z-10 m-4 self-start px-3.5 py-1.5 rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-xs font-black text-amber-300 flex items-center gap-1.5 shadow-sm">
                   <Trophy className="w-3.5 h-3.5" />
                   <span>সফল শিক্ষার্থী</span>
                 </div>
@@ -1380,7 +1380,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                     <button
                       type="button"
                       onClick={handlePrevTrustSlide}
-                      className="w-9 h-9 rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center backdrop-blur-md transition-all shadow-xl hover:scale-110 pointer-events-auto cursor-pointer"
+                      className="w-9 h-9 rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center backdrop-blur-md transition-all shadow-sm hover:scale-110 pointer-events-auto cursor-pointer"
                       aria-label="Previous Trust Slide"
                     >
                       <ChevronLeft className="w-4 h-4" />
@@ -1388,7 +1388,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                     <button
                       type="button"
                       onClick={handleNextTrustSlide}
-                      className="w-9 h-9 rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center backdrop-blur-md transition-all shadow-xl hover:scale-110 pointer-events-auto cursor-pointer"
+                      className="w-9 h-9 rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center backdrop-blur-md transition-all shadow-sm hover:scale-110 pointer-events-auto cursor-pointer"
                       aria-label="Next Trust Slide"
                     >
                       <ChevronRight className="w-4 h-4" />
@@ -1414,7 +1414,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                     </div>
                   ) : <div />}
 
-                  <div className="px-3.5 py-1.5 rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-xs font-black text-orange-400 flex items-center gap-1.5 shadow-lg">
+                  <div className="px-3.5 py-1.5 rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-xs font-black text-orange-400 flex items-center gap-1.5 shadow-sm">
                     <Star className="w-3.5 h-3.5 fill-current text-amber-400" />
                     <span>৪.৯/৫ রেটিং</span>
                   </div>
@@ -1456,7 +1456,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 {row1Loop.map((photo: any, idx: number) => (
                   <div 
                     key={`row1-${idx}`} 
-                    className="relative w-64 sm:w-80 md:w-96 aspect-[16/10] rounded-2xl sm:rounded-3xl overflow-hidden bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 shadow-2xl flex-shrink-0 group"
+                    className="relative w-64 sm:w-80 md:w-96 aspect-[16/10] rounded-2xl sm:rounded-3xl overflow-hidden bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 shadow-md flex-shrink-0 group"
                   >
                     <img 
                       src={photo.imageUrl} 
@@ -1473,7 +1473,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 {row2Loop.map((photo: any, idx: number) => (
                   <div 
                     key={`row2-${idx}`} 
-                    className="relative w-64 sm:w-80 md:w-96 aspect-[16/10] rounded-2xl sm:rounded-3xl overflow-hidden bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 shadow-2xl flex-shrink-0 group"
+                    className="relative w-64 sm:w-80 md:w-96 aspect-[16/10] rounded-2xl sm:rounded-3xl overflow-hidden bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 shadow-md flex-shrink-0 group"
                   >
                     <img 
                       src={photo.imageUrl} 
@@ -1492,7 +1492,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       {/* 10. সাহায্যের প্রয়োজন? আমরা পাশে আছি                                       */}
       {/* ========================================================================= */}
       <section className="py-12 max-w-5xl mx-auto px-3.5 sm:px-6">
-        <div className="relative rounded-[2rem] p-6 sm:p-8 bg-card border border-foreground/10 shadow-2xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="relative rounded-[2rem] p-6 sm:p-8 bg-card border border-foreground/10 shadow-sm overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
           
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 via-amber-500 to-blue-500" />
 
@@ -1519,7 +1519,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 href={contactFacebookPage}
                 target="_blank"
                 rel="noreferrer"
-                className="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all hover:scale-105"
+                className="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all hover:scale-105"
               >
                 <span className="font-black text-base">f</span>
                 <div className="text-left leading-tight">
@@ -1531,7 +1531,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
             <a
               href={`tel:${helpBarPhone}`}
-              className="px-5 py-3 rounded-2xl bg-background hover:bg-foreground/5 border-2 border-foreground/15 text-foreground font-bold text-xs flex items-center gap-2 shadow-md transition-all hover:scale-105"
+              className="px-5 py-3 rounded-2xl bg-background hover:bg-foreground/5 border-2 border-foreground/15 text-foreground font-bold text-xs flex items-center gap-2 shadow-sm transition-all hover:scale-105"
             >
               <Phone className="w-4 h-4 text-orange-500" />
               <div className="text-left leading-tight">

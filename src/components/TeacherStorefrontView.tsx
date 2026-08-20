@@ -45,8 +45,11 @@ import {
   Target,
   Send,
   Edit2,
-  LayoutDashboard
+  LayoutDashboard,
+  X,
+  Quote
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
 interface CourseItem {
@@ -74,6 +77,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
   const [profileData, setProfileData] = useState<any>(null);
   const [courses, setCourses] = useState<CourseItem[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>('সকল কোর্স');
+  const [selectedTeacherModal, setSelectedTeacherModal] = useState<any | null>(null);
 
   // Hero Slider Carousel State
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -817,9 +821,9 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       {/* 5.5 আমাদের শিক্ষক মণ্ডলী (Faculty Showcase for Institutions)              */}
       {/* ========================================================================= */}
       {isInstitution && teachersRoster.length > 0 && (
-        <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16 space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-500/10 text-orange-500 text-xs font-extrabold uppercase tracking-wider">
+        <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 relative">
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/20 text-xs font-extrabold uppercase tracking-wider shadow-sm">
               <Users className="w-3.5 h-3.5" />
               <span>Expert Faculty & Mentors</span>
             </div>
@@ -832,7 +836,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
             </div>
 
-            <p className="text-foreground/75 text-sm sm:text-base max-w-xl mx-auto">
+            <p className="text-foreground/75 text-sm sm:text-base max-w-xl mx-auto font-medium leading-relaxed">
               দেশের সেরা বিশ্ববিদ্যালয় ও শীর্ষস্থানীয় প্রতিষ্ঠানসমূহের অভিজ্ঞ মেন্টরদের সাথে নাও তোমার সেরা প্রস্তুতি
             </p>
           </div>
@@ -841,31 +845,34 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             {teachersRoster.map((teacher: any, idx: number) => (
               <div
                 key={teacher.id || idx}
-                className="group rounded-3xl bg-background border border-foreground/10 hover:border-orange-500/50 p-6 flex flex-col justify-between space-y-5 transition-all duration-300 shadow-md hover:shadow-2xl relative overflow-hidden"
+                className="group rounded-[2.5rem] bg-gradient-to-b from-white/[0.06] via-white/[0.02] to-transparent border border-foreground/10 hover:border-orange-500/50 p-6 flex flex-col justify-between space-y-5 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-orange-500/10 hover:-translate-y-1 relative overflow-hidden backdrop-blur-sm"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-orange-500/20 transition-colors" />
+                <div className="absolute top-0 right-0 w-36 h-36 bg-orange-500/15 rounded-full blur-2xl pointer-events-none group-hover:bg-orange-500/30 transition-colors" />
 
                 <div>
-                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full p-1 bg-gradient-to-tr from-orange-500 via-amber-500 to-orange-400 shadow-xl mb-4">
-                    <div className="w-full h-full rounded-full overflow-hidden border-2 border-background bg-foreground/10">
+                  <div className="relative w-28 h-28 mx-auto rounded-full p-1.5 bg-gradient-to-tr from-orange-500 via-amber-400 to-orange-600 shadow-xl mb-4 group-hover:scale-105 transition-transform duration-300">
+                    <div className="w-full h-full rounded-full overflow-hidden border-2 border-background bg-neutral-900">
                       <img
                         src={teacher.image || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(teacher.name)}
                         alt={teacher.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover"
                       />
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 p-1 rounded-full bg-blue-500 text-white shadow-md border-2 border-background">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
                     </div>
                   </div>
 
                   <div className="text-center space-y-1">
-                    <h3 className="font-extrabold text-base sm:text-lg text-foreground group-hover:text-orange-500 transition-colors line-clamp-1">
+                    <h3 className="font-extrabold text-lg text-foreground group-hover:text-orange-500 transition-colors line-clamp-1">
                       {teacher.name}
                     </h3>
-                    <p className="text-xs font-bold text-orange-500 line-clamp-1">
+                    <p className="text-xs font-bold text-orange-500">
                       {teacher.role || 'Senior Faculty'}
                     </p>
                     {teacher.university && (
-                      <div className="inline-flex items-center gap-1 text-[11px] text-foreground/60 font-medium">
-                        <GraduationCap className="w-3.5 h-3.5 text-foreground/40 shrink-0" />
+                      <div className="inline-flex items-center gap-1.5 text-xs text-foreground/70 font-medium mt-1">
+                        <GraduationCap className="w-3.5 h-3.5 text-orange-400 shrink-0" />
                         <span className="truncate">{teacher.university}</span>
                       </div>
                     )}
@@ -873,45 +880,58 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
                   {teacher.subjects && (
                     <div className="mt-3 text-center">
-                      <span className="inline-block px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/20 text-[11px] font-semibold max-w-full truncate">
+                      <span className="inline-block px-3.5 py-1 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/20 text-xs font-bold max-w-full truncate">
                         📚 {teacher.subjects}
                       </span>
                     </div>
                   )}
 
                   {teacher.bio && (
-                    <p className="text-xs text-foreground/70 mt-3 text-center line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-foreground/70 mt-3 text-center line-clamp-2 leading-relaxed font-medium">
                       {teacher.bio}
                     </p>
                   )}
                 </div>
 
-                {(teacher.facebookUrl || teacher.youtubeUrl) && (
-                  <div className="pt-3 border-t border-foreground/10 flex items-center justify-center gap-2">
-                    {teacher.facebookUrl && (
-                      <a
-                        href={teacher.facebookUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="w-8 h-8 rounded-full bg-foreground/5 hover:bg-blue-600 hover:text-white flex items-center justify-center text-foreground/70 transition-colors text-xs font-bold"
-                        title="Facebook"
-                      >
-                        f
-                      </a>
-                    )}
-                    {teacher.youtubeUrl && (
-                      <a
-                        href={teacher.youtubeUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="w-8 h-8 rounded-full bg-foreground/5 hover:bg-red-600 hover:text-white flex items-center justify-center text-foreground/70 transition-colors text-xs"
-                        title="YouTube"
-                      >
-                        <Video className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-                  </div>
-                )}
+                {/* Actions: Biodata Modal Button & Social */}
+                <div className="space-y-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedTeacherModal(teacher)}
+                    className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition-all flex items-center justify-center gap-2 group/btn cursor-pointer"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>বায়োডাটা দেখুন</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                  </button>
+
+                  {(teacher.facebookUrl || teacher.youtubeUrl) && (
+                    <div className="pt-2 border-t border-foreground/10 flex items-center justify-center gap-2.5">
+                      {teacher.facebookUrl && (
+                        <a
+                          href={teacher.facebookUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="w-8 h-8 rounded-full bg-foreground/5 hover:bg-blue-600 hover:text-white flex items-center justify-center text-foreground/70 transition-colors text-xs font-bold shadow-sm"
+                          title="Facebook"
+                        >
+                          f
+                        </a>
+                      )}
+                      {teacher.youtubeUrl && (
+                        <a
+                          href={teacher.youtubeUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="w-8 h-8 rounded-full bg-foreground/5 hover:bg-red-600 hover:text-white flex items-center justify-center text-foreground/70 transition-colors text-xs shadow-sm"
+                          title="YouTube"
+                        >
+                          <Video className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -919,10 +939,14 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       )}
 
       {/* ========================================================================= */}
-      {/* 6. আমাদের সম্পর্কে (About Section)                                         */}
+      {/* 6. আমাদের সম্পর্কে (About Section - Premium & Animated)                     */}
       {/* ========================================================================= */}
-      <section className="py-20 sm:py-28 bg-foreground/[0.02] border-y border-foreground/10">
-        <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+      <section className="py-20 sm:py-28 bg-foreground/[0.02] border-y border-foreground/10 relative overflow-hidden">
+        {/* Ambient floating lights */}
+        <div className="absolute top-10 left-1/4 w-80 h-80 bg-orange-500/10 rounded-full blur-[100px] pointer-events-none animate-pulse" />
+        <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-amber-500/10 rounded-full blur-[100px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 relative z-10">
           
           <div className="flex items-center justify-center gap-3 sm:gap-6 mb-12">
             <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
@@ -932,57 +956,86 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
           </div>
 
-          <div className="p-8 sm:p-14 rounded-[3rem] bg-gradient-to-br from-orange-500/[0.04] via-background to-orange-500/[0.02] border border-foreground/10 shadow-2xl relative overflow-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+          <div className="p-8 sm:p-14 rounded-[3.5rem] bg-gradient-to-br from-neutral-900 via-zinc-950 to-black text-white border border-white/10 shadow-2xl relative overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
               
-              <div className="lg:col-span-5 text-center space-y-4">
-                <div className="relative w-60 h-60 sm:w-72 sm:h-72 mx-auto rounded-full bg-gradient-to-tr from-orange-500/20 via-amber-500/15 to-orange-500/20 p-3 flex items-center justify-center shadow-2xl">
-                  <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-background bg-background shadow-inner">
+              {/* Left: Founder Avatar with glowing rings */}
+              <div className="lg:col-span-5 text-center space-y-5">
+                <div className="relative w-64 h-64 sm:w-76 sm:h-76 mx-auto rounded-full bg-gradient-to-tr from-orange-500 via-amber-400 to-orange-600 p-2.5 flex items-center justify-center shadow-2xl shadow-orange-500/20 group">
+                  <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-neutral-950 bg-neutral-900 shadow-inner">
                     <img 
                       src={aboutPhoto} 
                       alt={profileData?.displayName || "Founder"} 
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                   </div>
 
-                  <div className="absolute top-4 left-4 px-3.5 py-1 rounded-full bg-background/95 border border-foreground/15 shadow-md text-[11px] font-extrabold text-orange-500 backdrop-blur-md flex items-center gap-1.5">
+                  {/* Floating Badges */}
+                  <div className="absolute -top-2 left-0 px-4 py-1.5 rounded-full bg-neutral-900/90 border border-orange-500/40 shadow-xl text-xs font-black text-orange-400 backdrop-blur-md flex items-center gap-1.5">
                     <span>🏆</span>
                     <span>চিফ মেন্টর</span>
                   </div>
+
+                  <div className="absolute -bottom-2 right-0 px-4 py-1.5 rounded-full bg-neutral-900/90 border border-amber-500/40 shadow-xl text-xs font-black text-amber-300 backdrop-blur-md flex items-center gap-1.5">
+                    <span>⚡</span>
+                    <span>১০+ বছর অভিজ্ঞতা</span>
+                  </div>
                 </div>
 
-                <div className="inline-block px-8 py-3 rounded-2xl bg-background border border-foreground/10 shadow-lg text-center">
-                  <div className="flex items-center justify-center gap-1.5">
-                    <h4 className="text-lg font-black text-foreground">{profileData?.displayName || 'Instructor Name'}</h4>
-                    <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />
+                <div className="inline-block px-8 py-3.5 rounded-2xl bg-white/[0.05] border border-white/10 shadow-xl text-center backdrop-blur-md">
+                  <div className="flex items-center justify-center gap-2">
+                    <h4 className="text-xl font-black text-white">{profileData?.displayName || 'Instructor Name'}</h4>
+                    <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
                   </div>
-                  <p className="text-xs text-orange-500 font-bold mt-0.5">
+                  <p className="text-xs text-orange-400 font-bold mt-1 tracking-wide">
                     {founderRole}
                   </p>
                 </div>
               </div>
 
+              {/* Right: Story & Animated Stats */}
               <div className="lg:col-span-7 space-y-6">
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-500/10 text-orange-500 text-xs font-extrabold uppercase tracking-wider">
-                  <Target className="w-3.5 h-3.5" />
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-black uppercase tracking-wider">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                   <span>স্বপ্ন ছোঁয়ার প্রস্তুতি</span>
                 </div>
 
-                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground leading-[1.25]">
+                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-[1.25] tracking-tight">
                   {aboutHeadline}
                 </h3>
 
-                <p className="text-foreground/75 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-medium">
-                  {aboutBio}
-                </p>
+                <div className="relative">
+                  <Quote className="w-8 h-8 text-orange-500/20 absolute -top-4 -left-3 pointer-events-none" />
+                  <p className="text-gray-300 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-medium pl-4 border-l-2 border-orange-500/40">
+                    {aboutBio}
+                  </p>
+                </div>
 
+                {/* 3 Rich Animated Stats Cards */}
                 <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-4">
-                  {aboutStats.map((st: any) => (
-                    <div key={st.id} className="p-4 sm:p-5 rounded-2xl bg-background border border-foreground/10 shadow-sm text-center">
-                      <div className="text-xl sm:text-2xl md:text-3xl font-black text-orange-500">{st.value}</div>
-                      <div className="text-[11px] sm:text-xs font-bold text-foreground/60 mt-1 uppercase tracking-wider">{st.label}</div>
+                  <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-orange-500/40 shadow-xl transition-all text-center group hover:-translate-y-1">
+                    <div className="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                      <Users className="w-4 h-4" />
                     </div>
-                  ))}
+                    <div className="text-xl sm:text-2xl md:text-3xl font-black text-orange-400">১০,০০০+</div>
+                    <div className="text-[11px] sm:text-xs font-bold text-gray-400 mt-1 uppercase tracking-wider">মোট শিক্ষার্থী</div>
+                  </div>
+
+                  <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-emerald-500/40 shadow-xl transition-all text-center group hover:-translate-y-1">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                      <Trophy className="w-4 h-4" />
+                    </div>
+                    <div className="text-xl sm:text-2xl md:text-3xl font-black text-emerald-400">৯৯%</div>
+                    <div className="text-[11px] sm:text-xs font-bold text-gray-400 mt-1 uppercase tracking-wider">সফলতার হার</div>
+                  </div>
+
+                  <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-amber-500/40 shadow-xl transition-all text-center group hover:-translate-y-1">
+                    <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                      <Video className="w-4 h-4" />
+                    </div>
+                    <div className="text-xl sm:text-2xl md:text-3xl font-black text-amber-400">৫০০+</div>
+                    <div className="text-[11px] sm:text-xs font-bold text-gray-400 mt-1 uppercase tracking-wider">মোট ক্লাস লেকচার</div>
+                  </div>
                 </div>
               </div>
 
@@ -993,23 +1046,23 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       </section>
 
       {/* ========================================================================= */}
-      {/* 7. যোগাযোগ ও সোশ্যাল চ্যানেল (Contact Section)                            */}
+      {/* 7. যোগাযোগ ও সোশ্যাল চ্যানেল (Contact Section with Telegram, YouTube, etc.) */}
       {/* ========================================================================= */}
       <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        <div className="rounded-[3rem] p-8 sm:p-12 lg:p-14 bg-gradient-to-br from-neutral-900/90 via-black to-neutral-900/80 border border-white/10 shadow-2xl relative overflow-hidden">
+        <div className="rounded-[3.5rem] p-8 sm:p-12 lg:p-16 bg-gradient-to-br from-neutral-900/95 via-black to-neutral-900/90 border border-white/10 shadow-2xl relative overflow-hidden">
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+          <div className="space-y-12">
             
-            {/* Left side: Heading & Info */}
-            <div className="lg:col-span-5 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span>২৪/৭ হেল্প ও সাপোর্ট সক্রিয়</span>
-              </div>
+            {/* Heading & Intro */}
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-white/10">
+              <div className="space-y-3 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>২৪/৭ হেল্প ও সাপোর্ট সক্রিয়</span>
+                </div>
 
-              <div className="space-y-3">
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-                  আমাদের সাথে <br />
+                  আমাদের সাথে{' '}
                   <span className="bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500 bg-clip-text text-transparent">
                     যোগাযোগ করো
                   </span>
@@ -1021,7 +1074,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               </div>
 
               {contactImage && (
-                <div className="relative w-full max-w-[260px] h-52 rounded-2xl overflow-hidden bg-white/5 border border-white/10 shadow-xl">
+                <div className="hidden lg:block relative w-48 h-32 rounded-2xl overflow-hidden bg-white/5 border border-white/10 shadow-xl shrink-0">
                   <img 
                     src={contactImage} 
                     alt="Support Representative" 
@@ -1031,10 +1084,10 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               )}
             </div>
 
-            {/* Right side: 4 Rich Contact Action Cards */}
-            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            {/* 6 Rich Contact Action Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               
-              {/* Phone Call Card */}
+              {/* 1. Phone Call Card */}
               <a
                 href={`tel:${contactPhone}`}
                 className="p-6 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-orange-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-orange-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
@@ -1059,7 +1112,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 </div>
               </a>
 
-              {/* WhatsApp Message Card */}
+              {/* 2. WhatsApp Message Card */}
               {contactWhatsapp && (
                 <a
                   href={`https://wa.me/${String(contactWhatsapp).replace(/[^0-9]/g, '')}`}
@@ -1088,7 +1141,65 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 </a>
               )}
 
-              {/* Facebook Group Card */}
+              {/* 3. Telegram Channel Card */}
+              {contactTelegram && (
+                <a
+                  href={contactTelegram}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-6 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-sky-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-sky-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-lg shadow-sky-500/30 group-hover:scale-110 transition-transform">
+                      <Send className="w-6 h-6" />
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[10px] font-bold border border-sky-500/30">
+                      নোটিশ ও ফাইল
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-base text-white group-hover:text-sky-400 transition-colors">
+                      Telegram চ্যানেল
+                    </h4>
+                    <p className="text-xs text-gray-400 font-semibold mt-0.5">নিয়মিত আপডেট পেতে</p>
+                  </div>
+                  <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-sky-400 font-bold">
+                    <span>চ্যানেলে যুক্ত হোন</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </a>
+              )}
+
+              {/* 4. YouTube Channel Card */}
+              {contactYoutube && (
+                <a
+                  href={contactYoutube}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-6 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-red-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-red-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-600 text-white flex items-center justify-center shadow-lg shadow-red-500/30 group-hover:scale-110 transition-transform">
+                      <Play className="w-6 h-6 fill-current" />
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full bg-red-500/20 text-red-300 text-[10px] font-bold border border-red-500/30">
+                      ফ্রি ভিডিও
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-base text-white group-hover:text-red-400 transition-colors">
+                      YouTube চ্যানেল
+                    </h4>
+                    <p className="text-xs text-gray-400 font-semibold mt-0.5">ফ্রি ক্লাস ও টিপস দেখুন</p>
+                  </div>
+                  <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-red-400 font-bold">
+                    <span>সাবস্ক্রাইব করুন</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </a>
+              )}
+
+              {/* 5. Facebook Group Card */}
               {contactFacebookGroup && (
                 <a
                   href={contactFacebookGroup}
@@ -1117,7 +1228,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 </a>
               )}
 
-              {/* Email Contact Card */}
+              {/* 6. Email Contact Card */}
               <a
                 href={`mailto:${contactEmail}`}
                 className="p-6 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-purple-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/10 flex flex-col justify-between space-y-4 group hover:-translate-y-1"
@@ -1149,35 +1260,59 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       </section>
 
       {/* ========================================================================= */}
-      {/* 8. ট্রাস্ট ও কল-টু-অ্যাকশন ব্যানার                                         */}
+      {/* 8. ট্রাস্ট ও কল-টু-অ্যাকশন ব্যানার (Ultra-Premium Redesign)                   */}
       {/* ========================================================================= */}
-      <section className="py-12 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        <div className="rounded-[2.5rem] p-8 sm:p-12 lg:p-14 bg-gradient-to-r from-orange-500/[0.08] via-background to-amber-500/[0.05] border-2 border-orange-500/30 shadow-2xl relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8">
+      <section className="py-16 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+        <div className="rounded-[3.5rem] p-8 sm:p-14 lg:p-16 bg-gradient-to-br from-neutral-900 via-zinc-950 to-black text-white border-2 border-orange-500/30 shadow-2xl relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-10">
           
+          {/* Ambient Glow */}
+          <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-96 h-96 bg-orange-500/15 rounded-full blur-3xl pointer-events-none" />
+
           <div className="space-y-6 flex-1 relative z-10 max-w-2xl">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground leading-[1.2] tracking-tight">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-black uppercase tracking-wider">
+              <Award className="w-3.5 h-3.5 text-amber-300" />
+              <span>শীর্ষস্থানীয় এডটেক একাডেমি</span>
+            </div>
+
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-[1.2] tracking-tight">
               {cleanTrustTitle}{' '}
-              <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500 bg-clip-text text-transparent">
                 {trustHighlight}
               </span>{' '}
               একটি আস্থার নাম
             </h2>
 
-            <p className="text-foreground/75 text-sm sm:text-base leading-relaxed font-medium">
+            <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-medium">
               {trustSubtitle}
             </p>
+
+            <div className="flex items-center gap-3 flex-wrap text-xs font-bold text-gray-300 pt-1">
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.05] border border-white/10">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span>১০০% লাইভ ইন্টারঅ্যাকশন</span>
+              </span>
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.05] border border-white/10">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span>রিভিশন ও এক্সাম ব্যাচ</span>
+              </span>
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.05] border border-white/10">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span>ডেডিকেটেড মেন্টরশিপ</span>
+              </span>
+            </div>
 
             <div className="flex items-center gap-4 flex-wrap pt-2">
               <a
                 href="#courses"
-                className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm shadow-xl shadow-orange-500/30 hover:scale-105 transition-all"
+                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm shadow-xl shadow-orange-500/40 hover:scale-105 transition-all flex items-center gap-2"
               >
-                {trustPaidBtnText}
+                <span>{trustPaidBtnText}</span>
+                <ArrowRight className="w-4 h-4" />
               </a>
 
               <a
                 href={trustFreeLink}
-                className="px-8 py-3.5 rounded-2xl bg-background hover:bg-foreground/5 border-2 border-orange-500/30 hover:border-orange-500 text-foreground font-black text-sm transition-all hover:scale-105"
+                className="px-8 py-4 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/20 text-white font-black text-sm transition-all hover:scale-105 backdrop-blur-md"
               >
                 {trustFreeBtnText}
               </a>
@@ -1185,12 +1320,22 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
           </div>
 
           <div className="relative z-10 lg:w-96 flex-shrink-0 flex items-center justify-center">
-            <div className="relative w-64 sm:w-80 aspect-[4/4.5] rounded-3xl overflow-hidden shadow-2xl border-4 border-background bg-gradient-to-tr from-orange-500/20 via-amber-500/10 to-transparent">
+            <div className="relative w-72 sm:w-84 aspect-[4/4.5] rounded-3xl overflow-hidden shadow-2xl border-2 border-white/20 bg-gradient-to-tr from-orange-500/20 via-white/5 to-transparent group">
               <img 
                 src={trustCornerImage} 
                 alt="Student Success" 
-                className="w-full h-full object-cover object-top"
+                className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
               />
+
+              <div className="absolute top-4 left-4 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-xs font-black text-amber-300 flex items-center gap-1.5">
+                <Trophy className="w-3.5 h-3.5" />
+                <span>সফল শিক্ষার্থী</span>
+              </div>
+
+              <div className="absolute bottom-4 right-4 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-xs font-black text-orange-400 flex items-center gap-1.5">
+                <Star className="w-3.5 h-3.5 fill-current text-amber-400" />
+                <span>৪.৯/৫ রেটিং</span>
+              </div>
             </div>
           </div>
 
@@ -1311,6 +1456,159 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
         </div>
       </section>
+
+      {/* ========================================================================= */}
+      {/* Teacher Biodata Modal (Popup)                                             */}
+      {/* ========================================================================= */}
+      <AnimatePresence>
+        {selectedTeacherModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedTeacherModal(null)}
+              className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md"
+            />
+
+            <div className="fixed inset-0 z-[101] flex items-center justify-center p-3.5 sm:p-4 pointer-events-none">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.92, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.92, y: 20 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                className="bg-neutral-950 border border-white/15 rounded-[2.5rem] w-full max-w-2xl overflow-hidden shadow-2xl shadow-orange-500/10 pointer-events-auto relative flex flex-col max-h-[90vh] text-white"
+              >
+                {/* Close Button */}
+                <button
+                  onClick={() => setSelectedTeacherModal(null)}
+                  className="absolute top-4 right-4 z-20 p-2.5 bg-black/60 hover:bg-black/90 backdrop-blur-md rounded-full text-white border border-white/10 transition-colors cursor-pointer"
+                  title="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+
+                {/* Header Banner */}
+                <div className="relative h-36 sm:h-44 bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 shrink-0 overflow-hidden">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.3),transparent_70%)]" />
+                  <div className="absolute bottom-3 right-4 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-xs font-bold text-amber-200 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>এক্সপার্ট ফ্যাকাল্টি প্রোফাইল</span>
+                  </div>
+                </div>
+
+                {/* Avatar & Floating Info */}
+                <div className="px-6 sm:px-8 relative -mt-16 sm:-mt-20 z-10">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
+                    <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-full p-1.5 bg-gradient-to-tr from-orange-500 via-amber-400 to-orange-600 shadow-2xl shrink-0">
+                      <div className="w-full h-full rounded-full overflow-hidden border-4 border-neutral-950 bg-neutral-900">
+                        <img
+                          src={selectedTeacherModal.image || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(selectedTeacherModal.name)}
+                          alt={selectedTeacherModal.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1 pb-1 flex-1">
+                      <div className="flex items-center justify-center sm:justify-start gap-2">
+                        <h2 className="text-2xl sm:text-3xl font-black text-white">{selectedTeacherModal.name}</h2>
+                        <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
+                      </div>
+                      <p className="text-sm sm:text-base font-bold text-orange-400">{selectedTeacherModal.role || 'Senior Faculty'}</p>
+                      {selectedTeacherModal.university && (
+                        <div className="inline-flex items-center gap-1.5 text-xs text-gray-300 font-medium">
+                          <GraduationCap className="w-4 h-4 text-amber-400 shrink-0" />
+                          <span>{selectedTeacherModal.university}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Scrollable Content */}
+                <div className="p-6 sm:p-8 space-y-6 overflow-y-auto custom-scrollbar flex-1">
+                  
+                  {/* Subjects / Department */}
+                  {selectedTeacherModal.subjects && (
+                    <div className="p-4 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center shrink-0">
+                        <BookOpen className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">পাঠদানের বিষয়সমূহ</h4>
+                        <p className="text-sm sm:text-base font-extrabold text-white mt-0.5">{selectedTeacherModal.subjects}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Bio & Details */}
+                  {selectedTeacherModal.bio && (
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-orange-400" />
+                        <span>শিক্ষকের বিস্তারিত পরিচিতি ও অভিজ্ঞতা</span>
+                      </h4>
+                      <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 text-gray-200 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-medium">
+                        {selectedTeacherModal.bio}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Highlights / Features */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 flex items-center gap-2.5 text-xs text-gray-300">
+                      <Award className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>অভিজ্ঞ ও পেশাদার মেন্টরশিপ</span>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 flex items-center gap-2.5 text-xs text-gray-300">
+                      <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <span>ভেরিফাইড একাডেমি ফ্যাকাল্টি</span>
+                    </div>
+                  </div>
+
+                  {/* Social & Contact Channels */}
+                  {(selectedTeacherModal.facebookUrl || selectedTeacherModal.youtubeUrl || selectedTeacherModal.email || selectedTeacherModal.phone) && (
+                    <div className="pt-4 border-t border-white/10 flex flex-wrap items-center gap-3">
+                      {selectedTeacherModal.facebookUrl && (
+                        <a
+                          href={selectedTeacherModal.facebookUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-4 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 text-xs font-bold transition-all flex items-center gap-2"
+                        >
+                          <span>Facebook Profile</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                      {selectedTeacherModal.youtubeUrl && (
+                        <a
+                          href={selectedTeacherModal.youtubeUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-4 py-2 rounded-xl bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white border border-red-500/30 text-xs font-bold transition-all flex items-center gap-2"
+                        >
+                          <Video className="w-3.5 h-3.5" />
+                          <span>YouTube Channel</span>
+                        </a>
+                      )}
+                      {selectedTeacherModal.email && (
+                        <a
+                          href={`mailto:${selectedTeacherModal.email}`}
+                          className="px-4 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/30 text-xs font-bold transition-all flex items-center gap-2"
+                        >
+                          <Mail className="w-3.5 h-3.5" />
+                          <span>Email</span>
+                        </a>
+                      )}
+                    </div>
+                  )}
+
+                </div>
+              </motion.div>
+            </div>
+          </>
+        )}
+      </AnimatePresence>
 
     </div>
   );

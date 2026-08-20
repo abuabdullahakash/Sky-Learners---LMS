@@ -7,7 +7,6 @@ import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import RoleSelectionModal from '@/components/RoleSelectionModal';
-import TeacherStorefrontView from '@/components/TeacherStorefrontView';
 import gsap from 'gsap';
 import { 
   Search, 
@@ -104,10 +103,6 @@ export default function HomePage() {
   const isTeacher = isAdmin || userData?.role === 'teacher';
   const isStudent = !isAdmin && userData?.role === 'student';
 
-  // If logged in as teacher, render their personal storefront directly on Home
-  if (!loading && user && isTeacher) {
-    return <TeacherStorefrontView teacherId={user.uid} isOwner={true} />;
-  }
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);

@@ -217,7 +217,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
   const contactImage = config.contactImage || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop';
 
   // 8. Trust Banner
-  const rawTrustTitle = config.trustTitle || 'বিশ্ববিদ্যালয় ও মেডিকেল ভর্তি প্রস্তুতিতে';
+  const rawTrustTitle = String(config.trustTitle || 'বিশ্ববিদ্যালয় ও মেডিকেল ভর্তি প্রস্তুতিতে');
   const cleanTrustTitle = rawTrustTitle.replace(/একটি\s*আস্থার\s*নাম/gi, '').trim();
   const trustHighlight = profileData?.displayName || 'Physics Hunters';
   const trustSubtitle = config.trustSubtitle || 'ভর্তি প্রস্তুতির শুরু হোক আজ থেকেই। সঠিক দিকনির্দেশনা ও প্রয়োজনীয় রিসোর্সের সাথে এগিয়ে যাও তোমার লক্ষ্যের দিকে।';
@@ -235,10 +235,10 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
     { id: 'g-5', imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=600&auto=format&fit=crop' },
     { id: 'g-6', imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=600&auto=format&fit=crop' }
   ];
-  const galleryPhotos = config.galleryPhotos && config.galleryPhotos.length > 0 ? config.galleryPhotos : defaultGalleryPhotos;
+  const galleryPhotos = config.galleryPhotos && Array.isArray(config.galleryPhotos) && config.galleryPhotos.length > 0 ? config.galleryPhotos : defaultGalleryPhotos;
   
   const buildMarqueeSet = (items: any[]) => {
-    if (!items || items.length === 0) return [];
+    if (!items || !Array.isArray(items) || items.length === 0) return [];
     let set: any[] = [];
     while (set.length < 12) {
       set = [...set, ...items];
@@ -277,7 +277,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
     );
   }
 
-  const currentSlide = heroSliders[currentSlideIndex] || heroSliders[0];
+  const currentSlide = (heroSliders && heroSliders.length > 0) ? (heroSliders[currentSlideIndex] || heroSliders[0]) : { id: 'default', imageUrl: '', targetCourseId: '', title: '' };
 
   return (
     <div className={`min-h-screen bg-background text-foreground selection:bg-orange-500 selection:text-white w-full max-w-full overflow-x-hidden ${isOwner ? 'pt-28 sm:pt-32' : 'pt-16 sm:pt-20'}`}>
@@ -701,7 +701,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
                 {contactWhatsapp && (
                   <a
-                    href={`https://wa.me/${contactWhatsapp.replace(/[^0-9]/g, '')}`}
+                    href={`https://wa.me/${String(contactWhatsapp).replace(/[^0-9]/g, '')}`}
                     target="_blank"
                     rel="noreferrer"
                     className="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md"
@@ -955,7 +955,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
             {contactWhatsapp && (
               <a
-                href={`https://wa.me/${contactWhatsapp.replace(/[^0-9]/g, '')}`}
+                href={`https://wa.me/${String(contactWhatsapp).replace(/[^0-9]/g, '')}`}
                 target="_blank"
                 rel="noreferrer"
                 className="p-6 rounded-3xl bg-background border border-foreground/10 hover:border-emerald-500/40 transition-all shadow-sm hover:shadow-xl flex items-center justify-between group"

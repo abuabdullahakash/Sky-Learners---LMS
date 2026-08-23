@@ -3,6 +3,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from '@/i18n/routing';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { BookOpen, Users, Star, Clock, Search, PlusCircle, Sparkles, Building2, GraduationCap } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
@@ -11,9 +12,14 @@ import { Link } from '@/i18n/routing';
 export default function CoursesPage() {
   const { user, userData, loading: authLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryTeacherId = searchParams.get('teacherId');
   
   const isAdmin = userData?.isAdmin || userData?.role === 'admin' || user?.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com' || Boolean(user?.email?.toLowerCase().includes('abuabdullahakash'));
   const isTeacher = isAdmin || userData?.role === 'teacher';
+
+  const preferredTeacherId = userData?.preferredTeacherId && userData.preferredTeacherId !== 'global' ? userData.preferredTeacherId : null;
+  const activeTeacherId = isTeacher ? user?.uid : (preferredTeacherId || queryTeacherId || null);
 
   const [courses, setCourses] = useState<any[]>([]);
   const [teacherProfile, setTeacherProfile] = useState<any>(null);
@@ -30,17 +36,17 @@ export default function CoursesPage() {
         const coursesRef = collection(db, 'courses');
         let q;
 
-        // If teacher is logged in, fetch ONLY their own published courses
-        if (user && isTeacher) {
+        // If teacher is logged in OR student is in focused teacher mode, fetch ONLY that teacher's courses
+        if (activeTeacherId) {
           q = query(
             coursesRef, 
-            where('teacherId', '==', user.uid), 
+            where('teacherId', '==', activeTeacherId), 
             where('isPublished', '==', true)
           );
 
           // Also fetch teacher's profile for dynamic branding
           try {
-            const tDoc = await getDoc(doc(db, 'teacherProfiles', user.uid));
+            const tDoc = await getDoc(doc(db, 'teacherProfiles', activeTeacherId));
             if (tDoc.exists()) {
               setTeacherProfile(tDoc.data());
             }
@@ -48,7 +54,7 @@ export default function CoursesPage() {
             console.error("Error fetching teacher profile:", e);
           }
         } else {
-          // For guests and students, fetch all marketplace courses
+          // For guests and students in marketplace mode, fetch all marketplace courses
           q = query(coursesRef, where('isPublished', '==', true));
         }
 
@@ -94,7 +100,7 @@ export default function CoursesPage() {
     };
 
     fetchCourses();
-  }, [user, isTeacher, authLoading]);
+  }, [activeTeacherId, authLoading]);
 
   // Filter courses by search query and category
   const filteredCourses = courses.filter((c) => {
@@ -124,7 +130,8 @@ export default function CoursesPage() {
     );
   }
 
-  const academyName = teacherProfile?.displayName || user?.displayName || 'আমাদের';
+  const isFocusedAcademy = Boolean(activeTeacherId);
+  const academyName = teacherProfile?.displayName || (isTeacher ? user?.displayName : '') || 'আমাদের একাডেমি';
 
   return (
     <div className="min-h-[calc(100vh-80px)] pt-28 pb-16 bg-background text-foreground selection:bg-primary selection:text-white">
@@ -135,14 +142,14 @@ export default function CoursesPage() {
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-500 text-xs sm:text-sm font-bold tracking-wide uppercase shadow-sm">
             <Sparkles className="w-4 h-4 text-orange-500" />
             <span>
-              {user && isTeacher 
+              {isFocusedAcademy 
                 ? `${academyName} • কোর্স পোর্টাল` 
                 : 'এক্সপ্লোর করুন সকল কোর্স'}
             </span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground tracking-tight leading-tight">
-            {user && isTeacher ? (
+            {isFocusedAcademy ? (
               <>
                 <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-primary bg-clip-text text-transparent">
                   {academyName}
@@ -156,8 +163,8 @@ export default function CoursesPage() {
           </h1>
 
           <p className="text-foreground/70 text-sm sm:text-base md:text-lg leading-relaxed">
-            {user && isTeacher 
-              ? 'আমাদের সকল প্রিমিয়াম ব্যাচ, এক্সাম এবং স্পেশাল লাইভ ক্লাসসমূহ এক নজরে দেখুন।'
+            {isFocusedAcademy 
+              ? `${academyName}-এর সকল প্রিমিয়াম ব্যাচ, এক্সাম এবং স্পেশাল লাইভ ক্লাসসমূহ এক নজরে দেখুন।`
               : 'আপনার পছন্দের কোর্সটি বেছে নিন এবং আজই শেখা শুরু করুন। সেরা শিক্ষকদের গাইডলাইনে প্রস্তুত হোন ভবিষ্যতের জন্য।'}
           </p>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Link } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
@@ -246,9 +247,15 @@ export const COLOR_THEMES: Record<string, {
 
 export default function AboutPage() {
   const { user, userData, loading: authLoading } = useAuth();
+  const searchParams = useSearchParams();
+  const queryTeacherId = searchParams.get('teacherId');
 
   const isAdmin = userData?.isAdmin || userData?.role === 'admin' || user?.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com' || Boolean(user?.email?.toLowerCase().includes('abuabdullahakash'));
   const isTeacher = isAdmin || userData?.role === 'teacher';
+
+  const preferredTeacherId = userData?.preferredTeacherId && userData.preferredTeacherId !== 'global' ? userData.preferredTeacherId : null;
+  const activeTeacherId = isTeacher ? user?.uid : (preferredTeacherId || queryTeacherId || null);
+  const isOwner = Boolean(user && isTeacher && user?.uid === activeTeacherId);
 
   const [teacherProfile, setTeacherProfile] = useState<any>(null);
   const [coursesCount, setCoursesCount] = useState<number>(0);
@@ -275,16 +282,16 @@ export default function AboutPage() {
     const fetchAboutData = async () => {
       setLoading(true);
       try {
-        if (user && isTeacher) {
+        if (activeTeacherId) {
           // Fetch teacher's profile and custom config
-          const docRef = doc(db, 'teacherProfiles', user.uid);
+          const docRef = doc(db, 'teacherProfiles', activeTeacherId);
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
             setTeacherProfile(docSnap.data());
           }
 
           // Count teacher's published courses
-          const coursesQ = query(collection(db, 'courses'), where('teacherId', '==', user.uid), where('isPublished', '==', true));
+          const coursesQ = query(collection(db, 'courses'), where('teacherId', '==', activeTeacherId), where('isPublished', '==', true));
           const coursesSnap = await getDocs(coursesQ);
           setCoursesCount(coursesSnap.size);
         }
@@ -296,7 +303,7 @@ export default function AboutPage() {
     };
 
     fetchAboutData();
-  }, [user, isTeacher, authLoading]);
+  }, [activeTeacherId, authLoading]);
 
   if (authLoading || loading) {
     return (
@@ -307,18 +314,18 @@ export default function AboutPage() {
   }
 
   // =========================================================================
-  // CASE 1: LOGGED IN TEACHER / ACADEMY ABOUT PAGE (Shikho Style)
+  // CASE 1: LOGGED IN TEACHER / FOCUSED STUDENT ACADEMY ABOUT PAGE (Shikho Style)
   // =========================================================================
-  if (user && isTeacher) {
+  if (activeTeacherId && teacherProfile) {
     const config = teacherProfile?.homePageConfig || {};
     const ab = config.aboutPageConfig || teacherProfile?.aboutPageConfig || {};
 
     const isInstitution = teacherProfile?.type === 'institution';
-    const displayName = teacherProfile?.displayName || user.displayName || 'আমাদের একাডেমি';
+    const displayName = teacherProfile?.displayName || (isOwner ? user?.displayName : '') || 'আমাদের একাডেমি';
     const headline = teacherProfile?.headline || config.aboutHeadline || 'স্বপ্ন ছোঁয়ার আশা থাকলে সেই স্বপ্নের ভিত তৈরিতে সাথে আছি আমরা';
     const bio = ab.founderBio || config.aboutBio || teacherProfile?.bio || 'অনলাইন বিশ্ববিদ্যালয় ও বোর্ড পরীক্ষার প্রস্তুতির জন্য নিবেদিতপ্রাণ একটি আধুনিক একাডেমি। মানসম্মত লেকচার, নিয়মিত পরীক্ষা ও আন্তরিক মেন্টরশিপের মাধ্যমে শিক্ষার্থীদের স্বপ্ন পূরণে আমরা সর্বদা পাশে আছি।';
     const founderTitle = ab.founderTitle || config.founderTitle || (isInstitution ? 'প্রতিষ্ঠাতা ও পরিচালক' : 'চিফ মেন্টর ও পরিচালক');
-    const founderPhoto = ab.founderPhoto || config.aboutPhoto || teacherProfile?.profilePhoto || user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.uid;
+    const founderPhoto = ab.founderPhoto || config.aboutPhoto || teacherProfile?.profilePhoto || (isOwner ? user?.photoURL : '') || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + activeTeacherId;
     const teachersRoster = isInstitution ? (teacherProfile?.teachersRoster || []) : [];
     
     // Moments & Gallery Images

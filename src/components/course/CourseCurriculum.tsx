@@ -251,10 +251,9 @@ export default function CourseCurriculum({ modules, routineImageUrl, courseId }:
             <button 
               onClick={() => {
                 setIsLockedPopupOpen(false);
-                if (courseId) {
-                  router.push(`/courses/${courseId}/checkout`);
-                } else {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (typeof window !== 'undefined') {
+                  const current = window.location.pathname;
+                  router.push(current.endsWith('/checkout') ? current : `${current}/checkout`);
                 }
               }}
               className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-xs sm:text-base cursor-pointer"

@@ -1,6 +1,24 @@
 import { Firestore, doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 
 /**
+ * Normalizes category into a clean URL-friendly category slug.
+ * e.g., 'intermediate' -> 'hsc', 'high_school' -> 'ssc', 'primary' -> 'primary'
+ */
+export function generateCategorySlug(category?: string): string {
+  if (!category) return 'general';
+  const c = category.toLowerCase().trim();
+  if (c === 'intermediate' || c === 'hsc') return 'hsc';
+  if (c === 'high_school' || c === 'ssc') return 'ssc';
+  if (c === 'primary') return 'primary';
+  if (c === 'admission') return 'admission';
+  if (c === 'honours') return 'honours';
+  if (c === 'masters') return 'masters';
+  if (c === 'skills' || c === 'programming' || c === 'design' || c === 'language' || c === 'business') return c;
+  
+  return c.replace(/[^\w\s\u0980-\u09FF-]/g, '').replace(/[\s_]+/g, '-') || 'general';
+}
+
+/**
  * Generates a clean, URL-safe slug from a course title and optional teacher handle.
  * Handles both English and Bengali / Unicode characters properly.
  */
@@ -31,6 +49,15 @@ export function generateCourseSlug(title: string, teacherHandle?: string): strin
   }
 
   return baseSlug;
+}
+
+/**
+ * Generates the full clean hierarchical URL: /courses/[category]/[course-name]-[teacher-name]
+ */
+export function generateCourseUrl(course: { id?: string, slug?: string, category?: string, title?: string, teacherHandle?: string, coachingName?: string, instructorName?: string }): string {
+  const catSlug = generateCategorySlug(course.category);
+  const slug = course.slug || generateCourseSlug(course.title || 'course', course.teacherHandle || course.coachingName || course.instructorName);
+  return `/courses/${catSlug}/${slug}`;
 }
 
 /**

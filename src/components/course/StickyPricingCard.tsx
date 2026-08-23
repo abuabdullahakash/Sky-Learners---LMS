@@ -4,6 +4,8 @@ import { useRouter } from '@/i18n/routing';
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
+import { generateCategorySlug } from '@/lib/slug';
+
 export default function StickyPricingCard({ course }: { course: any }) {
   const t = useTranslations('CourseDetails');
   const router = useRouter();
@@ -118,7 +120,7 @@ export default function StickyPricingCard({ course }: { course: any }) {
         </ul>
 
         <button 
-          onClick={() => router.push(`/courses/${course.id}/checkout`)}
+          onClick={() => router.push(`/courses/${generateCategorySlug(course.category)}/${course.slug || course.id}/checkout`)}
           className="relative overflow-hidden w-full py-4 bg-primary text-primary-foreground text-xl font-bold rounded-lg shadow-lg shadow-primary/20 z-10 transition-all duration-300 before:absolute before:inset-0 before:-translate-x-full hover:before:translate-x-0 before:transition-transform before:duration-500 before:bg-white/20 cursor-pointer"
         >
           <span className="relative z-10">{t('pricingCard.enrollBtn')}</span>

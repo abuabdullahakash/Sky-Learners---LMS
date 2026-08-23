@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { generateCourseUrl } from '@/lib/slug';
 import { Link } from '@/i18n/routing';
 import { useLocale } from 'next-intl';
 import { 
@@ -625,7 +626,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                     </div>
 
                     <Link
-                      href={`/courses/${course.slug || course.id}`}
+                      href={generateCourseUrl(course)}
                       className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-black transition-all shadow-md hover:shadow-orange-500/25 flex items-center gap-1.5 group/btn shrink-0"
                     >
                       <span>বিস্তারিত</span>

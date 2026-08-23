@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore';
+import { generateCourseUrl } from '@/lib/slug';
 import { useAuth } from '@/context/AuthContext';
 import RoleSelectionModal from '@/components/RoleSelectionModal';
 import TeacherStorefrontView from '@/components/TeacherStorefrontView';
@@ -818,7 +819,7 @@ export default function HomePage() {
                         </div>
 
                         <Link 
-                          href={`/courses/${course.slug || course.id}`}
+                          href={generateCourseUrl(course)}
                           className="px-4 py-2 rounded-xl bg-foreground/5 hover:bg-primary hover:text-white font-bold text-xs transition-all flex items-center gap-1 group/btn"
                         >
                           <span>{t('featuredCourses.viewDetails')}</span>

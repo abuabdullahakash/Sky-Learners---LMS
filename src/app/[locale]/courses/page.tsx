@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { BookOpen, Users, Star, Clock, Search, PlusCircle, Sparkles, Building2, GraduationCap } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
+import { generateCourseUrl } from '@/lib/slug';
 import { Link } from '@/i18n/routing';
 
 export default function CoursesPage() {
@@ -409,7 +410,7 @@ export default function CoursesPage() {
                         )}
                       </div>
                       <Link 
-                        href={`/courses/${course.slug || course.id}`}
+                        href={generateCourseUrl(course)}
                         className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white font-bold text-xs rounded-xl transition-all duration-300 shadow-md shadow-orange-500/20 active:scale-95"
                       >
                         বিস্তারিত দেখুন

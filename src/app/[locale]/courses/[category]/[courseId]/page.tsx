@@ -14,11 +14,16 @@ import SchoolTemplate from '@/components/course/templates/SchoolTemplate';
 import AdmissionTemplate from '@/components/course/templates/AdmissionTemplate';
 import SkillTemplate from '@/components/course/templates/SkillTemplate';
 
-export default function CourseDetailsPage({ params }: { params: Promise<{ courseId: string }> }) {
+export default function CategoryCourseDetailsPage({ 
+  params 
+}: { 
+  params: Promise<{ category: string; courseId: string }> 
+}) {
   const router = useRouter();
   const t = useTranslations('CourseDetails');
   
   const resolvedParams = use(params);
+  const category = resolvedParams.category;
   const courseId = resolvedParams.courseId;
   
   const [course, setCourse] = useState<any>(null);
@@ -32,15 +37,15 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
         
         if (resolved) {
           setCourse(resolved);
-          // If visited via 1-segment URL, update the address bar to the full /courses/[category]/[slug] seamlessly!
+          
+          // Seamlessly ensure browser address bar is on the canonical clean URL
           if (typeof window !== 'undefined') {
-            try {
-              const canonicalCat = generateCategorySlug(resolved.category);
-              const canonicalSlug = resolved.slug || courseId;
+            const canonicalCat = generateCategorySlug(resolved.category);
+            const canonicalSlug = resolved.slug || courseId;
+            
+            if (category !== canonicalCat || courseId !== canonicalSlug) {
               const cleanPath = `/${window.location.pathname.split('/')[1] || 'bn'}/courses/${canonicalCat}/${encodeURIComponent(canonicalSlug)}`;
               window.history.replaceState(null, '', cleanPath);
-            } catch (e) {
-              console.error("URL slug sync error:", e);
             }
           }
         } else {
@@ -56,7 +61,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
     if (courseId) {
       fetchCourse();
     }
-  }, [courseId, router]);
+  }, [courseId, category, router]);
 
   useEffect(() => {
     if (course?.sliderImages?.length > 1) {

@@ -1,0 +1,515 @@
+"use client";
+
+import { useState, useEffect, use } from 'react';
+import { useRouter } from 'next/navigation';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, collection, addDoc, Timestamp, setDoc } from 'firebase/firestore';
+import { resolveCourseBySlugOrId } from '@/lib/slug';
+import { useAuth } from '@/context/AuthContext';
+import { CheckCircle2, ShieldCheck, ArrowRight, Loader2, AlertCircle, UserCircle, Phone, Link, Mail, Camera, Upload } from 'lucide-react';
+import { uploadImageToImgBB } from '@/lib/imgbb';
+
+export default function CategoryCheckoutPage({ 
+  params 
+}: { 
+  params: Promise<{ category: string; courseId: string }> 
+}) {
+  const router = useRouter();
+  
+  const resolvedParams = use(params);
+  const category = resolvedParams.category;
+  const courseId = resolvedParams.courseId;
+  
+  const { user, userData } = useAuth();
+  
+  const [course, setCourse] = useState<any>(null);
+  const [teacherPaymentData, setTeacherPaymentData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const [formData, setFormData] = useState({
+    paymentMethod: 'bkash',
+    senderNumber: '',
+    trxId: ''
+  });
+
+  const [studentInfo, setStudentInfo] = useState({
+    name: '',
+    phone: '',
+    whatsapp: '',
+    facebookUrl: '',
+    email: '',
+    imageUrl: ''
+  });
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    try {
+      const url = await uploadImageToImgBB(file);
+      setStudentInfo(prev => ({ ...prev, imageUrl: url }));
+    } catch (err) {
+      console.error("Error uploading image:", err);
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user || userData) {
+      setStudentInfo(prev => ({
+        ...prev,
+        name: prev.name || user?.displayName || userData?.name || ''
+      }));
+    }
+  }, [user, userData]);
+
+  useEffect(() => {
+    const fetchCourse = async () => {
+      setIsLoading(true);
+      try {
+        const courseData = await resolveCourseBySlugOrId(db, courseId);
+        if (courseData) {
+          setCourse(courseData);
+          
+          if (courseData.teacherId) {
+            const teacherRef = doc(db, 'users', courseData.teacherId);
+            const teacherSnap = await getDoc(teacherRef);
+            if (teacherSnap.exists() && teacherSnap.data().paymentData) {
+              const pData = teacherSnap.data().paymentData;
+              setTeacherPaymentData(pData);
+              
+              if (!pData.bkash && pData.nagad) {
+                setFormData(prev => ({...prev, paymentMethod: 'nagad'}));
+              } else if (!pData.bkash && !pData.nagad && pData.rocket) {
+                setFormData(prev => ({...prev, paymentMethod: 'rocket'}));
+              }
+            }
+          }
+        } else {
+          setError("Course not found!");
+        }
+      } catch (err) {
+        console.error("Error fetching course", err);
+        setError("Failed to load course details.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (courseId) fetchCourse();
+  }, [courseId]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+      alert("You must be logged in to enroll.");
+      return;
+    }
+    if (!formData.senderNumber) {
+      setError("Sender mobile number is required.");
+      return;
+    }
+    if (!studentInfo.phone) {
+      setError("Offline phone number is required.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError('');
+
+    let activePrice = Number(course?.price) || 0;
+    const hasDiscountPrice = course?.discountPrice !== undefined && course?.discountPrice !== null && (course?.discountPrice as any) !== '';
+    if (hasDiscountPrice && course?.discountValidUntil) {
+      const validUntil = new Date(course.discountValidUntil);
+      if (new Date() <= validUntil) {
+        activePrice = Number(course.discountPrice);
+      }
+    }
+
+    try {
+      await addDoc(collection(db, 'enrollments'), {
+        courseId: course?.id || courseId,
+        courseTitle: course?.title || 'Unknown Course',
+        teacherId: course?.teacherId || '',
+        studentId: user.uid,
+        studentName: studentInfo.name || user.displayName || userData?.name || 'Student',
+        studentEmail: user.email,
+        senderNumber: formData.senderNumber,
+        trxId: formData.trxId,
+        paymentMethod: formData.paymentMethod,
+        amount: activePrice,
+        status: 'pending',
+        offlinePhone: studentInfo.phone,
+        whatsappNumber: studentInfo.whatsapp,
+        facebookUrl: studentInfo.facebookUrl,
+        contactEmail: studentInfo.email,
+        profileImageUrl: studentInfo.imageUrl,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      });
+
+      if (course?.teacherId && (!userData?.preferredTeacherId || userData.preferredTeacherId === 'global')) {
+        try {
+          await setDoc(doc(db, 'users', user.uid), { preferredTeacherId: course.teacherId }, { merge: true });
+        } catch (e) {
+          console.error("Error setting default preferred teacher on enrollment:", e);
+        }
+      }
+      
+      setSuccess(true);
+    } catch (err) {
+      console.error("Error submitting enrollment", err);
+      setError("Failed to submit request. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (success) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-300">
+        <div className="max-w-md w-full bg-background border border-foreground/10 p-8 rounded-3xl shadow-2xl animate-in zoom-in-95 duration-500 text-center relative overflow-hidden">
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-green-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl"></div>
+          
+          <div className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 relative z-10">
+            <CheckCircle2 className="w-10 h-10" />
+          </div>
+          <h2 className="text-3xl font-extrabold mb-3 relative z-10 text-primary">অভিনন্দন!</h2>
+          <p className="text-foreground/80 mb-8 relative z-10 leading-relaxed">
+            আপনার রিকোয়েস্টটি সফলভাবে সাবমিট হয়েছে। শিক্ষক পেমেন্ট চেক করে অ্যাপ্রুভ করা পর্যন্ত অনুগ্রহ করে অপেক্ষা করুন।
+          </p>
+          
+          <div className="space-y-3 relative z-10">
+            <button 
+              onClick={() => router.push('/dashboard')}
+              className="w-full py-3.5 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+            >
+              ড্যাশবোর্ডে যান
+            </button>
+            <button 
+              onClick={() => router.push('/courses')}
+              className="w-full py-3.5 bg-foreground/5 text-foreground font-semibold rounded-xl hover:bg-foreground/10 transition-colors"
+            >
+              আরও কোর্স দেখুন
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-5xl mx-auto pt-28 pb-12 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">পেমেন্ট এবং চেকআউট</h1>
+        <p className="text-foreground/60">কোর্সে যুক্ত হতে নিচের নির্দেশাবলী অনুসরণ করে পেমেন্ট সম্পন্ন করুন।</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative items-start">
+        
+        {/* Left Column: Payment Instructions & Form */}
+        <div className="lg:col-span-2 space-y-8">
+          
+          {/* Instructions */}
+          <div className="bg-foreground/5 border border-foreground/10 p-6 rounded-3xl">
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <ShieldCheck className="text-green-500" /> পেমেন্ট নির্দেশাবলী
+            </h2>
+            
+            <div className="space-y-4 text-foreground/80 font-medium">
+              <p>১. আপনার {teacherPaymentData?.bkash && 'বিকাশ'}{teacherPaymentData?.bkash && (teacherPaymentData?.nagad || teacherPaymentData?.rocket) ? ', ' : ''}{teacherPaymentData?.nagad && 'নগদ'}{teacherPaymentData?.nagad && teacherPaymentData?.rocket ? ' বা ' : (!teacherPaymentData?.nagad && teacherPaymentData?.bkash && teacherPaymentData?.rocket ? ' বা ' : '')}{teacherPaymentData?.rocket && 'রকেট'} অ্যাপ ওপেন করুন।</p>
+              <p>২. <strong className="text-foreground">Send Money</strong> অপশনটি সিলেক্ট করুন।</p>
+              <p>৩. নিচের যেকোনো একটি নাম্বারে ঠিক <strong className="text-xl text-primary bg-primary/10 px-2 py-0.5 rounded">
+                ৳{
+                  course?.discountPrice && course?.discountValidUntil && (new Date() <= new Date(course.discountValidUntil)) 
+                  ? course.discountPrice 
+                  : (course?.price || 0)
+                }
+              </strong> সেন্ড মানি করুন:</p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                {teacherPaymentData?.bkash && (
+                  <div className="bg-pink-500/10 border border-pink-500/20 p-5 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">
+                    <span className="font-bold text-pink-500 uppercase tracking-wider text-xs">bKash (Personal)</span>
+                    <span className="text-2xl font-black text-foreground">{teacherPaymentData.bkash}</span>
+                  </div>
+                )}
+                {teacherPaymentData?.nagad && (
+                  <div className="bg-orange-500/10 border border-orange-500/20 p-5 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">
+                    <span className="font-bold text-orange-500 uppercase tracking-wider text-xs">Nagad (Personal)</span>
+                    <span className="text-2xl font-black text-foreground">{teacherPaymentData.nagad}</span>
+                  </div>
+                )}
+                {teacherPaymentData?.rocket && (
+                  <div className="bg-purple-500/10 border border-purple-500/20 p-5 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">
+                    <span className="font-bold text-purple-500 uppercase tracking-wider text-xs">Rocket (Personal)</span>
+                    <span className="text-2xl font-black text-foreground">{teacherPaymentData.rocket}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Student Information Form */}
+          <div className="bg-foreground/5 border border-foreground/10 p-6 rounded-3xl">
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <UserCircle className="text-blue-500" /> স্টুডেন্ট ইনফরমেশন
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-bold text-foreground/80 flex items-center gap-2">
+                  <UserCircle className="w-4 h-4" /> স্টুডেন্ট এর নাম <span className="text-red-500">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  placeholder="আপনার পূর্ণ নাম" 
+                  value={studentInfo.name}
+                  onChange={(e) => setStudentInfo({...studentInfo, name: e.target.value})}
+                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-semibold"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-foreground/80 flex items-center gap-2">
+                  <Phone className="w-4 h-4" /> অফলাইন ফোন নাম্বার <span className="text-red-500">*</span>
+                </label>
+                <input 
+                  type="tel" 
+                  placeholder="01XXXXXXXXX" 
+                  value={studentInfo.phone}
+                  onChange={(e) => setStudentInfo({...studentInfo, phone: e.target.value})}
+                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-semibold"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-foreground/80 flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-green-500" /> হোয়াটসঅ্যাপ নাম্বার <span className="text-foreground/50 font-normal text-xs">(ঐচ্ছিক)</span>
+                </label>
+                <input 
+                  type="tel" 
+                  placeholder="01XXXXXXXXX" 
+                  value={studentInfo.whatsapp}
+                  onChange={(e) => setStudentInfo({...studentInfo, whatsapp: e.target.value})}
+                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-semibold"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-foreground/80 flex items-center gap-2">
+                  <Link className="w-4 h-4 text-blue-600" /> ফেসবুক প্রোফাইল লিংক <span className="text-foreground/50 font-normal text-xs">(ঐচ্ছিক)</span>
+                </label>
+                <input 
+                  type="url" 
+                  placeholder="https://facebook.com/..." 
+                  value={studentInfo.facebookUrl}
+                  onChange={(e) => setStudentInfo({...studentInfo, facebookUrl: e.target.value})}
+                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-foreground/80 flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-orange-500" /> ইমেইল এড্রেস <span className="text-foreground/50 font-normal text-xs">(ঐচ্ছিক)</span>
+                </label>
+                <input 
+                  type="email" 
+                  placeholder="student@example.com" 
+                  value={studentInfo.email}
+                  onChange={(e) => setStudentInfo({...studentInfo, email: e.target.value})}
+                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-bold text-foreground/80 flex items-center gap-2">
+                  <Camera className="w-4 h-4 text-pink-500" /> আপনার ছবি <span className="text-foreground/50 font-normal text-xs">(ঐচ্ছিক)</span>
+                </label>
+                <div className="flex items-center gap-4 mt-2">
+                  {studentInfo.imageUrl ? (
+                    <div className="relative w-20 h-20 rounded-xl overflow-hidden border-2 border-primary/20">
+                      <img src={studentInfo.imageUrl} alt="Student profile" className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl bg-foreground/5 border-2 border-dashed border-foreground/20 flex flex-col items-center justify-center text-foreground/50">
+                      <UserCircle className="w-8 h-8 mb-1" />
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 rounded-lg text-sm font-semibold transition-colors">
+                      {isUploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                      {isUploadingImage ? 'আপলোড হচ্ছে...' : 'ছবি আপলোড করুন'}
+                      <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isUploadingImage} />
+                    </label>
+                    <p className="text-xs text-foreground/50 mt-2">শিক্ষকের সাথে সহজে পরিচিত হওয়ার জন্য আপনার একটি সুন্দর ছবি যুক্ত করতে পারেন।</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Form */}
+          <div className="bg-foreground/5 border border-foreground/10 p-6 rounded-3xl">
+            <h2 className="text-xl font-bold mb-6">পেমেন্ট ভেরিফিকেশন ফর্ম</h2>
+            
+            {error && (
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 flex items-center gap-2 text-sm font-semibold">
+                <AlertCircle className="w-5 h-5 shrink-0" />
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-foreground/80">পেমেন্ট মেথড <span className="text-red-500">*</span></label>
+                <div className="flex gap-4">
+                  {teacherPaymentData?.bkash && (
+                    <label className={`flex-1 border rounded-xl p-3 text-center cursor-pointer transition-colors ${formData.paymentMethod === 'bkash' ? 'border-primary bg-primary/10 text-primary font-bold' : 'border-foreground/20 hover:border-foreground/40 font-semibold text-foreground/70'}`}>
+                      <input 
+                        type="radio" 
+                        name="paymentMethod" 
+                        value="bkash" 
+                        className="hidden"
+                        checked={formData.paymentMethod === 'bkash'}
+                        onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})}
+                      />
+                      <span className="capitalize">bKash</span>
+                    </label>
+                  )}
+                  {teacherPaymentData?.nagad && (
+                    <label className={`flex-1 border rounded-xl p-3 text-center cursor-pointer transition-colors ${formData.paymentMethod === 'nagad' ? 'border-primary bg-primary/10 text-primary font-bold' : 'border-foreground/20 hover:border-foreground/40 font-semibold text-foreground/70'}`}>
+                      <input 
+                        type="radio" 
+                        name="paymentMethod" 
+                        value="nagad" 
+                        className="hidden"
+                        checked={formData.paymentMethod === 'nagad'}
+                        onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})}
+                      />
+                      <span className="capitalize">Nagad</span>
+                    </label>
+                  )}
+                  {teacherPaymentData?.rocket && (
+                    <label className={`flex-1 border rounded-xl p-3 text-center cursor-pointer transition-colors ${formData.paymentMethod === 'rocket' ? 'border-primary bg-primary/10 text-primary font-bold' : 'border-foreground/20 hover:border-foreground/40 font-semibold text-foreground/70'}`}>
+                      <input 
+                        type="radio" 
+                        name="paymentMethod" 
+                        value="rocket" 
+                        className="hidden"
+                        checked={formData.paymentMethod === 'rocket'}
+                        onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})}
+                      />
+                      <span className="capitalize">Rocket</span>
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-foreground/80">যে নাম্বার থেকে টাকা পাঠিয়েছেন <span className="text-red-500">*</span></label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. 017XXXXXXXX" 
+                  value={formData.senderNumber}
+                  onChange={(e) => setFormData({...formData, senderNumber: e.target.value})}
+                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-semibold"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-foreground/80">Transaction ID (TrxID) <span className="text-foreground/50 text-xs font-normal">(ঐচ্ছিক কিন্তু দিলে ভালো)</span></label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. 9J5A6B8CD" 
+                  value={formData.trxId}
+                  onChange={(e) => setFormData({...formData, trxId: e.target.value})}
+                  className="w-full bg-background border border-foreground/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono font-bold tracking-wider"
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed text-lg"
+              >
+                {isSubmitting ? (
+                  <><Loader2 className="w-5 h-5 animate-spin" /> সাবমিট হচ্ছে...</>
+                ) : (
+                  <>পেমেন্ট সাবমিট করুন <ArrowRight className="w-5 h-5" /></>
+                )}
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+        {/* Right Column: Order Summary */}
+        <div className="lg:col-span-1 sticky top-24">
+          <div className="bg-foreground/5 border border-foreground/10 p-6 rounded-3xl">
+            <h2 className="text-xl font-bold mb-6 border-b border-foreground/10 pb-4">অর্ডার সামারি</h2>
+            
+            <div className="mb-6">
+              {course?.thumbnailUrl ? (
+                <img src={course.thumbnailUrl} alt={course.title} className="w-full h-36 object-cover rounded-xl mb-4 border border-foreground/10 shadow-sm" />
+              ) : (
+                <div className="w-full h-36 bg-background rounded-xl mb-4 flex items-center justify-center border border-foreground/10">Loading...</div>
+              )}
+              <h3 className="font-bold text-lg line-clamp-2 leading-tight">{course?.title || 'Loading...'}</h3>
+              <p className="text-sm font-semibold text-primary mt-1 uppercase tracking-wide">{course?.category === 'intermediate' ? 'HSC' : course?.category}</p>
+            </div>
+
+            <div className="space-y-3 border-t border-foreground/10 pt-4 mb-6">
+              <div className="flex justify-between text-foreground/80 font-medium">
+                <span>কোর্স ফি</span>
+                <span>৳{course?.price || 0}</span>
+              </div>
+              {course?.discountPrice !== undefined && course?.discountPrice !== null && (course?.discountPrice as any) !== '' && course?.discountValidUntil && new Date() <= new Date(course.discountValidUntil) && (
+                <div className="flex justify-between text-green-600 font-medium">
+                  <span>ডিসকাউন্ট</span>
+                  <span>-৳{(course?.price || 0) - Number(course.discountPrice)}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-extrabold text-xl pt-2 border-t border-foreground/10">
+                <span>সর্বমোট</span>
+                <span className="text-primary">
+                  {(() => {
+                    const hasDisc = course?.discountPrice !== undefined && course?.discountPrice !== null && (course?.discountPrice as any) !== '' && course?.discountValidUntil && new Date() <= new Date(course.discountValidUntil);
+                    const finalP = hasDisc ? Number(course.discountPrice) : Number(course?.price || 0);
+                    return finalP === 0 ? 'ফ্রি (৳০)' : `৳${finalP}`;
+                  })()}
+                </span>
+              </div>
+            </div>
+
+            <div className="p-4 bg-yellow-500/10 text-yellow-600 rounded-xl text-sm font-semibold flex gap-3">
+              <AlertCircle className="w-5 h-5 shrink-0" />
+              <p>আপনার পেমেন্টটি শিক্ষকের দ্বারা ম্যানুয়ালি ভেরিফাই করা হবে। এটি সাধারণত ৫-১০ মিনিট সময় নেয়।</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}

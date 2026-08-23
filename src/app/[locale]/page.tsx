@@ -410,6 +410,11 @@ export default function HomePage() {
     return <TeacherStorefrontView teacherId={user.uid} isOwner={true} />;
   }
 
+  // If a logged-in user is a Student with a Focused Academy preference selected, immediately display that Teacher's Storefront!
+  if (user && isStudent && userData?.preferredTeacherId && userData.preferredTeacherId !== 'global') {
+    return <TeacherStorefrontView teacherId={userData.preferredTeacherId} isOwner={false} />;
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-white">
       

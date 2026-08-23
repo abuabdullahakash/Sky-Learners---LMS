@@ -36,6 +36,7 @@ import {
   HelpCircle,
   ShieldCheck,
   Globe,
+  Building2,
   Megaphone
 } from 'lucide-react';
 import RoleSelectionModal from './RoleSelectionModal';
@@ -392,6 +393,34 @@ export default function Navbar() {
                         </>
                       )}
 
+                      {/* Active Academy Indicator for Students */}
+                      {isStudent && (
+                        <div className="p-2.5 rounded-xl bg-foreground/[0.03] border border-foreground/10 space-y-1.5 my-1.5">
+                          <div className="flex items-center justify-between text-[10px] font-bold text-foreground/50">
+                            <span>বর্তমান একাডেমি:</span>
+                            <span className={`px-1.5 py-0.2 rounded text-[9px] font-black ${isCustomTeacherMode ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'}`}>
+                              {isCustomTeacherMode ? 'ফোকাসড' : 'মার্কেটপ্লেস'}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
+                              {isCustomTeacherMode ? <Building2 className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-black text-foreground truncate">
+                                {isCustomTeacherMode ? (preferredTeacherName || 'শিক্ষক একাডেমি') : 'SkyLearners মার্কেটপ্লেস'}
+                              </p>
+                            </div>
+                          </div>
+                          <Link
+                            href="/dashboard/settings"
+                            className="text-[10px] font-bold text-orange-500 hover:underline flex items-center gap-1 pt-0.5"
+                          >
+                            <span>⚙️ পরিবর্তন / সুইচ সেটিংস</span>
+                          </Link>
+                        </div>
+                      )}
+
                       <button 
                         onClick={() => setShowLogoutConfirm(true)} 
                         className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-red-500/10 text-red-500 text-xs font-medium transition-colors"
@@ -722,6 +751,38 @@ export default function Navbar() {
                       >
                         <Settings className="w-4 h-4 text-foreground/70" /> Account Settings
                       </Link>
+                    )}
+
+                    {/* Active Academy Indicator for Students (Mobile) */}
+                    {isStudent && (
+                      <div className="p-3 rounded-xl bg-foreground/[0.03] border border-foreground/10 space-y-1.5 my-1">
+                        <div className="flex items-center justify-between text-[11px] font-bold text-foreground/50">
+                          <span>বর্তমান একাডেমি:</span>
+                          <span className={`px-1.5 py-0.2 rounded text-[10px] font-black ${isCustomTeacherMode ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'}`}>
+                            {isCustomTeacherMode ? 'ফোকাসড একাডেমি' : 'মার্কেটপ্লেস'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
+                            {isCustomTeacherMode ? <Building2 className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-black text-foreground truncate">
+                              {isCustomTeacherMode ? (preferredTeacherName || 'শিক্ষক একাডেমি') : 'SkyLearners মার্কেটপ্লেস'}
+                            </p>
+                          </div>
+                        </div>
+                        <Link
+                          href="/dashboard/settings"
+                          onClick={() => {
+                            setIsMobileMenuOpen(false);
+                            setShowProfileMenu(false);
+                          }}
+                          className="text-[11px] font-bold text-orange-500 hover:underline flex items-center gap-1 pt-0.5"
+                        >
+                          <span>⚙️ একাডেমি পরিবর্তন / সেটিংস</span>
+                        </Link>
+                      </div>
                     )}
                     <div className="h-px bg-foreground/10 my-1 mx-2"></div>
                     <button 

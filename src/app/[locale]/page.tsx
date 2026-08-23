@@ -7,6 +7,7 @@ import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import RoleSelectionModal from '@/components/RoleSelectionModal';
+import TeacherStorefrontView from '@/components/TeacherStorefrontView';
 import gsap from 'gsap';
 import { 
   Search, 
@@ -135,6 +136,11 @@ export default function HomePage() {
 
   // Fetch Firestore Courses, Profiles & Teacher Posts
   useEffect(() => {
+    if (user && isTeacher) {
+      setLoadingData(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
         // 1. Fetch Published Courses
@@ -391,11 +397,24 @@ export default function HomePage() {
     exam_alert: { label: locale === 'bn' ? '📝 পরীক্ষার বার্তা' : '📝 Exam Alert', color: 'bg-purple-500/10 text-purple-500 border-purple-500/20' },
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // If a logged-in user is a Teacher, immediately display their own Academy / Storefront Home Page (SS 2)
+  if (user && isTeacher && user.uid) {
+    return <TeacherStorefrontView teacherId={user.uid} isOwner={true} />;
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-white">
       
       {/* ========================================================================= */}
-      {/* 1. HERO SECTION (Role-Adaptive: Student vs Teacher vs Guest)              */}
+      {/* 1. HERO SECTION (Role-Adaptive: Student vs Guest)                         */}
       {/* ========================================================================= */}
       <section className="relative pt-24 pb-20 md:pt-32 md:pb-28 overflow-hidden">
         {/* Background Parallax & Dynamic Glowing Orbs */}
@@ -413,10 +432,8 @@ export default function HomePage() {
             <div ref={heroTagRef} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs sm:text-sm font-bold tracking-wide uppercase shadow-sm backdrop-blur-md">
               <Sparkles className="w-4 h-4 text-primary animate-pulse" />
               <span>
-                {user ? (
-                  isTeacher 
-                    ? (locale === 'bn' ? `👨‍🏫 শিক্ষক ড্যাশবোর্ড • স্বাগতম ${user.displayName || 'Teacher'}` : `👨‍🏫 Teacher Hub • Welcome ${user.displayName || 'Teacher'}`)
-                    : (locale === 'bn' ? `🎓 শিক্ষার্থী পোর্টাল • স্বাগতম ${user.displayName || 'Learner'}` : `🎓 Student Portal • Welcome ${user.displayName || 'Learner'}`)
+                {user && isStudent ? (
+                  locale === 'bn' ? `🎓 শিক্ষার্থী পোর্টাল • স্বাগতম ${user.displayName || 'Learner'}` : `🎓 Student Portal • Welcome ${user.displayName || 'Learner'}`
                 ) : (
                   t('heroTag')
                 )}
@@ -433,16 +450,6 @@ export default function HomePage() {
                 ) : (
                   <>
                     What do you want to <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">learn today?</span>
-                  </>
-                )
-              ) : user && isTeacher ? (
-                locale === 'bn' ? (
-                  <>
-                    আপনার <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-primary bg-clip-text text-transparent">একাডেমি ও কোর্স</span> পরিচালনা করুন
-                  </>
-                ) : (
-                  <>
-                    Manage your <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-primary bg-clip-text text-transparent">Academy & Courses</span>
                   </>
                 )
               ) : (
@@ -464,10 +471,6 @@ export default function HomePage() {
                 locale === 'bn'
                   ? 'আপনার পছন্দের বিষয় বা শিক্ষকের কোর্স খুঁজে নিন, লাইভ ক্লাসে অংশ নিন এবং নিয়মিত ডেইলি এক্সাম দিয়ে নিজেকে এগিয়ে রাখুন।'
                   : 'Discover your favorite subjects, join live classes, and test your skills with daily exams.'
-              ) : user && isTeacher ? (
-                locale === 'bn'
-                  ? 'আপনার লাইভ ক্লাসের শিডিউল চেক করুন, নতুন কোর্স লঞ্চ করুন এবং শিক্ষার্থীদের জন্য নোটিশ ও টিপস পোস্ট করুন।'
-                  : 'Check your schedule, publish new courses, and broadcast notices to your students.'
               ) : (
                 t('subtitle')
               )}
@@ -513,35 +516,8 @@ export default function HomePage() {
 
             {/* DYNAMIC HERO ACTION BUTTONS */}
             <div ref={heroCtaRef} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-              {/* CASE 1: TEACHER */}
-              {user && isTeacher ? (
-                <>
-                  <Link 
-                    href="/teacher-dashboard"
-                    className="w-full sm:w-auto px-8 py-4 rounded-xl sm:rounded-2xl bg-orange-500 text-white font-bold text-base hover:bg-orange-600 transition-all shadow-xl hover:scale-[1.02] flex items-center justify-center gap-2"
-                  >
-                    <LayoutDashboard className="w-5 h-5" />
-                    <span>{locale === 'bn' ? 'টিচার ড্যাশবোর্ডে যান' : 'Teacher Dashboard'}</span>
-                  </Link>
-
-                  <Link 
-                    href={`/teachers/${user.uid}`}
-                    className="w-full sm:w-auto px-8 py-4 rounded-xl sm:rounded-2xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/15 text-foreground font-bold text-base transition-all shadow-sm flex items-center justify-center gap-2"
-                  >
-                    <Globe className="w-5 h-5 text-orange-500" />
-                    <span>{locale === 'bn' ? 'আমার ওয়েবসাইট দেখুন' : 'View My Website'}</span>
-                  </Link>
-
-                  <Link 
-                    href="/teacher-dashboard/courses/create"
-                    className="w-full sm:w-auto px-6 py-4 rounded-xl sm:rounded-2xl bg-primary text-white font-bold text-base hover:bg-primary/90 transition-all shadow-md flex items-center justify-center gap-2"
-                  >
-                    <PlusCircle className="w-5 h-5" />
-                    <span>{locale === 'bn' ? '+ নতুন কোর্স' : '+ Create Course'}</span>
-                  </Link>
-                </>
-              ) : user && isStudent ? (
-                /* CASE 2: STUDENT */
+              {user && isStudent ? (
+                /* CASE 1: STUDENT */
                 <>
                   <Link 
                     href="/dashboard/courses"
@@ -560,7 +536,7 @@ export default function HomePage() {
                   </Link>
                 </>
               ) : (
-                /* CASE 3: GUEST */
+                /* CASE 2: GUEST */
                 <>
                   <Link 
                     href="/courses"

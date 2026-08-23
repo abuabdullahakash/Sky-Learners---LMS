@@ -107,12 +107,14 @@ export default function AboutPage() {
   // =========================================================================
   if (user && isTeacher) {
     const config = teacherProfile?.homePageConfig || {};
+    const ab = config.aboutPageConfig || teacherProfile?.aboutPageConfig || {};
+
     const isInstitution = teacherProfile?.type === 'institution';
     const displayName = teacherProfile?.displayName || user.displayName || 'আমাদের একাডেমি';
     const headline = teacherProfile?.headline || config.aboutHeadline || 'স্বপ্ন ছোঁয়ার আশা থাকলে সেই স্বপ্নের ভিত তৈরিতে সাথে আছি আমরা';
-    const bio = config.aboutBio || teacherProfile?.bio || 'অনলাইন বিশ্ববিদ্যালয় ও বোর্ড পরীক্ষার প্রস্তুতির জন্য নিবেদিতপ্রাণ একটি আধুনিক একাডেমি। মানসম্মত লেকচার, নিয়মিত পরীক্ষা ও আন্তরিক মেন্টরশিপের মাধ্যমে শিক্ষার্থীদের স্বপ্ন পূরণে আমরা সর্বদা পাশে আছি।';
-    const founderTitle = config.founderTitle || (isInstitution ? 'প্রতিষ্ঠাতা ও পরিচালক' : 'চিফ মেন্টর ও পরিচালক');
-    const founderPhoto = config.aboutPhoto || teacherProfile?.profilePhoto || user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.uid;
+    const bio = ab.founderBio || config.aboutBio || teacherProfile?.bio || 'অনলাইন বিশ্ববিদ্যালয় ও বোর্ড পরীক্ষার প্রস্তুতির জন্য নিবেদিতপ্রাণ একটি আধুনিক একাডেমি। মানসম্মত লেকচার, নিয়মিত পরীক্ষা ও আন্তরিক মেন্টরশিপের মাধ্যমে শিক্ষার্থীদের স্বপ্ন পূরণে আমরা সর্বদা পাশে আছি।';
+    const founderTitle = ab.founderTitle || config.founderTitle || (isInstitution ? 'প্রতিষ্ঠাতা ও পরিচালক' : 'চিফ মেন্টর ও পরিচালক');
+    const founderPhoto = ab.founderPhoto || config.aboutPhoto || teacherProfile?.profilePhoto || user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.uid;
     const teachersRoster = isInstitution ? (teacherProfile?.teachersRoster || []) : [];
     
     // Moments & Gallery Images
@@ -130,7 +132,8 @@ export default function AboutPage() {
         ];
 
     // Story Team Image
-    const storyImage = config.coverPhoto || teacherProfile?.coverPhoto || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200&auto=format&fit=crop';
+    const storyImage = ab.storyImage || config.coverPhoto || teacherProfile?.coverPhoto || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200&auto=format&fit=crop';
+    const heroBgImage = ab.heroBgImage || storyImage;
     
     // Combine all photos for interactive showcase
     const customGalleryPhotos = (config.galleryPhotos && Array.isArray(config.galleryPhotos) && config.galleryPhotos.length > 0)
@@ -150,7 +153,7 @@ export default function AboutPage() {
     const allTeamPhotos: string[] = Array.from(new Set(combinedPhotos)).filter(Boolean) as string[];
 
     // Promo Video
-    const promoVideoUrl = config.introVideoUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+    const promoVideoUrl = ab.heroVideoUrl || config.introVideoUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
 
     return (
       <div className="min-h-screen bg-background text-foreground selection:bg-orange-500 selection:text-white pt-20">
@@ -163,7 +166,7 @@ export default function AboutPage() {
           {/* Full Background Team Photo */}
           <div className="absolute inset-0 z-0">
             <img 
-              src={storyImage} 
+              src={heroBgImage} 
               alt="Team Background" 
               className="w-full h-full object-cover object-center scale-105 filter brightness-90"
             />
@@ -178,27 +181,27 @@ export default function AboutPage() {
               {/* Left Column: Slogan & Narrative */}
               <div className="lg:col-span-7 space-y-5 text-center lg:text-left text-white">
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15] drop-shadow-md">
-                  শিখবো, <span className="bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 bg-clip-text text-transparent">জিতবো</span>
+                  {ab.heroHeading || 'শিখবো, জিতবো'}
                 </h1>
 
                 <p className="text-white/90 text-sm sm:text-base lg:text-lg font-normal leading-relaxed max-w-xl mx-auto lg:mx-0 drop-shadow">
-                  {displayName}, দেশজুড়ে সবার জন্য মানসম্মত পড়াশোনা নিশ্চিত করতে অভিজ্ঞ মেন্টর এবং অত্যাধুনিক প্রযুক্তির সাহায্যে আমরা গড়ে তুলেছি সহজে শেখার এবং সহজে জেতার এক নতুন দুনিয়া!
+                  {ab.heroSubtitle || `${displayName}, দেশজুড়ে সবার জন্য মানসম্মত পড়াশোনা নিশ্চিত করতে অভিজ্ঞ মেন্টর এবং অত্যাধুনিক প্রযুক্তির সাহায্যে আমরা গড়ে তুলেছি সহজে শেখার এবং সহজে জেতার এক নতুন দুনিয়া!`}
                 </p>
 
                 <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
                   <Link
-                    href="/courses"
+                    href={ab.heroBtn1Link || "/courses"}
                     className="px-7 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-sm shadow-xl shadow-orange-500/30 transition-all hover:scale-105 flex items-center gap-2"
                   >
                     <BookOpen className="w-4 h-4" />
-                    <span>কোর্সগুলো দেখুন</span>
+                    <span>{ab.heroBtn1Text || "কোর্সগুলো দেখুন"}</span>
                   </Link>
 
                   <a
-                    href="#story"
-                    className="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm backdrop-blur-md transition-all flex items-center gap-2"
+                    href={ab.heroBtn2Link || "#story"}
+                    className="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm backdrop-blur-md transition-all flex items-center gap-2 hover:scale-105"
                   >
-                    <span>আমাদের গল্প পড়ুন</span>
+                    <span>{ab.heroBtn2Text || "আমাদের গল্প পড়ুন"}</span>
                     <ArrowRight className="w-4 h-4 text-orange-400" />
                   </a>
                 </div>
@@ -214,7 +217,7 @@ export default function AboutPage() {
                   className="w-full max-w-sm sm:max-w-md aspect-[16/10] rounded-3xl overflow-hidden bg-white/10 backdrop-blur-md border-2 border-white/30 hover:border-orange-400 shadow-2xl relative group cursor-pointer transition-all duration-300 hover:scale-[1.03]"
                 >
                   <img 
-                    src={storyImage} 
+                    src={heroBgImage} 
                     alt="Promo" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-95"
                   />
@@ -269,36 +272,50 @@ export default function AboutPage() {
             <div className="lg:col-span-6 space-y-6">
               <div>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
-                  আমাদের <span className="text-orange-500">গল্প</span>
+                  {ab.storyHeading ? (
+                    <span>{ab.storyHeading}</span>
+                  ) : (
+                    <>আমাদের <span className="text-orange-500">গল্প</span></>
+                  )}
                 </h2>
                 <div className="h-1 w-20 bg-orange-500 rounded-full mt-2" />
               </div>
 
-              <div className="space-y-4 text-foreground/80 text-sm sm:text-base leading-relaxed">
-                <p>
-                  ২০২০ সালের শুরুতে একদল স্বপ্নবাজ শিক্ষকের হাত ধরে আমাদের এই শিক্ষাযাত্রার সূচনা। আমাদের মূল লক্ষ্য ছিল বাংলাদেশের প্রচলিত মুখস্থভিত্তিক পড়াশোনার বাইরে গিয়ে প্রতিটি বিষয়ের গভীরে গিয়ে কনসেপ্ট ভিত্তিক ও প্রাণবন্ত পাঠদান নিশ্চিত করা।
-                </p>
-                <p>
-                  গত কয়েক বছরে হাজারো শিক্ষার্থীকে তাদের বোর্ড পরীক্ষা এবং শীর্ষস্থানীয় বিশ্ববিদ্যালয়ে ভর্তির জন্য সফলভাবে গাইড করেছি আমরা। আধুনিক ডিজিটাল ক্লাসরুম, নিয়মিত লাইভ ও রেকর্ডেড ক্লাস এবং ডেইলি এক্সাম সিস্টেমের মাধ্যমে প্রতিটি শিক্ষার্থীর দুর্বলতা দূর করে তাদের আত্মবিশ্বাস বহুগুণ বৃদ্ধি করাই আমাদের প্রতিদিনের সাধনা।
-                </p>
-                <p className="font-semibold text-foreground">
-                  আমরা বিশ্বাস করি—সঠিক দিকনির্দেশনা ও আন্তরিক চেষ্টা থাকলে যেকোনো শিক্ষার্থী তার স্বপ্নের শীর্ষ চূড়ায় পৌঁছাতে পারে।
-                </p>
+              <div className="space-y-4 text-foreground/80 text-sm sm:text-base leading-relaxed whitespace-pre-line">
+                {ab.storyDesc ? (
+                  <p>{ab.storyDesc}</p>
+                ) : (
+                  <>
+                    <p>
+                      ২০২০ সালের শুরুতে একদল স্বপ্নবাজ শিক্ষকের হাত ধরে আমাদের এই শিক্ষাযাত্রার সূচনা। আমাদের মূল লক্ষ্য ছিল বাংলাদেশের প্রচলিত মুখস্থভিত্তিক পড়াশোনার বাইরে গিয়ে প্রতিটি বিষয়ের গভীরে গিয়ে কনসেপ্ট ভিত্তিক ও প্রাণবন্ত পাঠদান নিশ্চিত করা।
+                    </p>
+                    <p>
+                      গত কয়েক বছরে হাজারো শিক্ষার্থীকে তাদের বোর্ড পরীক্ষা এবং শীর্ষস্থানীয় বিশ্ববিদ্যালয়ে ভর্তির জন্য সফলভাবে গাইড করেছি আমরা। আধুনিক ডিজিটাল ক্লাসরুম, নিয়মিত লাইভ ও রেকর্ডেড ক্লাস এবং ডেইলি এক্সাম সিস্টেমের মাধ্যমে প্রতিটি শিক্ষার্থীর দুর্বলতা দূর করে তাদের আত্মবিশ্বাস বহুগুণ বৃদ্ধি করাই আমাদের প্রতিদিনের সাধনা।
+                    </p>
+                    <p className="font-semibold text-foreground">
+                      আমরা বিশ্বাস করি—সঠিক দিকনির্দেশনা ও আন্তরিক চেষ্টা থাকলে যেকোনো শিক্ষার্থী তার স্বপ্নের শীর্ষ চূড়ায় পৌঁছাতে পারে।
+                    </p>
+                  </>
+                )}
               </div>
 
-              {/* Quick Stats Grid */}
-              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-foreground/10">
-                <div className="p-4 rounded-2xl bg-foreground/[0.03] border border-foreground/10 text-center">
-                  <div className="text-2xl sm:text-3xl font-black text-orange-500">{coursesCount || 5}+</div>
-                  <div className="text-[11px] sm:text-xs text-foreground/70 font-semibold mt-0.5">কোর্সসমূহ</div>
+              {/* 4 Stats Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-foreground/10">
+                <div className="p-3.5 rounded-2xl bg-foreground/[0.03] border border-foreground/10 text-center">
+                  <div className="text-xl sm:text-2xl font-black text-orange-500">{ab.storyStat1Num || `${coursesCount || 5}+`}</div>
+                  <div className="text-[11px] text-foreground/70 font-bold mt-0.5">{ab.storyStat1Label || 'কোর্স ও ব্যাচ'}</div>
                 </div>
-                <div className="p-4 rounded-2xl bg-foreground/[0.03] border border-foreground/10 text-center">
-                  <div className="text-2xl sm:text-3xl font-black text-orange-500">১,২০০+</div>
-                  <div className="text-[11px] sm:text-xs text-foreground/70 font-semibold mt-0.5">সফল শিক্ষার্থী</div>
+                <div className="p-3.5 rounded-2xl bg-foreground/[0.03] border border-foreground/10 text-center">
+                  <div className="text-xl sm:text-2xl font-black text-orange-500">{ab.storyStat2Num || '১,২০০+'}</div>
+                  <div className="text-[11px] text-foreground/70 font-bold mt-0.5">{ab.storyStat2Label || 'সফল শিক্ষার্থী'}</div>
                 </div>
-                <div className="p-4 rounded-2xl bg-foreground/[0.03] border border-foreground/10 text-center">
-                  <div className="text-2xl sm:text-3xl font-black text-orange-500">৯৯%</div>
-                  <div className="text-[11px] sm:text-xs text-foreground/70 font-semibold mt-0.5">সন্তুষ্টি রেটিং</div>
+                <div className="p-3.5 rounded-2xl bg-foreground/[0.03] border border-foreground/10 text-center">
+                  <div className="text-xl sm:text-2xl font-black text-orange-500">{ab.storyStat3Num || '৪.৯ ★'}</div>
+                  <div className="text-[11px] text-foreground/70 font-bold mt-0.5">{ab.storyStat3Label || 'গড় রেটিং'}</div>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-foreground/[0.03] border border-foreground/10 text-center">
+                  <div className="text-xl sm:text-2xl font-black text-orange-500">{ab.storyStat4Num || '৯৮%'}</div>
+                  <div className="text-[11px] text-foreground/70 font-bold mt-0.5">{ab.storyStat4Label || 'সফলতা হার'}</div>
                 </div>
               </div>
 
@@ -315,11 +332,15 @@ export default function AboutPage() {
             
             <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
-                আমাদের <span className="text-orange-500">মূল ভিত্তি</span>
+                {ab.valuesHeading ? (
+                  <span>{ab.valuesHeading}</span>
+                ) : (
+                  <>আমাদের <span className="text-orange-500">মূল ভিত্তি</span></>
+                )}
               </h2>
               <div className="h-1 w-24 bg-orange-500 rounded-full mx-auto" />
               <p className="text-foreground/70 text-sm sm:text-base font-medium pt-2">
-                যে আদর্শ ও মূলনীতির ওপর দাঁড়িয়ে আমাদের প্রতিটি ক্লাস ও সিদ্ধান্ত
+                {ab.valuesSubtitle || 'যে আদর্শ ও মূলনীতির ওপর দাঁড়িয়ে আমাদের প্রতিটি ক্লাস ও সিদ্ধান্ত'}
               </p>
             </div>
 
@@ -446,11 +467,15 @@ export default function AboutPage() {
           
           <div className="text-center max-w-3xl mx-auto space-y-2 mb-6 sm:mb-8">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
-              {displayName} <span className="text-orange-500">পরিবার</span>
+              {ab.showcaseHeading ? (
+                <span>{ab.showcaseHeading}</span>
+              ) : (
+                <>{displayName} <span className="text-orange-500">পরিবার</span></>
+              )}
             </h2>
             <div className="h-1 w-20 bg-orange-500 rounded-full mx-auto" />
             <p className="text-foreground/70 text-xs sm:text-sm md:text-base font-medium pt-1">
-              {displayName}-কে নেতৃত্ব দিচ্ছে প্রতিভাবান এবং দক্ষ একটি ডায়নামিক টিম। সবার জন্য মানসম্মত শিক্ষা সহজলভ্য করার লক্ষ্যে আমাদের সম্মিলিত প্রয়াস।
+              {ab.showcaseSubtitle || `${displayName}-কে নেতৃত্ব দিচ্ছে প্রতিভাবান এবং দক্ষ একটি ডায়নামিক টিম। সবার জন্য মানসম্মত শিক্ষা সহজলভ্য করার লক্ষ্যে আমাদের সম্মিলিত প্রয়াস।`}
             </p>
           </div>
 
@@ -715,59 +740,59 @@ export default function AboutPage() {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/20 border border-orange-500/40 text-orange-400 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-sm">
                 <Sparkles className="w-4 h-4 text-orange-400 animate-pulse" />
-                <span>সাফল্যের শুরু হোক আজই</span>
+                <span>{ab.ctaBadge || 'সাফল্যের শুরু হোক আজই'}</span>
               </div>
 
               {/* Mega Title */}
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
-                তোমার স্বপ্নের সেরা প্রস্তুতিতে সাথে আছে <br />
+                {ab.ctaHeading || 'তোমার স্বপ্নের সেরা প্রস্তুতিতে সাথে আছে'} <br />
                 <span className="bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 bg-clip-text text-transparent">
                   "{displayName}"
                 </span>
               </h2>
 
               <p className="text-white/80 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-                দেশসেরা দিকনির্দেশনা, মানসম্মত লেকচার ও নিয়মিত মডেল টেস্টের মাধ্যমে ঘরে বসেই নাও শতভাগ প্রস্তুতি।
+                {ab.ctaSubtitle || 'দেশসেরা দিকনির্দেশনা, মানসম্মত লেকচার ও নিয়মিত মডেল টেস্টের মাধ্যমে ঘরে বসেই নাও শতভাগ প্রস্তুতি।'}
               </p>
 
               {/* 4 Feature Checklist Badges */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 max-w-2xl mx-auto pt-2">
                 <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/90 flex items-center justify-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-                  <span>লাইভ ক্লাস</span>
+                  <span>{ab.ctaFeature1 || 'লাইভ ক্লাস'}</span>
                 </div>
                 <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/90 flex items-center justify-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-                  <span>ডেইলি এক্সাম</span>
+                  <span>{ab.ctaFeature2 || 'ডেইলি এক্সাম'}</span>
                 </div>
                 <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/90 flex items-center justify-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-                  <span>ডাউট সলভিং</span>
+                  <span>{ab.ctaFeature3 || 'ডাউট সলভিং'}</span>
                 </div>
                 <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/90 flex items-center justify-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-                  <span>লেকচার শিট</span>
+                  <span>{ab.ctaFeature4 || 'লেকচার শিট'}</span>
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
                 <Link
-                  href="/courses"
+                  href={ab.ctaBtn1Link || "/courses"}
                   className="px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-black text-sm shadow-2xl shadow-orange-500/40 transition-all hover:scale-105 flex items-center gap-2"
                 >
                   <BookOpen className="w-4 h-4" />
-                  <span>সকল কোর্সসমূহ দেখুন</span>
+                  <span>{ab.ctaBtn1Text || "সকল কোর্সসমূহ দেখুন"}</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
 
-                {config.contactPhone && (
+                {(ab.ctaPhone || config.contactPhone) && (
                   <a
-                    href={`tel:${config.contactPhone}`}
+                    href={`tel:${ab.ctaPhone || config.contactPhone}`}
                     className="px-7 py-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm backdrop-blur-md transition-all flex items-center gap-2 hover:scale-105"
                   >
                     <Phone className="w-4 h-4 text-orange-400" />
-                    <span>হেল্পলাইনে কল দিন</span>
+                    <span>{ab.ctaBtn2Text || "হেল্পলাইনে কল দিন"}</span>
                   </a>
                 )}
               </div>

@@ -205,6 +205,54 @@ export default function TeacherHomePageBuilderPage() {
   const [helpBarTitle, setHelpBarTitle] = useState('সাহায্যের প্রয়োজন?');
   const [helpBarPhone, setHelpBarPhone] = useState('01700000000');
 
+  // 11. Full About Page Builder State
+  const [aboutHeroHeading, setAboutHeroHeading] = useState('শিখবো, জিতবো');
+  const [aboutHeroSubtitle, setAboutHeroSubtitle] = useState('');
+  const [aboutHeroBgImage, setAboutHeroBgImage] = useState('');
+  const [aboutHeroVideoUrl, setAboutHeroVideoUrl] = useState('');
+  const [aboutHeroBtn1Text, setAboutHeroBtn1Text] = useState('কোর্সগুলো দেখুন');
+  const [aboutHeroBtn1Link, setAboutHeroBtn1Link] = useState('/courses');
+  const [aboutHeroBtn2Text, setAboutHeroBtn2Text] = useState('আমাদের গল্প পড়ুন');
+  const [aboutHeroBtn2Link, setAboutHeroBtn2Link] = useState('#story');
+
+  const [aboutStoryHeading, setAboutStoryHeading] = useState('আমাদের গল্প');
+  const [aboutStoryDesc, setAboutStoryDesc] = useState('');
+  const [aboutStoryImage, setAboutStoryImage] = useState('');
+  const [aboutStoryStat1Num, setAboutStoryStat1Num] = useState('১০০+');
+  const [aboutStoryStat1Label, setAboutStoryStat1Label] = useState('স্পেশাল ব্যাচ ও কোর্স');
+  const [aboutStoryStat2Num, setAboutStoryStat2Num] = useState('১,২০০+');
+  const [aboutStoryStat2Label, setAboutStoryStat2Label] = useState('সফল শিক্ষার্থী');
+  const [aboutStoryStat3Num, setAboutStoryStat3Num] = useState('৪.৯ ★');
+  const [aboutStoryStat3Label, setAboutStoryStat3Label] = useState('গড় রেটিং');
+  const [aboutStoryStat4Num, setAboutStoryStat4Num] = useState('৯৮%');
+  const [aboutStoryStat4Label, setAboutStoryStat4Label] = useState('সন্তুষ্টি ও সাফল্য');
+
+  const [aboutValuesHeading, setAboutValuesHeading] = useState('আমাদের মূল ভিত্তি');
+  const [aboutValuesSubtitle, setAboutValuesSubtitle] = useState('যে মূলনীতি ও দৃষ্টিভঙ্গির ওপর ভিত্তি করে আমাদের শিক্ষা কার্যক্রম পরিচালিত হয়');
+
+  const [aboutShowcaseHeading, setAboutShowcaseHeading] = useState('');
+  const [aboutShowcaseSubtitle, setAboutShowcaseSubtitle] = useState('');
+
+  const [aboutFounderTitle, setAboutFounderTitle] = useState('প্রতিষ্ঠাতা ও চিফ মেন্টর');
+  const [aboutFounderBio, setAboutFounderBio] = useState('');
+  const [aboutFounderPhoto, setAboutFounderPhoto] = useState('');
+
+  const [aboutCtaBadge, setAboutCtaBadge] = useState('সাফল্যের শুরু হোক আজই');
+  const [aboutCtaHeading, setAboutCtaHeading] = useState('তোমার স্বপ্নের সেরা প্রস্তুতিতে সাথে আছে');
+  const [aboutCtaSubtitle, setAboutCtaSubtitle] = useState('দেশসেরা দিকনির্দেশনা, মানসম্মত লেকচার ও নিয়মিত মডেল টেস্টের মাধ্যমে ঘরে বসেই নাও শতভাগ প্রস্তুতি।');
+  const [aboutCtaBtn1Text, setAboutCtaBtn1Text] = useState('সকল কোর্সসমূহ দেখুন');
+  const [aboutCtaBtn1Link, setAboutCtaBtn1Link] = useState('/courses');
+  const [aboutCtaBtn2Text, setAboutCtaBtn2Text] = useState('হেল্পলাইনে কল দিন');
+  const [aboutCtaPhone, setAboutCtaPhone] = useState('');
+  const [aboutCtaFeature1, setAboutCtaFeature1] = useState('লাইভ ক্লাস');
+  const [aboutCtaFeature2, setAboutCtaFeature2] = useState('ডেইলি এক্সাম');
+  const [aboutCtaFeature3, setAboutCtaFeature3] = useState('ডাউট সলভিং');
+  const [aboutCtaFeature4, setAboutCtaFeature4] = useState('লেকচার শিট');
+
+  const [uploadingAboutHeroBg, setUploadingAboutHeroBg] = useState(false);
+  const [uploadingAboutStoryImg, setUploadingAboutStoryImg] = useState(false);
+  const [uploadingAboutFounderImg, setUploadingAboutFounderImg] = useState(false);
+
   // Fetch initial data
   useEffect(() => {
     const fetchData = async () => {
@@ -277,6 +325,46 @@ export default function TeacherHomePageBuilderPage() {
             if (config.gallerySubtitle) setGallerySubtitle(config.gallerySubtitle);
             if (config.helpBarTitle) setHelpBarTitle(config.helpBarTitle);
             if (config.helpBarPhone) setHelpBarPhone(config.helpBarPhone);
+
+            // Populate About Page Config
+            const abConfig = config.aboutPageConfig || data.aboutPageConfig || {};
+            if (abConfig.heroHeading) setAboutHeroHeading(abConfig.heroHeading);
+            if (abConfig.heroSubtitle) setAboutHeroSubtitle(abConfig.heroSubtitle);
+            if (abConfig.heroBgImage) setAboutHeroBgImage(abConfig.heroBgImage);
+            if (abConfig.heroVideoUrl) setAboutHeroVideoUrl(abConfig.heroVideoUrl);
+            if (abConfig.heroBtn1Text) setAboutHeroBtn1Text(abConfig.heroBtn1Text);
+            if (abConfig.heroBtn1Link) setAboutHeroBtn1Link(abConfig.heroBtn1Link);
+            if (abConfig.heroBtn2Text) setAboutHeroBtn2Text(abConfig.heroBtn2Text);
+            if (abConfig.heroBtn2Link) setAboutHeroBtn2Link(abConfig.heroBtn2Link);
+            if (abConfig.storyHeading) setAboutStoryHeading(abConfig.storyHeading);
+            if (abConfig.storyDesc) setAboutStoryDesc(abConfig.storyDesc);
+            if (abConfig.storyImage) setAboutStoryImage(abConfig.storyImage);
+            if (abConfig.storyStat1Num) setAboutStoryStat1Num(abConfig.storyStat1Num);
+            if (abConfig.storyStat1Label) setAboutStoryStat1Label(abConfig.storyStat1Label);
+            if (abConfig.storyStat2Num) setAboutStoryStat2Num(abConfig.storyStat2Num);
+            if (abConfig.storyStat2Label) setAboutStoryStat2Label(abConfig.storyStat2Label);
+            if (abConfig.storyStat3Num) setAboutStoryStat3Num(abConfig.storyStat3Num);
+            if (abConfig.storyStat3Label) setAboutStoryStat3Label(abConfig.storyStat3Label);
+            if (abConfig.storyStat4Num) setAboutStoryStat4Num(abConfig.storyStat4Num);
+            if (abConfig.storyStat4Label) setAboutStoryStat4Label(abConfig.storyStat4Label);
+            if (abConfig.valuesHeading) setAboutValuesHeading(abConfig.valuesHeading);
+            if (abConfig.valuesSubtitle) setAboutValuesSubtitle(abConfig.valuesSubtitle);
+            if (abConfig.showcaseHeading) setAboutShowcaseHeading(abConfig.showcaseHeading);
+            if (abConfig.showcaseSubtitle) setAboutShowcaseSubtitle(abConfig.showcaseSubtitle);
+            if (abConfig.founderTitle) setAboutFounderTitle(abConfig.founderTitle);
+            if (abConfig.founderBio) setAboutFounderBio(abConfig.founderBio);
+            if (abConfig.founderPhoto) setAboutFounderPhoto(abConfig.founderPhoto);
+            if (abConfig.ctaBadge) setAboutCtaBadge(abConfig.ctaBadge);
+            if (abConfig.ctaHeading) setAboutCtaHeading(abConfig.ctaHeading);
+            if (abConfig.ctaSubtitle) setAboutCtaSubtitle(abConfig.ctaSubtitle);
+            if (abConfig.ctaBtn1Text) setAboutCtaBtn1Text(abConfig.ctaBtn1Text);
+            if (abConfig.ctaBtn1Link) setAboutCtaBtn1Link(abConfig.ctaBtn1Link);
+            if (abConfig.ctaBtn2Text) setAboutCtaBtn2Text(abConfig.ctaBtn2Text);
+            if (abConfig.ctaPhone) setAboutCtaPhone(abConfig.ctaPhone);
+            if (abConfig.ctaFeature1) setAboutCtaFeature1(abConfig.ctaFeature1);
+            if (abConfig.ctaFeature2) setAboutCtaFeature2(abConfig.ctaFeature2);
+            if (abConfig.ctaFeature3) setAboutCtaFeature3(abConfig.ctaFeature3);
+            if (abConfig.ctaFeature4) setAboutCtaFeature4(abConfig.ctaFeature4);
           } else if (data.profilePhoto || data.photoUrl) {
             setAboutPhoto(data.profilePhoto || data.photoUrl);
           }
@@ -339,6 +427,45 @@ export default function TeacherHomePageBuilderPage() {
         galleryPhotos,
         helpBarTitle,
         helpBarPhone,
+        aboutPageConfig: {
+          heroHeading: aboutHeroHeading,
+          heroSubtitle: aboutHeroSubtitle,
+          heroBgImage: aboutHeroBgImage,
+          heroVideoUrl: aboutHeroVideoUrl,
+          heroBtn1Text: aboutHeroBtn1Text,
+          heroBtn1Link: aboutHeroBtn1Link,
+          heroBtn2Text: aboutHeroBtn2Text,
+          heroBtn2Link: aboutHeroBtn2Link,
+          storyHeading: aboutStoryHeading,
+          storyDesc: aboutStoryDesc,
+          storyImage: aboutStoryImage,
+          storyStat1Num: aboutStoryStat1Num,
+          storyStat1Label: aboutStoryStat1Label,
+          storyStat2Num: aboutStoryStat2Num,
+          storyStat2Label: aboutStoryStat2Label,
+          storyStat3Num: aboutStoryStat3Num,
+          storyStat3Label: aboutStoryStat3Label,
+          storyStat4Num: aboutStoryStat4Num,
+          storyStat4Label: aboutStoryStat4Label,
+          valuesHeading: aboutValuesHeading,
+          valuesSubtitle: aboutValuesSubtitle,
+          showcaseHeading: aboutShowcaseHeading,
+          showcaseSubtitle: aboutShowcaseSubtitle,
+          founderTitle: aboutFounderTitle,
+          founderBio: aboutFounderBio,
+          founderPhoto: aboutFounderPhoto,
+          ctaBadge: aboutCtaBadge,
+          ctaHeading: aboutCtaHeading,
+          ctaSubtitle: aboutCtaSubtitle,
+          ctaBtn1Text: aboutCtaBtn1Text,
+          ctaBtn1Link: aboutCtaBtn1Link,
+          ctaBtn2Text: aboutCtaBtn2Text,
+          ctaPhone: aboutCtaPhone,
+          ctaFeature1: aboutCtaFeature1,
+          ctaFeature2: aboutCtaFeature2,
+          ctaFeature3: aboutCtaFeature3,
+          ctaFeature4: aboutCtaFeature4
+        },
         updatedAt: new Date().toISOString()
       };
 
@@ -352,7 +479,8 @@ export default function TeacherHomePageBuilderPage() {
         photoUrl: profilePhoto,
         coverPhoto,
         teachersRoster,
-        homePageConfig: fullConfig 
+        homePageConfig: fullConfig,
+        aboutPageConfig: fullConfig.aboutPageConfig
       }, { merge: true });
 
       // Also update users collection if displayName or photo changed
@@ -574,6 +702,54 @@ export default function TeacherHomePageBuilderPage() {
       toast.error(locale === 'bn' ? 'ফটো আপলোড ব্যর্থ হয়েছে' : 'Failed to upload photo');
     } finally {
       setUploadingGalleryImg(false);
+    }
+  };
+
+  // About Page Hero Bg Image Handler
+  const handleUploadAboutHeroBg = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAboutHeroBg(true);
+    try {
+      const url = await uploadImageToImgBB(file);
+      setAboutHeroBgImage(url);
+      toast.success(locale === 'bn' ? 'হিরো ব্যাকগ্রাউন্ড ইমেজ আপলোড হয়েছে!' : 'Hero background uploaded!');
+    } catch (err) {
+      toast.error(locale === 'bn' ? 'ছবি আপলোড ব্যর্থ হয়েছে' : 'Failed to upload photo');
+    } finally {
+      setUploadingAboutHeroBg(false);
+    }
+  };
+
+  // About Story Image Handler
+  const handleUploadAboutStoryImg = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAboutStoryImg(true);
+    try {
+      const url = await uploadImageToImgBB(file);
+      setAboutStoryImage(url);
+      toast.success(locale === 'bn' ? 'স্টোরি ইমেজ আপলোড হয়েছে!' : 'Story image uploaded!');
+    } catch (err) {
+      toast.error(locale === 'bn' ? 'ছবি আপলোড ব্যর্থ হয়েছে' : 'Failed to upload photo');
+    } finally {
+      setUploadingAboutStoryImg(false);
+    }
+  };
+
+  // About Founder Photo Handler
+  const handleUploadAboutFounderImg = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAboutFounderImg(true);
+    try {
+      const url = await uploadImageToImgBB(file);
+      setAboutFounderPhoto(url);
+      toast.success(locale === 'bn' ? 'মেন্টরের ছবি আপলোড হয়েছে!' : 'Founder photo uploaded!');
+    } catch (err) {
+      toast.error(locale === 'bn' ? 'ছবি আপলোড ব্যর্থ হয়েছে' : 'Failed to upload photo');
+    } finally {
+      setUploadingAboutFounderImg(false);
     }
   };
 
@@ -2079,40 +2255,528 @@ export default function TeacherHomePageBuilderPage() {
             </div>
           )}
 
-          {/* TAB: ABOUT PAGE INFO */}
+          {/* TAB: ABOUT PAGE INFO & FULL BUILDER */}
           {activeTab === 'aboutPageInfo' && (
-            <div className="space-y-6">
-              <div className="border-b border-foreground/10 pb-4">
-                <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
-                  <Globe className="w-5 h-5 text-orange-500" />
-                  <span>বিস্তারিত অ্যাবাউট ও কন্টাক্ট পেজ (Full About & Contact Page)</span>
-                </h3>
-                <p className="text-xs text-foreground/60 mt-1">
-                  আপনার একাডেমি ওয়েবসাইটের পূর্ণাঙ্গ About পেজ ও আগামী Contact পেজ সংক্রান্ত তথ্য।
-                </p>
+            <div className="space-y-8">
+              
+              {/* Header Info & Live Link */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-5">
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-black text-foreground flex items-center gap-2.5">
+                    <Globe className="w-6 h-6 text-orange-500" />
+                    <span>অ্যাবাউট ও কন্টাক্ট পেজ বিল্ডার (About Page Builder)</span>
+                  </h3>
+                  <p className="text-xs sm:text-sm text-foreground/70 mt-1">
+                    আপনার ওয়েবসাইটের পূর্ণাঙ্গ <strong>/about</strong> পেজের প্রতিটি সেকশন, টেক্সট, বাটন ও লিংক কাস্টমাইজ করুন।
+                  </p>
+                </div>
+
+                <Link
+                  href="/about"
+                  target="_blank"
+                  className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-lg shadow-orange-500/20 transition-all flex items-center gap-2 self-start sm:self-auto hover:scale-105 shrink-0"
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>লাইভ পেজ দেখুন</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </Link>
               </div>
 
-              <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-orange-500/10 via-background to-foreground/[0.02] border border-orange-500/20 text-center space-y-4 max-w-2xl mx-auto shadow-sm">
-                <div className="w-16 h-16 rounded-2xl bg-orange-500/20 text-orange-500 flex items-center justify-center mx-auto mb-2">
-                  <Sparkles className="w-8 h-8" />
+              {/* 1. HERO SECTION CUSTOMIZER */}
+              <div className="p-6 rounded-3xl bg-background border border-foreground/10 space-y-5 shadow-sm">
+                <div className="flex items-center gap-2 border-b border-foreground/10 pb-3">
+                  <Flame className="w-5 h-5 text-orange-500" />
+                  <h4 className="text-base font-bold text-foreground">১. হিরো ব্যানার ও স্লোগান (Hero Banner)</h4>
                 </div>
-                <h4 className="text-2xl font-black text-foreground">স্বয়ংক্রিয় লাইভ অ্যাবাউট পেজ প্রস্তুত!</h4>
-                <p className="text-sm text-foreground/70 leading-relaxed max-w-lg mx-auto">
-                  আপনার হোম পেজের পরিচিতি, শিক্ষক তালিকা ও যোগাযোগের তথ্য দিয়ে আপনার নিজস্ব <strong>/about</strong> পেজ ইতিমধ্যেই লাইভ হয়ে গেছে। শিক্ষার্থীরা আপনার পূর্ণ পরিচিতি দেখতে পারছে।
-                </p>
-                
-                <div className="pt-3 flex flex-wrap items-center justify-center gap-3">
-                  <Link
-                    href="/about"
-                    target="_blank"
-                    className="px-6 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-lg shadow-orange-500/20 transition-all flex items-center gap-2 hover:scale-105"
-                  >
-                    <Globe className="w-4 h-4" />
-                    <span>লাইভ অ্যাবাউট পেজ দেখুন (/about)</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </Link>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">
+                    <label className="text-xs font-bold text-foreground/80 block mb-1">
+                      মূল স্লোগান / প্রধান হেডিং (Default: "শিখবো, জিতবো")
+                    </label>
+                    <input
+                      type="text"
+                      value={aboutHeroHeading}
+                      onChange={(e) => setAboutHeroHeading(e.target.value)}
+                      placeholder="শিখবো, জিতবো"
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-sm focus:outline-none focus:border-orange-500 font-bold"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="text-xs font-bold text-foreground/80 block mb-1">
+                      হিরো সাবটাইটেল / বর্ণনা
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={aboutHeroSubtitle}
+                      onChange={(e) => setAboutHeroSubtitle(e.target.value)}
+                      placeholder={`${displayName || 'আমাদের একাডেমি'}, দেশজুড়ে সবার জন্য মানসম্মত পড়াশোনা নিশ্চিত করতে অভিজ্ঞ মেন্টর এবং অত্যাধুনিক প্রযুক্তির সাহায্যে...`}
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  {/* Button 1 Controls */}
+                  <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3">
+                    <span className="text-xs font-black text-orange-500">বাটন ১ (Primary Button)</span>
+                    <div>
+                      <label className="text-[11px] font-bold text-foreground/70 block mb-1">বাটন টেক্সট</label>
+                      <input
+                        type="text"
+                        value={aboutHeroBtn1Text}
+                        onChange={(e) => setAboutHeroBtn1Text(e.target.value)}
+                        placeholder="কোর্সগুলো দেখুন"
+                        className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-foreground/70 block mb-1">বাটন লিংক / URL</label>
+                      <input
+                        type="text"
+                        value={aboutHeroBtn1Link}
+                        onChange={(e) => setAboutHeroBtn1Link(e.target.value)}
+                        placeholder="/courses"
+                        className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Button 2 Controls */}
+                  <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3">
+                    <span className="text-xs font-black text-foreground/70">বাটন ২ (Secondary Button)</span>
+                    <div>
+                      <label className="text-[11px] font-bold text-foreground/70 block mb-1">বাটন টেক্সট</label>
+                      <input
+                        type="text"
+                        value={aboutHeroBtn2Text}
+                        onChange={(e) => setAboutHeroBtn2Text(e.target.value)}
+                        placeholder="আমাদের গল্প পড়ুন"
+                        className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-foreground/70 block mb-1">বাটন লিংক / Scroll Anchor</label>
+                      <input
+                        type="text"
+                        value={aboutHeroBtn2Link}
+                        onChange={(e) => setAboutHeroBtn2Link(e.target.value)}
+                        placeholder="#story"
+                        className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="text-xs font-bold text-foreground/80 block mb-1">
+                      পরিচিতি ভিডিও লিঙ্ক (YouTube Video URL)
+                    </label>
+                    <input
+                      type="text"
+                      value={aboutHeroVideoUrl}
+                      onChange={(e) => setAboutHeroVideoUrl(e.target.value)}
+                      placeholder="https://www.youtube.com/watch?v=..."
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-mono"
+                    />
+                  </div>
+
+                  {/* Hero Background Photo */}
+                  <div className="sm:col-span-2 space-y-2">
+                    <label className="text-xs font-bold text-foreground/80 block">
+                      হিরো ব্যাকগ্রাউন্ড ও ভিডিও কার্ড কভার ফটো
+                    </label>
+                    <div className="flex flex-wrap items-center gap-4">
+                      {aboutHeroBgImage && (
+                        <img 
+                          src={aboutHeroBgImage} 
+                          alt="Hero Bg Preview" 
+                          className="w-28 h-16 object-cover rounded-xl border border-foreground/10 shadow-sm" 
+                        />
+                      )}
+                      <label className="px-4 py-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-xs font-bold cursor-pointer flex items-center gap-2 transition-all">
+                        {uploadingAboutHeroBg ? <Loader2 className="w-4 h-4 animate-spin text-orange-500" /> : <Upload className="w-4 h-4 text-orange-500" />}
+                        <span>{uploadingAboutHeroBg ? 'আপলোড হচ্ছে...' : 'ছবি পরিবর্তন করুন'}</span>
+                        <input type="file" accept="image/*" onChange={handleUploadAboutHeroBg} className="hidden" disabled={uploadingAboutHeroBg} />
+                      </label>
+                    </div>
+                  </div>
+
                 </div>
               </div>
+
+              {/* 2. OUR STORY & STATS CUSTOMIZER */}
+              <div className="p-6 rounded-3xl bg-background border border-foreground/10 space-y-5 shadow-sm">
+                <div className="flex items-center gap-2 border-b border-foreground/10 pb-3">
+                  <BookOpen className="w-5 h-5 text-orange-500" />
+                  <h4 className="text-base font-bold text-foreground">২. আমাদের গল্প ও পরিসংখ্যান (Our Story & Stats)</h4>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">
+                    <label className="text-xs font-bold text-foreground/80 block mb-1">সেকশন হেডিং</label>
+                    <input
+                      type="text"
+                      value={aboutStoryHeading}
+                      onChange={(e) => setAboutStoryHeading(e.target.value)}
+                      placeholder="আমাদের গল্প"
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-sm font-bold focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="text-xs font-bold text-foreground/80 block mb-1">গল্পের বিবরণ / বিস্তারিত বার্তা</label>
+                    <textarea
+                      rows={4}
+                      value={aboutStoryDesc}
+                      onChange={(e) => setAboutStoryDesc(e.target.value)}
+                      placeholder="আমাদের লক্ষ্য প্রতিটি শিক্ষার্থীকে কনসেপ্ট ক্লিয়ার করে মুখস্থবিদ্যার বাইরে গিয়ে বাস্তবসম্মতভাবে পড়ানো..."
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  {/* Story Image */}
+                  <div className="sm:col-span-2 space-y-2">
+                    <label className="text-xs font-bold text-foreground/80 block">স্টোরি সেকশন ছবি</label>
+                    <div className="flex flex-wrap items-center gap-4">
+                      {aboutStoryImage && (
+                        <img 
+                          src={aboutStoryImage} 
+                          alt="Story Preview" 
+                          className="w-28 h-20 object-cover rounded-xl border border-foreground/10 shadow-sm" 
+                        />
+                      )}
+                      <label className="px-4 py-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-xs font-bold cursor-pointer flex items-center gap-2 transition-all">
+                        {uploadingAboutStoryImg ? <Loader2 className="w-4 h-4 animate-spin text-orange-500" /> : <Upload className="w-4 h-4 text-orange-500" />}
+                        <span>{uploadingAboutStoryImg ? 'আপলোড হচ্ছে...' : 'ছবি পরিবর্তন করুন'}</span>
+                        <input type="file" accept="image/*" onChange={handleUploadAboutStoryImg} className="hidden" disabled={uploadingAboutStoryImg} />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* 4 Stats Grid */}
+                  <div className="sm:col-span-2 pt-2">
+                    <label className="text-xs font-black text-foreground block mb-3">৪টি গুরুত্বপূর্ণ পরিসংখ্যান (Live Stats)</label>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      
+                      <div className="p-3 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2">
+                        <label className="text-[10px] font-bold text-orange-500 block">স্ট্যাটাস ১</label>
+                        <input
+                          type="text"
+                          value={aboutStoryStat1Num}
+                          onChange={(e) => setAboutStoryStat1Num(e.target.value)}
+                          placeholder="১০০+"
+                          className="w-full px-3 py-1.5 rounded-lg bg-background border border-foreground/10 text-xs font-bold"
+                        />
+                        <input
+                          type="text"
+                          value={aboutStoryStat1Label}
+                          onChange={(e) => setAboutStoryStat1Label(e.target.value)}
+                          placeholder="স্পেশাল ব্যাচ ও কোর্স"
+                          className="w-full px-3 py-1.5 rounded-lg bg-background border border-foreground/10 text-[11px]"
+                        />
+                      </div>
+
+                      <div className="p-3 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2">
+                        <label className="text-[10px] font-bold text-orange-500 block">স্ট্যাটাস ২</label>
+                        <input
+                          type="text"
+                          value={aboutStoryStat2Num}
+                          onChange={(e) => setAboutStoryStat2Num(e.target.value)}
+                          placeholder="১,২০০+"
+                          className="w-full px-3 py-1.5 rounded-lg bg-background border border-foreground/10 text-xs font-bold"
+                        />
+                        <input
+                          type="text"
+                          value={aboutStoryStat2Label}
+                          onChange={(e) => setAboutStoryStat2Label(e.target.value)}
+                          placeholder="সফল শিক্ষার্থী"
+                          className="w-full px-3 py-1.5 rounded-lg bg-background border border-foreground/10 text-[11px]"
+                        />
+                      </div>
+
+                      <div className="p-3 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2">
+                        <label className="text-[10px] font-bold text-orange-500 block">স্ট্যাটাস ৩</label>
+                        <input
+                          type="text"
+                          value={aboutStoryStat3Num}
+                          onChange={(e) => setAboutStoryStat3Num(e.target.value)}
+                          placeholder="৪.৯ ★"
+                          className="w-full px-3 py-1.5 rounded-lg bg-background border border-foreground/10 text-xs font-bold"
+                        />
+                        <input
+                          type="text"
+                          value={aboutStoryStat3Label}
+                          onChange={(e) => setAboutStoryStat3Label(e.target.value)}
+                          placeholder="গড় রেটিং"
+                          className="w-full px-3 py-1.5 rounded-lg bg-background border border-foreground/10 text-[11px]"
+                        />
+                      </div>
+
+                      <div className="p-3 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2">
+                        <label className="text-[10px] font-bold text-orange-500 block">স্ট্যাটাস ৪</label>
+                        <input
+                          type="text"
+                          value={aboutStoryStat4Num}
+                          onChange={(e) => setAboutStoryStat4Num(e.target.value)}
+                          placeholder="৯৮%"
+                          className="w-full px-3 py-1.5 rounded-lg bg-background border border-foreground/10 text-xs font-bold"
+                        />
+                        <input
+                          type="text"
+                          value={aboutStoryStat4Label}
+                          onChange={(e) => setAboutStoryStat4Label(e.target.value)}
+                          placeholder="সন্তুষ্টি ও সাফল্য"
+                          className="w-full px-3 py-1.5 rounded-lg bg-background border border-foreground/10 text-[11px]"
+                        />
+                      </div>
+
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* 3. CORE VALUES CUSTOMIZER */}
+              <div className="p-6 rounded-3xl bg-background border border-foreground/10 space-y-5 shadow-sm">
+                <div className="flex items-center gap-2 border-b border-foreground/10 pb-3">
+                  <Award className="w-5 h-5 text-orange-500" />
+                  <h4 className="text-base font-bold text-foreground">৩. আমাদের মূল ভিত্তি (Core Values Section)</h4>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-foreground/80 block mb-1">সেকশন হেডিং</label>
+                    <input
+                      type="text"
+                      value={aboutValuesHeading}
+                      onChange={(e) => setAboutValuesHeading(e.target.value)}
+                      placeholder="আমাদের মূল ভিত্তি"
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-sm font-bold focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-foreground/80 block mb-1">সাবটাইটেল</label>
+                    <input
+                      type="text"
+                      value={aboutValuesSubtitle}
+                      onChange={(e) => setAboutValuesSubtitle(e.target.value)}
+                      placeholder="যে মূলনীতি ও দৃষ্টিভঙ্গির ওপর ভিত্তি করে আমাদের শিক্ষা কার্যক্রম পরিচালিত হয়"
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. SHOWCASE & CAMPUS MOMENTS */}
+              <div className="p-6 rounded-3xl bg-background border border-foreground/10 space-y-5 shadow-sm">
+                <div className="flex items-center gap-2 border-b border-foreground/10 pb-3">
+                  <ImageIcon className="w-5 h-5 text-orange-500" />
+                  <h4 className="text-base font-bold text-foreground">৪. ক্যাম্পাস ও টিম মোমেন্টস (Moments Showcase)</h4>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-foreground/80 block mb-1">গ্যালারি প্রধান হেডিং</label>
+                    <input
+                      type="text"
+                      value={aboutShowcaseHeading}
+                      onChange={(e) => setAboutShowcaseHeading(e.target.value)}
+                      placeholder={`${displayName || 'আমাদের একাডেমি'} পরিবার`}
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-sm font-bold focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-foreground/80 block mb-1">গ্যালারি সাবটাইটেল</label>
+                    <input
+                      type="text"
+                      value={aboutShowcaseSubtitle}
+                      onChange={(e) => setAboutShowcaseSubtitle(e.target.value)}
+                      placeholder="শিক্ষার্থীদের স্বপ্ন পূরণে নিবেদিত একদল প্রতিভাবান ও দক্ষ মেন্টর..."
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 5. FOUNDER PROFILE SPOTLIGHT */}
+              <div className="p-6 rounded-3xl bg-background border border-foreground/10 space-y-5 shadow-sm">
+                <div className="flex items-center gap-2 border-b border-foreground/10 pb-3">
+                  <User className="w-5 h-5 text-orange-500" />
+                  <h4 className="text-base font-bold text-foreground">৫. ফাউন্ডার ও চিফ মেন্টর প্রোফাইল (Founder Spotlight)</h4>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-foreground/80 block mb-1">মেন্টরের পদবি / রোল</label>
+                    <input
+                      type="text"
+                      value={aboutFounderTitle}
+                      onChange={(e) => setAboutFounderTitle(e.target.value)}
+                      placeholder="প্রতিষ্ঠাতা ও চিফ মেন্টর"
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-sm font-bold focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  {/* Founder Photo */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-foreground/80 block">মেন্টরের বিশেষ ছবি</label>
+                    <div className="flex flex-wrap items-center gap-3">
+                      {aboutFounderPhoto && (
+                        <img 
+                          src={aboutFounderPhoto} 
+                          alt="Founder Preview" 
+                          className="w-12 h-12 rounded-xl object-cover border border-foreground/10 shadow-sm" 
+                        />
+                      )}
+                      <label className="px-3.5 py-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-xs font-bold cursor-pointer flex items-center gap-2 transition-all">
+                        {uploadingAboutFounderImg ? <Loader2 className="w-3.5 h-3.5 animate-spin text-orange-500" /> : <Upload className="w-3.5 h-3.5 text-orange-500" />}
+                        <span>{uploadingAboutFounderImg ? 'আপলোড হচ্ছে...' : 'ছবি পরিবর্তন'}</span>
+                        <input type="file" accept="image/*" onChange={handleUploadAboutFounderImg} className="hidden" disabled={uploadingAboutFounderImg} />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="text-xs font-bold text-foreground/80 block mb-1">মেন্টরের বিশেষ বার্তা / কোটেশন</label>
+                    <textarea
+                      rows={3}
+                      value={aboutFounderBio}
+                      onChange={(e) => setAboutFounderBio(e.target.value)}
+                      placeholder="আমাদের লক্ষ্য প্রতিটি শিক্ষার্থীকে কনসেপ্ট ক্লিয়ার করে মুখস্থবিদ্যার বাইরে গিয়ে বাস্তবসম্মতভাবে পড়ানো..."
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 6. BOTTOM MEGA CTA BANNER */}
+              <div className="p-6 rounded-3xl bg-background border border-foreground/10 space-y-5 shadow-sm">
+                <div className="flex items-center gap-2 border-b border-foreground/10 pb-3">
+                  <Target className="w-5 h-5 text-orange-500" />
+                  <h4 className="text-base font-bold text-foreground">৬. নিচের মেগা প্রস্তুতি ব্যানার (Mega CTA Banner)</h4>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-foreground/80 block mb-1">শীর্ষ ব্যাজ টেক্সট</label>
+                    <input
+                      type="text"
+                      value={aboutCtaBadge}
+                      onChange={(e) => setAboutCtaBadge(e.target.value)}
+                      placeholder="সাফল্যের শুরু হোক আজই"
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs font-bold focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-foreground/80 block mb-1">প্রধান হেডিং</label>
+                    <input
+                      type="text"
+                      value={aboutCtaHeading}
+                      onChange={(e) => setAboutCtaHeading(e.target.value)}
+                      placeholder="তোমার স্বপ্নের সেরা প্রস্তুতিতে সাথে আছে"
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-sm font-bold focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="text-xs font-bold text-foreground/80 block mb-1">সাবহেডিং / বিবরণ</label>
+                    <input
+                      type="text"
+                      value={aboutCtaSubtitle}
+                      onChange={(e) => setAboutCtaSubtitle(e.target.value)}
+                      placeholder="দেশসেরা দিকনির্দেশনা, মানসম্মত লেকচার ও নিয়মিত মডেল টেস্টের মাধ্যমে ঘরে বসেই নাও শতভাগ প্রস্তুতি।"
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  {/* CTA Button 1 */}
+                  <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3">
+                    <span className="text-xs font-black text-orange-500">প্রাইমারি অ্যাকশন বাটন</span>
+                    <div>
+                      <label className="text-[11px] font-bold text-foreground/70 block mb-1">বাটন টেক্সট</label>
+                      <input
+                        type="text"
+                        value={aboutCtaBtn1Text}
+                        onChange={(e) => setAboutCtaBtn1Text(e.target.value)}
+                        placeholder="সকল কোর্সসমূহ দেখুন"
+                        className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-foreground/70 block mb-1">বাটন লিংক / URL</label>
+                      <input
+                        type="text"
+                        value={aboutCtaBtn1Link}
+                        onChange={(e) => setAboutCtaBtn1Link(e.target.value)}
+                        placeholder="/courses"
+                        className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  {/* CTA Button 2 */}
+                  <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3">
+                    <span className="text-xs font-black text-foreground/70">হেল্পলাইন বাটন</span>
+                    <div>
+                      <label className="text-[11px] font-bold text-foreground/70 block mb-1">বাটন টেক্সট</label>
+                      <input
+                        type="text"
+                        value={aboutCtaBtn2Text}
+                        onChange={(e) => setAboutCtaBtn2Text(e.target.value)}
+                        placeholder="হেল্পলাইনে কল দিন"
+                        className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-foreground/70 block mb-1">হেল্পলাইন ফোন নম্বর</label>
+                      <input
+                        type="text"
+                        value={aboutCtaPhone}
+                        onChange={(e) => setAboutCtaPhone(e.target.value)}
+                        placeholder={contactPhone || "017XXXXXXXX"}
+                        className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  {/* 4 Feature Checklist Badges */}
+                  <div className="sm:col-span-2 pt-2">
+                    <label className="text-xs font-bold text-foreground/80 block mb-2">৪টি সুবিধা চেকলিস্ট ব্যাজ</label>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      <input
+                        type="text"
+                        value={aboutCtaFeature1}
+                        onChange={(e) => setAboutCtaFeature1(e.target.value)}
+                        placeholder="লাইভ ক্লাস"
+                        className="px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs font-bold text-center"
+                      />
+                      <input
+                        type="text"
+                        value={aboutCtaFeature2}
+                        onChange={(e) => setAboutCtaFeature2(e.target.value)}
+                        placeholder="ডেইলি এক্সাম"
+                        className="px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs font-bold text-center"
+                      />
+                      <input
+                        type="text"
+                        value={aboutCtaFeature3}
+                        onChange={(e) => setAboutCtaFeature3(e.target.value)}
+                        placeholder="ডাউট সলভিং"
+                        className="px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs font-bold text-center"
+                      />
+                      <input
+                        type="text"
+                        value={aboutCtaFeature4}
+                        onChange={(e) => setAboutCtaFeature4(e.target.value)}
+                        placeholder="লেকচার শিট"
+                        className="px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs font-bold text-center"
+                      />
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
             </div>
           )}
 

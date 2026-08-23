@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { 
   ShieldCheck, CreditCard, Bell, Save, AlertCircle, CheckCircle2, ChevronRight, ChevronLeft, Loader2,
-  Sparkles, Eye, EyeOff, Lock, Globe, Building2, Check, User
+  Sparkles, Eye, EyeOff, Lock
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { db, auth } from '@/lib/firebase';
@@ -11,17 +11,13 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 
 export default function TeacherSettingsPage() {
-  const { user, userData, refreshUserData } = useAuth();
+  const { user } = useAuth();
   
-  const [activeTab, setActiveTab] = useState<'payment' | 'security' | 'preferences' | 'notifications'>('payment');
+  const [activeTab, setActiveTab] = useState<'payment' | 'security' | 'notifications'>('payment');
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Preference Mode State
-  const [preferredTeacher, setPreferredTeacher] = useState<string>(userData?.preferredTeacherId || 'global');
-  const [savingPref, setSavingPref] = useState(false);
 
   // Payment Form States
   const [paymentData, setPaymentData] = useState({
@@ -182,24 +178,6 @@ export default function TeacherSettingsPage() {
     }
   };
 
-  const handleSavePreference = async (targetId: string) => {
-    if (!user) return;
-    setSavingPref(true);
-    try {
-      await updateDoc(doc(db, 'users', user.uid), {
-        preferredTeacherId: targetId
-      });
-      setPreferredTeacher(targetId);
-      if (refreshUserData) await refreshUserData();
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (e) {
-      console.error('Error updating preference:', e);
-    } finally {
-      setSavingPref(false);
-    }
-  };
-
   const scrollTabs = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const scrollAmount = 200;
@@ -213,7 +191,6 @@ export default function TeacherSettingsPage() {
   const tabs = [
     { id: 'payment', label: 'Payment Methods', icon: CreditCard },
     { id: 'security', label: 'Security', icon: ShieldCheck },
-    { id: 'preferences', label: 'Academy Preference', icon: Sparkles },
     { id: 'notifications', label: 'Notifications', icon: Bell },
   ];
 
@@ -482,119 +459,6 @@ export default function TeacherSettingsPage() {
               </div>
             )}
 
-            {/* PREFERENCES TAB */}
-            {activeTab === 'preferences' && (
-              <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
-                <div className="border-b border-foreground/10 pb-4 mb-6">
-                  <h2 className="text-xl font-bold flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-orange-500" />
-                    <span>একাডেমি ও ওয়েবসাইট ভিউ প্রেফারেন্স (Academy Mode Preference)</span>
-                  </h2>
-                  <p className="text-sm text-foreground/60 mt-1">
-                    আপনি যখন ওয়েবসাইট ব্রাউজ করবেন, সাইটের ন্যাভবার ও মূল পাতা ডিফল্টভাবে কীভাবে প্রদর্শিত হবে তা নির্বাচন করুন।
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Option 1: Global Marketplace */}
-                  <div
-                    onClick={() => !savingPref && handleSavePreference('global')}
-                    className={`p-5 rounded-2xl border transition-all cursor-pointer relative flex flex-col justify-between space-y-4 ${
-                      preferredTeacher === 'global'
-                        ? 'bg-blue-500/[0.04] border-blue-500 shadow-md ring-1 ring-blue-500/30'
-                        : 'bg-background hover:bg-foreground/[0.02] border-foreground/10 hover:border-foreground/20'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0 border border-blue-500/20 shadow-xs">
-                          <Globe className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-black text-sm text-foreground">SkyLearners মার্কেটপ্লেস মোড</h4>
-                            <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 text-[10px] font-extrabold border border-blue-500/20">
-                              গ্লোবাল ভিউ
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-foreground/60 mt-0.5">
-                            সারাদেশের সকল শিক্ষক ও প্রতিষ্ঠানের কোর্স
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
-                        preferredTeacher === 'global'
-                          ? 'border-blue-500 bg-blue-500 text-white'
-                          : 'border-foreground/30 bg-transparent'
-                      }`}>
-                        {preferredTeacher === 'global' && <Check className="w-3 h-3 stroke-[3]" />}
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-foreground/70 leading-relaxed">
-                      মেনুবারের [হোম], [কোর্স] ও [About] বাটনগুলো মূল মার্কেটপ্লেসের সকল শিক্ষক ও কোর্সের পাতায় নিয়ে যাবে।
-                    </p>
-
-                    <div className="pt-2 border-t border-foreground/5 flex items-center justify-between">
-                      <span className={`text-[11px] font-bold ${preferredTeacher === 'global' ? 'text-blue-500' : 'text-foreground/40'}`}>
-                        {preferredTeacher === 'global' ? '✓ বর্তমানে সক্রিয় রয়েছে' : 'ক্লিক করে সক্রিয় করুন'}
-                      </span>
-                      <span className="text-[10px] text-foreground/40">Marketplace Standard</span>
-                    </div>
-                  </div>
-
-                  {/* Option 2: Personal Teacher Storefront */}
-                  <div
-                    onClick={() => !savingPref && handleSavePreference(user?.uid || '')}
-                    className={`p-5 rounded-2xl border transition-all cursor-pointer relative flex flex-col justify-between space-y-4 ${
-                      preferredTeacher === user?.uid
-                        ? 'bg-orange-500/[0.04] border-orange-500 shadow-md ring-1 ring-orange-500/30'
-                        : 'bg-background hover:bg-foreground/[0.02] border-foreground/10 hover:border-foreground/20'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0 border border-orange-500/20 shadow-xs">
-                          <Building2 className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-black text-sm text-foreground">আমার নিজস্ব শিক্ষক স্টোরফ্রন্ট</h4>
-                            <span className="px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-500 text-[10px] font-extrabold border border-orange-500/20">
-                              একাডেমি মোড
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-foreground/60 mt-0.5">
-                            ব্যক্তিগত কাস্টম ব্র্যান্ডেড একাডেমি ও কোর্সসমূহ
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
-                        preferredTeacher === user?.uid
-                          ? 'border-orange-500 bg-orange-500 text-white'
-                          : 'border-foreground/30 bg-transparent'
-                      }`}>
-                        {preferredTeacher === user?.uid && <Check className="w-3 h-3 stroke-[3]" />}
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-foreground/70 leading-relaxed">
-                      মেনুবারের [হোম], [কোর্স] ও [About] বাটনগুলো সরাসরি আপনার নিজস্ব শিক্ষক একাডেমি ও আপনার তৈরি কোর্সে নিয়ে যাবে।
-                    </p>
-
-                    <div className="pt-2 border-t border-foreground/5 flex items-center justify-between">
-                      <span className={`text-[11px] font-bold ${preferredTeacher === user?.uid ? 'text-orange-500' : 'text-foreground/40'}`}>
-                        {preferredTeacher === user?.uid ? '✓ বর্তমানে সক্রিয় রয়েছে' : 'ক্লিক করে সক্রিয় করুন'}
-                      </span>
-                      <span className="text-[10px] text-foreground/40">Custom Academy</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* NOTIFICATIONS TAB */}
             {activeTab === 'notifications' && (
               <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
@@ -644,7 +508,7 @@ export default function TeacherSettingsPage() {
             )}
 
             {/* General Save Button (For Payment / Notification Settings) */}
-            {activeTab !== 'security' && activeTab !== 'preferences' && (
+            {activeTab !== 'security' && (
               <div className="pt-6 border-t border-foreground/10 flex items-center justify-between">
                 {saveSuccess ? (
                   <div className="text-green-500 flex items-center gap-2 font-bold animate-in fade-in slide-in-from-left-4 text-xs sm:text-sm">

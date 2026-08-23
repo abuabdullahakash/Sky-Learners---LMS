@@ -44,7 +44,10 @@ export default function CategoryCourseDetailsPage({
             const canonicalSlug = resolved.slug || courseId;
             
             if (category !== canonicalCat || courseId !== canonicalSlug) {
-              const cleanPath = `/${window.location.pathname.split('/')[1] || 'bn'}/courses/${canonicalCat}/${encodeURIComponent(canonicalSlug)}`;
+              const segments = window.location.pathname.split('/').filter(Boolean);
+              const hasLocale = segments[0] === 'bn' || segments[0] === 'en';
+              const prefix = hasLocale ? `/${segments[0]}` : '';
+              const cleanPath = `${prefix}/courses/${canonicalCat}/${encodeURIComponent(canonicalSlug)}`;
               window.history.replaceState(null, '', cleanPath);
             }
           }

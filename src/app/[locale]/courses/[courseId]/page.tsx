@@ -37,7 +37,10 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
             try {
               const canonicalCat = generateCategorySlug(resolved.category);
               const canonicalSlug = resolved.slug || courseId;
-              const cleanPath = `/${window.location.pathname.split('/')[1] || 'bn'}/courses/${canonicalCat}/${encodeURIComponent(canonicalSlug)}`;
+              const segments = window.location.pathname.split('/').filter(Boolean);
+              const hasLocale = segments[0] === 'bn' || segments[0] === 'en';
+              const prefix = hasLocale ? `/${segments[0]}` : '';
+              const cleanPath = `${prefix}/courses/${canonicalCat}/${encodeURIComponent(canonicalSlug)}`;
               window.history.replaceState(null, '', cleanPath);
             } catch (e) {
               console.error("URL slug sync error:", e);

@@ -57,7 +57,7 @@ export default function TeacherHomePageBuilderPage() {
   const [saving, setSaving] = useState(false);
   const [courses, setCourses] = useState<{ id: string; title: string }[]>([]);
   const [activeTab, setActiveTab] = useState<
-    'branding' | 'faculty' | 'sliders' | 'quickCards' | 'categories' | 'features' | 'admission' | 'about' | 'contact' | 'trustBanner' | 'gallery' | 'helpBar'
+    'branding' | 'faculty' | 'sliders' | 'quickCards' | 'categories' | 'features' | 'admission' | 'about' | 'contact' | 'trustBanner' | 'gallery' | 'helpBar' | 'aboutPageInfo'
   >('branding');
 
   // 0. Branding & Identity State
@@ -579,33 +579,34 @@ export default function TeacherHomePageBuilderPage() {
 
   const tabGroups = [
     {
+      id: 'branding',
+      groupName: '🎨 ব্র্যান্ডিং ও পরিচিতি (BRANDING)',
+      items: [
+        { id: 'branding', label: 'ব্র্যান্ডিং ও একাউন্ট টাইপ', icon: Building2 },
+      ]
+    },
+    {
       id: 'home',
       groupName: '🏠 হোম পেজ (HOME PAGE)',
       items: [
-        { id: 'sliders', label: 'ব্যানার স্লাইডার', icon: Sliders },
-        { id: 'quickCards', label: 'পেইড ও ফ্রি কার্ডস', icon: Layers },
-        { id: 'categories', label: 'কোর্স ও ক্যাটাগরি', icon: Grid },
-        { id: 'features', label: 'প্রস্তুতিতে যা প্রয়োজন', icon: Award },
-        { id: 'admission', label: 'ভর্তি তথ্য ও নিয়ম', icon: Info },
-        { id: 'trustBanner', label: 'আস্থার ব্যানার', icon: Flame },
+        { id: 'sliders', label: '১. ব্যানার স্লাইডার', icon: Sliders },
+        { id: 'quickCards', label: '২. পেইড ও ফ্রি কার্ডস', icon: Layers },
+        { id: 'categories', label: '৩. কোর্স ও ক্যাটাগরি', icon: Grid },
+        { id: 'features', label: '৪. প্রস্তুতিতে যা প্রয়োজন', icon: Award },
+        { id: 'admission', label: '৫. ভর্তি তথ্য ও নিয়ম', icon: Info },
+        { id: 'about', label: '৬. পরিচিতি ও বায়ো সেকশন', icon: Users },
+        ...(profileType === 'institution' ? [{ id: 'faculty', label: '৭. শিক্ষক মণ্ডলী প্যানেল', icon: Users }] : []),
+        { id: 'trustBanner', label: '৮. আস্থার ব্যানার', icon: Flame },
+        { id: 'gallery', label: '৯. স্মরণীয় মুহূর্ত ও ছবি', icon: ImageIcon },
+        { id: 'contact', label: '১০. যোগাযোগ ও সোশ্যাল লিঙ্ক', icon: Phone },
+        { id: 'helpBar', label: '১১. হেল্প ও সাপোর্ট বার', icon: HelpCircle },
       ]
     },
     {
-      id: 'about',
-      groupName: 'ℹ️ অ্যাবাউট পেজ (ABOUT PAGE)',
+      id: 'pages',
+      groupName: '📄 অন্যান্য পেজ (About & Pages)',
       items: [
-        { id: 'about', label: 'আমাদের সম্পর্কে ও বায়ো', icon: Users },
-        ...(profileType === 'institution' ? [{ id: 'faculty', label: 'শিক্ষক প্যানেল', icon: Users }] : []),
-        { id: 'gallery', label: 'স্মরণীয় মুহূর্ত ও ছবি', icon: ImageIcon },
-      ]
-    },
-    {
-      id: 'branding',
-      groupName: '🎨 ব্র্যান্ডিং ও যোগাযোগ',
-      items: [
-        { id: 'branding', label: 'ব্র্যান্ডিং ও প্রোফাইল', icon: Building2 },
-        { id: 'contact', label: 'যোগাযোগ ও সোশ্যাল লিঙ্ক', icon: Phone },
-        { id: 'helpBar', label: 'হেল্প ও সাপোর্ট বার', icon: HelpCircle },
+        { id: 'aboutPageInfo', label: 'বিস্তারিত অ্যাবাউট ও কন্টাক্ট পেজ', icon: Globe },
       ]
     }
   ];
@@ -2073,6 +2074,43 @@ export default function TeacherHomePageBuilderPage() {
                     onChange={(e) => setHelpBarPhone(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: ABOUT PAGE INFO */}
+          {activeTab === 'aboutPageInfo' && (
+            <div className="space-y-6">
+              <div className="border-b border-foreground/10 pb-4">
+                <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                  <Globe className="w-5 h-5 text-orange-500" />
+                  <span>বিস্তারিত অ্যাবাউট ও কন্টাক্ট পেজ (Full About & Contact Page)</span>
+                </h3>
+                <p className="text-xs text-foreground/60 mt-1">
+                  আপনার একাডেমি ওয়েবসাইটের পূর্ণাঙ্গ About পেজ ও আগামী Contact পেজ সংক্রান্ত তথ্য।
+                </p>
+              </div>
+
+              <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-orange-500/10 via-background to-foreground/[0.02] border border-orange-500/20 text-center space-y-4 max-w-2xl mx-auto shadow-sm">
+                <div className="w-16 h-16 rounded-2xl bg-orange-500/20 text-orange-500 flex items-center justify-center mx-auto mb-2">
+                  <Sparkles className="w-8 h-8" />
+                </div>
+                <h4 className="text-2xl font-black text-foreground">স্বয়ংক্রিয় লাইভ অ্যাবাউট পেজ প্রস্তুত!</h4>
+                <p className="text-sm text-foreground/70 leading-relaxed max-w-lg mx-auto">
+                  আপনার হোম পেজের পরিচিতি, শিক্ষক তালিকা ও যোগাযোগের তথ্য দিয়ে আপনার নিজস্ব <strong>/about</strong> পেজ ইতিমধ্যেই লাইভ হয়ে গেছে। শিক্ষার্থীরা আপনার পূর্ণ পরিচিতি দেখতে পারছে।
+                </p>
+                
+                <div className="pt-3 flex flex-wrap items-center justify-center gap-3">
+                  <Link
+                    href="/about"
+                    target="_blank"
+                    className="px-6 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-lg shadow-orange-500/20 transition-all flex items-center gap-2 hover:scale-105"
+                  >
+                    <Globe className="w-4 h-4" />
+                    <span>লাইভ অ্যাবাউট পেজ দেখুন (/about)</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </Link>
                 </div>
               </div>
             </div>

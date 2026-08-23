@@ -124,35 +124,39 @@ export default function AboutPage() {
       <div className="min-h-screen bg-background text-foreground selection:bg-orange-500 selection:text-white pt-20">
         
         {/* ========================================================================= */}
-        {/* 1. TOP HERO BANNER WITH PROMO VIDEO (Shikho Style)                        */}
+        {/* 1. TOP HERO BANNER WITH BACKGROUND PHOTO & OVERLAY (Shikho Exact Match)   */}
         {/* ========================================================================= */}
-        <section className="relative overflow-hidden pt-12 pb-20 sm:pt-16 sm:pb-28 bg-gradient-to-b from-orange-500/10 via-background to-background border-b border-foreground/10">
+        <section className="relative overflow-hidden min-h-[460px] sm:min-h-[520px] flex items-center justify-center border-b border-foreground/10">
           
-          {/* Subtle Ambient Glows */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-r from-orange-500/15 via-amber-500/10 to-orange-600/15 blur-3xl pointer-events-none rounded-full" />
-          
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-              
-              {/* Left Column: Title & Slogan */}
-              <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-500 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-sm">
-                  <Sparkles className="w-4 h-4 text-orange-500 animate-pulse" />
-                  <span>{displayName} • পরিচিতি ও লক্ষ্য</span>
-                </div>
+          {/* Full Background Team Photo */}
+          <div className="absolute inset-0 z-0">
+            <img 
+              src={storyImage} 
+              alt="Team Background" 
+              className="w-full h-full object-cover object-center scale-105 filter brightness-90"
+            />
+            {/* Smooth Gradient Overlay: Deep Rich Gradient matching Site Theme */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#09090b]/95 via-[#09090b]/80 to-[#09090b]/40 sm:from-[#09090b]/95 sm:via-[#1c120c]/85 sm:to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/40" />
+          </div>
 
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-foreground tracking-tight leading-[1.15]">
-                  শিখবো, <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">জিতবো</span>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 sm:py-24 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              
+              {/* Left Column: Slogan & Narrative */}
+              <div className="lg:col-span-7 space-y-5 text-center lg:text-left text-white">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15] drop-shadow-md">
+                  শিখবো, <span className="bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 bg-clip-text text-transparent">জিতবো</span>
                 </h1>
 
-                <p className="text-foreground/75 text-base sm:text-lg lg:text-xl font-medium leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                  {headline}
+                <p className="text-white/90 text-sm sm:text-base lg:text-lg font-normal leading-relaxed max-w-xl mx-auto lg:mx-0 drop-shadow">
+                  {displayName}, দেশজুড়ে সবার জন্য মানসম্মত পড়াশোনা নিশ্চিত করতে অভিজ্ঞ মেন্টর এবং অত্যাধুনিক প্রযুক্তির সাহায্যে আমরা গড়ে তুলেছি সহজে শেখার এবং সহজে জেতার এক নতুন দুনিয়া!
                 </p>
 
                 <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
                   <Link
                     href="/courses"
-                    className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold text-sm shadow-xl shadow-orange-500/25 transition-all hover:scale-105 flex items-center gap-2"
+                    className="px-7 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-sm shadow-xl shadow-orange-500/30 transition-all hover:scale-105 flex items-center gap-2"
                   >
                     <BookOpen className="w-4 h-4" />
                     <span>কোর্সগুলো দেখুন</span>
@@ -160,37 +164,43 @@ export default function AboutPage() {
 
                   <Link
                     href="/teacher-dashboard/home-builder"
-                    className="px-6 py-3.5 rounded-2xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/15 text-foreground font-bold text-sm transition-all flex items-center gap-2"
+                    className="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm backdrop-blur-md transition-all flex items-center gap-2"
                   >
-                    <Edit3 className="w-4 h-4 text-orange-500" />
-                    <span>পেজ কাস্টমাইজ করুন</span>
+                    <Edit3 className="w-4 h-4 text-orange-400" />
+                    <span>পেজ সাজান</span>
                   </Link>
                 </div>
               </div>
 
-              {/* Right Column: Interactive Video Preview Card */}
-              <div className="lg:col-span-5 flex justify-center">
+              {/* Right Column: Video Card with Circular Play Button */}
+              <div className="lg:col-span-5 flex justify-center lg:justify-end">
                 <div 
                   onClick={() => {
                     setVideoModalUrl(promoVideoUrl);
                     setIsVideoModalOpen(true);
                   }}
-                  className="w-full max-w-md aspect-[16/10] sm:aspect-video rounded-3xl overflow-hidden bg-zinc-950 border-2 border-orange-500/40 shadow-2xl relative group cursor-pointer hover:border-orange-500 transition-all duration-500 hover:scale-[1.02]"
+                  className="w-full max-w-sm sm:max-w-md aspect-[16/10] rounded-3xl overflow-hidden bg-white/10 backdrop-blur-md border-2 border-white/30 hover:border-orange-400 shadow-2xl relative group cursor-pointer transition-all duration-300 hover:scale-[1.03]"
                 >
                   <img 
                     src={storyImage} 
                     alt="Promo" 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-75"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-95"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                   
-                  {/* Play Button Overlay */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-orange-500/90 text-white flex items-center justify-center shadow-2xl shadow-orange-500/50 group-hover:scale-110 group-hover:bg-orange-500 transition-all duration-300 ring-8 ring-orange-500/20">
-                      <Play className="w-7 h-7 sm:w-9 sm:h-9 fill-white translate-x-0.5" />
+                  {/* Subtle White / Dark Sheen */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-white/10" />
+
+                  {/* Centered Play Button (Matching Shikho Design) */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/90 text-orange-600 flex items-center justify-center shadow-2xl group-hover:scale-110 group-hover:bg-white transition-all duration-300 ring-8 ring-white/30">
+                      <Play className="w-7 h-7 sm:w-8 sm:h-8 fill-orange-600 translate-x-0.5" />
                     </div>
-                    <span className="text-white text-xs sm:text-sm font-extrabold tracking-wide uppercase bg-black/60 px-3.5 py-1 rounded-full backdrop-blur-md border border-white/10">
-                      পরিচিতি ভিডিও দেখুন
+                  </div>
+
+                  {/* Corner caption badge */}
+                  <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between pointer-events-none">
+                    <span className="text-[11px] font-black text-white bg-black/60 px-3 py-1 rounded-full backdrop-blur-md border border-white/10">
+                      আমি শিখবো, আমি জিতবো
                     </span>
                   </div>
                 </div>

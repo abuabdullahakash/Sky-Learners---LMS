@@ -20,21 +20,22 @@ import {
   MessageCircle, 
   ArrowRight, 
   Edit3, 
-  CheckCircle2,
-  Globe,
-  Flame,
-  Compass,
-  Trophy,
-  Play,
-  Zap,
-  Target,
-  Lightbulb,
-  HeartHandshake,
-  TrendingUp,
-  Mountain,
-  Send,
-  ChevronLeft,
-  ChevronRight
+  CheckCircle2, 
+  Globe, 
+  Flame, 
+  Compass, 
+  Trophy, 
+  Play, 
+  Zap, 
+  Target, 
+  Lightbulb, 
+  HeartHandshake, 
+  TrendingUp, 
+  Mountain, 
+  Send, 
+  ChevronLeft, 
+  ChevronRight,
+  Quote
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VideoModal } from '@/components/ui/VideoModal';
@@ -193,13 +194,13 @@ export default function AboutPage() {
                     <span>কোর্সগুলো দেখুন</span>
                   </Link>
 
-                  <Link
-                    href="/teacher-dashboard/home-builder"
+                  <a
+                    href="#story"
                     className="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm backdrop-blur-md transition-all flex items-center gap-2"
                   >
-                    <Edit3 className="w-4 h-4 text-orange-400" />
-                    <span>পেজ সাজান</span>
-                  </Link>
+                    <span>আমাদের গল্প পড়ুন</span>
+                    <ArrowRight className="w-4 h-4 text-orange-400" />
+                  </a>
                 </div>
               </div>
 
@@ -244,7 +245,7 @@ export default function AboutPage() {
         {/* ========================================================================= */}
         {/* 2. "আমাদের গল্প" (OUR STORY / THE JOURNEY)                                 */}
         {/* ========================================================================= */}
-        <section className="py-20 sm:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="story" className="py-20 sm:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             
             {/* Left Photo */}
@@ -571,74 +572,121 @@ export default function AboutPage() {
         </section>
 
         {/* ========================================================================= */}
-        {/* 5. "ফাউন্ডার ও চিফ মেন্টর প্রোফাইল" (FOUNDER SPOTLIGHT - Shikho Style)     */}
+        {/* 5. "ফাউন্ডার ও চিফ মেন্টর প্রোফাইল" (ELITE FOUNDER SPOTLIGHT)              */}
         {/* ========================================================================= */}
-        <section className="py-20 sm:py-28 bg-gradient-to-b from-background via-orange-500/5 to-background border-t border-foreground/10">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-20 sm:py-28 relative overflow-hidden">
+          
+          {/* Ambient Lighting Orbs */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-500/10 rounded-full blur-[140px] pointer-events-none" />
+          
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
-            <div className="p-8 sm:p-14 rounded-[3rem] bg-gradient-to-br from-foreground/[0.04] via-background to-foreground/[0.02] border-2 border-orange-500/30 shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-80 h-80 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+            {/* Main Luxury Glassmorphic Bento Card */}
+            <div className="rounded-[2.5rem] sm:rounded-[3.5rem] bg-gradient-to-br from-white/[0.08] via-white/[0.03] to-transparent dark:from-zinc-900/90 dark:via-zinc-900/50 dark:to-zinc-950/80 border-2 border-foreground/15 dark:border-white/15 p-6 sm:p-12 lg:p-16 shadow-2xl backdrop-blur-2xl relative overflow-hidden">
               
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center relative z-10">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
                 
-                {/* Founder Photo with Stylized Curve */}
-                <div className="md:col-span-5 flex justify-center">
-                  <div className="relative">
-                    <div className="w-56 h-72 sm:w-64 sm:h-80 rounded-[2.5rem] overflow-hidden border-4 border-orange-500 shadow-2xl bg-neutral-900 group">
+                {/* Left Column: Stylized Portrait */}
+                <div className="lg:col-span-5 flex flex-col items-center justify-center">
+                  <div className="relative group">
+                    
+                    {/* Glowing Aura Ring */}
+                    <div className="absolute -inset-2 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 rounded-[3rem] blur-xl opacity-50 group-hover:opacity-80 transition duration-500" />
+                    
+                    <div className="relative w-64 h-80 sm:w-72 sm:h-92 rounded-[2.5rem] overflow-hidden border-4 border-background bg-zinc-950 shadow-2xl">
                       <img 
                         src={founderPhoto} 
                         alt={displayName} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" 
                       />
+                      
+                      {/* Active Status Badge */}
+                      <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/75 text-emerald-400 text-[11px] font-extrabold backdrop-blur-md border border-emerald-500/30 shadow-lg">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        <span>সক্রিয় মেন্টর</span>
+                      </div>
                     </div>
-                    <div className="absolute -bottom-3 -right-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white p-3 rounded-2xl shadow-xl">
-                      <Award className="w-6 h-6" />
+
+                    {/* Achievement Corner Badge */}
+                    <div className="absolute -bottom-3 -right-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-xs shadow-2xl shadow-orange-500/40 flex items-center gap-2 border-2 border-background">
+                      <Award className="w-4 h-4" />
+                      <span>{founderTitle}</span>
                     </div>
+
                   </div>
                 </div>
 
-                {/* Founder Details & Message */}
-                <div className="md:col-span-7 space-y-5 text-center md:text-left">
-                  <div>
-                    <div className="inline-block px-3 py-1 rounded-full bg-orange-500/15 text-orange-500 text-xs font-black uppercase tracking-wider mb-2">
-                      {founderTitle}
+                {/* Right Column: Founder Message & Stats Bento */}
+                <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+                  
+                  {/* Tag & Name */}
+                  <div className="space-y-2">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-500 text-xs font-black uppercase tracking-wider">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>মেন্টরের বিশেষ বার্তা</span>
                     </div>
-                    <h3 className="text-3xl sm:text-4xl font-black text-foreground">
+
+                    <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
                       {displayName}
                     </h3>
-                    <p className="text-xs sm:text-sm text-foreground/60 font-semibold mt-1">
+                    
+                    <p className="text-xs sm:text-sm font-bold text-orange-500 uppercase tracking-wide">
                       শীর্ষ একাডেমি প্রশিক্ষক ও কনসেপ্ট মেন্টর
                     </p>
                   </div>
 
-                  <p className="text-foreground/80 text-sm sm:text-base leading-relaxed whitespace-pre-line italic">
-                    "{bio}"
-                  </p>
+                  {/* Quote Body with Icon */}
+                  <div className="relative p-5 sm:p-6 rounded-2xl bg-foreground/[0.03] border border-foreground/10 space-y-2">
+                    <Quote className="w-8 h-8 text-orange-500/40 absolute -top-4 -left-3" />
+                    <p className="text-foreground/85 text-sm sm:text-base leading-relaxed italic pt-2">
+                      "{bio}"
+                    </p>
+                  </div>
 
-                  {/* Social Connect Links */}
-                  <div className="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-3">
+                  {/* 3 Quick Value Badges */}
+                  <div className="grid grid-cols-3 gap-3 pt-1">
+                    <div className="p-3.5 rounded-2xl bg-foreground/[0.03] border border-foreground/10 text-center">
+                      <div className="text-lg sm:text-xl font-black text-orange-500">{coursesCount || 5}+</div>
+                      <div className="text-[10px] sm:text-xs text-foreground/65 font-bold mt-0.5">কোর্সসমূহ</div>
+                    </div>
+                    <div className="p-3.5 rounded-2xl bg-foreground/[0.03] border border-foreground/10 text-center">
+                      <div className="text-lg sm:text-xl font-black text-orange-500">১,২০০+</div>
+                      <div className="text-[10px] sm:text-xs text-foreground/65 font-bold mt-0.5">সফল শিক্ষার্থী</div>
+                    </div>
+                    <div className="p-3.5 rounded-2xl bg-foreground/[0.03] border border-foreground/10 text-center">
+                      <div className="text-lg sm:text-xl font-black text-orange-500">৪.৯ ★</div>
+                      <div className="text-[10px] sm:text-xs text-foreground/65 font-bold mt-0.5">রেটিং</div>
+                    </div>
+                  </div>
+
+                  {/* Social Media Connect Channels */}
+                  <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-3">
                     {config.contactFacebookPage && (
-                      <a href={config.contactFacebookPage} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl bg-blue-600/10 hover:bg-blue-600 text-blue-500 hover:text-white border border-blue-600/20 transition-all" title="Facebook">
+                      <a href={config.contactFacebookPage} target="_blank" rel="noreferrer" className="px-4 py-2 rounded-xl bg-blue-600/10 hover:bg-blue-600 text-blue-500 hover:text-white border border-blue-600/20 transition-all font-bold text-xs flex items-center gap-2" title="Facebook">
                         <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                           <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                         </svg>
+                        <span>Facebook</span>
                       </a>
                     )}
                     {config.contactYoutube && (
-                      <a href={config.contactYoutube} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white border border-red-600/20 transition-all" title="YouTube">
+                      <a href={config.contactYoutube} target="_blank" rel="noreferrer" className="px-4 py-2 rounded-xl bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white border border-red-600/20 transition-all font-bold text-xs flex items-center gap-2" title="YouTube">
                         <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                           <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                         </svg>
+                        <span>YouTube</span>
                       </a>
                     )}
                     {config.contactWhatsapp && (
-                      <a href={`https://wa.me/${config.contactWhatsapp}`} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl bg-emerald-600/10 hover:bg-emerald-600 text-emerald-500 hover:text-white border border-emerald-600/20 transition-all" title="WhatsApp">
+                      <a href={`https://wa.me/${config.contactWhatsapp}`} target="_blank" rel="noreferrer" className="px-4 py-2 rounded-xl bg-emerald-600/10 hover:bg-emerald-600 text-emerald-500 hover:text-white border border-emerald-600/20 transition-all font-bold text-xs flex items-center gap-2" title="WhatsApp">
                         <MessageCircle className="w-4 h-4" />
+                        <span>WhatsApp</span>
                       </a>
                     )}
                     {config.contactEmail && (
-                      <a href={`mailto:${config.contactEmail}`} className="p-2.5 rounded-xl bg-orange-600/10 hover:bg-orange-600 text-orange-500 hover:text-white border border-orange-600/20 transition-all" title="Email">
+                      <a href={`mailto:${config.contactEmail}`} className="px-4 py-2 rounded-xl bg-orange-600/10 hover:bg-orange-600 text-orange-500 hover:text-white border border-orange-600/20 transition-all font-bold text-xs flex items-center gap-2" title="Email">
                         <Mail className="w-4 h-4" />
+                        <span>ইমেইল</span>
                       </a>
                     )}
                   </div>
@@ -652,36 +700,82 @@ export default function AboutPage() {
         </section>
 
         {/* ========================================================================= */}
-        {/* 6. BOTTOM CALL-TO-ACTION (CTA)                                            */}
+        {/* 6. "প্রস্তুতি শুরু করার মেগা ব্যানার" (MEGA EDTECH BENTO CTA)             */}
         {/* ========================================================================= */}
-        <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="p-10 sm:p-16 rounded-[3rem] bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 text-white shadow-2xl relative overflow-hidden space-y-6">
-            <div className="relative z-10 max-w-2xl mx-auto space-y-4">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black">
-                আজই তোমার প্রস্তুতি শুরু করো
+        <section className="py-16 sm:py-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="p-8 sm:p-14 lg:p-16 rounded-[2.5rem] sm:rounded-[3.5rem] bg-gradient-to-br from-[#1c0f06] via-[#120a04] to-[#09090b] border-2 border-orange-500/40 text-white shadow-2xl relative overflow-hidden text-center space-y-8">
+            
+            {/* Ambient Lighting & Neon Grid */}
+            <div className="absolute top-0 right-1/4 w-80 h-80 bg-orange-500/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-amber-500/20 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 max-w-3xl mx-auto space-y-5">
+              
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/20 border border-orange-500/40 text-orange-400 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-sm">
+                <Sparkles className="w-4 h-4 text-orange-400 animate-pulse" />
+                <span>সাফল্যের শুরু হোক আজই</span>
+              </div>
+
+              {/* Mega Title */}
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
+                তোমার স্বপ্নের সেরা প্রস্তুতিতে সাথে আছে <br />
+                <span className="bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 bg-clip-text text-transparent">
+                  "{displayName}"
+                </span>
               </h2>
-              <p className="text-orange-100 text-sm sm:text-base">
-                দেশসেরা দিকনির্দেশনায় ঘরে বসেই নাও শতভাগ প্রস্তুতি এবং নিজেকে এগিয়ে রাখো সবার চেয়ে।
+
+              <p className="text-white/80 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
+                দেশসেরা দিকনির্দেশনা, মানসম্মত লেকচার ও নিয়মিত মডেল টেস্টের মাধ্যমে ঘরে বসেই নাও শতভাগ প্রস্তুতি।
               </p>
+
+              {/* 4 Feature Checklist Badges */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 max-w-2xl mx-auto pt-2">
+                <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/90 flex items-center justify-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                  <span>লাইভ ক্লাস</span>
+                </div>
+                <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/90 flex items-center justify-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                  <span>ডেইলি এক্সাম</span>
+                </div>
+                <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/90 flex items-center justify-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                  <span>ডাউট সলভিং</span>
+                </div>
+                <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/90 flex items-center justify-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                  <span>লেকচার শিট</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
               <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
                 <Link
                   href="/courses"
-                  className="px-8 py-4 rounded-2xl bg-white text-slate-950 font-black text-sm hover:bg-orange-50 transition-all shadow-xl hover:scale-105"
+                  className="px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-black text-sm shadow-2xl shadow-orange-500/40 transition-all hover:scale-105 flex items-center gap-2"
                 >
-                  সকল কোর্সসমূহ দেখুন
+                  <BookOpen className="w-4 h-4" />
+                  <span>সকল কোর্সসমূহ দেখুন</span>
+                  <ArrowRight className="w-4 h-4" />
                 </Link>
+
                 {config.contactPhone && (
                   <a
                     href={`tel:${config.contactPhone}`}
-                    className="px-8 py-4 rounded-2xl bg-black/40 hover:bg-black/60 border border-white/20 text-white font-bold text-sm transition-all flex items-center gap-2"
+                    className="px-7 py-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm backdrop-blur-md transition-all flex items-center gap-2 hover:scale-105"
                   >
-                    <Phone className="w-4 h-4" />
+                    <Phone className="w-4 h-4 text-orange-400" />
                     <span>হেল্পলাইনে কল দিন</span>
                   </a>
                 )}
               </div>
+
             </div>
+
           </div>
+
         </section>
 
         {/* Video Modal Component */}

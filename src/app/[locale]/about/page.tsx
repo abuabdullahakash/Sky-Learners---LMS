@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Link } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
@@ -55,6 +55,14 @@ export default function AboutPage() {
 
   // Interactive Team Showcase State
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+  const thumbnailScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollThumbnails = (direction: 'left' | 'right') => {
+    if (thumbnailScrollRef.current) {
+      const scrollAmount = direction === 'left' ? -350 : 350;
+      thumbnailScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     if (authLoading) return;
@@ -433,28 +441,28 @@ export default function AboutPage() {
         {/* ========================================================================= */}
         {/* 4. "টিম ও ক্লাসরুম মোমেন্টস" (100VH INTERACTIVE SLIDE SHOWCASE)          */}
         {/* ========================================================================= */}
-        <section className="min-h-screen py-16 sm:py-24 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 flex flex-col justify-center space-y-8 sm:space-y-10">
+        <section className="min-h-screen py-12 sm:py-20 max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-8 flex flex-col justify-center">
           
-          <div className="text-center max-w-3xl mx-auto space-y-3">
+          <div className="text-center max-w-3xl mx-auto space-y-2 mb-6 sm:mb-8">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
               {displayName} <span className="text-orange-500">পরিবার</span>
             </h2>
-            <div className="h-1 w-24 bg-orange-500 rounded-full mx-auto" />
+            <div className="h-1 w-20 bg-orange-500 rounded-full mx-auto" />
             <p className="text-foreground/70 text-xs sm:text-sm md:text-base font-medium pt-1">
               {displayName}-কে নেতৃত্ব দিচ্ছে প্রতিভাবান এবং দক্ষ একটি ডায়নামিক টিম। সবার জন্য মানসম্মত শিক্ষা সহজলভ্য করার লক্ষ্যে আমাদের সম্মিলিত প্রয়াস।
             </p>
           </div>
 
-          {/* Large Interactive Slide Display Frame (Full Impact 100vh Feel) */}
-          <div className="relative w-full max-w-6xl mx-auto h-[55vh] sm:h-[68vh] lg:h-[75vh] rounded-[2rem] sm:rounded-[3rem] overflow-hidden bg-zinc-950 border-2 border-foreground/15 shadow-2xl group">
+          {/* Large Interactive Full Height Frame */}
+          <div className="relative w-full h-[58vh] sm:h-[70vh] lg:h-[78vh] rounded-[2rem] sm:rounded-[3rem] overflow-hidden bg-zinc-950 border-2 border-foreground/15 shadow-2xl group z-10">
             
             {/* Framer Motion Smooth Animated Slide */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={selectedPhotoIndex}
-                initial={{ opacity: 0, scale: 1.05, filter: 'blur(8px)' }}
+                initial={{ opacity: 0, scale: 1.04, filter: 'blur(8px)' }}
                 animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, scale: 0.96, filter: 'blur(4px)' }}
+                exit={{ opacity: 0, scale: 0.97, filter: 'blur(4px)' }}
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                 className="w-full h-full relative"
               >
@@ -466,8 +474,8 @@ export default function AboutPage() {
               </motion.div>
             </AnimatePresence>
 
-            {/* Gradient Bottom Overlay with Caption */}
-            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end justify-between pointer-events-none z-10">
+            {/* Gradient Top & Bottom Overlays */}
+            <div className="absolute inset-x-0 bottom-0 pb-20 sm:pb-28 pt-16 px-6 sm:px-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end justify-between pointer-events-none z-10">
               <div className="text-white space-y-1 drop-shadow-md">
                 <div className="inline-block px-3 py-1 rounded-full bg-orange-500 text-white text-[11px] font-black uppercase tracking-wider">
                   ক্যাম্পাস ও ক্লাসরুম মুহূর্ত #{selectedPhotoIndex + 1}
@@ -502,33 +510,61 @@ export default function AboutPage() {
 
           </div>
 
-          {/* 2-Row Thumbnails Grid (Exact Shikho Match) */}
-          <div className="w-full max-w-6xl mx-auto space-y-3 pt-2">
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-8 gap-2 sm:gap-3">
-              {allTeamPhotos.map((imgUrl: string, idx: number) => {
-                const isActive = idx === selectedPhotoIndex;
-                return (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setSelectedPhotoIndex(idx)}
-                    className={`aspect-[16/10] sm:aspect-video rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-300 relative group cursor-pointer ${
-                      isActive 
-                        ? 'ring-4 ring-orange-500 ring-offset-2 ring-offset-background scale-105 shadow-xl shadow-orange-500/30 border-transparent' 
-                        : 'opacity-60 hover:opacity-100 hover:scale-105 border border-foreground/15'
-                    }`}
-                  >
-                    <img 
-                      src={imgUrl} 
-                      alt={`Thumbnail ${idx + 1}`} 
-                      className="w-full h-full object-cover" 
-                    />
-                    {isActive && (
-                      <div className="absolute inset-0 bg-orange-500/10 pointer-events-none" />
-                    )}
-                  </button>
-                );
-              })}
+          {/* 2-Row Thumbnails Container - OVERLAPPING ON TOP OF BIG IMAGE (Shikho Exact Match) */}
+          <div className="relative -mt-14 sm:-mt-20 lg:-mt-24 z-20 px-2 sm:px-6 w-full">
+            <div className="relative group/slider">
+              
+              {/* Left Scroll Button */}
+              <button
+                type="button"
+                onClick={() => scrollThumbnails('left')}
+                className="absolute -left-2 sm:-left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/85 hover:bg-orange-500 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all shadow-xl z-30 opacity-80 hover:opacity-100 hover:scale-110"
+                title="Scroll Left"
+              >
+                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+
+              {/* 2-Row Strict Horizontal Grid */}
+              <div 
+                ref={thumbnailScrollRef}
+                className="grid grid-rows-2 grid-flow-col auto-cols-[105px] sm:auto-cols-[140px] md:auto-cols-[165px] lg:auto-cols-[185px] gap-2 sm:gap-3 overflow-x-auto pb-3 pt-1.5 no-scrollbar scroll-smooth snap-x"
+              >
+                {allTeamPhotos.map((imgUrl: string, idx: number) => {
+                  const isActive = idx === selectedPhotoIndex;
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setSelectedPhotoIndex(idx)}
+                      className={`w-full aspect-[16/10] rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-300 relative group cursor-pointer shrink-0 snap-start ${
+                        isActive 
+                          ? 'ring-4 ring-orange-500 ring-offset-2 ring-offset-background scale-105 shadow-2xl shadow-orange-500/40 border-transparent z-10' 
+                          : 'opacity-75 hover:opacity-100 hover:scale-[1.03] border-2 border-white/40 dark:border-white/20 shadow-lg backdrop-blur-sm'
+                      }`}
+                    >
+                      <img 
+                        src={imgUrl} 
+                        alt={`Thumbnail ${idx + 1}`} 
+                        className="w-full h-full object-cover" 
+                      />
+                      {isActive && (
+                        <div className="absolute inset-0 bg-orange-500/15 pointer-events-none" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Right Scroll Button */}
+              <button
+                type="button"
+                onClick={() => scrollThumbnails('right')}
+                className="absolute -right-2 sm:-right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/85 hover:bg-orange-500 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all shadow-xl z-30 opacity-80 hover:opacity-100 hover:scale-110"
+                title="Scroll Right"
+              >
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+
             </div>
           </div>
 

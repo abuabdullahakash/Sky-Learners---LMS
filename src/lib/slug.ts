@@ -1,24 +1,60 @@
 import { Firestore, doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 
 /**
- * Generates a clean, URL-safe slug from a course title.
+ * Generates a clean, URL-safe slug from a course title and optional teacher handle.
  * Handles both English and Bengali / Unicode characters properly.
  */
-export function generateCourseSlug(title: string): string {
+export function generateCourseSlug(title: string, teacherHandle?: string): string {
   if (!title) return `course-${Date.now().toString(36)}`;
 
-  let slug = title
+  let baseSlug = title
     .toLowerCase()
     .trim()
-    // Remove punctuation & special characters except letters, numbers, spaces, and Bengali characters (\u0980-\u09FF)
     .replace(/[^\w\s\u0980-\u09FF-]/g, '')
-    // Replace spaces, underscores, and consecutive hyphens with a single hyphen
     .replace(/[\s_]+/g, '-')
     .replace(/-+/g, '-')
-    // Remove leading and trailing hyphens
     .replace(/^-+|-+$/g, '');
 
-  return slug || `course-${Date.now().toString(36)}`;
+  if (!baseSlug) baseSlug = `course-${Date.now().toString(36)}`;
+
+  if (teacherHandle && teacherHandle.trim()) {
+    const cleanHandle = teacherHandle
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s\u0980-\u09FF-]/g, '')
+      .replace(/[\s_]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    if (cleanHandle && !baseSlug.endsWith(cleanHandle)) {
+      return `${baseSlug}-${cleanHandle}`;
+    }
+  }
+
+  return baseSlug;
+}
+
+/**
+ * Generates a clean teacher username/handle from name or email.
+ */
+export function generateTeacherHandle(name?: string, email?: string): string {
+  if (name && name.trim()) {
+    const fromName = name
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s\u0980-\u09FF-]/g, '')
+      .replace(/[\s_]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    if (fromName) return fromName;
+  }
+
+  if (email && email.includes('@')) {
+    const emailPrefix = email.split('@')[0]
+      .toLowerCase()
+      .replace(/[^\w-]/g, '');
+    if (emailPrefix) return emailPrefix;
+  }
+
+  return `teacher-${Date.now().toString(36)}`;
 }
 
 /**
@@ -35,7 +71,7 @@ export async function resolveCourseBySlugOrId(db: Firestore, slugOrId: string) {
     if (docSnap.exists()) {
       const data = docSnap.data();
       if (!data.slug && data.title) {
-        const autoSlug = generateCourseSlug(data.title);
+        const autoSlug = generateCourseSlug(data.title, data.coachingName || data.instructorName);
         import('firebase/firestore').then(({ updateDoc }) => {
           updateDoc(docRef, { slug: autoSlug, slugHistory: [autoSlug] }).catch(() => {});
         });

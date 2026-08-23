@@ -97,7 +97,8 @@ export default function CreateCoursePage() {
       // 1. Upload Thumbnail to ImgBB
       const thumbnailUrl = await uploadImageToImgBB(thumbnail);
 
-      const slug = generateCourseSlug(title);
+      const teacherIdentifier = (courseType === 'coaching' && coachingName) ? coachingName : (user.displayName || user.email?.split('@')[0] || '');
+      const slug = generateCourseSlug(title, teacherIdentifier);
 
       // 2. Save Course to Firestore
       const courseData = {

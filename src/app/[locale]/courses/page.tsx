@@ -113,17 +113,36 @@ export default function CoursesPage() {
     fetchCourses();
   }, [activeTeacherId, authLoading]);
 
-  // Filter courses by search query and category
+  // Filter & Smart-Rank courses by search query, category, and popularity
   const filteredCourses = courses.filter((c) => {
-    const matchesSearch = searchQuery.trim() === '' || 
-      c.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.instructorName?.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = searchQuery.toLowerCase().trim();
+    const matchesSearch = q === '' || 
+      c.title?.toLowerCase().includes(q) ||
+      c.category?.toLowerCase().includes(q) ||
+      c.instructorName?.toLowerCase().includes(q) ||
+      c.coachingName?.toLowerCase().includes(q) ||
+      (c.specificSubjects && c.specificSubjects.some((s: any) => (typeof s === 'string' ? s : s.name)?.toLowerCase().includes(q)));
 
     const matchesCategory = selectedCategory === 'all' || 
       (c.category && c.category.toLowerCase() === selectedCategory.toLowerCase());
 
     return matchesSearch && matchesCategory;
+  }).sort((a, b) => {
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const aTitle = a.title?.toLowerCase() || '';
+      const bTitle = b.title?.toLowerCase() || '';
+      const aInstructor = (a.coachingName || a.instructorName || '').toLowerCase();
+      const bInstructor = (b.coachingName || b.instructorName || '').toLowerCase();
+
+      const aExact = aTitle === q || aInstructor.includes(q);
+      const bExact = bTitle === q || bInstructor.includes(q);
+      if (aExact && !bExact) return -1;
+      if (!aExact && bExact) return 1;
+    }
+    const aCount = (a.enrolledStudents || a.enrolledCount || 0);
+    const bCount = (b.enrolledStudents || b.enrolledCount || 0);
+    return bCount - aCount;
   });
 
   // Extract unique categories for filter tabs

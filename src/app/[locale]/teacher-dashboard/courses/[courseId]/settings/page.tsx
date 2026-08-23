@@ -159,7 +159,8 @@ export default function CourseSettingsPage() {
     if (!course) return;
     setIsSaving(true);
     try {
-      const newSlug = generateCourseSlug(course.title);
+      const teacherIdentifier = course.coachingName || user?.displayName || user?.email?.split('@')[0] || '';
+      const newSlug = generateCourseSlug(course.title, teacherIdentifier);
       const existingHistory: string[] = course.slugHistory || [];
       const updatedHistory = existingHistory.includes(newSlug)
         ? existingHistory

@@ -442,7 +442,7 @@ export default function AboutPage() {
         {/* ========================================================================= */}
         {/* 4. "টিম ও ক্লাসরুম মোমেন্টস" (100VH INTERACTIVE SLIDE SHOWCASE)          */}
         {/* ========================================================================= */}
-        <section className="min-h-screen py-12 sm:py-20 max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-8 flex flex-col justify-center">
+        <section className="py-12 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
           
           <div className="text-center max-w-3xl mx-auto space-y-2 mb-6 sm:mb-8">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
@@ -454,8 +454,8 @@ export default function AboutPage() {
             </p>
           </div>
 
-          {/* Large Interactive Full Height Frame */}
-          <div className="relative w-full h-[58vh] sm:h-[70vh] lg:h-[78vh] rounded-[2rem] sm:rounded-[3rem] overflow-hidden bg-zinc-950 border-2 border-foreground/15 shadow-2xl group z-10">
+          {/* Large Interactive Height-Balanced Frame */}
+          <div className="relative w-full h-[46vh] sm:h-[54vh] lg:h-[58vh] rounded-[2rem] sm:rounded-[3rem] overflow-hidden bg-zinc-950 border-2 border-foreground/15 shadow-2xl group z-10">
             
             {/* Framer Motion Smooth Animated Slide */}
             <AnimatePresence mode="wait">
@@ -476,12 +476,12 @@ export default function AboutPage() {
             </AnimatePresence>
 
             {/* Gradient Top & Bottom Overlays */}
-            <div className="absolute inset-x-0 bottom-0 pb-20 sm:pb-28 pt-16 px-6 sm:px-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end justify-between pointer-events-none z-10">
+            <div className="absolute inset-x-0 bottom-0 pb-16 sm:pb-24 pt-12 px-5 sm:px-8 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end justify-between pointer-events-none z-10">
               <div className="text-white space-y-1 drop-shadow-md">
                 <div className="inline-block px-3 py-1 rounded-full bg-orange-500 text-white text-[11px] font-black uppercase tracking-wider">
                   ক্যাম্পাস ও ক্লাসরুম মুহূর্ত #{selectedPhotoIndex + 1}
                 </div>
-                <h3 className="text-lg sm:text-2xl lg:text-3xl font-black">
+                <h3 className="text-base sm:text-xl lg:text-2xl font-black">
                   শিক্ষার্থীদের স্বপ্ন পূরণে নিবেদিত একদল মেন্টর
                 </h3>
               </div>
@@ -495,7 +495,7 @@ export default function AboutPage() {
             <button
               type="button"
               onClick={() => setSelectedPhotoIndex(prev => (prev - 1 + allTeamPhotos.length) % allTeamPhotos.length)}
-              className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-13 sm:h-13 rounded-full bg-black/60 hover:bg-orange-500 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all opacity-0 group-hover:opacity-100 hover:scale-110 shadow-xl z-20"
+              className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 hover:bg-orange-500 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all opacity-0 group-hover:opacity-100 hover:scale-110 shadow-xl z-20"
               title="Previous Photo"
             >
               <ChevronLeft className="w-6 h-6" />
@@ -503,7 +503,7 @@ export default function AboutPage() {
             <button
               type="button"
               onClick={() => setSelectedPhotoIndex(prev => (prev + 1) % allTeamPhotos.length)}
-              className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-13 sm:h-13 rounded-full bg-black/60 hover:bg-orange-500 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all opacity-0 group-hover:opacity-100 hover:scale-110 shadow-xl z-20"
+              className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 hover:bg-orange-500 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all opacity-0 group-hover:opacity-100 hover:scale-110 shadow-xl z-20"
               title="Next Photo"
             >
               <ChevronRight className="w-6 h-6" />
@@ -512,14 +512,14 @@ export default function AboutPage() {
           </div>
 
           {/* 2-Row Thumbnails Container - OVERLAPPING ON TOP OF BIG IMAGE (Shikho Exact Match) */}
-          <div className="relative -mt-14 sm:-mt-20 lg:-mt-24 z-20 px-2 sm:px-6 w-full">
+          <div className="relative -mt-12 sm:-mt-16 lg:-mt-20 z-20 px-2 sm:px-4 w-full">
             <div className="relative group/slider">
               
               {/* Left Scroll Button */}
               <button
                 type="button"
                 onClick={() => scrollThumbnails('left')}
-                className="absolute -left-2 sm:-left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/85 hover:bg-orange-500 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all shadow-xl z-30 opacity-80 hover:opacity-100 hover:scale-110"
+                className="absolute -left-2 sm:-left-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/85 hover:bg-orange-500 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all shadow-xl z-30 opacity-80 hover:opacity-100 hover:scale-110"
                 title="Scroll Left"
               >
                 <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -528,7 +528,7 @@ export default function AboutPage() {
               {/* 2-Row Strict Horizontal Grid */}
               <div 
                 ref={thumbnailScrollRef}
-                className="grid grid-rows-2 grid-flow-col auto-cols-[105px] sm:auto-cols-[140px] md:auto-cols-[165px] lg:auto-cols-[185px] gap-2 sm:gap-3 overflow-x-auto pb-3 pt-1.5 no-scrollbar scroll-smooth snap-x"
+                className="grid grid-rows-2 grid-flow-col auto-cols-[100px] sm:auto-cols-[130px] md:auto-cols-[150px] lg:auto-cols-[170px] gap-2 sm:gap-2.5 overflow-x-auto pb-3 pt-1.5 no-scrollbar scroll-smooth snap-x"
               >
                 {allTeamPhotos.map((imgUrl: string, idx: number) => {
                   const isActive = idx === selectedPhotoIndex;
@@ -560,7 +560,7 @@ export default function AboutPage() {
               <button
                 type="button"
                 onClick={() => scrollThumbnails('right')}
-                className="absolute -right-2 sm:-right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/85 hover:bg-orange-500 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all shadow-xl z-30 opacity-80 hover:opacity-100 hover:scale-110"
+                className="absolute -right-2 sm:-right-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/85 hover:bg-orange-500 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all shadow-xl z-30 opacity-80 hover:opacity-100 hover:scale-110"
                 title="Scroll Right"
               >
                 <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />

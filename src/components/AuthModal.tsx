@@ -85,17 +85,25 @@ export default function AuthModal({ initialMode }: AuthModalProps) {
   // Close handler with smooth scale & fade out
   const handleClose = (e: React.MouseEvent) => {
     e.preventDefault();
+    const navigateAway = () => {
+      if (typeof window !== 'undefined' && window.history.length > 1) {
+        router.back();
+      } else {
+        router.push('/');
+      }
+    };
+
     if (cardRef.current) {
       gsap.to(cardRef.current, {
         opacity: 0,
         scale: 0.94,
         y: 15,
-        duration: 0.22,
+        duration: 0.2,
         ease: "power2.in",
-        onComplete: () => router.push('/')
+        onComplete: navigateAway
       });
     } else {
-      router.push('/');
+      navigateAway();
     }
   };
 

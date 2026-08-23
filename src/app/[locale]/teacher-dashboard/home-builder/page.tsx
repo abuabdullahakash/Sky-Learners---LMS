@@ -49,6 +49,43 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+function ImageSizeGuideBadge({ size, note }: { size: string; note?: string }) {
+  return (
+    <div className="relative inline-flex items-center group">
+      <button
+        type="button"
+        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 dark:text-blue-400 border border-blue-500/30 text-[11px] font-black transition-all cursor-pointer shadow-xs"
+      >
+        <Info className="w-3 h-3 text-blue-500 dark:text-blue-400 flex-shrink-0" />
+        <span>সাইজ গাইড</span>
+      </button>
+
+      {/* Floating Hover/Click Tooltip Popover */}
+      <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block group-focus-within:block z-50 w-64 sm:w-72 p-3.5 rounded-2xl bg-zinc-950 text-white border border-white/20 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 pointer-events-none">
+        <div className="flex items-center gap-1.5 text-xs font-black text-orange-400 border-b border-white/10 pb-1.5 mb-2">
+          <Info className="w-3.5 h-3.5 shrink-0" />
+          <span>প্রস্তাবিত রেজোলিউশন (Pixels)</span>
+        </div>
+        <div className="space-y-1.5 text-xs">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-white/70 font-medium">সাইজ:</span>
+            <span className="px-2 py-0.5 rounded-lg bg-orange-500/25 text-orange-300 font-mono font-black border border-orange-500/40 text-[12px]">{size}</span>
+          </div>
+          {note && (
+            <p className="text-[11px] text-white/80 leading-relaxed pt-0.5">
+              {note}
+            </p>
+          )}
+          <div className="pt-1.5 border-t border-white/10 flex items-center gap-1.5 text-[10px] font-bold text-emerald-400">
+            <CheckCircle2 className="w-3 h-3 shrink-0" />
+            <span>Desktop, Tablet ও Mobile-এ পারফেক্ট ফিট হবে</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function TeacherHomePageBuilderPage() {
   const { user } = useAuth();
   const locale = useLocale();
@@ -1106,9 +1143,12 @@ export default function TeacherHomePageBuilderPage() {
 
                 {/* Cover Banner */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-foreground/70 block">
-                    কভার ব্যানার ফটো (Cover Banner Photo) - ১২০০ × ৪০০ পিক্সেল রেকমেন্ডেড
-                  </label>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs font-bold text-foreground/70 block">
+                      কভার ব্যানার ফটো (Cover Banner)
+                    </label>
+                    <ImageSizeGuideBadge size="1200 × 400 px" note="কম্পিউটার ও মোবাইলের হেডারে কোনো অংশ কাটা ছাড়া নিখুঁত ফিট হবে।" />
+                  </div>
                   <div className="relative aspect-[21/7] sm:aspect-[21/6] rounded-2xl overflow-hidden bg-foreground/5 border border-foreground/10 group">
                     <img src={coverPhoto} alt="Cover Banner" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
@@ -1147,9 +1187,12 @@ export default function TeacherHomePageBuilderPage() {
 
                   <div className="flex-1 space-y-2">
                     <div>
-                      <h5 className="text-xs font-bold text-foreground">
-                        {profileType === 'institution' ? 'প্রতিষ্ঠানের লোগো (Brand Logo)' : 'প্রোফাইল ছবি (Teacher Portrait)'}
-                      </h5>
+                      <div className="flex items-center gap-2">
+                        <h5 className="text-xs font-bold text-foreground">
+                          {profileType === 'institution' ? 'প্রতিষ্ঠানের লোগো (Brand Logo)' : 'প্রোফাইল ছবি (Teacher Portrait)'}
+                        </h5>
+                        <ImageSizeGuideBadge size="500 × 500 px" note="স্কয়ার বা রাউন্ড ফ্রেমে ক্রিস্প ও স্পষ্টভাবে প্রদর্শিত হবে।" />
+                      </div>
                       <p className="text-[11px] text-foreground/60 mt-0.5">
                         PNG বা JPG ফরম্যাটে ১:১ স্কয়ার ছবি ব্যবহার করুন।
                       </p>
@@ -1266,6 +1309,10 @@ export default function TeacherHomePageBuilderPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                     {/* Photo upload */}
                     <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-background border border-foreground/10">
+                      <div className="flex items-center justify-between w-full px-1">
+                        <span className="text-[11px] font-bold text-foreground/70">শিক্ষকের ছবি</span>
+                        <ImageSizeGuideBadge size="600 × 600 px" note="ফ্যাকাল্টি রোস্টারের গোল ফ্রেমে পারফেক্ট দেখাবে।" />
+                      </div>
                       <div className="relative w-28 h-28 rounded-2xl overflow-hidden bg-foreground/10 border border-foreground/15">
                         <img
                           src={facultyImage || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(facultyName || 'Mentor')}
@@ -1470,11 +1517,19 @@ export default function TeacherHomePageBuilderPage() {
                   এখানে আপলোড করা বড় ব্যানারগুলো আপনার হোম পেজের শীর্ষে স্লাইডারে ঘুরবে। ব্যানারে ক্লিক করলে শিক্ষার্থীকে নির্দিষ্ট কোর্সে নিয়ে যাওয়া হবে।
                 </p>
 
-                {/* Dimension & Aspect Ratio Guideline Alert */}
-                <div className="p-3.5 rounded-xl bg-orange-500/10 border border-orange-500/30 text-xs text-orange-600 dark:text-orange-400 font-medium flex items-start gap-2.5">
-                  <Info className="w-4 h-4 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold">📐 প্রস্তাবিত ব্যানার সাইজ:</span> ১৯২০ × ৮০০ পিক্সেল (Aspect Ratio 2.4:1 বা 21:9) অথবা ১২০০ × ৫০০ পিক্সেল। এই রেজুলেশনের ছবি ব্যবহার করলে মোবাইলে ও কম্পিউটারে কোনো অংশ কাটা যাবে না।
+                {/* Dimension & Pixel Guideline Alert */}
+                <div className="p-4 rounded-2xl bg-orange-500/10 border border-orange-500/30 text-xs text-orange-600 dark:text-orange-400 font-medium flex items-start gap-3">
+                  <Info className="w-5 h-5 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-bold">📐 প্রস্তাবিত ব্যানার সাইজ:</span>
+                      <span className="px-2.5 py-0.5 rounded-lg bg-orange-500/20 font-mono font-black text-orange-600 dark:text-orange-300 border border-orange-500/30">1920 × 650 px</span>
+                      <span className="text-[11px] text-foreground/70">বা</span>
+                      <span className="px-2.5 py-0.5 rounded-lg bg-orange-500/20 font-mono font-black text-orange-600 dark:text-orange-300 border border-orange-500/30">1600 × 600 px</span>
+                    </div>
+                    <p className="text-[11px] text-foreground/75 leading-relaxed">
+                      এই রেজুলেশনের ছবি ব্যবহার করলে মোবাইল, ট্যাবলেট ও কম্পিউটার সব স্ক্রিনেই কোনো অংশ কাটা ছাড়া নিখুঁত ফিট হবে।
+                    </p>
                   </div>
                 </div>
               </div>
@@ -1539,12 +1594,13 @@ export default function TeacherHomePageBuilderPage() {
                   </div>
                 ))}
 
-                <div className="pt-2">
+                <div className="pt-2 flex flex-wrap items-center gap-3">
                   <label className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/30 text-xs font-bold cursor-pointer transition-colors">
                     {uploadingSlideImg ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                     <span>{uploadingSlideImg ? 'ইমেজ আপলোড হচ্ছে...' : '+ নতুন ব্যানার ইমেজ আপলোড করুন'}</span>
                     <input type="file" accept="image/*" onChange={handleAddSlideImage} className="hidden" />
                   </label>
+                  <ImageSizeGuideBadge size="1920 × 650 px" note="হিরো ক্যারোজেল স্লাইডারের জন্য সবচেয়ে আইডিয়াল রেজোলিউশন।" />
                 </div>
               </div>
             </div>
@@ -1988,11 +2044,14 @@ export default function TeacherHomePageBuilderPage() {
               <div className="p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <label className="text-[11px] font-bold text-foreground/70 block">
-                      যোগাযোগ সেকশনের প্রতিনিধি বা শিক্ষকের ছবি (Transparent PNG Image)
-                    </label>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[11px] font-bold text-foreground/70 block">
+                        যোগাযোগ সেকশনের প্রতিনিধি বা শিক্ষকের ছবি (Transparent PNG)
+                      </label>
+                      <ImageSizeGuideBadge size="800 × 1000 px" note="ব্যাকগ্রাউন্ড ছাড়া ট্রান্সপারেন্ট PNG দিলে কার্ডের নিচে অসাধারণ দেখাবে।" />
+                    </div>
                     <p className="text-[11px] text-orange-500 font-semibold mt-0.5">
-                      💡 প্রস্তাবিত: ব্যাকগ্রাউন্ড ছাড়া ট্রান্সপারেন্ট PNG ছবি (যেমন: ৮০০ × ৮০০ বা ৬০০ × ৮০০ পিক্সেল)। এটি কোনো বর্ডার বা ব্যাকগ্রাউন্ড বক্স ছাড়াই হোম পেজে স্বচ্ছভাবে ফুটে উঠবে।
+                      💡 ব্যাকগ্রাউন্ড ছাড়া ট্রান্সপারেন্ট PNG ছবি ব্যবহার করলে কোনো বর্ডার বা ব্যাকগ্রাউন্ড বক্স ছাড়াই হোম পেজে স্বচ্ছভাবে ফুটে উঠবে।
                     </p>
                   </div>
                 </div>
@@ -2152,12 +2211,12 @@ export default function TeacherHomePageBuilderPage() {
                 {/* Trust Corner Image Upload */}
                 <div className="p-4 sm:p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3">
                   <div>
-                    <label className="text-[11px] font-bold text-foreground/70 block">
-                      ব্যানারের স্লাইডার ছবি (শিক্ষার্থী বা মেন্টরের ছবি)
-                    </label>
-                    <p className="text-[11px] text-foreground/60 mt-0.5">
-                      📐 প্রস্তাবিত সাইজ: ৮০০ × ৯০০ পিক্সেল বা ৪:৫ অনুপাত (Portrait Photo)।
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[11px] font-bold text-foreground/70 block">
+                        ব্যানারের স্লাইডার ছবি (শিক্ষার্থী বা মেন্টরের ছবি)
+                      </label>
+                      <ImageSizeGuideBadge size="800 × 1000 px" note="লম্বালম্বি পোর্ট্রেট ফটো ব্যানার কর্নারে নিখুঁতভাবে ফিট হবে।" />
+                    </div>
                   </div>
                   
                   <div className="flex items-center gap-4">
@@ -2214,12 +2273,13 @@ export default function TeacherHomePageBuilderPage() {
                 ))}
               </div>
 
-              <div className="pt-2">
+              <div className="pt-2 flex flex-wrap items-center gap-3">
                 <label className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/30 text-xs font-bold cursor-pointer transition-colors">
                   {uploadingGalleryImg ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                   <span>{uploadingGalleryImg ? 'ফটো আপলোড হচ্ছে...' : '+ নতুন গ্যালারি ফটো আপলোড করুন'}</span>
                   <input type="file" accept="image/*" onChange={handleAddGalleryPhoto} className="hidden" />
                 </label>
+                <ImageSizeGuideBadge size="1200 × 800 px" note="অটো-স্ক্রলিং গ্যালারিতে ছবি ক্রিস্প ও ক্লিয়ার থাকবে।" />
               </div>
             </div>
           )}
@@ -2380,9 +2440,12 @@ export default function TeacherHomePageBuilderPage() {
 
                 {/* Hero Background Photo */}
                 <div className="sm:col-span-2 space-y-2">
-                  <label className="text-xs font-bold text-foreground/80 block">
-                    হিরো ব্যাকগ্রাউন্ড ও ভিডিও কার্ড কভার ফটো
-                  </label>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs font-bold text-foreground/80 block">
+                      হিরো ব্যাকগ্রাউন্ড ও ভিডিও কার্ড কভার ফটো
+                    </label>
+                    <ImageSizeGuideBadge size="1920 × 800 px" note="ফুল-উইডথ হিরো ব্যাকগ্রাউন্ড ও ভিডিও থাম্বনেইলের জন্য পারফেক্ট।" />
+                  </div>
                   <div className="flex flex-wrap items-center gap-4">
                     {aboutHeroBgImage && (
                       <img 
@@ -2452,7 +2515,10 @@ export default function TeacherHomePageBuilderPage() {
 
                 {/* Story Image */}
                 <div className="sm:col-span-2 space-y-2">
-                  <label className="text-xs font-bold text-foreground/80 block">স্টোরি সেকশন ছবি</label>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs font-bold text-foreground/80 block">স্টোরি সেকশন ছবি</label>
+                    <ImageSizeGuideBadge size="1200 × 800 px" note="মোবাইল ও ল্যাপটপে লেখার পাশে নিখুঁতভাবে প্রদর্শিত হবে।" />
+                  </div>
                   <div className="flex flex-wrap items-center gap-4">
                     {aboutStoryImage && (
                       <img 
@@ -2689,7 +2755,10 @@ export default function TeacherHomePageBuilderPage() {
 
                 {/* Founder Photo */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-foreground/80 block">মেন্টরের বিশেষ ছবি</label>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs font-bold text-foreground/80 block">মেন্টরের বিশেষ ছবি</label>
+                    <ImageSizeGuideBadge size="800 × 1000 px" note="ফাউন্ডার গ্লাস বেন্টো কার্ডে প্রিমিয়াম পোর্ট্রেট ফিট হবে।" />
+                  </div>
                   <div className="flex flex-wrap items-center gap-3">
                     {aboutFounderPhoto && (
                       <img 

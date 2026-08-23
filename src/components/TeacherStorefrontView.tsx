@@ -95,16 +95,35 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
         return;
       }
       try {
-        // 1. Fetch Teacher Profile & Home Page Config
+        // 1. Fetch Teacher Profile & Home Page Config (Supports direct UID or custom handle/slug)
+        let resolvedId = teacherId;
+        let profile = null;
+
         const docRef = doc(db, 'teacherProfiles', teacherId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setProfileData(docSnap.data());
+          profile = docSnap.data();
+        } else {
+          // Check by custom username/handle
+          const qSlug = query(collection(db, 'teacherProfiles'), where('username', '==', teacherId.toLowerCase()));
+          const slugSnap = await getDocs(qSlug);
+          if (!slugSnap.empty) {
+            resolvedId = slugSnap.docs[0].id;
+            profile = slugSnap.docs[0].data();
+            if (typeof window !== 'undefined') {
+              sessionStorage.setItem('referralTeacherId', resolvedId);
+              localStorage.setItem('referralTeacherId', resolvedId);
+            }
+          }
+        }
+
+        if (profile) {
+          setProfileData(profile);
         }
 
         // 2. Fetch Teacher's Published Courses
         const coursesRef = collection(db, 'courses');
-        const qCourses = query(coursesRef, where('teacherId', '==', teacherId), where('isPublished', '==', true));
+        const qCourses = query(coursesRef, where('teacherId', '==', resolvedId), where('isPublished', '==', true));
         const coursesSnap = await getDocs(qCourses);
         const fetchedCourses: CourseItem[] = [];
         coursesSnap.forEach(d => {
@@ -119,7 +138,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             enrolledCount: data.enrolledCount || 0,
             rating: 4.9,
             duration: data.duration,
-            instructorName: data.coachingName || docSnap.data()?.displayName || 'Instructor'
+            instructorName: data.coachingName || profile?.displayName || 'Instructor'
           });
         });
         setCourses(fetchedCourses);

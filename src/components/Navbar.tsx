@@ -168,12 +168,13 @@ export default function Navbar() {
         ? preferredTeacherId 
         : (routeTeacherId || null));
 
-  const homeLink = effectiveTeacherId && !isTeacher ? `/teachers/${effectiveTeacherId}` : '/';
-  const coursesLink = effectiveTeacherId && !isTeacher ? `/courses?teacherId=${effectiveTeacherId}` : '/courses';
-  const aboutLink = effectiveTeacherId && !isTeacher ? `/about?teacherId=${effectiveTeacherId}` : '/about';
-  const isHomeActive = pathname === '/' || (Boolean(isTeacher) && Boolean(user?.uid) && pathname === `/teachers/${user?.uid}`) || Boolean(effectiveTeacherId && pathname === `/teachers/${effectiveTeacherId}`);
-  const isCoursesActive = pathname === '/courses' || (Boolean(effectiveTeacherId) && pathname.startsWith('/courses'));
-  const isAboutActive = pathname === '/about' || (Boolean(effectiveTeacherId) && pathname.startsWith('/about'));
+  // 100% Clean URLs for seamless user experience:
+  const homeLink = '/';
+  const coursesLink = '/courses';
+  const aboutLink = '/about';
+  const isHomeActive = pathname === '/' || pathname.startsWith('/teachers/');
+  const isCoursesActive = pathname === '/courses' || pathname.startsWith('/courses');
+  const isAboutActive = pathname === '/about' || pathname.startsWith('/about');
 
   // Dashboard Nav Links (Account Settings is handled in the bottom profile popup menu)
   const studentDashboardLinks = [

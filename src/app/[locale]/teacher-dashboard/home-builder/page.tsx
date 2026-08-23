@@ -782,29 +782,6 @@ export default function TeacherHomePageBuilderPage() {
             </div>
           </div>
 
-          {user?.uid && (
-            <div className="grid grid-cols-2 gap-1.5">
-              <Link
-                href="/"
-                target="_blank"
-                className="flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-[11px] font-bold text-foreground transition-colors"
-                title="হোম পেজ দেখুন"
-              >
-                <Eye className="w-3.5 h-3.5 text-orange-500" />
-                <span>Home Site</span>
-              </Link>
-              <Link
-                href="/about"
-                target="_blank"
-                className="flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-[11px] font-bold text-foreground transition-colors"
-                title="অ্যাবাউট পেজ দেখুন"
-              >
-                <Users className="w-3.5 h-3.5 text-blue-500" />
-                <span>About Site</span>
-              </Link>
-            </div>
-          )}
-
           <button
             type="button"
             onClick={handleSaveConfig}
@@ -858,30 +835,7 @@ export default function TeacherHomePageBuilderPage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
-            {user?.uid && (
-              <>
-                <Link
-                  href="/"
-                  target="_blank"
-                  className="px-3.5 py-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-xs font-bold flex items-center gap-1.5 transition-colors"
-                >
-                  <Eye className="w-3.5 h-3.5 text-orange-500" />
-                  <span>Home Live</span>
-                  <ExternalLink className="w-3 h-3 text-foreground/40" />
-                </Link>
-                <Link
-                  href="/about"
-                  target="_blank"
-                  className="px-3.5 py-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-xs font-bold flex items-center gap-1.5 transition-colors"
-                >
-                  <Users className="w-3.5 h-3.5 text-blue-500" />
-                  <span>About Live</span>
-                  <ExternalLink className="w-3 h-3 text-foreground/40" />
-                </Link>
-              </>
-            )}
-
+          <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={handleSaveConfig}

@@ -2,11 +2,12 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
-import { LayoutDashboard, Video, Users, DollarSign, Settings, UserCircle, GraduationCap, Globe, Megaphone, ExternalLink, AlertCircle, Sparkles, Sliders } from 'lucide-react';
+import { LayoutDashboard, Video, Users, DollarSign, Settings, UserCircle, GraduationCap, Globe, Megaphone, ExternalLink, AlertCircle, Sparkles, Sliders, Share2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import ShareWebsiteModal from '@/components/ShareWebsiteModal';
 
 export default function TeacherSidebar() {
   const t = useTranslations('Dashboard.sidebar');
@@ -16,6 +17,8 @@ export default function TeacherSidebar() {
   
   const [profileName, setProfileName] = useState('');
   const [profileImage, setProfileImage] = useState('');
+  const [customSlug, setCustomSlug] = useState('');
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
@@ -27,6 +30,7 @@ export default function TeacherSidebar() {
           const data = docSnap.data();
           setProfileName(data.displayName || '');
           setProfileImage(data.profilePhoto || data.photoUrl || '');
+          setCustomSlug(data.username || data.customSlug || '');
         }
       };
       fetchProfile();
@@ -72,20 +76,19 @@ export default function TeacherSidebar() {
           );
         })}
 
-        {/* Live Public Website Link */}
+        {/* Share Your Website Button */}
         {user?.uid && (
           <div className="pt-2">
-            <Link
-              href="/"
-              target="_blank"
-              className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/20 text-xs font-bold transition-all group"
+            <button
+              onClick={() => setIsShareModalOpen(true)}
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/20 text-xs font-bold transition-all group"
             >
               <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4" />
-                <span>{t('viewLiveWebsite') || 'View Live Website'}</span>
+                <Share2 className="w-4 h-4" />
+                <span>{locale === 'bn' ? 'ওয়েবসাইট শেয়ার করুন' : 'Share Your Website'}</span>
               </div>
-              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </Link>
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+            </button>
           </div>
         )}
       </div>
@@ -165,6 +168,16 @@ export default function TeacherSidebar() {
             </div>
           </div>
         </div>
+      )}
+      {/* Share Website Modal */}
+      {user?.uid && (
+        <ShareWebsiteModal
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
+          teacherId={user.uid}
+          customSlug={customSlug}
+          academyName={profileName}
+        />
       )}
     </aside>
   );

@@ -104,6 +104,18 @@ export default function HomePage() {
   const isTeacher = isAdmin || userData?.role === 'teacher';
   const isStudent = !isAdmin && userData?.role === 'student';
 
+  const [guestTeacherId, setGuestTeacherId] = useState<string | null>(null);
+  const [hasCheckedStorage, setHasCheckedStorage] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('referralTeacherId') || localStorage.getItem('referralTeacherId');
+      if (stored && stored !== 'global') {
+        setGuestTeacherId(stored);
+      }
+      setHasCheckedStorage(true);
+    }
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
@@ -122,6 +134,16 @@ export default function HomePage() {
   const heroSearchRef = useRef<HTMLDivElement>(null);
   const heroCtaRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
+
+  const activeTeacherId = isTeacher && user?.uid
+    ? user.uid
+    : (isStudent && userData?.preferredTeacherId && userData.preferredTeacherId !== 'global'
+        ? userData.preferredTeacherId
+        : (!user && guestTeacherId ? guestTeacherId : null));
+
+  if (activeTeacherId) {
+    return <TeacherStorefrontView teacherId={activeTeacherId} isOwner={Boolean(isTeacher && user?.uid === activeTeacherId)} />;
+  }
 
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });

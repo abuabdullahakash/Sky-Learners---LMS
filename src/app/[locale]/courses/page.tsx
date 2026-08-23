@@ -14,12 +14,23 @@ export default function CoursesPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryTeacherId = searchParams.get('teacherId');
+
+  const [guestTeacherId, setGuestTeacherId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('referralTeacherId') || localStorage.getItem('referralTeacherId');
+      if (stored && stored !== 'global') {
+        setGuestTeacherId(stored);
+      }
+    }
+  }, []);
   
   const isAdmin = userData?.isAdmin || userData?.role === 'admin' || user?.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com' || Boolean(user?.email?.toLowerCase().includes('abuabdullahakash'));
   const isTeacher = isAdmin || userData?.role === 'teacher';
 
   const preferredTeacherId = userData?.preferredTeacherId && userData.preferredTeacherId !== 'global' ? userData.preferredTeacherId : null;
-  const activeTeacherId = isTeacher ? user?.uid : (preferredTeacherId || queryTeacherId || null);
+  const activeTeacherId = isTeacher ? user?.uid : (preferredTeacherId || queryTeacherId || (!user ? guestTeacherId : null));
 
   const [courses, setCourses] = useState<any[]>([]);
   const [teacherProfile, setTeacherProfile] = useState<any>(null);

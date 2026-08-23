@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { Link } from '@/i18n/routing';
-import { BookOpen, Clock, CheckCircle2, PlayCircle, AlertCircle, Loader2, Sparkles } from 'lucide-react';
+import { BookOpen, Clock, CheckCircle2, PlayCircle, AlertCircle, Loader2, Sparkles, User, Globe, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations, useLocale } from 'next-intl';
 import FlyingBookLoader from '@/components/ui/FlyingBookLoader';
@@ -135,7 +135,25 @@ export default function StudentCoursesPage() {
             const courseSnap = await getDoc(courseRef);
             if (courseSnap.exists()) {
               const cData = courseSnap.data();
-              courseDetails = { id: courseSnap.id, ...cData };
+              
+              let teacherName = cData.teacherName || cData.creatorName || '';
+              if (cData.teacherId && !teacherName) {
+                try {
+                  const tSnap = await getDoc(doc(db, 'teacherProfiles', cData.teacherId));
+                  if (tSnap.exists()) {
+                    teacherName = tSnap.data().displayName || tSnap.data().academyName || '';
+                  } else {
+                    const uSnap = await getDoc(doc(db, 'users', cData.teacherId));
+                    if (uSnap.exists()) {
+                      teacherName = uSnap.data().name || uSnap.data().displayName || '';
+                    }
+                  }
+                } catch (err) {
+                  console.error("Error fetching teacher details for course card", err);
+                }
+              }
+
+              courseDetails = { id: courseSnap.id, ...cData, teacherName };
 
               const actualUploadedLessons = (cData.modules || []).reduce(
                 (sum: number, mod: any) => sum + (mod.lessons?.length || 0),
@@ -352,6 +370,30 @@ function CourseCard({ item, t, formatNumber }: { item: EnrolledCourse; t: any; f
         </div>
         <h3 className="text-xl font-bold mb-3 line-clamp-2 text-gray-900 dark:text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 dark:group-hover:from-blue-400 dark:group-hover:to-purple-400 transition-colors duration-300">{course.title}</h3>
         
+        {/* Teacher / Academy Storefront Visit Link */}
+        {course.teacherId && (
+          <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-foreground/[0.03] border border-foreground/10 mb-4 shadow-2xs">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-6 h-6 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
+                <User className="w-3.5 h-3.5" />
+              </div>
+              <span className="text-xs font-bold text-foreground/80 truncate">
+                {course.teacherName || 'কোর্স শিক্ষক'}
+              </span>
+            </div>
+            <Link
+              href={`/teachers/${course.teacherId}`}
+              target="_blank"
+              className="px-2.5 py-1 rounded-lg bg-orange-500/10 hover:bg-orange-500 text-orange-600 hover:text-white text-[11px] font-bold transition-all flex items-center gap-1 shrink-0 border border-orange-500/20 shadow-xs"
+              title="এই শিক্ষকের পার্সোনালাইজড ওয়েবসাইট ভিজিট করুন"
+            >
+              <Globe className="w-3 h-3" />
+              <span>টিচারের সাইট</span>
+              <ExternalLink className="w-2.5 h-2.5 opacity-70" />
+            </Link>
+          </div>
+        )}
+
         {/* Dynamic Progress Bar */}
         {!isPending && (
           <div className="mt-auto pt-4 mb-5">

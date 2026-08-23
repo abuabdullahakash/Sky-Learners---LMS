@@ -2,14 +2,15 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import { useState, useEffect, useRef } from 'react';
-import { User, Shield, Bell, CreditCard, Camera, CheckCircle2, XCircle, Eye, EyeOff, Loader2, ChevronLeft, ChevronRight, Receipt, Printer, FileText, Clock, Download, ChevronDown } from 'lucide-react';
+import { User, Shield, Bell, CreditCard, Camera, CheckCircle2, XCircle, Eye, EyeOff, Loader2, ChevronLeft, ChevronRight, Receipt, Printer, FileText, Clock, Download, ChevronDown, Globe, Building2, Sparkles, Check, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { db, auth } from '@/lib/firebase';
-import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, getDocs, getDoc } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 import { uploadImageToImgBB } from '@/lib/imgbb';
+import toast from 'react-hot-toast';
 
 export default function SettingsPage() {
   const t = useTranslations('Dashboard.settings');
@@ -23,6 +24,12 @@ export default function SettingsPage() {
   const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<any | null>(null);
+
+  // Focus Academy / Preferred Teacher State
+  const [enrolledTeachers, setEnrolledTeachers] = useState<Array<{ teacherId: string; teacherName: string; teacherPhoto?: string; academyName?: string; courseTitles: string[] }>>([]);
+  const [loadingTeachers, setLoadingTeachers] = useState(false);
+  const [preferredTeacher, setPreferredTeacher] = useState<string>(userData?.preferredTeacherId || 'global');
+  const [savingPref, setSavingPref] = useState(false);
 
   const scrollTabs = (direction: 'left' | 'right') => {
     if (tabsRef.current) {
@@ -76,6 +83,116 @@ export default function SettingsPage() {
 
     fetchPaymentHistory();
   }, [user, activeTab]);
+
+  // Sync preferred teacher state with userData
+  useEffect(() => {
+    if (userData?.preferredTeacherId) {
+      setPreferredTeacher(userData.preferredTeacherId);
+    }
+  }, [userData?.preferredTeacherId]);
+
+  // Fetch unique teachers from student's enrolled courses
+  useEffect(() => {
+    const fetchEnrolledTeachers = async () => {
+      if (!user) return;
+      setLoadingTeachers(true);
+      try {
+        const enrollmentsMap = new Map<string, any>();
+        const uidSnap = await getDocs(query(collection(db, 'enrollments'), where('studentId', '==', user.uid)));
+        uidSnap.forEach(d => enrollmentsMap.set(d.id, d.data()));
+
+        if (user.email) {
+          const userEmail = user.email.toLowerCase().trim();
+          const [bySEmail, byCEmail] = await Promise.all([
+            getDocs(query(collection(db, 'enrollments'), where('studentEmail', '==', userEmail))),
+            getDocs(query(collection(db, 'enrollments'), where('contactEmail', '==', userEmail)))
+          ]);
+          bySEmail.forEach(d => enrollmentsMap.set(d.id, d.data()));
+          byCEmail.forEach(d => enrollmentsMap.set(d.id, d.data()));
+        }
+
+        const teacherMap = new Map<string, { teacherId: string; teacherName: string; teacherPhoto?: string; academyName?: string; courseTitles: string[] }>();
+
+        const enrollments = Array.from(enrollmentsMap.values());
+        for (const enr of enrollments) {
+          if (enr.courseId) {
+            try {
+              const cSnap = await getDoc(doc(db, 'courses', enr.courseId));
+              if (cSnap.exists()) {
+                const cData = cSnap.data();
+                const tId = cData.teacherId;
+                if (tId) {
+                  if (!teacherMap.has(tId)) {
+                    let tName = cData.teacherName || cData.creatorName || '';
+                    let tPhoto = '';
+                    let acName = '';
+
+                    const tSnap = await getDoc(doc(db, 'teacherProfiles', tId));
+                    if (tSnap.exists()) {
+                      const tpData = tSnap.data();
+                      tName = tpData.displayName || tName;
+                      tPhoto = tpData.profilePhoto || tpData.photoURL || '';
+                      acName = tpData.academyName || '';
+                    } else {
+                      const uSnap = await getDoc(doc(db, 'users', tId));
+                      if (uSnap.exists()) {
+                        const uData = uSnap.data();
+                        tName = uData.name || uData.displayName || tName;
+                        tPhoto = uData.profilePhoto || uData.photoURL || '';
+                      }
+                    }
+
+                    teacherMap.set(tId, {
+                      teacherId: tId,
+                      teacherName: tName || 'শিক্ষক',
+                      teacherPhoto: tPhoto,
+                      academyName: acName,
+                      courseTitles: [cData.title || 'কোর্স']
+                    });
+                  } else {
+                    const existing = teacherMap.get(tId)!;
+                    if (cData.title && !existing.courseTitles.includes(cData.title)) {
+                      existing.courseTitles.push(cData.title);
+                    }
+                  }
+                }
+              }
+            } catch (err) {
+              console.error("Error fetching course for teacher preference", err);
+            }
+          }
+        }
+
+        setEnrolledTeachers(Array.from(teacherMap.values()));
+      } catch (err) {
+        console.error("Error fetching enrolled teachers", err);
+      } finally {
+        setLoadingTeachers(false);
+      }
+    };
+
+    fetchEnrolledTeachers();
+  }, [user]);
+
+  const handleSavePreference = async (teacherId: string) => {
+    if (!user) return;
+    setSavingPref(true);
+    try {
+      await updateDoc(doc(db, 'users', user.uid), {
+        preferredTeacherId: teacherId
+      });
+      setPreferredTeacher(teacherId);
+      if (refreshUserData) {
+        await refreshUserData();
+      }
+      toast.success(locale === 'bn' ? 'একাডেমি ভিউ প্রেফারেন্স সফলভাবে আপডেট হয়েছে!' : 'Academy view preference updated!');
+    } catch (err) {
+      console.error("Error saving teacher preference", err);
+      toast.error(locale === 'bn' ? 'প্রেফারেন্স সংরক্ষণ করতে সমস্যা হয়েছে' : 'Failed to update preference');
+    } finally {
+      setSavingPref(false);
+    }
+  };
   
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -527,7 +644,160 @@ export default function SettingsPage() {
               <p className="text-foreground/60 text-xs sm:text-sm">{t('preferences.subtitle')}</p>
             </div>
 
-            <div className="max-w-2xl space-y-4 sm:space-y-6">
+            {/* 1. PRIMARY ACADEMY / FOCUSED TEACHER MODE */}
+            <div className="space-y-4">
+              <div className="border-b border-foreground/10 pb-3">
+                <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-orange-500" />
+                  <span>প্রাইমারি একাডেমি ও ওয়েবসাইট মোড (Focused Academy Preference)</span>
+                </h3>
+                <p className="text-xs text-foreground/60 mt-1 leading-relaxed">
+                  আপনার উপরের প্রধান মেনুবার ([হোম], [কোর্স], [About]) কোন মোডে পরিচালিত হবে তা এখান থেকে কাস্টমাইজ করুন। ডিফল্টভাবে এটি পুরো মার্কেটপ্লেসের সাথে যুক্ত থাকে।
+                </p>
+              </div>
+
+              {/* Preferences Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                {/* Option 1: Global Marketplace Mode */}
+                <div 
+                  onClick={() => !savingPref && handleSavePreference('global')}
+                  className={`p-5 rounded-2xl border transition-all cursor-pointer relative flex flex-col justify-between space-y-4 ${
+                    preferredTeacher === 'global'
+                      ? 'bg-orange-500/[0.04] border-orange-500 shadow-md ring-1 ring-orange-500/30'
+                      : 'bg-background hover:bg-foreground/[0.02] border-foreground/10 hover:border-foreground/20'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0 border border-blue-500/20 shadow-xs">
+                        <Globe className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-black text-sm text-foreground">SkyLearners মার্কেটপ্লেস</h4>
+                          <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 text-[10px] font-extrabold border border-blue-500/20">
+                            ডিফল্ট মোড
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-foreground/60 mt-0.5">গ্লোবাল প্ল্যাটফর্ম ভিউ</p>
+                      </div>
+                    </div>
+
+                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
+                      preferredTeacher === 'global' 
+                        ? 'border-orange-500 bg-orange-500 text-white' 
+                        : 'border-foreground/30 bg-transparent'
+                    }`}>
+                      {preferredTeacher === 'global' && <Check className="w-3 h-3 stroke-[3]" />}
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-foreground/70 leading-relaxed">
+                    মেনুবারের [হোম], [কোর্স] ও [About] বাটনগুলো মূল মার্কেটপ্লেসের সকল শিক্ষক ও কোর্সের পাতায় নিয়ে যাবে।
+                  </p>
+
+                  <div className="pt-2 border-t border-foreground/5 flex items-center justify-between">
+                    <span className={`text-[11px] font-bold ${preferredTeacher === 'global' ? 'text-orange-500' : 'text-foreground/40'}`}>
+                      {preferredTeacher === 'global' ? '✓ বর্তমানে সক্রিয় রয়েছে' : 'ক্লিক করে সক্রিয় করুন'}
+                    </span>
+                    <span className="text-[10px] text-foreground/40">Marketplace Standard</span>
+                  </div>
+                </div>
+
+                {/* Loading State for Teachers */}
+                {loadingTeachers && (
+                  <div className="p-8 rounded-2xl border border-foreground/10 bg-background/50 flex flex-col items-center justify-center space-y-2">
+                    <Loader2 className="w-6 h-6 animate-spin text-orange-500" />
+                    <span className="text-xs text-foreground/60 font-bold">এনরোল করা শিক্ষকদের তালিকা লোড হচ্ছে...</span>
+                  </div>
+                )}
+
+                {/* Option 2..N: Enrolled Teachers */}
+                {!loadingTeachers && enrolledTeachers.map((teacher) => {
+                  const isSelected = preferredTeacher === teacher.teacherId;
+
+                  return (
+                    <div 
+                      key={teacher.teacherId}
+                      onClick={() => !savingPref && handleSavePreference(teacher.teacherId)}
+                      className={`p-5 rounded-2xl border transition-all cursor-pointer relative flex flex-col justify-between space-y-4 ${
+                        isSelected
+                          ? 'bg-orange-500/[0.04] border-orange-500 shadow-md ring-1 ring-orange-500/30'
+                          : 'bg-background hover:bg-foreground/[0.02] border-foreground/10 hover:border-foreground/20'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0 border border-orange-500/20 overflow-hidden shadow-xs">
+                            {teacher.teacherPhoto ? (
+                              <img src={teacher.teacherPhoto} alt={teacher.teacherName} className="w-full h-full object-cover" />
+                            ) : (
+                              <User className="w-6 h-6 text-orange-500" />
+                            )}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-black text-sm text-foreground">{teacher.teacherName}</h4>
+                              <span className="px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-500 text-[10px] font-extrabold border border-orange-500/20">
+                                এনরোল্ড শিক্ষক
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-foreground/60 mt-0.5">
+                              {teacher.academyName || 'ব্যক্তিগত একাডেমি মোড'}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
+                          isSelected 
+                            ? 'border-orange-500 bg-orange-500 text-white' 
+                            : 'border-foreground/30 bg-transparent'
+                        }`}>
+                          {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                        </div>
+                      </div>
+
+                      <div className="text-xs text-foreground/70 leading-relaxed">
+                        <span className="font-bold text-foreground/80">আপনার কোর্স: </span>
+                        <span>{teacher.courseTitles.join(', ')}</span>
+                        <p className="text-[11px] text-foreground/50 mt-1">
+                          এটি নির্বাচন করলে আপনার উপরের মেনুবার স্বয়ংক্রিয়ভাবে {teacher.teacherName}-এর ওয়েবসাইটে ফোকাসড থাকবে।
+                        </p>
+                      </div>
+
+                      <div className="pt-2 border-t border-foreground/5 flex items-center justify-between">
+                        <span className={`text-[11px] font-bold ${isSelected ? 'text-orange-500' : 'text-foreground/40'}`}>
+                          {isSelected ? '✓ ফোকাসড একাডেমি সক্রিয়' : 'ক্লিক করে ফোকাসড মোড করুন'}
+                        </span>
+                        <Link 
+                          href={`/teachers/${teacher.teacherId}`}
+                          target="_blank"
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-[11px] font-bold text-orange-500 hover:underline flex items-center gap-1"
+                        >
+                          <span>ওয়েবসাইট প্রিভিউ</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {!loadingTeachers && enrolledTeachers.length === 0 && (
+                <div className="p-6 rounded-2xl border border-dashed border-foreground/15 text-center bg-foreground/[0.01] space-y-2">
+                  <Building2 className="w-8 h-8 text-foreground/30 mx-auto" />
+                  <p className="text-xs font-bold text-foreground/70">আপনি এখনো কোনো শিক্ষকের কোর্সে ভর্তি হননি</p>
+                  <p className="text-[11px] text-foreground/50 max-w-sm mx-auto">
+                    কোনো কোর্সে ভর্তি হলে সেই শিক্ষকের ব্যক্তিগত একাডেমি মোড এখানে স্বয়ংক্রিয়ভাবে যুক্ত হবে।
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* 2. NOTIFICATIONS PREFERENCES */}
+            <div className="max-w-2xl space-y-4 sm:space-y-6 pt-4 border-t border-foreground/10">
               <h3 className="font-semibold text-lg border-b border-foreground/10 pb-2">{t('preferences.notifications')}</h3>
               
               {[

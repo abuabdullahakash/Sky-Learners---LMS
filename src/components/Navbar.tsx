@@ -120,8 +120,40 @@ export default function Navbar() {
   const isStudent = !isAdmin && userData?.role === 'student' && Boolean(userData?.onboardingComplete);
   const hasCompletedRole = isAdmin || isTeacher || isStudent;
   const userProfileLink = isAdmin ? '/admin' : (isTeacher ? '/teacher-dashboard' : (isStudent ? '/dashboard' : '/onboarding'));
-  const homeLink = '/';
-  const isHomeActive = pathname === '/' || (Boolean(isTeacher) && Boolean(user?.uid) && pathname === `/teachers/${user?.uid}`);
+  const [preferredTeacherName, setPreferredTeacherName] = useState<string>('');
+
+  // Fetch preferred teacher details if student has chosen focused academy mode
+  useEffect(() => {
+    if (isStudent && userData?.preferredTeacherId && userData.preferredTeacherId !== 'global') {
+      const fetchTeacher = async () => {
+        try {
+          const tDoc = await getDoc(doc(db, 'teacherProfiles', userData.preferredTeacherId));
+          if (tDoc.exists()) {
+            const data = tDoc.data();
+            setPreferredTeacherName(data.displayName || data.academyName || 'Teacher Academy');
+          } else {
+            const uDoc = await getDoc(doc(db, 'users', userData.preferredTeacherId));
+            if (uDoc.exists()) {
+              const uData = uDoc.data();
+              setPreferredTeacherName(uData.name || uData.displayName || 'Teacher Academy');
+            }
+          }
+        } catch (e) {
+          console.error("Error fetching preferred teacher in navbar:", e);
+        }
+      };
+      fetchTeacher();
+    } else {
+      setPreferredTeacherName('');
+    }
+  }, [isStudent, userData?.preferredTeacherId]);
+
+  const preferredTeacherId = userData?.preferredTeacherId;
+  const isCustomTeacherMode = Boolean(isStudent && preferredTeacherId && preferredTeacherId !== 'global');
+  const homeLink = isCustomTeacherMode && preferredTeacherId ? `/teachers/${preferredTeacherId}` : '/';
+  const coursesLink = isCustomTeacherMode && preferredTeacherId ? `/teachers/${preferredTeacherId}#courses` : '/courses';
+  const aboutLink = isCustomTeacherMode && preferredTeacherId ? `/about?teacherId=${preferredTeacherId}` : '/about';
+  const isHomeActive = pathname === '/' || (Boolean(isTeacher) && Boolean(user?.uid) && pathname === `/teachers/${user?.uid}`) || Boolean(isCustomTeacherMode && preferredTeacherId && pathname === `/teachers/${preferredTeacherId}`);
 
   // Dashboard Nav Links (Account Settings is handled in the bottom profile popup menu)
   const studentDashboardLinks = [
@@ -182,14 +214,25 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
+              {isCustomTeacherMode && preferredTeacherName && (
+                <Link 
+                  href="/dashboard/settings"
+                  className="px-3 py-1 rounded-full bg-gradient-to-r from-orange-500/15 to-amber-500/15 hover:from-orange-500/25 hover:to-amber-500/25 text-orange-500 border border-orange-500/30 text-xs font-black flex items-center gap-1.5 transition-all shadow-xs"
+                  title="আপনার ফোকাসড একাডেমি ভিউ। মোড পরিবর্তন করতে সেটিংস এ যান।"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-orange-500" />
+                  <span className="truncate max-w-[130px]">{preferredTeacherName}</span>
+                </Link>
+              )}
+
               <Link href={homeLink} className={`font-medium transition-colors hover:text-primary ${isHomeActive ? 'text-primary' : 'text-foreground/80'}`}>
                 {t('home')}
               </Link>
-              <Link href="/courses" className={`font-medium transition-colors hover:text-primary ${pathname === '/courses' ? 'text-primary' : 'text-foreground/80'}`}>
+              <Link href={coursesLink} className={`font-medium transition-colors hover:text-primary ${pathname === '/courses' ? 'text-primary' : 'text-foreground/80'}`}>
                 {t('courses')}
               </Link>
-              <Link href="/about" className={`font-medium transition-colors hover:text-primary ${pathname === '/about' ? 'text-primary' : 'text-foreground/80'}`}>
+              <Link href={aboutLink} className={`font-medium transition-colors hover:text-primary ${pathname === '/about' ? 'text-primary' : 'text-foreground/80'}`}>
                 About
               </Link>
               
@@ -526,8 +569,13 @@ export default function Navbar() {
             ) : (
               /* CASE 3: Public Site Pages (Home, Courses, About) */
               <div className="space-y-2">
-                <div className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/40 px-3 mb-2">
-                  Navigation
+                <div className="flex items-center justify-between px-3 mb-2">
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/40">Navigation</span>
+                  {isCustomTeacherMode && preferredTeacherName && (
+                    <span className="text-[10px] font-black text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">
+                      {preferredTeacherName}
+                    </span>
+                  )}
                 </div>
                 <Link
                   href={homeLink}
@@ -545,7 +593,7 @@ export default function Navbar() {
                   <ChevronRight className={`w-4 h-4 transition-transform ${isHomeActive ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
                 </Link>
                 <Link
-                  href="/courses"
+                  href={coursesLink}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
                     pathname === '/courses' 
@@ -560,7 +608,7 @@ export default function Navbar() {
                   <ChevronRight className={`w-4 h-4 transition-transform ${pathname === '/courses' ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
                 </Link>
                 <Link
-                  href="/about"
+                  href={aboutLink}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
                     pathname === '/about' 

@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import { Save, ImagePlus, Trash2, X, Loader2, Plus } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import { uploadImageToImgBB } from '@/lib/imgbb';
+import { generateCourseSlug } from '@/lib/slug';
 import { IconPicker } from '@/components/ui/IconPicker';
 import { RichTextEditor } from '@/components/ui/RichTextEditor';
 import toast from 'react-hot-toast';
@@ -158,8 +159,17 @@ export default function CourseSettingsPage() {
     if (!course) return;
     setIsSaving(true);
     try {
+      const newSlug = generateCourseSlug(course.title);
+      const existingHistory: string[] = course.slugHistory || [];
+      const updatedHistory = existingHistory.includes(newSlug)
+        ? existingHistory
+        : (course.slug ? [...existingHistory, course.slug, newSlug] : [newSlug]);
+      const cleanHistory = Array.from(new Set(updatedHistory.filter(Boolean)));
+
       await updateDoc(doc(db, 'courses', courseId), {
         title: course.title,
+        slug: newSlug,
+        slugHistory: cleanHistory,
         subtitle: course.subtitle,
         detailedDescription: course.detailedDescription || '',
         coverImageUrl: course.coverImageUrl || '',
@@ -182,6 +192,7 @@ export default function CourseSettingsPage() {
         studyRoutineUrl: course.studyRoutineUrl || '',
         routineImageUrl: course.routineImageUrl || '',
       });
+      setCourse((prev: any) => ({ ...prev, slug: newSlug, slugHistory: cleanHistory }));
       toast.success('Settings updated successfully!');
     } catch (error) {
       console.error("Error updating course", error);

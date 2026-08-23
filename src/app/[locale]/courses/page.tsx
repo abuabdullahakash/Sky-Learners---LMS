@@ -390,7 +390,7 @@ export default function CoursesPage() {
                         )}
                       </div>
                       <Link 
-                        href={`/courses/${course.id}`}
+                        href={`/courses/${course.slug || course.id}`}
                         className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white font-bold text-xs rounded-xl transition-all duration-300 shadow-md shadow-orange-500/20 active:scale-95"
                       >
                         বিস্তারিত দেখুন

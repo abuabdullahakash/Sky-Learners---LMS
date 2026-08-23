@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { resolveCourseBySlugOrId } from '@/lib/slug';
 import { BookOpen } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
@@ -28,11 +28,20 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const docRef = doc(db, 'courses', courseId);
-        const docSnap = await getDoc(docRef);
+        const resolved = await resolveCourseBySlugOrId(db, courseId);
         
-        if (docSnap.exists()) {
-          setCourse({ id: docSnap.id, ...docSnap.data() });
+        if (resolved) {
+          setCourse(resolved);
+          // If visited via raw ID and course has a clean slug, update the address bar to the clean slug seamlessly!
+          if (resolved.slug && courseId !== resolved.slug && typeof window !== 'undefined') {
+            try {
+              const currentPath = window.location.pathname;
+              const cleanPath = currentPath.replace(courseId, encodeURIComponent(resolved.slug));
+              window.history.replaceState(null, '', cleanPath);
+            } catch (e) {
+              console.error("URL slug sync error:", e);
+            }
+          }
         } else {
           router.push('/courses');
         }
@@ -46,7 +55,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ course
     if (courseId) {
       fetchCourse();
     }
-  }, [courseId]);
+  }, [courseId, router]);
 
   useEffect(() => {
     if (course?.sliderImages?.length > 1) {

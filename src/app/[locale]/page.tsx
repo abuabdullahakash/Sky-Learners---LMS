@@ -43,6 +43,7 @@ import {
 
 interface CourseItem {
   id: string;
+  slug?: string;
   title: string;
   thumbnailUrl?: string;
   category?: string;
@@ -181,6 +182,7 @@ export default function HomePage() {
 
           fetchedCourses.push({
             id: docSnap.id,
+            slug: data.slug,
             title: data.title || 'Untitled Course',
             thumbnailUrl: data.thumbnailUrl,
             category: data.category,
@@ -816,7 +818,7 @@ export default function HomePage() {
                         </div>
 
                         <Link 
-                          href={`/courses/${course.id}`}
+                          href={`/courses/${course.slug || course.id}`}
                           className="px-4 py-2 rounded-xl bg-foreground/5 hover:bg-primary hover:text-white font-bold text-xs transition-all flex items-center gap-1 group/btn"
                         >
                           <span>{t('featuredCourses.viewDetails')}</span>

@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, addDoc, Timestamp, setDoc } from 'firebase/firestore';
+import { resolveCourseBySlugOrId } from '@/lib/slug';
 import { useAuth } from '@/context/AuthContext';
 import { CheckCircle2, ShieldCheck, ArrowRight, Loader2, AlertCircle, UserCircle, Phone, Link, Mail, Camera, Upload } from 'lucide-react';
 import { uploadImageToImgBB } from '@/lib/imgbb';
@@ -68,10 +69,8 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
     const fetchCourse = async () => {
       setIsLoading(true);
       try {
-        const docRef = doc(db, 'courses', courseId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const courseData = { id: docSnap.id, ...docSnap.data() } as any;
+        const courseData = await resolveCourseBySlugOrId(db, courseId);
+        if (courseData) {
           setCourse(courseData);
           
           if (courseData.teacherId) {

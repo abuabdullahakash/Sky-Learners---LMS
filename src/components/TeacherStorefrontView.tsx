@@ -54,6 +54,7 @@ import toast from 'react-hot-toast';
 
 interface CourseItem {
   id: string;
+  slug?: string;
   title: string;
   thumbnailUrl?: string;
   category?: string;
@@ -130,6 +131,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
           const data = d.data();
           fetchedCourses.push({
             id: d.id,
+            slug: data.slug,
             title: data.title || 'Untitled Course',
             thumbnailUrl: data.thumbnailUrl,
             category: data.category,
@@ -623,7 +625,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                     </div>
 
                     <Link
-                      href={`/courses/${course.id}`}
+                      href={`/courses/${course.slug || course.id}`}
                       className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-black transition-all shadow-md hover:shadow-orange-500/25 flex items-center gap-1.5 group/btn shrink-0"
                     >
                       <span>বিস্তারিত</span>

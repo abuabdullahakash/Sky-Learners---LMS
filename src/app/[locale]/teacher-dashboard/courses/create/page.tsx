@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { uploadImageToImgBB } from '@/lib/imgbb';
+import { generateCourseSlug } from '@/lib/slug';
 import { ImagePlus, Loader2, ArrowLeft } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
@@ -96,9 +97,13 @@ export default function CreateCoursePage() {
       // 1. Upload Thumbnail to ImgBB
       const thumbnailUrl = await uploadImageToImgBB(thumbnail);
 
+      const slug = generateCourseSlug(title);
+
       // 2. Save Course to Firestore
       const courseData = {
         title,
+        slug,
+        slugHistory: [slug],
         subtitle,
         teacherId: user.uid,
         courseType,

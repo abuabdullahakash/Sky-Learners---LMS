@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
@@ -9,6 +9,7 @@ import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { 
   Sparkles, 
+  Sparkle,
   Globe,
   Save, 
   Eye, 
@@ -17,28 +18,50 @@ import {
   Image as ImageIcon, 
   Loader2, 
   CheckCircle2, 
+  BadgeCheck,
+  FileCheck,
   ExternalLink,
   Layers,
+  Boxes,
   Sliders,
   BookOpen,
+  Bookmark,
+  BookMarked,
+  Library,
+  School,
+  Pencil,
   Grid,
   Info,
   Phone,
   HelpCircle,
   Award,
+  Trophy,
+  Medal,
+  Crown,
+  Gem,
   Video,
   FileText,
+  FileCode,
+  FolderGit2,
   Users,
+  UserCheck,
+  UserPlus,
+  MessagesSquare,
+  MessageCircle,
   Compass,
-  Trophy,
   Check,
+  ChevronLeft,
   ChevronRight,
   ChevronDown,
   ArrowRight,
   ArrowLeft,
   Flame,
   Target,
+  Crosshair,
   Send,
+  Share2,
+  Megaphone,
+  Briefcase,
   Building2,
   User,
   GraduationCap,
@@ -49,28 +72,60 @@ import {
   Search,
   RotateCcw,
   Palette,
+  Brush,
+  Music,
+  Film,
+  Gift,
+  Coffee,
   HeartHandshake,
   Heart,
   HeartPulse,
+  Smile,
+  ThumbsUp,
+  Handshake,
   Zap,
+  Gauge,
+  Timer,
+  FastForward,
+  Footprints,
   Sun,
+  Anchor,
   TrendingUp,
+  TrendingDown,
   BarChart3,
+  PieChart,
+  LineChart,
   Activity,
   ShieldCheck,
   Shield,
+  ShieldAlert,
   Lock,
+  Key,
   Mountain,
-  Medal,
   Lightbulb,
+  Brain,
+  Atom,
+  Microscope,
+  Dna,
+  Binary,
+  Cpu,
+  Orbit,
+  Puzzle,
   Rocket,
   Star,
-  Bookmark,
-  UserCheck,
-  Smile,
   Laptop,
+  Monitor,
+  Smartphone,
+  Headphones,
+  Radio,
+  Tv,
+  Terminal,
+  Database,
+  Server,
+  Wifi,
+  Cloud,
+  Bot,
   Code,
-  Cpu,
   type LucideIcon
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -78,6 +133,7 @@ import toast from 'react-hot-toast';
 export interface ValueCardItem {
   id: string;
   icon: string;
+  customSvg?: string;
   title: string;
   subtitle: string;
   desc: string;
@@ -136,15 +192,24 @@ export const DEFAULT_VALUE_CARDS: ValueCardItem[] = [
 ];
 
 export const VALUE_ICON_MAP: Record<string, LucideIcon> = {
-  HeartHandshake, Heart, HeartPulse,
-  Zap, Flame, Sparkles, Sun,
-  TrendingUp, BarChart3, Activity,
-  ShieldCheck, Shield, Lock, CheckCircle2,
-  Mountain, Trophy, Award, Medal, Target,
-  Lightbulb, Compass, Rocket, Star,
-  BookOpen, GraduationCap, Bookmark,
-  Users, UserCheck, Smile,
-  Laptop, Video, Globe, Code, FileText, Cpu
+  // Values & Emotions
+  HeartHandshake, Heart, HeartPulse, Smile, ThumbsUp, Handshake, Sun, Flame, Sparkles, Sparkle,
+  // Speed & Action
+  Zap, Rocket, Activity, Gauge, Timer, FastForward, Compass, Footprints,
+  // Growth & Excellence
+  TrendingUp, TrendingDown, BarChart3, PieChart, LineChart, Target, Crosshair, Award, Trophy, Medal, Crown, Gem, Mountain,
+  // Trust & Security
+  ShieldCheck, Shield, ShieldAlert, Lock, Key, CheckCircle2, BadgeCheck, FileCheck, Anchor, Eye,
+  // Education & Knowledge
+  BookOpen, GraduationCap, Bookmark, BookMarked, Library, School, Pencil, FileText, FileCode, FolderGit2, Layers, Boxes,
+  // Science & Ideas
+  Brain, Lightbulb, Atom, Microscope, Dna, Binary, Cpu, Orbit, Puzzle,
+  // Tech & Media
+  Laptop, Monitor, Smartphone, Video, Globe, Code, Headphones, Radio, Tv, Terminal, Database, Server, Wifi, Cloud, Bot,
+  // Community & Work
+  Users, UserCheck, UserPlus, MessagesSquare, MessageCircle, Briefcase, Building2, Megaphone, Share2, Send,
+  // Lifestyle & Creative
+  Palette, Brush, Camera, Music, Film, Gift, Coffee, Star, Check
 };
 
 export const COLOR_THEME_OPTIONS = [
@@ -158,42 +223,133 @@ export const COLOR_THEME_OPTIONS = [
   { id: 'indigo', name: 'ইন্ডিগো / Indigo', border: 'border-indigo-500', text: 'text-indigo-500', bg: 'bg-indigo-500/10' },
 ];
 
+export const ICON_CATEGORIES = [
+  { id: 'all', label: 'সবগুলো (All)' },
+  { id: 'values', label: 'মূল্যবোধ ও বিশ্বাস' },
+  { id: 'speed', label: 'গতি ও কর্মতৎপরতা' },
+  { id: 'growth', label: 'উন্নতি ও শ্রেষ্ঠত্ব' },
+  { id: 'trust', label: 'সুরক্ষা ও নিশ্চয়তা' },
+  { id: 'education', label: 'শিক্ষা ও একাডেমি' },
+  { id: 'innovation', label: 'আইডিয়া ও উদ্ভাবন' },
+  { id: 'tech', label: 'টেকনোলজি ও মিডিয়া' },
+  { id: 'community', label: 'টিম ও কমিউনিটি' },
+  { id: 'creative', label: 'ক্রিয়েটিভিটি ও লাইফস্টাইল' }
+];
+
 export const AVAILABLE_ICONS = [
+  // 1. Values & Emotion
   { id: 'HeartHandshake', name: 'সহমর্মিতা ও বিশ্বাস', category: 'values' },
   { id: 'Heart', name: 'ভালোবাসা ও কেয়ার', category: 'values' },
   { id: 'HeartPulse', name: 'উদ্যম ও স্পন্দন', category: 'values' },
-  { id: 'Zap', name: 'গতি ও বিদ্যুৎ', category: 'speed' },
-  { id: 'Flame', name: 'আগ্রহ ও প্রেরণা', category: 'speed' },
-  { id: 'Sparkles', name: 'চমক ও নতুনত্ব', category: 'innovation' },
-  { id: 'Rocket', name: 'দ্রুত প্রবৃদ্ধি ও রকেট', category: 'speed' },
-  { id: 'TrendingUp', name: 'অগ্রগতি ও প্রবৃদ্ধি', category: 'growth' },
-  { id: 'BarChart3', name: 'উন্নতি ও গ্রাফ', category: 'growth' },
-  { id: 'Activity', name: 'সক্রিয়তা ও এনার্জি', category: 'growth' },
-  { id: 'ShieldCheck', name: 'দায়বদ্ধতা ও সুরক্ষা', category: 'trust' },
-  { id: 'Shield', name: 'নিরাপত্তা শিল্ড', category: 'trust' },
-  { id: 'Lock', name: 'দৃঢ়তা ও গোপনীয়তা', category: 'trust' },
-  { id: 'CheckCircle2', name: 'নিশ্চয়তা ও নির্ভুলতা', category: 'trust' },
-  { id: 'Mountain', name: 'দৃঢ়তা ও পর্বত শিখর', category: 'excellence' },
-  { id: 'Trophy', name: 'সাফল্য ট্রফি', category: 'excellence' },
-  { id: 'Award', name: 'শ্রেষ্ঠত্ব ও মেডেল', category: 'excellence' },
-  { id: 'Medal', name: 'অসাধারণ সম্মাননা', category: 'excellence' },
-  { id: 'Target', name: 'টার্গেট ও ফোকাস', category: 'excellence' },
-  { id: 'Star', name: 'সেরা পারফরম্যান্স', category: 'excellence' },
-  { id: 'Lightbulb', name: 'সৃজনশীল চিন্তা ও আইডিয়া', category: 'innovation' },
-  { id: 'Compass', name: 'সঠিক দিকনির্দেশনা', category: 'guidance' },
-  { id: 'BookOpen', name: 'উন্মুক্ত বই ও জ্ঞান', category: 'education' },
-  { id: 'GraduationCap', name: 'উচ্চশিক্ষা ও ডিগ্রি', category: 'education' },
-  { id: 'Bookmark', name: 'গুরুত্বপূর্ণ রিসোর্স', category: 'education' },
-  { id: 'Users', name: 'টিম ও শিক্ষার্থী দল', category: 'community' },
-  { id: 'UserCheck', name: 'মেন্টরশিপ গাইডেন্স', category: 'community' },
-  { id: 'Smile', name: 'আনন্দময় লার্নিং', category: 'community' },
-  { id: 'Laptop', name: 'অনলাইন লার্নিং', category: 'tech' },
-  { id: 'Video', name: 'লাইভ ক্লাস ও ভিডিও', category: 'tech' },
-  { id: 'Globe', name: 'দেশব্যাপী বিস্তৃতি', category: 'tech' },
-  { id: 'Code', name: 'টেকনিক ও স্কিল', category: 'tech' },
-  { id: 'FileText', name: 'লেকচার শিট ও নোট', category: 'education' },
+  { id: 'Smile', name: 'আনন্দময় লার্নিং', category: 'values' },
+  { id: 'ThumbsUp', name: 'উৎসাহ ও সাপোর্ট', category: 'values' },
+  { id: 'Handshake', name: 'অংশীদারিত্ব ও চুক্তি', category: 'values' },
   { id: 'Sun', name: 'উজ্জ্বল ভবিষ্যৎ', category: 'values' },
-  { id: 'Cpu', name: 'স্মার্ট মেথডলজি', category: 'tech' }
+  { id: 'Flame', name: 'আগ্রহ ও প্যাশন', category: 'values' },
+  { id: 'Sparkles', name: 'চমক ও স্পার্ক', category: 'values' },
+  { id: 'Sparkle', name: 'বিশেষ আলো', category: 'values' },
+
+  // 2. Speed & Momentum
+  { id: 'Zap', name: 'বিদ্যুৎ গতি ও তৎপরতা', category: 'speed' },
+  { id: 'Rocket', name: 'রকেট স্পিড ও প্রবৃদ্ধি', category: 'speed' },
+  { id: 'Activity', name: 'সক্রিয়তা ও গতিশীলতা', category: 'speed' },
+  { id: 'Gauge', name: 'গতিমাপক ও অ্যাক্সিলারেশন', category: 'speed' },
+  { id: 'Timer', name: 'সময় সচেতনতা', category: 'speed' },
+  { id: 'FastForward', name: 'দ্রুত এগিয়ে যাওয়া', category: 'speed' },
+  { id: 'Compass', name: 'সঠিক দিকনির্দেশনা', category: 'speed' },
+  { id: 'Footprints', name: 'ধারাবাহিক পদচিহ্ন', category: 'speed' },
+
+  // 3. Growth & Excellence
+  { id: 'TrendingUp', name: 'শতগুণ প্রবৃদ্ধি (100X)', category: 'growth' },
+  { id: 'TrendingDown', name: 'ঝুঁকি কমানো', category: 'growth' },
+  { id: 'BarChart3', name: 'উন্নতির বার চার্ট', category: 'growth' },
+  { id: 'PieChart', name: 'পরিমাপ ও অ্যানালিটিক্স', category: 'growth' },
+  { id: 'LineChart', name: 'ক্রমাগত উন্নতি', category: 'growth' },
+  { id: 'Target', name: 'স্পষ্ট লক্ষ্য ও ফোকাস', category: 'growth' },
+  { id: 'Crosshair', name: 'নিখুঁত নিশানা', category: 'growth' },
+  { id: 'Award', name: 'শ্রেষ্ঠত্ব ও মেডেল', category: 'growth' },
+  { id: 'Trophy', name: 'সাফল্য ট্রফি', category: 'growth' },
+  { id: 'Medal', name: 'বিশেষ সম্মাননা', category: 'growth' },
+  { id: 'Crown', name: 'শীর্ষ স্থান ও নেতৃত্ব', category: 'growth' },
+  { id: 'Gem', name: 'প্রিমিয়াম কোয়ালিটি', category: 'growth' },
+  { id: 'Mountain', name: 'সর্বোচ্চ শিখরে পৌঁছানো', category: 'growth' },
+
+  // 4. Trust & Security
+  { id: 'ShieldCheck', name: 'পূর্ণ দায়বদ্ধতা ও নিশ্চয়তা', category: 'trust' },
+  { id: 'Shield', name: 'নিরাপত্তা শিল্ড', category: 'trust' },
+  { id: 'ShieldAlert', name: 'সতর্ক প্রতিরক্ষা', category: 'trust' },
+  { id: 'Lock', name: 'গোপনীয়তা ও নিরাপত্তা', category: 'trust' },
+  { id: 'Key', name: 'সাফল্যের চাবিকাঠি', category: 'trust' },
+  { id: 'CheckCircle2', name: 'শতভাগ নিশ্চয়তা', category: 'trust' },
+  { id: 'BadgeCheck', name: 'ভেরিফায়েড ও পরীক্ষিত', category: 'trust' },
+  { id: 'FileCheck', name: 'নিখুঁত ডকুমেন্টস', category: 'trust' },
+  { id: 'Anchor', name: 'দৃঢ় ভিত্তি ও নির্ভরতা', category: 'trust' },
+  { id: 'Eye', name: 'স্বচ্ছতা ও দৃষ্টি', category: 'trust' },
+
+  // 5. Education & Knowledge
+  { id: 'BookOpen', name: 'উন্মুক্ত বই ও পাঠদান', category: 'education' },
+  { id: 'GraduationCap', name: 'উচ্চশিক্ষা ও একাডেমি', category: 'education' },
+  { id: 'Bookmark', name: 'গুরুত্বপূর্ণ রিসোর্স', category: 'education' },
+  { id: 'BookMarked', name: 'সংরক্ষিত লেকচার', category: 'education' },
+  { id: 'Library', name: 'বিশাল লাইব্রেরি', category: 'education' },
+  { id: 'School', name: 'ডিজিটাল ক্যাম্পাস', category: 'education' },
+  { id: 'Pencil', name: 'অনুশীলন ও নোট', category: 'education' },
+  { id: 'FileText', name: 'লেকচার শিট ও সিলেবাস', category: 'education' },
+  { id: 'FileCode', name: 'কোড ফাইল ও প্রজেক্ট', category: 'education' },
+  { id: 'FolderGit2', name: 'রিসোর্স ভোল্ট', category: 'education' },
+  { id: 'Layers', name: 'ধাপভিত্তিক সিলেবাস', category: 'education' },
+  { id: 'Boxes', name: 'কমপ্লিট কোর্স প্যাকেজ', category: 'education' },
+
+  // 6. Science & Ideas
+  { id: 'Brain', name: 'তীক্ষ্ণ মেধা ও কনসেপ্ট', category: 'innovation' },
+  { id: 'Lightbulb', name: 'ভিন্নধর্মী আইডিয়া ও চিন্তা', category: 'innovation' },
+  { id: 'Atom', name: 'গভীর বিজ্ঞান ও সূত্র', category: 'innovation' },
+  { id: 'Microscope', name: 'সূক্ষ্ম পর্যবেক্ষণ', category: 'innovation' },
+  { id: 'Dna', name: 'মৌলিক ভিত্তি', category: 'innovation' },
+  { id: 'Binary', name: 'লজিক্যাল থিংকিং', category: 'innovation' },
+  { id: 'Cpu', name: 'স্মার্ট মেথডলজি', category: 'innovation' },
+  { id: 'Orbit', name: 'পরিকল্পিত গতিপথ', category: 'innovation' },
+  { id: 'Puzzle', name: 'প্রবলেম সলভিং স্কিল', category: 'innovation' },
+
+  // 7. Tech & Media
+  { id: 'Laptop', name: 'অনলাইন লাইভ লার্নিং', category: 'tech' },
+  { id: 'Monitor', name: 'বড় স্ক্রিন ক্লাস', category: 'tech' },
+  { id: 'Smartphone', name: 'মোবাইল ফ্রেন্ডলি অ্যাপ', category: 'tech' },
+  { id: 'Video', name: 'HD ভিডিও লেকচার', category: 'tech' },
+  { id: 'Globe', name: 'দেশব্যাপী সুযোগ', category: 'tech' },
+  { id: 'Code', name: 'প্রোগ্রামিং ও টেকনিক', category: 'tech' },
+  { id: 'Headphones', name: 'মনোযোগ ও অডিও লিসেনিং', category: 'tech' },
+  { id: 'Radio', name: 'সরাসরি ব্রডকাস্ট', category: 'tech' },
+  { id: 'Tv', name: 'স্মার্ট টিভি ক্লাসরুম', category: 'tech' },
+  { id: 'Terminal', name: 'হ্যান্ডস-অন প্র্যাকটিস', category: 'tech' },
+  { id: 'Database', name: 'প্রশ্নব্যাংক ও আর্কাইভ', category: 'tech' },
+  { id: 'Server', name: '২৪/৭ সার্ভার সাপোর্ট', category: 'tech' },
+  { id: 'Wifi', name: 'হাই-স্পিড কানেক্টিভিটি', category: 'tech' },
+  { id: 'Cloud', name: 'ক্লাউড অ্যাক্সেস', category: 'tech' },
+  { id: 'Bot', name: 'AI অ্যাসিস্ট্যান্ট সাপোর্ট', category: 'tech' },
+
+  // 8. Community & Work
+  { id: 'Users', name: 'টিম ও শিক্ষার্থী কমিউনিটি', category: 'community' },
+  { id: 'UserCheck', name: 'ব্যক্তিগত মেন্টরশিপ', category: 'community' },
+  { id: 'UserPlus', name: 'সহজ অ্যাডমিশন', category: 'community' },
+  { id: 'MessagesSquare', name: 'লাইভ ডাউট সলভ ফোরাম', category: 'community' },
+  { id: 'MessageCircle', name: '২৪/৭ হেল্পলাইন চ্যাট', category: 'community' },
+  { id: 'Briefcase', name: 'ক্যারিয়ার ও প্রফেশনাল তৈরি', category: 'community' },
+  { id: 'Building2', name: 'প্রতিষ্ঠানের মর্যাদা', category: 'community' },
+  { id: 'Megaphone', name: 'জরুরি নোটিশ ও অ্যানাউন্সমেন্ট', category: 'community' },
+  { id: 'Share2', name: 'জ্ঞান বিনিময়', category: 'community' },
+  { id: 'Send', name: 'সরাসরি প্রতিক্রিয়া', category: 'community' },
+
+  // 9. Lifestyle & Creativity
+  { id: 'Palette', name: 'সৃজনশীল ডিজাইন ও আর্ট', category: 'creative' },
+  { id: 'Brush', name: 'দক্ষতা পরিমার্জন', category: 'creative' },
+  { id: 'Camera', name: 'স্মরণীয় মোমেন্টস', category: 'creative' },
+  { id: 'Music', name: 'ছন্দ ও আনন্দ', category: 'creative' },
+  { id: 'Film', name: 'ভিজ্যুয়াল স্টোরিটেলিং', category: 'creative' },
+  { id: 'Gift', name: 'বিশেষ স্কলারশিপ ও গিফট', category: 'creative' },
+  { id: 'Coffee', name: 'অবিরাম পরিশ্রম ও চর্চা', category: 'creative' },
+  { id: 'Star', name: '৫ স্টার কোয়ালিটি', category: 'creative' },
+  { id: 'Check', name: 'সম্পূর্ণ কমপ্লিট সিলেবাস', category: 'creative' }
 ];
 
 function ImageSizeGuideBadge({ size, note }: { size: string; note?: string }) {
@@ -415,8 +571,11 @@ export default function TeacherHomePageBuilderPage() {
   const [aboutValuesSubtitle, setAboutValuesSubtitle] = useState('যে মূলনীতি ও দৃষ্টিভঙ্গির ওপর ভিত্তি করে আমাদের শিক্ষা কার্যক্রম পরিচালিত হয়');
   const [aboutValueCards, setAboutValueCards] = useState<ValueCardItem[]>(DEFAULT_VALUE_CARDS);
   const [iconPickerCardId, setIconPickerCardId] = useState<string | null>(null);
+  const [iconPickerTab, setIconPickerTab] = useState<'lucide' | 'svg'>('lucide');
+  const [customSvgInput, setCustomSvgInput] = useState('');
   const [iconSearchQuery, setIconSearchQuery] = useState('');
   const [iconCategoryFilter, setIconCategoryFilter] = useState('all');
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
 
   const [aboutShowcaseHeading, setAboutShowcaseHeading] = useState('');
   const [aboutShowcaseSubtitle, setAboutShowcaseSubtitle] = useState('');
@@ -982,9 +1141,52 @@ export default function TeacherHomePageBuilderPage() {
   const handleSelectIcon = (iconId: string) => {
     if (!iconPickerCardId) return;
     handleUpdateValueCard(iconPickerCardId, 'icon', iconId);
+    handleUpdateValueCard(iconPickerCardId, 'customSvg', '');
     setIconPickerCardId(null);
     setIconSearchQuery('');
     toast.success(locale === 'bn' ? 'আইকন পরিবর্তন হয়েছে!' : 'Icon updated!');
+  };
+
+  const scrollCategory = (direction: 'left' | 'right') => {
+    if (categoryScrollRef.current) {
+      categoryScrollRef.current.scrollBy({
+        left: direction === 'left' ? -220 : 220,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const handleSvgFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.svg') && file.type !== 'image/svg+xml') {
+      toast.error(locale === 'bn' ? 'দয়া করে একটি বৈধ .svg ফাইল নির্বাচন করুন' : 'Please select a valid .svg file');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      if (content && content.includes('<svg')) {
+        setCustomSvgInput(content);
+        toast.success(locale === 'bn' ? 'SVG কোড সফলভাবে লোড হয়েছে!' : 'SVG loaded successfully!');
+      } else {
+        toast.error(locale === 'bn' ? 'ফাইলের মধ্যে কোনো বৈধ SVG ট্যাগ পাওয়া যায়নি' : 'No valid SVG tag found');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleApplyCustomSvg = () => {
+    if (!iconPickerCardId) return;
+    if (!customSvgInput.trim() || !customSvgInput.includes('<svg')) {
+      toast.error(locale === 'bn' ? 'সঠিক SVG কোড লিখুন বা .svg ফাইল আপলোড করুন' : 'Please provide valid SVG code');
+      return;
+    }
+    handleUpdateValueCard(iconPickerCardId, 'icon', 'custom-svg');
+    handleUpdateValueCard(iconPickerCardId, 'customSvg', customSvgInput.trim());
+    setIconPickerCardId(null);
+    setCustomSvgInput('');
+    toast.success(locale === 'bn' ? 'কাস্টম SVG আইকন সফলভাবে সেট হয়েছে!' : 'Custom SVG icon applied!');
   };
 
   const tabGroups = [
@@ -2945,21 +3147,32 @@ export default function TeacherHomePageBuilderPage() {
                       {/* Icon Picker Trigger & Preview */}
                       <div className="flex items-center gap-3.5 p-3 rounded-xl bg-background border border-foreground/10">
                         <div className={`w-12 h-12 rounded-xl ${currentTheme.bg} ${currentTheme.text} flex items-center justify-center shrink-0 border border-foreground/10 shadow-xs`}>
-                          <CurrentIcon className="w-6 h-6" />
+                          {card.icon === 'custom-svg' && card.customSvg ? (
+                            <div 
+                              className="w-6 h-6 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>svg]:fill-current [&>svg]:stroke-current"
+                              dangerouslySetInnerHTML={{ __html: card.customSvg }}
+                            />
+                          ) : (
+                            <CurrentIcon className="w-6 h-6" />
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-[11px] font-bold text-foreground/60">বর্তমান আইকন: <span className="text-foreground font-black">{card.icon}</span></div>
+                          <div className="text-[11px] font-bold text-foreground/60">
+                            বর্তমান আইকন: <span className="text-foreground font-black">{card.icon === 'custom-svg' ? 'কাস্টম SVG আইকন' : card.icon}</span>
+                          </div>
                           <button
                             type="button"
                             onClick={() => {
                               setIconPickerCardId(card.id);
+                              setIconPickerTab(card.icon === 'custom-svg' ? 'svg' : 'lucide');
+                              setCustomSvgInput(card.customSvg || '');
                               setIconSearchQuery('');
                               setIconCategoryFilter('all');
                             }}
                             className="mt-1 px-3 py-1 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition-all inline-flex items-center gap-1.5 shadow-xs cursor-pointer"
                           >
                             <Sparkles className="w-3 h-3" />
-                            <span>আইকন চুজ করুন</span>
+                            <span>আইকন চুজ / SVG আপলোড</span>
                           </button>
                         </div>
                       </div>
@@ -3014,10 +3227,10 @@ export default function TeacherHomePageBuilderPage() {
                 <span>+ নতুন ভ্যালু পোস্টার কার্ড যোগ করুন</span>
               </button>
 
-              {/* Interactive Lucide Icon Picker Modal */}
+              {/* Interactive Icon Picker & SVG Upload Modal */}
               {iconPickerCardId && (
                 <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                  <div className="bg-card border border-foreground/15 rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                  <div className="bg-card border border-foreground/15 rounded-3xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
                     
                     {/* Modal Header */}
                     <div className="p-5 border-b border-foreground/10 flex items-center justify-between bg-foreground/[0.02]">
@@ -3026,8 +3239,8 @@ export default function TeacherHomePageBuilderPage() {
                           <Sparkles className="w-5 h-5" />
                         </div>
                         <div>
-                          <h4 className="text-base font-black text-foreground">লুসিড আইকন নির্বাচন (Lucide Icons)</h4>
-                          <p className="text-xs text-foreground/60">আপনার ভ্যালু কার্ডের জন্য মানানসই একটি আইকন নির্বাচন করুন</p>
+                          <h4 className="text-base font-black text-foreground">আইকন ও ভেক্টর নির্বাচন</h4>
+                          <p className="text-xs text-foreground/60">লুসিড আইকন লাইব্রেরি থেকে পছন্দ করুন অথবা নিজস্ব SVG আপলোড করুন</p>
                         </div>
                       </div>
                       <button
@@ -3039,125 +3252,237 @@ export default function TeacherHomePageBuilderPage() {
                       </button>
                     </div>
 
-                    {/* Search & Filter Bar */}
-                    <div className="p-4 border-b border-foreground/10 space-y-3 bg-background">
-                      <div className="relative">
-                        <Search className="w-4 h-4 text-foreground/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="text"
-                          value={iconSearchQuery}
-                          onChange={(e) => setIconSearchQuery(e.target.value)}
-                          placeholder="আইকন খুঁজুন (যেমন: Heart, Zap, Star, Trophy, Shield...)"
-                          className="w-full pl-10 pr-4 py-2 rounded-xl bg-foreground/[0.03] border border-foreground/10 text-xs font-medium focus:outline-none focus:border-orange-500"
-                        />
-                        {iconSearchQuery && (
-                          <button
-                            type="button"
-                            onClick={() => setIconSearchQuery('')}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground text-xs font-bold"
-                          >
-                            মুছুন
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Category Chips */}
-                      <div className="flex flex-wrap gap-1.5">
-                        {[
-                          { id: 'all', label: 'সবগুলো' },
-                          { id: 'values', label: 'মূল্যবোধ' },
-                          { id: 'speed', label: 'গতি ও উদ্যম' },
-                          { id: 'growth', label: 'উন্নতি ও গ্রাফ' },
-                          { id: 'trust', label: 'সুরক্ষা ও নিশ্চয়তা' },
-                          { id: 'excellence', label: 'শ্রেষ্ঠত্ব ও ট্রফি' },
-                          { id: 'innovation', label: 'উদ্ভাবন ও আইডিয়া' },
-                          { id: 'education', label: 'শিক্ষা ও জ্ঞান' },
-                          { id: 'tech', label: 'টেকনোলজি' },
-                          { id: 'community', label: 'কমিউনিটি' }
-                        ].map(cat => (
-                          <button
-                            key={cat.id}
-                            type="button"
-                            onClick={() => setIconCategoryFilter(cat.id)}
-                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                              iconCategoryFilter === cat.id
-                                ? 'bg-orange-500 text-white shadow-xs'
-                                : 'bg-foreground/5 hover:bg-foreground/10 text-foreground/70'
-                            }`}
-                          >
-                            {cat.label}
-                          </button>
-                        ))}
-                      </div>
+                    {/* Mode Tabs: Lucide Pack vs Custom SVG */}
+                    <div className="flex border-b border-foreground/10 bg-foreground/[0.01] p-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setIconPickerTab('lucide')}
+                        className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                          iconPickerTab === 'lucide'
+                            ? 'bg-orange-500 text-white shadow-xs'
+                            : 'hover:bg-foreground/5 text-foreground/70'
+                        }`}
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>লুসিড আইকন লাইব্রেরি (১০০+ Icons)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIconPickerTab('svg')}
+                        className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                          iconPickerTab === 'svg'
+                            ? 'bg-orange-500 text-white shadow-xs'
+                            : 'hover:bg-foreground/5 text-foreground/70'
+                        }`}
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>কাস্টম SVG আপলোড / পেস্ট</span>
+                      </button>
                     </div>
 
-                    {/* Icons Grid Content */}
-                    <div className="p-4 overflow-y-auto max-h-[420px] bg-foreground/[0.01]">
-                      {(() => {
-                        const filtered = AVAILABLE_ICONS.filter(item => {
-                          const matchesSearch = iconSearchQuery === '' || 
-                            item.id.toLowerCase().includes(iconSearchQuery.toLowerCase()) || 
-                            item.name.toLowerCase().includes(iconSearchQuery.toLowerCase());
-                          const matchesCat = iconCategoryFilter === 'all' || item.category === iconCategoryFilter;
-                          return matchesSearch && matchesCat;
-                        });
-
-                        if (filtered.length === 0) {
-                          return (
-                            <div className="py-12 text-center text-foreground/60 text-xs font-bold space-y-2">
-                              <p>কোনো আইকন খুঁজে পাওয়া যায়নি!</p>
+                    {/* TAB 1: LUCIDE ICONS */}
+                    {iconPickerTab === 'lucide' && (
+                      <>
+                        {/* Search & Horizontal Category Slider */}
+                        <div className="p-4 border-b border-foreground/10 space-y-3 bg-background">
+                          <div className="relative">
+                            <Search className="w-4 h-4 text-foreground/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                            <input
+                              type="text"
+                              value={iconSearchQuery}
+                              onChange={(e) => setIconSearchQuery(e.target.value)}
+                              placeholder="আইকন খুঁজুন (যেমন: Heart, Zap, Star, Trophy, Shield, Brain, Laptop...)"
+                              className="w-full pl-10 pr-4 py-2 rounded-xl bg-foreground/[0.03] border border-foreground/10 text-xs font-medium focus:outline-none focus:border-orange-500"
+                            />
+                            {iconSearchQuery && (
                               <button
                                 type="button"
-                                onClick={() => {
-                                  setIconSearchQuery('');
-                                  setIconCategoryFilter('all');
-                                }}
-                                className="text-orange-500 underline"
+                                onClick={() => setIconSearchQuery('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground text-xs font-bold"
                               >
-                                সব আইকন দেখুন
+                                মুছুন
                               </button>
-                            </div>
-                          );
-                        }
+                            )}
+                          </div>
 
-                        return (
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
-                            {filtered.map(item => {
-                              const ItemIcon = VALUE_ICON_MAP[item.id] || Sparkles;
-                              const currentCard = aboutValueCards.find(c => c.id === iconPickerCardId);
-                              const isSelected = currentCard?.icon === item.id;
+                          {/* Horizontal Category Carousel with < > Arrows */}
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => scrollCategory('left')}
+                              className="w-7 h-7 rounded-lg bg-foreground/5 hover:bg-foreground/10 text-foreground flex items-center justify-center shrink-0 transition-colors cursor-pointer border border-foreground/10"
+                              title="বামে স্ক্রোল করুন"
+                            >
+                              <ChevronLeft className="w-4 h-4" />
+                            </button>
 
-                              return (
+                            <div 
+                              ref={categoryScrollRef}
+                              className="overflow-x-auto scroll-smooth flex items-center gap-1.5 py-1 px-1 flex-1"
+                              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                            >
+                              {ICON_CATEGORIES.map(cat => (
                                 <button
-                                  key={item.id}
+                                  key={cat.id}
                                   type="button"
-                                  onClick={() => handleSelectIcon(item.id)}
-                                  className={`p-3 rounded-xl border flex flex-col items-center text-center gap-2 transition-all cursor-pointer group ${
-                                    isSelected
-                                      ? 'bg-orange-500/10 border-orange-500 text-orange-500 font-bold shadow-xs'
-                                      : 'bg-background hover:bg-foreground/5 border-foreground/10 text-foreground/80 hover:text-foreground'
+                                  onClick={() => setIconCategoryFilter(cat.id)}
+                                  className={`px-3 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all shrink-0 cursor-pointer border ${
+                                    iconCategoryFilter === cat.id
+                                      ? 'bg-orange-500 text-white border-orange-500 shadow-xs'
+                                      : 'bg-foreground/5 hover:bg-foreground/10 text-foreground/70 border-foreground/10'
                                   }`}
                                 >
-                                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${
-                                    isSelected ? 'bg-orange-500 text-white' : 'bg-foreground/5 text-foreground'
-                                  }`}>
-                                    <ItemIcon className="w-5 h-5" />
-                                  </div>
-                                  <div className="min-w-0 w-full">
-                                    <p className="text-xs font-bold truncate">{item.id}</p>
-                                    <p className="text-[10px] text-foreground/50 truncate">{item.name}</p>
-                                  </div>
+                                  {cat.label}
                                 </button>
-                              );
-                            })}
+                              ))}
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => scrollCategory('right')}
+                              className="w-7 h-7 rounded-lg bg-foreground/5 hover:bg-foreground/10 text-foreground flex items-center justify-center shrink-0 transition-colors cursor-pointer border border-foreground/10"
+                              title="ডানে স্ক্রোল করুন"
+                            >
+                              <ChevronRight className="w-4 h-4" />
+                            </button>
                           </div>
-                        );
-                      })()}
-                    </div>
+                        </div>
+
+                        {/* Icons Grid Content */}
+                        <div className="p-4 overflow-y-auto max-h-[380px] bg-foreground/[0.01]">
+                          {(() => {
+                            const filtered = AVAILABLE_ICONS.filter(item => {
+                              const matchesSearch = iconSearchQuery === '' || 
+                                item.id.toLowerCase().includes(iconSearchQuery.toLowerCase()) || 
+                                item.name.toLowerCase().includes(iconSearchQuery.toLowerCase());
+                              const matchesCat = iconCategoryFilter === 'all' || item.category === iconCategoryFilter;
+                              return matchesSearch && matchesCat;
+                            });
+
+                            if (filtered.length === 0) {
+                              return (
+                                <div className="py-12 text-center text-foreground/60 text-xs font-bold space-y-2">
+                                  <p>কোনো আইকন খুঁজে পাওয়া যায়নি!</p>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setIconSearchQuery('');
+                                      setIconCategoryFilter('all');
+                                    }}
+                                    className="text-orange-500 underline cursor-pointer"
+                                  >
+                                    সব আইকন দেখুন
+                                  </button>
+                                </div>
+                              );
+                            }
+
+                            return (
+                              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+                                {filtered.map(item => {
+                                  const ItemIcon = VALUE_ICON_MAP[item.id] || Sparkles;
+                                  const currentCard = aboutValueCards.find(c => c.id === iconPickerCardId);
+                                  const isSelected = currentCard?.icon === item.id;
+
+                                  return (
+                                    <button
+                                      key={item.id}
+                                      type="button"
+                                      onClick={() => handleSelectIcon(item.id)}
+                                      className={`p-3 rounded-xl border flex flex-col items-center text-center gap-2 transition-all cursor-pointer group ${
+                                        isSelected
+                                          ? 'bg-orange-500/10 border-orange-500 text-orange-500 font-bold shadow-xs'
+                                          : 'bg-background hover:bg-foreground/5 border-foreground/10 text-foreground/80 hover:text-foreground'
+                                      }`}
+                                    >
+                                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${
+                                        isSelected ? 'bg-orange-500 text-white' : 'bg-foreground/5 text-foreground'
+                                      }`}>
+                                        <ItemIcon className="w-5 h-5" />
+                                      </div>
+                                      <div className="min-w-0 w-full">
+                                        <p className="text-xs font-bold truncate">{item.id}</p>
+                                        <p className="text-[10px] text-foreground/50 truncate">{item.name}</p>
+                                      </div>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      </>
+                    )}
+
+                    {/* TAB 2: CUSTOM SVG UPLOAD */}
+                    {iconPickerTab === 'svg' && (
+                      <div className="p-6 overflow-y-auto max-h-[420px] space-y-5 bg-background">
+                        {/* File Upload Trigger */}
+                        <div className="p-5 rounded-2xl border-2 border-dashed border-foreground/20 hover:border-orange-500/50 bg-foreground/[0.02] text-center space-y-2 transition-all">
+                          <div className="w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center mx-auto">
+                            <Upload className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-foreground">আপনার কম্পিউটার থেকে SVG ফাইল আপলোড করুন</p>
+                            <p className="text-[11px] text-foreground/60 mt-0.5">শুধুমাত্র .svg ফরম্যাট সমর্থিত</p>
+                          </div>
+                          <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold cursor-pointer transition-all shadow-xs">
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>SVG ফাইল নির্বাচন করুন</span>
+                            <input type="file" accept=".svg,image/svg+xml" onChange={handleSvgFileUpload} className="hidden" />
+                          </label>
+                        </div>
+
+                        {/* Raw SVG Textarea */}
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-foreground/80 block">অথবা সরাসরি SVG কোড পেস্ট করুন (&lt;svg&gt;...&lt;/svg&gt;):</label>
+                          <textarea
+                            rows={4}
+                            value={customSvgInput}
+                            onChange={(e) => setCustomSvgInput(e.target.value)}
+                            placeholder='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">...</svg>'
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-foreground/[0.03] border border-foreground/10 text-xs font-mono focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+
+                        {/* Live SVG Preview Box */}
+                        {customSvgInput && customSvgInput.includes('<svg') && (
+                          <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2">
+                            <div className="text-[11px] font-bold text-foreground/70">লাইভ প্রিভিউ:</div>
+                            <div className="flex items-center gap-4">
+                              <div className="w-14 h-14 rounded-2xl bg-orange-500/15 text-orange-500 flex items-center justify-center p-3 border border-orange-500/30 [&>svg]:w-full [&>svg]:h-full [&>svg]:fill-current [&>svg]:stroke-current">
+                                <div 
+                                  className="w-full h-full flex items-center justify-center"
+                                  dangerouslySetInnerHTML={{ __html: customSvgInput }}
+                                />
+                              </div>
+                              <div className="text-xs space-y-1">
+                                <p className="font-bold text-emerald-500 flex items-center gap-1">
+                                  <CheckCircle2 className="w-3.5 h-3.5" />
+                                  <span>SVG কোড সঠিকভাবে লোড হয়েছে</span>
+                                </p>
+                                <p className="text-[11px] text-foreground/60">কার্ডের থিম কালার অনুযায়ী এটি স্বয়ংক্রিয়ভাবে মানানসই রঙ ধারণ করবে।</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Apply SVG Button */}
+                        <button
+                          type="button"
+                          onClick={handleApplyCustomSvg}
+                          disabled={!customSvgInput || !customSvgInput.includes('<svg')}
+                          className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold text-xs shadow-md shadow-orange-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          <Check className="w-4 h-4" />
+                          <span>এই SVG আইকনটি কার্ডে প্রয়োগ করুন</span>
+                        </button>
+                      </div>
+                    )}
 
                     {/* Modal Footer */}
                     <div className="p-3 border-t border-foreground/10 bg-background flex items-center justify-between text-xs text-foreground/60 px-5">
-                      <span>আইকনের ওপর ক্লিক করলে স্বয়ংক্রিয়ভাবে কার্ডে যুক্ত হবে।</span>
+                      <span>আইকনে ক্লিক করলে বা SVG অ্যাপ্লাই করলে স্বয়ংক্রিয়ভাবে কার্ডে যুক্ত হবে।</span>
                       <button
                         type="button"
                         onClick={() => setIconPickerCardId(null)}

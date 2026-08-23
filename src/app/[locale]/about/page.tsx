@@ -8,50 +8,108 @@ import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firesto
 import { 
   Building2, 
   Users, 
+  UserCheck,
+  UserPlus,
   Sparkles, 
+  Sparkle,
   Award, 
   Star, 
   GraduationCap, 
   BookOpen, 
+  Bookmark,
+  BookMarked,
+  Library,
+  School,
+  Pencil,
   ShieldCheck, 
   Shield,
+  ShieldAlert,
   Lock,
+  Key,
   Video, 
   Phone, 
   Mail, 
   MessageCircle, 
+  MessagesSquare,
   ArrowRight, 
   Edit3, 
   CheckCircle2, 
+  BadgeCheck,
+  FileCheck,
   Globe, 
   Flame, 
   Compass, 
   Trophy, 
+  Medal,
+  Crown,
+  Gem,
   Play, 
   Zap, 
   Target, 
+  Crosshair,
   Lightbulb, 
+  Brain,
+  Atom,
+  Microscope,
+  Dna,
+  Binary,
+  Cpu,
+  Orbit,
+  Puzzle,
   HeartHandshake, 
   Heart,
   HeartPulse,
+  Smile,
+  ThumbsUp,
+  Handshake,
   TrendingUp, 
+  TrendingDown,
   BarChart3,
+  PieChart,
+  LineChart,
   Activity,
+  Gauge,
+  Timer,
+  FastForward,
+  Footprints,
   Mountain, 
-  Medal,
   Send, 
+  Share2,
+  Megaphone,
+  Briefcase,
+  Laptop,
+  Monitor,
+  Smartphone,
+  Headphones,
+  Radio,
+  Tv,
+  Terminal,
+  Database,
+  Server,
+  Wifi,
+  Cloud,
+  Bot,
+  Code,
+  FileText,
+  FileCode,
+  FolderGit2,
+  Layers,
+  Boxes,
+  Palette,
+  Brush,
+  Camera,
+  Music,
+  Film,
+  Gift,
+  Coffee,
+  Sun,
+  Anchor,
+  Eye,
   ChevronLeft, 
   ChevronRight,
   Quote,
   Rocket,
-  Bookmark,
-  UserCheck,
-  Smile,
-  Laptop,
-  Code,
-  FileText,
-  Sun,
-  Cpu,
+  Check,
   type LucideIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -60,6 +118,7 @@ import { VideoModal } from '@/components/ui/VideoModal';
 export interface ValueCardItem {
   id: string;
   icon: string;
+  customSvg?: string;
   title: string;
   subtitle: string;
   desc: string;
@@ -118,15 +177,24 @@ export const DEFAULT_VALUE_CARDS: ValueCardItem[] = [
 ];
 
 export const VALUE_ICON_MAP: Record<string, LucideIcon> = {
-  HeartHandshake, Heart, HeartPulse,
-  Zap, Flame, Sparkles, Sun,
-  TrendingUp, BarChart3, Activity,
-  ShieldCheck, Shield, Lock, CheckCircle2,
-  Mountain, Trophy, Award, Medal, Target,
-  Lightbulb, Compass, Rocket, Star,
-  BookOpen, GraduationCap, Bookmark,
-  Users, UserCheck, Smile,
-  Laptop, Video, Globe, Code, FileText, Cpu
+  // Values & Emotions
+  HeartHandshake, Heart, HeartPulse, Smile, ThumbsUp, Handshake, Sun, Flame, Sparkles, Sparkle,
+  // Speed & Action
+  Zap, Rocket, Activity, Gauge, Timer, FastForward, Compass, Footprints,
+  // Growth & Excellence
+  TrendingUp, TrendingDown, BarChart3, PieChart, LineChart, Target, Crosshair, Award, Trophy, Medal, Crown, Gem, Mountain,
+  // Trust & Security
+  ShieldCheck, Shield, ShieldAlert, Lock, Key, CheckCircle2, BadgeCheck, FileCheck, Anchor, Eye,
+  // Education & Knowledge
+  BookOpen, GraduationCap, Bookmark, BookMarked, Library, School, Pencil, FileText, FileCode, FolderGit2, Layers, Boxes,
+  // Science & Ideas
+  Brain, Lightbulb, Atom, Microscope, Dna, Binary, Cpu, Orbit, Puzzle,
+  // Tech & Media
+  Laptop, Monitor, Smartphone, Video, Globe, Code, Headphones, Radio, Tv, Terminal, Database, Server, Wifi, Cloud, Bot,
+  // Community & Work
+  Users, UserCheck, UserPlus, MessagesSquare, MessageCircle, Briefcase, Building2, Megaphone, Share2, Send,
+  // Lifestyle & Creative
+  Palette, Brush, Camera, Music, Film, Gift, Coffee, Star
 };
 
 export const COLOR_THEMES: Record<string, {
@@ -499,7 +567,14 @@ export default function AboutPage() {
                       >
                         <div className="space-y-4">
                           <div className={`w-14 h-14 rounded-2xl ${theme.badgeBg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                            <IconComponent className="w-7 h-7" />
+                            {card.icon === 'custom-svg' && card.customSvg ? (
+                              <div 
+                                className="w-7 h-7 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>svg]:fill-current [&>svg]:stroke-current"
+                                dangerouslySetInnerHTML={{ __html: card.customSvg }}
+                              />
+                            ) : (
+                              <IconComponent className="w-7 h-7" />
+                            )}
                           </div>
                           <div>
                             <h3 className="text-2xl font-black text-foreground tracking-wide uppercase">

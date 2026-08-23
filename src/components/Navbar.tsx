@@ -134,7 +134,7 @@ export default function Navbar() {
     { name: 'Overview', href: '/teacher-dashboard', icon: LayoutDashboard },
     { name: '+ Create New Course', href: '/teacher-dashboard/courses/create', icon: PlusCircle, isHighlight: true },
     { name: 'My Courses', href: '/teacher-dashboard/courses', icon: Video },
-    { name: 'Home Builder', href: '/teacher-dashboard/home-builder', icon: Sparkles },
+    { name: 'Website Builder', href: '/teacher-dashboard/home-builder', icon: Globe },
     { name: 'My Website', href: '/', icon: Globe },
     { name: 'Posts & Notices', href: '/teacher-dashboard/posts', icon: Megaphone },
     { name: 'Students', href: '/teacher-dashboard/students', icon: Users },
@@ -280,7 +280,7 @@ export default function Navbar() {
                             href="/teacher-dashboard/home-builder" 
                             className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
                           >
-                            <Sparkles className="w-3.5 h-3.5 text-orange-500" /> Home Builder
+                            <Globe className="w-3.5 h-3.5 text-orange-500" /> Website Builder
                           </Link>
 
                           <Link 
@@ -640,7 +640,7 @@ export default function Navbar() {
                           }} 
                           className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
                         >
-                          <Sparkles className="w-4 h-4 text-orange-500" /> Home Builder
+                          <Globe className="w-4 h-4 text-orange-500" /> Website Builder
                         </Link>
                       </>
                     ) : isStudent ? (

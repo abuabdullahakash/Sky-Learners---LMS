@@ -9,6 +9,7 @@ import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { 
   Sparkles, 
+  Globe,
   Save, 
   Eye, 
   Plus, 
@@ -575,20 +576,40 @@ export default function TeacherHomePageBuilderPage() {
     }
   };
 
-  const tabs = [
-    { id: 'branding', label: '১. ব্র্যান্ডিং ও পরিচিতি', icon: Building2 },
-    ...(profileType === 'institution' ? [{ id: 'faculty', label: '২. শিক্ষক মণ্ডলী', icon: Users }] : []),
-    { id: 'sliders', label: profileType === 'institution' ? '৩. ব্যানার স্লাইডার' : '২. ব্যানার স্লাইডার', icon: Sliders },
-    { id: 'quickCards', label: profileType === 'institution' ? '৪. পেইড/ফ্রি কার্ডস' : '৩. পেইড/ফ্রি কার্ডস', icon: Layers },
-    { id: 'categories', label: profileType === 'institution' ? '৫. কোর্স ও ক্যাটাগরি' : '৪. কোর্স ও ক্যাটাগরি', icon: Grid },
-    { id: 'features', label: profileType === 'institution' ? '৬. প্রস্তুতিতে যা প্রয়োজন' : '৫. প্রস্তুতিতে যা প্রয়োজন', icon: Award },
-    { id: 'admission', label: profileType === 'institution' ? '৭. ভর্তি তথ্য' : '৬. ভর্তি তথ্য', icon: Info },
-    { id: 'about', label: profileType === 'institution' ? '৮. আমাদের সম্পর্কে' : '৭. আমাদের সম্পর্কে', icon: Users },
-    { id: 'contact', label: profileType === 'institution' ? '৯. যোগাযোগ ও সোশ্যাল লিঙ্ক' : '৮. যোগাযোগ ও সোশ্যাল লিঙ্ক', icon: Phone },
-    { id: 'trustBanner', label: profileType === 'institution' ? '১০. আস্থার ব্যানার' : '৯. আস্থার ব্যানার', icon: Flame },
-    { id: 'gallery', label: profileType === 'institution' ? '১১. ফটো গ্যালারি' : '১০. ফটো গ্যালারি', icon: ImageIcon },
-    { id: 'helpBar', label: profileType === 'institution' ? '১২. হেল্পবার' : '১১. হেল্পবার', icon: HelpCircle },
+  const tabGroups = [
+    {
+      id: 'home',
+      groupName: '🏠 হোম পেজ (Home Page)',
+      items: [
+        { id: 'sliders', label: 'ব্যানার স্লাইডার', icon: Sliders },
+        { id: 'quickCards', label: 'পেইড ও ফ্রি কার্ডস', icon: Layers },
+        { id: 'categories', label: 'কোর্স ও ক্যাটাগরি', icon: Grid },
+        { id: 'features', label: 'প্রস্তুতিতে যা প্রয়োজন', icon: Award },
+        { id: 'admission', label: 'ভর্তি তথ্য ও নিয়ম', icon: Info },
+        { id: 'trustBanner', label: 'আস্থার ব্যানার', icon: Flame },
+      ]
+    },
+    {
+      id: 'about',
+      groupName: 'ℹ️ অ্যাবাউট পেজ (About Page)',
+      items: [
+        { id: 'about', label: 'আমাদের সম্পর্কে ও বায়ো', icon: Users },
+        ...(profileType === 'institution' ? [{ id: 'faculty', label: 'শিক্ষক প্যানেল', icon: Users }] : []),
+        { id: 'gallery', label: 'স্মরণীয় মুহূর্ত ও ছবি', icon: ImageIcon },
+      ]
+    },
+    {
+      id: 'branding',
+      groupName: '🎨 ব্র্যান্ডিং ও যোগাযোগ',
+      items: [
+        { id: 'branding', label: 'ব্র্যান্ডিং ও প্রোফাইল', icon: Building2 },
+        { id: 'contact', label: 'যোগাযোগ ও সোশ্যাল লিঙ্ক', icon: Phone },
+        { id: 'helpBar', label: 'হেল্প ও সাপোর্ট বার', icon: HelpCircle },
+      ]
+    }
   ];
+
+  const allTabs = tabGroups.flatMap(g => g.items);
 
   if (loading) {
     return (
@@ -602,7 +623,7 @@ export default function TeacherHomePageBuilderPage() {
     <div className="w-full relative min-h-screen">
       
       {/* ========================================================================= */}
-      {/* DEDICATED HOME PAGE BUILDER SIDEBAR (Replaces Main Sidebar on Desktop)     */}
+      {/* DEDICATED WEBSITE BUILDER SIDEBAR (Replaces Main Sidebar on Desktop)      */}
       {/* ========================================================================= */}
       <aside className="hidden md:flex w-64 lg:w-[280px] flex-shrink-0 bg-background border-r border-foreground/10 fixed left-0 top-[80px] h-[calc(100vh-80px)] z-40 overflow-y-auto custom-scrollbar flex-col justify-between">
         
@@ -619,56 +640,72 @@ export default function TeacherHomePageBuilderPage() {
 
             <div>
               <h3 className="font-extrabold text-base text-foreground flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-orange-500" />
-                <span>হোম পেজ বিল্ডার</span>
+                <Globe className="w-4 h-4 text-orange-500" />
+                <span>ওয়েবসাইট বিল্ডার</span>
               </h3>
               <p className="text-[11px] text-foreground/50 mt-0.5">
-                আপনার ওয়েবসাইট কাস্টমাইজ করুন
+                আপনার একাডেমি সাইট কাস্টমাইজ করুন
               </p>
             </div>
           </div>
 
-          {/* 10 Builder Section Items */}
-          <div className="p-2.5 space-y-1">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-left ${
-                    isActive
-                      ? 'bg-orange-500 text-white shadow-md font-bold'
-                      : 'hover:bg-foreground/5 text-foreground/75 hover:text-foreground'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5 truncate">
-                    <Icon className="w-4 h-4 flex-shrink-0" />
-                    <span className="truncate">{tab.label}</span>
-                  </div>
-                  <ChevronRight className={`w-3.5 h-3.5 flex-shrink-0 ${isActive ? 'text-white' : 'text-foreground/30'}`} />
-                </button>
-              );
-            })}
+          {/* Grouped Builder Section Items */}
+          <div className="p-2.5 space-y-3">
+            {tabGroups.map((group) => (
+              <div key={group.id} className="space-y-1">
+                <div className="text-[11px] font-black uppercase tracking-wider text-orange-500/90 px-3 py-1 bg-foreground/[0.02] rounded-lg border border-foreground/5">
+                  {group.groupName}
+                </div>
+                {group.items.map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveTab(tab.id as any)}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all text-left ${
+                        isActive
+                          ? 'bg-orange-500 text-white shadow-md font-bold'
+                          : 'hover:bg-foreground/5 text-foreground/75 hover:text-foreground'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 truncate">
+                        <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="truncate">{tab.label}</span>
+                      </div>
+                      <ChevronRight className={`w-3 h-3 flex-shrink-0 ${isActive ? 'text-white' : 'text-foreground/30'}`} />
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Bottom Sidebar Action Buttons */}
         <div className="p-3 border-t border-foreground/10 space-y-2">
           {user?.uid && (
-            <Link
-              href="/"
-              target="_blank"
-              className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-[11px] font-bold text-foreground transition-colors"
-            >
-              <div className="flex items-center gap-2">
+            <div className="grid grid-cols-2 gap-1.5">
+              <Link
+                href="/"
+                target="_blank"
+                className="flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-[11px] font-bold text-foreground transition-colors"
+                title="হোম পেজ দেখুন"
+              >
                 <Eye className="w-3.5 h-3.5 text-orange-500" />
-                <span>লাইভ ওয়েবসাইট</span>
-              </div>
-              <ExternalLink className="w-3 h-3 text-foreground/40" />
-            </Link>
+                <span>Home Site</span>
+              </Link>
+              <Link
+                href="/about"
+                target="_blank"
+                className="flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-[11px] font-bold text-foreground transition-colors"
+                title="অ্যাবাউট পেজ দেখুন"
+              >
+                <Users className="w-3.5 h-3.5 text-blue-500" />
+                <span>About Site</span>
+              </Link>
+            </div>
           )}
 
           <button
@@ -691,7 +728,7 @@ export default function TeacherHomePageBuilderPage() {
         
         {/* Mobile Horizontal Tabs Bar */}
         <div className="md:hidden flex items-center gap-2 overflow-x-auto pb-2 border-b border-foreground/10">
-          {tabs.map((tab) => {
+          {allTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
@@ -713,28 +750,39 @@ export default function TeacherHomePageBuilderPage() {
         <div className="p-6 rounded-3xl bg-background border border-foreground/10 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 text-xs font-bold uppercase tracking-wider mb-2">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Globe className="w-3.5 h-3.5" />
               <span>Storefront Website Builder</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
-              {tabs.find(t => t.id === activeTab)?.label}
+              {allTabs.find(t => t.id === activeTab)?.label}
             </h1>
             <p className="text-xs sm:text-sm text-foreground/60 mt-1">
               আপনার ওয়েবসাইটের এই সেকশনটির তথ্য ও ডিজাইন কাস্টমাইজ করুন।
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             {user?.uid && (
-              <Link
-                href="/"
-                target="_blank"
-                className="px-4 py-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-xs font-bold flex items-center gap-2 transition-colors"
-              >
-                <Eye className="w-4 h-4 text-orange-500" />
-                <span>লাইভ প্রিভিউ</span>
-                <ExternalLink className="w-3.5 h-3.5 text-foreground/40" />
-              </Link>
+              <>
+                <Link
+                  href="/"
+                  target="_blank"
+                  className="px-3.5 py-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                >
+                  <Eye className="w-3.5 h-3.5 text-orange-500" />
+                  <span>Home Live</span>
+                  <ExternalLink className="w-3 h-3 text-foreground/40" />
+                </Link>
+                <Link
+                  href="/about"
+                  target="_blank"
+                  className="px-3.5 py-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                >
+                  <Users className="w-3.5 h-3.5 text-blue-500" />
+                  <span>About Live</span>
+                  <ExternalLink className="w-3 h-3 text-foreground/40" />
+                </Link>
+              </>
             )}
 
             <button

@@ -44,7 +44,7 @@ export default function TeacherSidebar() {
   const menuItems = [
     { name: getLabel('overview', 'ওভারভিউ', 'Overview'), href: '/teacher-dashboard', icon: LayoutDashboard },
     { name: getLabel('courses', 'আমার কোর্স', 'My Courses'), href: '/teacher-dashboard/courses', icon: Video },
-    { name: getLabel('homeBuilder', 'হোম বিল্ডার', 'Home Builder'), href: '/teacher-dashboard/home-builder', icon: Sparkles },
+    { name: getLabel('homeBuilder', 'ওয়েবসাইট বিল্ডার', 'Website Builder'), href: '/teacher-dashboard/home-builder', icon: Globe },
     { name: getLabel('posts', 'পোস্ট ও নোটিশ', 'Posts & Notices'), href: '/teacher-dashboard/posts', icon: Megaphone },
     { name: getLabel('students', 'শিক্ষার্থীবৃন্দ', 'Students'), href: '/teacher-dashboard/students', icon: Users },
     { name: getLabel('earnings', 'উপার্জন ও হিসেব', 'Earnings'), href: '/teacher-dashboard/earnings', icon: DollarSign },

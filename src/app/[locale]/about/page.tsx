@@ -80,13 +80,13 @@ export default function AboutPage() {
   // =========================================================================
   if (user && isTeacher) {
     const config = teacherProfile?.homePageConfig || {};
-    const isInstitution = teacherProfile?.type === 'institution' || (teacherProfile?.teachersRoster && teacherProfile.teachersRoster.length > 0);
+    const isInstitution = teacherProfile?.type === 'institution';
     const displayName = teacherProfile?.displayName || user.displayName || 'আমাদের একাডেমি';
     const headline = teacherProfile?.headline || config.aboutHeadline || 'শ্রেষ্ঠ শিক্ষা ও উজ্জ্বল ভবিষ্যৎ গড়ার বিশ্বস্ত সঙ্গী';
     const bio = config.aboutBio || teacherProfile?.bio || 'ভর্তি প্রস্তুতি ও একাডেমিক সাফল্য অর্জনের জন্য নিবেদিতপ্রাণ একটি প্ল্যাটফর্ম। মানসম্মত লেকচার, নিয়মিত পরীক্ষা ও আন্তরিক মেন্টরশিপের মাধ্যমে শিক্ষার্থীদের স্বপ্ন পূরণে আমরা সর্বদা পাশে আছি।';
     const founderTitle = config.founderTitle || (isInstitution ? 'প্রতিষ্ঠাতা ও পরিচালক' : 'চিফ মেন্টর ও পরিচালক');
     const founderPhoto = config.aboutPhoto || teacherProfile?.profilePhoto || user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.uid;
-    const teachersRoster = teacherProfile?.teachersRoster || [];
+    const teachersRoster = isInstitution ? (teacherProfile?.teachersRoster || []) : [];
     const galleryPhotos = (config.trustSliders && config.trustSliders.length > 0) ? config.trustSliders : [];
 
     const stats = config.aboutStats && config.aboutStats.length > 0 ? config.aboutStats : [

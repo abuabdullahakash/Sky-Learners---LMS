@@ -195,8 +195,8 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
   ];
 
   // 5.5 Institution & Faculty State
-  const isInstitution = profileData?.type === 'institution' || (profileData?.teachersRoster && profileData.teachersRoster.length > 0);
-  const teachersRoster = profileData?.teachersRoster || [];
+  const isInstitution = profileData?.type === 'institution';
+  const teachersRoster = isInstitution ? (profileData?.teachersRoster || []) : [];
 
   // 6. About Section
   const aboutTitle = config.aboutTitle || (isInstitution ? 'আমাদের প্রতিষ্ঠান সম্পর্কে' : 'আমাদের সম্পর্কে');

@@ -33,6 +33,7 @@ import {
   Trophy,
   Check,
   ChevronRight,
+  ChevronDown,
   ArrowRight,
   ArrowLeft,
   Flame,
@@ -579,7 +580,7 @@ export default function TeacherHomePageBuilderPage() {
   const tabGroups = [
     {
       id: 'home',
-      groupName: '🏠 হোম পেজ (Home Page)',
+      groupName: '🏠 হোম পেজ (HOME PAGE)',
       items: [
         { id: 'sliders', label: 'ব্যানার স্লাইডার', icon: Sliders },
         { id: 'quickCards', label: 'পেইড ও ফ্রি কার্ডস', icon: Layers },
@@ -591,7 +592,7 @@ export default function TeacherHomePageBuilderPage() {
     },
     {
       id: 'about',
-      groupName: 'ℹ️ অ্যাবাউট পেজ (About Page)',
+      groupName: 'ℹ️ অ্যাবাউট পেজ (ABOUT PAGE)',
       items: [
         { id: 'about', label: 'আমাদের সম্পর্কে ও বায়ো', icon: Users },
         ...(profileType === 'institution' ? [{ id: 'faculty', label: 'শিক্ষক প্যানেল', icon: Users }] : []),
@@ -610,6 +611,29 @@ export default function TeacherHomePageBuilderPage() {
   ];
 
   const allTabs = tabGroups.flatMap(g => g.items);
+
+  // Accordion open group state (defaults to 'home')
+  const [openGroup, setOpenGroup] = useState<string>('home');
+
+  // Auto-open corresponding accordion when activeTab changes
+  useEffect(() => {
+    const parentGroup = tabGroups.find(g => g.items.some(it => it.id === activeTab));
+    if (parentGroup && openGroup !== parentGroup.id) {
+      setOpenGroup(parentGroup.id);
+    }
+  }, [activeTab]);
+
+  // Website Setup Progress Calculation
+  const checklist = [
+    { label: 'একাডেমি নাম ও ব্র্যান্ডিং', done: Boolean(displayName && displayName.trim().length > 0) },
+    { label: 'প্রোফাইল ছবি / লোগো', done: Boolean(profilePhoto && !profilePhoto.includes('Felix')) || Boolean(coverPhoto && !coverPhoto.includes('unsplash.com/photo-1516321318423')) },
+    { label: 'ব্যানার স্লাইডার', done: Boolean(heroSliders && heroSliders.length > 0 && heroSliders.some(s => s.imageUrl && !s.imageUrl.includes('unsplash.com/photo-1516321318423'))) },
+    { label: 'আমাদের সম্পর্কে ও বায়ো', done: Boolean((aboutBio && aboutBio.trim().length > 15) || (bio && bio.trim().length > 15)) },
+    { label: 'যোগাযোগ ও সোশ্যাল তথ্য', done: Boolean(contactPhone || contactWhatsapp || contactEmail || contactFacebookPage) }
+  ];
+
+  const completedCount = checklist.filter(c => c.done).length;
+  const progressPercent = Math.round((completedCount / checklist.length) * 100);
 
   if (loading) {
     return (
@@ -649,42 +673,115 @@ export default function TeacherHomePageBuilderPage() {
             </div>
           </div>
 
-          {/* Grouped Builder Section Items */}
-          <div className="p-2.5 space-y-3">
-            {tabGroups.map((group) => (
-              <div key={group.id} className="space-y-1">
-                <div className="text-[11px] font-black uppercase tracking-wider text-orange-500/90 px-3 py-1 bg-foreground/[0.02] rounded-lg border border-foreground/5">
-                  {group.groupName}
+          {/* Accordion Grouped Builder Section Items */}
+          <div className="p-2.5 space-y-2">
+            {tabGroups.map((group) => {
+              const isOpen = openGroup === group.id;
+              const hasActiveChild = group.items.some(it => it.id === activeTab);
+              return (
+                <div key={group.id} className="rounded-2xl border border-foreground/10 bg-background/50 overflow-hidden shadow-sm transition-all duration-300">
+                  {/* Accordion Header Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isOpen) {
+                        setOpenGroup('');
+                      } else {
+                        setOpenGroup(group.id);
+                        if (!hasActiveChild && group.items.length > 0) {
+                          setActiveTab(group.items[0].id as any);
+                        }
+                      }
+                    }}
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-black tracking-wide transition-all duration-200 ${
+                      isOpen
+                        ? 'bg-orange-500/10 text-orange-500 border-b border-orange-500/20'
+                        : hasActiveChild 
+                          ? 'bg-foreground/5 text-orange-500 font-bold'
+                          : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      <span>{group.groupName}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-foreground/10 text-foreground/70">
+                        {group.items.length}
+                      </span>
+                      <ChevronDown 
+                        className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                          isOpen ? 'rotate-180 text-orange-500' : 'text-foreground/40'
+                        }`} 
+                      />
+                    </div>
+                  </button>
+
+                  {/* Accordion Body Items */}
+                  {isOpen && (
+                    <div className="p-1.5 space-y-1 bg-foreground/[0.02] animate-in fade-in duration-200">
+                      {group.items.map((tab) => {
+                        const Icon = tab.icon;
+                        const isActive = activeTab === tab.id;
+                        return (
+                          <button
+                            key={tab.id}
+                            type="button"
+                            onClick={() => setActiveTab(tab.id as any)}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all text-left ${
+                              isActive
+                                ? 'bg-orange-500 text-white shadow-md font-bold'
+                                : 'hover:bg-foreground/5 text-foreground/75 hover:text-foreground'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 truncate">
+                              <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                              <span className="truncate">{tab.label}</span>
+                            </div>
+                            <ChevronRight className={`w-3 h-3 flex-shrink-0 ${isActive ? 'text-white' : 'text-foreground/30'}`} />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-                {group.items.map((tab) => {
-                  const Icon = tab.icon;
-                  const isActive = activeTab === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => setActiveTab(tab.id as any)}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all text-left ${
-                        isActive
-                          ? 'bg-orange-500 text-white shadow-md font-bold'
-                          : 'hover:bg-foreground/5 text-foreground/75 hover:text-foreground'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 truncate">
-                        <Icon className="w-3.5 h-3.5 flex-shrink-0" />
-                        <span className="truncate">{tab.label}</span>
-                      </div>
-                      <ChevronRight className={`w-3 h-3 flex-shrink-0 ${isActive ? 'text-white' : 'text-foreground/30'}`} />
-                    </button>
-                  );
-                })}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
-        {/* Bottom Sidebar Action Buttons */}
-        <div className="p-3 border-t border-foreground/10 space-y-2">
+        {/* Bottom Sidebar Action Buttons with Progress Bar */}
+        <div className="p-3 border-t border-foreground/10 space-y-3">
+          
+          {/* Website Setup Completion Progress Bar */}
+          <div className="p-3 bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-foreground/[0.02] border border-orange-500/20 rounded-2xl space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+                <Sparkles className="w-3.5 h-3.5 text-orange-500" />
+                <span>সাইট রেডি প্রগ্রেস</span>
+              </div>
+              <span className={`text-xs font-black ${progressPercent === 100 ? 'text-emerald-500' : 'text-orange-500'}`}>
+                {progressPercent}%
+              </span>
+            </div>
+
+            {/* Progress Track */}
+            <div className="w-full h-2 bg-foreground/10 rounded-full overflow-hidden p-0.5">
+              <div 
+                className={`h-full rounded-full transition-all duration-700 ${
+                  progressPercent === 100 
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-400 shadow-[0_0_10px_rgba(16,185,129,0.5)]' 
+                    : 'bg-gradient-to-r from-orange-500 to-amber-500 shadow-[0_0_8px_rgba(249,115,22,0.4)]'
+                }`}
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+
+            <div className="flex items-center justify-between text-[10px] text-foreground/60 pt-0.5">
+              <span>{progressPercent === 100 ? '🎉 সম্পূর্ণ রেডি!' : `${checklist.length - completedCount}টি তথ্য বাকি`}</span>
+              <span className="font-bold">{completedCount}/{checklist.length} টি পূর্ণ</span>
+            </div>
+          </div>
+
           {user?.uid && (
             <div className="grid grid-cols-2 gap-1.5">
               <Link

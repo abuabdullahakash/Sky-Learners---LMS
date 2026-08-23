@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import { uploadImageToImgBB } from '@/lib/imgbb';
 import { Plus, Trash2, Link as LinkIcon, Save, CheckSquare, Clock, Trophy, ChevronDown, ChevronUp, Users, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
+import { resolveCourseBySlugOrId } from '@/lib/slug';
 import Link from 'next/link';
 
 export type Question = {
@@ -42,6 +43,7 @@ export default function CourseExamsPage() {
   const router = useRouter();
   const params = useParams();
   const courseId = params.courseId as string;
+  const [realCourseId, setRealCourseId] = useState(courseId);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -70,13 +72,13 @@ export default function CourseExamsPage() {
   const [uploadingOptionKey, setUploadingOptionKey] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCourse = async () => {
-      if (!user) return;
+    const fetchCourseAndParticipants = async () => {
+      if (!user || !courseId) return;
       try {
-        const docRef = doc(db, 'courses', courseId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
+        const data = await resolveCourseBySlugOrId(db, courseId);
+        if (data) {
+          const docRef = doc(db, 'courses', data.id);
+          setRealCourseId(data.id);
           const isOwner = data.teacherId === user.uid ||
             (user.email && (data.teacherEmail === user.email || data.instructorEmail === user.email)) ||
             (user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') ||
@@ -88,6 +90,18 @@ export default function CourseExamsPage() {
             }
             setCourse(data);
             setExams(data.exams || []);
+
+            const targetIds = Array.from(new Set([data.id, courseId, data.slug].filter(Boolean)));
+            const q = query(collection(db, 'completed_exams'), where('courseId', 'in', targetIds));
+            const querySnapshot = await getDocs(q);
+            const counts: Record<string, number> = {};
+            querySnapshot.forEach((docSnap) => {
+              const d = docSnap.data();
+              if (d.examId) {
+                counts[d.examId] = (counts[d.examId] || 0) + 1;
+              }
+            });
+            setParticipantCounts(counts);
           } else {
             router.push('/teacher-dashboard/courses');
           }
@@ -101,26 +115,7 @@ export default function CourseExamsPage() {
       }
     };
 
-    const fetchParticipants = async () => {
-      if (!courseId) return;
-      try {
-        const q = query(collection(db, 'completed_exams'), where('courseId', '==', courseId));
-        const querySnapshot = await getDocs(q);
-        const counts: Record<string, number> = {};
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.examId) {
-            counts[data.examId] = (counts[data.examId] || 0) + 1;
-          }
-        });
-        setParticipantCounts(counts);
-      } catch (err) {
-        console.error("Error fetching exam participants", err);
-      }
-    };
-
-    fetchCourse();
-    fetchParticipants();
+    fetchCourseAndParticipants();
   }, [user, courseId, router]);
 
   const getPastedImageFile = (e: React.ClipboardEvent): File | null => {
@@ -345,7 +340,7 @@ export default function CourseExamsPage() {
         updatedExams = [...exams, examData];
       }
 
-      const docRef = doc(db, 'courses', courseId);
+      const docRef = doc(db, 'courses', realCourseId || courseId);
       await updateDoc(docRef, {
         exams: updatedExams
       });
@@ -380,7 +375,7 @@ export default function CourseExamsPage() {
     if (!confirm('Are you sure you want to delete this exam?')) return;
     try {
       const updatedExams = exams.filter(e => e.id !== id);
-      const docRef = doc(db, 'courses', courseId);
+      const docRef = doc(db, 'courses', realCourseId || courseId);
       await updateDoc(docRef, { exams: updatedExams });
       setExams(updatedExams);
     } catch (err) {

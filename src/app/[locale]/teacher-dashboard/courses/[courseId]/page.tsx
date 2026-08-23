@@ -6,6 +6,7 @@ import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { Users, DollarSign, PlayCircle, BookOpen, Loader2 } from 'lucide-react';
+import { resolveCourseBySlugOrId } from '@/lib/slug';
 
 export default function CourseOverviewPage() {
   const { user } = useAuth();
@@ -23,11 +24,10 @@ export default function CourseOverviewPage() {
     const fetchCourseAndStats = async () => {
       if (!user || !courseId) return;
       try {
-        const docRef = doc(db, 'courses', courseId);
-        const docSnap = await getDoc(docRef);
+        const cData = await resolveCourseBySlugOrId(db, courseId);
         
-        if (docSnap.exists()) {
-          const cData = docSnap.data();
+        if (cData) {
+          const docRef = doc(db, 'courses', cData.id);
           const isOwner = cData.teacherId === user.uid ||
             (user.email && (cData.teacherEmail === user.email || cData.instructorEmail === user.email)) ||
             (user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') ||
@@ -42,7 +42,7 @@ export default function CourseOverviewPage() {
             // Fetch enrollments for this course to calculate approved students & revenue
             const enrollmentsQuery = query(
               collection(db, 'enrollments'),
-              where('courseId', '==', courseId)
+              where('courseId', 'in', Array.from(new Set([cData.id, courseId, cData.slug].filter(Boolean))))
             );
             const enrollmentsSnap = await getDocs(enrollmentsQuery);
 

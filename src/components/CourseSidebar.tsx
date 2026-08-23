@@ -6,11 +6,13 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { doc, getDoc, updateDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { resolveCourseBySlugOrId } from '@/lib/slug';
 
 export default function CourseSidebar() {
   const pathname = usePathname();
   const params = useParams();
   const courseId = params.courseId as string;
+  const [realCourseId, setRealCourseId] = useState(courseId);
   const [courseTitle, setCourseTitle] = useState('Loading...');
   const [isPublished, setIsPublished] = useState(false);
   const [courseType, setCourseType] = useState('coaching');
@@ -19,10 +21,9 @@ export default function CourseSidebar() {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const docRef = doc(db, 'courses', courseId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
+        const data = await resolveCourseBySlugOrId(db, courseId);
+        if (data) {
+          setRealCourseId(data.id);
           setCourseTitle(data.title);
           setIsPublished(data.isPublished);
           setCourseType(data.courseType || 'coaching');
@@ -41,7 +42,7 @@ export default function CourseSidebar() {
     try {
       const q = query(
         collection(db, 'lesson_issues'),
-        where('courseId', '==', courseId)
+        where('courseId', 'in', Array.from(new Set([realCourseId, courseId])).filter(Boolean))
       );
 
       const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -61,14 +62,14 @@ export default function CourseSidebar() {
     } catch (error) {
       console.error("Error subscribing to lesson_issues:", error);
     }
-  }, [courseId]);
+  }, [courseId, realCourseId]);
 
   const handleTogglePublish = async () => {
     const action = isPublished ? 'unpublish' : 'publish';
     if (!window.confirm(`Are you sure you want to ${action} this course?`)) return;
 
     try {
-      const docRef = doc(db, 'courses', courseId);
+      const docRef = doc(db, 'courses', realCourseId || courseId);
       await updateDoc(docRef, {
         isPublished: !isPublished
       });

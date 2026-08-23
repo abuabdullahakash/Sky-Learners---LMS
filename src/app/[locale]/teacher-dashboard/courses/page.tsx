@@ -10,6 +10,7 @@ import Image from 'next/image';
 
 type Course = {
   id: string;
+  slug?: string;
   title: string;
   category: string;
   price: number;
@@ -346,7 +347,7 @@ export default function CoursesListPage() {
           {filteredCourses.map((course) => (
             <div 
               key={course.id} 
-              onClick={() => router.push(`/teacher-dashboard/courses/${course.id}`)}
+              onClick={() => router.push(`/teacher-dashboard/courses/${course.slug || course.id}`)}
               className="cursor-pointer group bg-foreground/5 rounded-2xl border border-orange-500/30 md:border-foreground/10 hover:border-orange-500/60 active:border-orange-500 shadow-md hover:shadow-xl hover:shadow-orange-500/10 active:scale-[0.99] transition-all duration-300 flex flex-col overflow-hidden"
             >
               
@@ -406,7 +407,7 @@ export default function CoursesListPage() {
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      router.push(`/teacher-dashboard/courses/${course.id}/edit`);
+                      router.push(`/teacher-dashboard/courses/${course.slug || course.id}/edit`);
                     }}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white rounded-lg font-bold text-xs shadow-md shadow-orange-500/25 active:scale-95 transition-all duration-200"
                   >

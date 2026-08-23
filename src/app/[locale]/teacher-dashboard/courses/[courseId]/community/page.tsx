@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import { Save, MessageSquare, Plus, Trash2, Link as LinkIcon, Bell, Megaphone, ImagePlus, Loader2, Image as ImageIcon, ZoomIn, X } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import { uploadImageToImgBB } from '@/lib/imgbb';
+import { resolveCourseBySlugOrId } from '@/lib/slug';
 
 interface CommunityLink {
   id: string;
@@ -39,6 +40,7 @@ export default function CourseCommunityPage() {
   const router = useRouter();
   const params = useParams();
   const courseId = params.courseId as string;
+  const [realCourseId, setRealCourseId] = useState(courseId);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -60,10 +62,10 @@ export default function CourseCommunityPage() {
     const fetchCourse = async () => {
       if (!user) return;
       try {
-        const docRef = doc(db, 'courses', courseId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
+        const data = await resolveCourseBySlugOrId(db, courseId);
+        if (data) {
+          const docRef = doc(db, 'courses', data.id);
+          setRealCourseId(data.id);
           const isOwner = data.teacherId === user.uid ||
             (user.email && (data.teacherEmail === user.email || data.instructorEmail === user.email)) ||
             (user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') ||
@@ -142,7 +144,7 @@ export default function CourseCommunityPage() {
     const validLinks = communityLinks.filter(link => link.url.trim() !== '');
     
     try {
-      await updateDoc(doc(db, 'courses', courseId), {
+      await updateDoc(doc(db, 'courses', realCourseId || courseId), {
         communityLinks: validLinks
       });
       setMessage('Community links updated successfully!');
@@ -183,7 +185,7 @@ export default function CourseCommunityPage() {
 
       const updatedNotices = [newNotice, ...notices];
 
-      await updateDoc(doc(db, 'courses', courseId), {
+      await updateDoc(doc(db, 'courses', realCourseId || courseId), {
         notices: updatedNotices
       });
       setNotices(updatedNotices);
@@ -207,7 +209,7 @@ export default function CourseCommunityPage() {
     if (!confirm('Are you sure you want to delete this notice?')) return;
     const updatedNotices = notices.filter(n => n.id !== noticeId);
     try {
-      await updateDoc(doc(db, 'courses', courseId), {
+      await updateDoc(doc(db, 'courses', realCourseId || courseId), {
         notices: updatedNotices
       });
       setNotices(updatedNotices);

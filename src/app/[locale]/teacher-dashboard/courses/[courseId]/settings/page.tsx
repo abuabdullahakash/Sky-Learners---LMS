@@ -263,7 +263,14 @@ export default function CourseSettingsPage() {
                 <input 
                   type="text" 
                   value={course.customSlug !== undefined ? course.customSlug : (course.slug || '')} 
-                  onChange={e => setCourse({...course, customSlug: e.target.value.toLowerCase().replace(/[^\w-]/g, '')})}
+                  onChange={e => {
+                    const formatted = e.target.value
+                      .toLowerCase()
+                      .replace(/[\s_]+/g, '-')
+                      .replace(/[^\w-]/g, '')
+                      .replace(/-+/g, '-');
+                    setCourse({...course, customSlug: formatted});
+                  }}
                   placeholder="e.g. ganitik-physics or master-react"
                   className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors font-mono text-xs sm:text-sm"
                 />

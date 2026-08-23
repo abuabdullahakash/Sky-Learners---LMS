@@ -216,7 +216,12 @@ export default function CreateCoursePage() {
                   value={customSlug}
                   onChange={(e) => {
                     setIsSlugTouched(true);
-                    setCustomSlug(e.target.value.toLowerCase().replace(/[^\w-]/g, ''));
+                    const formatted = e.target.value
+                      .toLowerCase()
+                      .replace(/[\s_]+/g, '-')
+                      .replace(/[^\w-]/g, '')
+                      .replace(/-+/g, '-');
+                    setCustomSlug(formatted);
                   }}
                   placeholder="e.g. ganitik-physics or master-react"
                   className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all font-mono text-sm"

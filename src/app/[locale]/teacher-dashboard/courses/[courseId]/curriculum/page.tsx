@@ -7,6 +7,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { Plus, GripVertical, Video as VideoIcon, Image as ImageIcon, Trash2, Upload, Loader2, X, FileText, Settings, Calendar, User, BookOpen, CheckCircle, Search, ChevronDown, ChevronRight, Edit2, HardDrive, Link as LinkIcon, AlertTriangle, PlayCircle } from 'lucide-react';
 import { uploadImageToImgBB } from '@/lib/imgbb';
+import { resolveCourseBySlugOrId } from '@/lib/slug';
 import toast from 'react-hot-toast';
 
 const scanVideoUrl = (url: string, isPrivateGroupCheck: boolean = false) => {
@@ -36,6 +37,7 @@ export default function CourseCurriculumPage() {
   const { user } = useAuth();
   const params = useParams();
   const courseId = params.courseId as string;
+  const [realCourseId, setRealCourseId] = useState(courseId);
 
   const [isLoading, setIsLoading] = useState(true);
   const [course, setCourse] = useState<any>(null);
@@ -81,10 +83,10 @@ export default function CourseCurriculumPage() {
     const fetchCourse = async () => {
       if (!user) return;
       try {
-        const docRef = doc(db, 'courses', courseId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
+        const data = await resolveCourseBySlugOrId(db, courseId);
+        if (data) {
+          const docRef = doc(db, 'courses', data.id);
+          setRealCourseId(data.id);
           const isOwner = data.teacherId === user.uid ||
             (user.email && (data.teacherEmail === user.email || data.instructorEmail === user.email)) ||
             (user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') ||
@@ -132,7 +134,7 @@ export default function CourseCurriculumPage() {
     };
     const updatedModules = [...course.modules, newModule];
     setCourse({ ...course, modules: updatedModules });
-    await updateDoc(doc(db, 'courses', courseId), { modules: updatedModules });
+    await updateDoc(doc(db, 'courses', realCourseId || courseId), { modules: updatedModules });
     setExpandedModules([...expandedModules, newModuleId]); // Expand the new module
   };
 
@@ -141,7 +143,7 @@ export default function CourseCurriculumPage() {
       mod.id === moduleId ? { ...mod, title: newTitle } : mod
     );
     setCourse({ ...course, modules: updatedModules });
-    await updateDoc(doc(db, 'courses', courseId), { modules: updatedModules });
+    await updateDoc(doc(db, 'courses', realCourseId || courseId), { modules: updatedModules });
   };
 
   const handleRemoveModule = async (moduleId: string) => {
@@ -149,7 +151,7 @@ export default function CourseCurriculumPage() {
     
     const updatedModules = course.modules.filter((mod: any) => mod.id !== moduleId);
     setCourse({ ...course, modules: updatedModules });
-    await updateDoc(doc(db, 'courses', courseId), { modules: updatedModules });
+    await updateDoc(doc(db, 'courses', realCourseId || courseId), { modules: updatedModules });
   };
 
   // --- Subject Management ---
@@ -157,7 +159,7 @@ export default function CourseCurriculumPage() {
     if (!newSubject.trim()) return;
     const updatedSubjects = [...(course.subjects || []), newSubject.trim()];
     setCourse({ ...course, subjects: updatedSubjects });
-    await updateDoc(doc(db, 'courses', courseId), { subjects: updatedSubjects });
+    await updateDoc(doc(db, 'courses', realCourseId || courseId), { subjects: updatedSubjects });
     setNewSubject('');
   };
 
@@ -165,13 +167,13 @@ export default function CourseCurriculumPage() {
     const updatedSubjects = [...course.subjects];
     updatedSubjects.splice(index, 1);
     setCourse({ ...course, subjects: updatedSubjects });
-    await updateDoc(doc(db, 'courses', courseId), { subjects: updatedSubjects });
+    await updateDoc(doc(db, 'courses', realCourseId || courseId), { subjects: updatedSubjects });
   };
 
   const handleSaveSyllabus = async () => {
     const toastId = toast.loading('Saving syllabus...');
     try {
-      await updateDoc(doc(db, 'courses', courseId), {
+      await updateDoc(doc(db, 'courses', realCourseId || courseId), {
         syllabus: {
           objectives: syllabusObjectives,
           prerequisites: syllabusPrerequisites,
@@ -382,7 +384,7 @@ export default function CourseCurriculumPage() {
       }
 
       setCourse({ ...course, modules: updatedModules });
-      await updateDoc(doc(db, 'courses', courseId), { modules: updatedModules });
+      await updateDoc(doc(db, 'courses', realCourseId || courseId), { modules: updatedModules });
       
       // Auto expand module if we added a lesson to it
       if (!expandedModules.includes(editingModuleId)) {
@@ -410,7 +412,7 @@ export default function CourseCurriculumPage() {
       return mod;
     });
     setCourse({ ...course, modules: updatedModules });
-    await updateDoc(doc(db, 'courses', courseId), { modules: updatedModules });
+    await updateDoc(doc(db, 'courses', realCourseId || courseId), { modules: updatedModules });
   };
 
   if (isLoading) return <div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 animate-spin text-orange-500" /></div>;

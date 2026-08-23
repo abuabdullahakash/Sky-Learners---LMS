@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { Search, Users, Phone, Link, Mail, UserCircle, LayoutGrid, List as ListIcon } from 'lucide-react';
+import { resolveCourseBySlugOrId } from '@/lib/slug';
 
 type Student = {
   id: string;
@@ -35,9 +36,12 @@ export default function CourseStudentsPage() {
   const fetchStudents = async () => {
     setIsLoading(true);
     try {
+      const cData = await resolveCourseBySlugOrId(db, courseId);
+      const targetIds = Array.from(new Set([cData?.id, courseId, cData?.slug].filter(Boolean)));
+
       const q = query(
         collection(db, 'enrollments'),
-        where('courseId', '==', courseId),
+        where('courseId', 'in', targetIds),
         where('status', '==', 'approved')
       );
       const querySnapshot = await getDocs(q);
@@ -54,25 +58,20 @@ export default function CourseStudentsPage() {
       });
       
       // Fetch course data for total lessons
-      const courseRef = doc(db, 'courses', courseId);
-      const courseSnap = await getDoc(courseRef);
       let totalLessons = 0;
-      if (courseSnap.exists()) {
-        const courseData = courseSnap.data();
-        if (courseData.modules) {
-          courseData.modules.forEach((module: any) => {
-            if (module.lessons) {
-              totalLessons += module.lessons.length;
-            }
-          });
-        }
+      if (cData && cData.modules) {
+        cData.modules.forEach((module: any) => {
+          if (module.lessons) {
+            totalLessons += module.lessons.length;
+          }
+        });
       }
       setTotalCourseLessons(totalLessons);
 
       // Fetch all completed lessons for this course
       const completedQuery = query(
         collection(db, 'completed_lessons'),
-        where('courseId', '==', courseId)
+        where('courseId', 'in', targetIds)
       );
       const completedSnap = await getDocs(completedQuery);
       const progressCounts: Record<string, number> = {};

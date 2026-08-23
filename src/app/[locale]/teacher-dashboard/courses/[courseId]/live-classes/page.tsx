@@ -7,6 +7,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { Video, Plus, Trash2, Calendar, Clock, Link as LinkIcon, Save, Edit, PlayCircle, StopCircle, ChevronDown, ChevronRight, GripVertical, Filter } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
+import { resolveCourseBySlugOrId } from '@/lib/slug';
 import toast from 'react-hot-toast';
 
 type LiveClass = {
@@ -27,6 +28,7 @@ export default function CourseLiveClassesPage() {
   const router = useRouter();
   const params = useParams();
   const courseId = params.courseId as string;
+  const [realCourseId, setRealCourseId] = useState(courseId);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -55,10 +57,10 @@ export default function CourseLiveClassesPage() {
     const fetchCourse = async () => {
       if (!user) return;
       try {
-        const docRef = doc(db, 'courses', courseId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
+        const data = await resolveCourseBySlugOrId(db, courseId);
+        if (data) {
+          const docRef = doc(db, 'courses', data.id);
+          setRealCourseId(data.id);
           const isOwner = data.teacherId === user.uid ||
             (user.email && (data.teacherEmail === user.email || data.instructorEmail === user.email)) ||
             (user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') ||
@@ -115,7 +117,7 @@ export default function CourseLiveClassesPage() {
   const handleUpdateModule = async (moduleId: string, newTitle: string) => {
     const updatedModules = liveModules.map(m => m.id === moduleId ? { ...m, title: newTitle } : m);
     setLiveModules(updatedModules);
-    await updateDoc(doc(db, 'courses', courseId), { liveModules: updatedModules });
+    await updateDoc(doc(db, 'courses', realCourseId || courseId), { liveModules: updatedModules });
   };
 
   const handleDeleteModule = async (moduleId: string) => {
@@ -136,7 +138,7 @@ export default function CourseLiveClassesPage() {
     try {
       const updates: any = { liveModules: updatedModules };
       if (classesUpdated) updates.liveClasses = updatedClasses;
-      await updateDoc(doc(db, 'courses', courseId), updates);
+      await updateDoc(doc(db, 'courses', realCourseId || courseId), updates);
       setLiveModules(updatedModules);
       setModuleOrder(prev => prev.filter(id => id !== moduleId));
       if (classesUpdated) setLiveClasses(updatedClasses);
@@ -210,7 +212,7 @@ export default function CourseLiveClassesPage() {
     }
     
     try {
-      await updateDoc(doc(db, 'courses', courseId), { liveClasses: updatedClasses });
+      await updateDoc(doc(db, 'courses', realCourseId || courseId), { liveClasses: updatedClasses });
       setLiveClasses(updatedClasses);
       handleCloseForm();
     } catch (err) {
@@ -226,7 +228,7 @@ export default function CourseLiveClassesPage() {
     
     const updatedClasses = liveClasses.filter(c => c.id !== id);
     try {
-      await updateDoc(doc(db, 'courses', courseId), { liveClasses: updatedClasses });
+      await updateDoc(doc(db, 'courses', realCourseId || courseId), { liveClasses: updatedClasses });
       setLiveClasses(updatedClasses);
     } catch (err) {
       console.error(err);
@@ -236,7 +238,7 @@ export default function CourseLiveClassesPage() {
 
   const toggleGoLive = async (cls: LiveClass) => {
     try {
-      const docRef = doc(db, 'courses', courseId);
+      const docRef = doc(db, 'courses', realCourseId || courseId);
       const docSnap = await getDoc(docRef);
       
       if (!docSnap.exists()) return;

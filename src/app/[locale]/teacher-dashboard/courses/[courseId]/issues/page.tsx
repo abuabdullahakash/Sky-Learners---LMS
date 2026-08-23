@@ -9,6 +9,7 @@ import { useParams } from 'next/navigation';
 import { CheckCircle, Clock, Search, ChevronDown, ChevronUp, Image as ImageIcon, Loader2, Send, MessageSquare, X, Upload, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadImageToImgBB } from '@/lib/imgbb';
+import { resolveCourseBySlugOrId } from '@/lib/slug';
 
 export default function CourseIssuesPage() {
   const { user } = useAuth();
@@ -67,9 +68,12 @@ export default function CourseIssuesPage() {
   const fetchIssues = async () => {
     if (!user || !courseId) return;
     try {
+      const cData = await resolveCourseBySlugOrId(db, courseId);
+      const targetIds = Array.from(new Set([cData?.id, courseId, cData?.slug].filter(Boolean)));
+
       const q = query(
         collection(db, 'lesson_issues'),
-        where('courseId', '==', courseId),
+        where('courseId', 'in', targetIds),
         orderBy('createdAt', 'desc')
       );
       const querySnapshot = await getDocs(q);
@@ -100,7 +104,9 @@ export default function CourseIssuesPage() {
     } catch (error) {
       console.error("Error fetching issues:", error);
       try {
-        const q2 = query(collection(db, 'lesson_issues'), where('courseId', '==', courseId));
+        const cData = await resolveCourseBySlugOrId(db, courseId);
+        const targetIds = Array.from(new Set([cData?.id, courseId, cData?.slug].filter(Boolean)));
+        const q2 = query(collection(db, 'lesson_issues'), where('courseId', 'in', targetIds));
         const querySnapshot = await getDocs(q2);
         
         const validIssues = [];

@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { uploadImageToImgBB } from '@/lib/imgbb';
+import { generateCourseSlug, generateCategorySlug, resolveCourseBySlugOrId } from '@/lib/slug';
 import { ImagePlus, Loader2, ArrowLeft, Sparkles, BookOpen, Trash2 } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
@@ -19,6 +20,10 @@ export default function EditCoursePage() {
   const { user } = useAuth();
   
   const [title, setTitle] = useState('');
+  const [customSlug, setCustomSlug] = useState('');
+  const [slugHistory, setSlugHistory] = useState<string[]>([]);
+  const [isSlugTouched, setIsSlugTouched] = useState(false);
+  const [realCourseId, setRealCourseId] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [courseType, setCourseType] = useState('coaching');
   const [category, setCategory] = useState(''); // Education Level
@@ -82,35 +87,37 @@ export default function EditCoursePage() {
     if (!courseId) return;
     const fetchCourse = async () => {
       try {
-        const courseDoc = await getDoc(doc(db, 'courses', courseId));
-        if (courseDoc.exists()) {
-          const data = courseDoc.data();
-          setTitle(data.title || '');
-          setSubtitle(data.subtitle || '');
-          setCourseType(data.courseType || 'coaching');
-          setCategory(data.category || '');
-          setEduClass(data.eduClass || '');
-          setDepartment(data.department || '');
-          setYear(data.year || '');
-          setCoachingName(data.coachingName || '');
-          setPrice(data.price !== undefined && data.price !== null ? data.price.toString() : '');
-          setThumbnailPreview(data.thumbnailUrl || '');
+        const resolved = await resolveCourseBySlugOrId(db, courseId);
+        if (resolved) {
+          setRealCourseId(resolved.id);
+          setTitle(resolved.title || '');
+          setCustomSlug(resolved.slug || '');
+          setSlugHistory(resolved.slugHistory || []);
+          setSubtitle(resolved.subtitle || '');
+          setCourseType(resolved.courseType || 'coaching');
+          setCategory(resolved.category || '');
+          setEduClass(resolved.eduClass || '');
+          setDepartment(resolved.department || '');
+          setYear(resolved.year || '');
+          setCoachingName(resolved.coachingName || '');
+          setPrice(resolved.price !== undefined && resolved.price !== null ? resolved.price.toString() : '');
+          setThumbnailPreview(resolved.thumbnailUrl || '');
           
-          setTotalLiveClasses(data.totalLiveClasses ? data.totalLiveClasses.toString() : '');
-          setTotalVideoLessons(data.totalVideoLessons ? data.totalVideoLessons.toString() : '');
-          setTotalExams(data.totalExams ? data.totalExams.toString() : '');
-          setTotalPdfs(data.totalPdfs ? data.totalPdfs.toString() : '');
-          setHasDoubtSolving(data.hasDoubtSolving || false);
+          setTotalLiveClasses(resolved.totalLiveClasses ? resolved.totalLiveClasses.toString() : '');
+          setTotalVideoLessons(resolved.totalVideoLessons ? resolved.totalVideoLessons.toString() : '');
+          setTotalExams(resolved.totalExams ? resolved.totalExams.toString() : '');
+          setTotalPdfs(resolved.totalPdfs ? resolved.totalPdfs.toString() : '');
+          setHasDoubtSolving(resolved.hasDoubtSolving || false);
           
-          setDiscountPrice(data.discountPrice !== undefined && data.discountPrice !== null ? data.discountPrice.toString() : '');
-          setDiscountValidUntil(data.discountValidUntil || '');
-          setClassStartDate(data.classStartDate || '');
-          setCourseValidity(data.courseValidity || '');
-          setContactNumber(data.contactNumber || '');
+          setDiscountPrice(resolved.discountPrice !== undefined && resolved.discountPrice !== null ? resolved.discountPrice.toString() : '');
+          setDiscountValidUntil(resolved.discountValidUntil || '');
+          setClassStartDate(resolved.classStartDate || '');
+          setCourseValidity(resolved.courseValidity || '');
+          setContactNumber(resolved.contactNumber || '');
           
           let parsedSubjects: any[] = [];
-          if (data.specificSubjects && Array.isArray(data.specificSubjects)) {
-            parsedSubjects = data.specificSubjects.map((sub: any) => {
+          if (resolved.specificSubjects && Array.isArray(resolved.specificSubjects)) {
+            parsedSubjects = resolved.specificSubjects.map((sub: any) => {
               if (typeof sub === 'string') {
                 return { name: sub, instructor: '', liveClasses: '', videoLessons: '', exams: '' };
               }
@@ -139,7 +146,8 @@ export default function EditCoursePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !courseId) return;
+    const targetId = realCourseId || courseId;
+    if (!user || !targetId) return;
     if (!title || !category || price === '' || price === undefined || price === null || (!thumbnail && !thumbnailPreview)) {
       setError('Please fill in all required fields and upload a thumbnail.');
       return;
@@ -155,9 +163,19 @@ export default function EditCoursePage() {
         thumbnailUrl = await uploadImageToImgBB(thumbnail);
       }
 
+      const teacherIdentifier = (courseType === 'coaching' && coachingName) ? coachingName : (user.displayName || user.email?.split('@')[0] || '');
+      const finalSlug = generateCourseSlug(customSlug || title, teacherIdentifier);
+      const existingHistory = slugHistory || [];
+      const updatedHistory = existingHistory.includes(finalSlug)
+        ? existingHistory
+        : (customSlug ? [...existingHistory, customSlug, finalSlug] : [finalSlug]);
+      const cleanHistory = Array.from(new Set(updatedHistory.filter(Boolean)));
+
       // 2. Update Course in Firestore
       const courseData = {
         title,
+        slug: finalSlug,
+        slugHistory: cleanHistory,
         subtitle,
         courseType,
         category, // Used as Education Level
@@ -180,7 +198,9 @@ export default function EditCoursePage() {
         thumbnailUrl,
       };
 
-      await updateDoc(doc(db, 'courses', courseId), courseData);
+      await updateDoc(doc(db, 'courses', targetId), courseData);
+      setCustomSlug(finalSlug);
+      setSlugHistory(cleanHistory);
       
       toast.success('Course updated successfully!');
       setIsLoading(false);
@@ -242,18 +262,62 @@ export default function EditCoursePage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           
           <div className="space-y-5">
-            {/* Course Title */}
-            <div>
-              <label className="block text-xs sm:text-sm font-bold mb-1.5 text-foreground/80">Course Title <span className="text-red-500">*</span></label>
-              <input 
-                type="text" 
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Master React in 30 Days"
-                className="w-full px-4 py-3 bg-background border border-foreground/15 rounded-xl focus:outline-none focus:border-orange-500 transition-colors text-sm font-medium"
-                required
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs sm:text-sm font-bold mb-1.5 text-foreground/80">Course Title <span className="text-red-500">*</span></label>
+                <input 
+                  type="text" 
+                  value={title}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setTitle(val);
+                    if (!isSlugTouched) {
+                      const auto = val.toLowerCase().trim().replace(/[\s_]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-');
+                      setCustomSlug(auto);
+                    }
+                  }}
+                  placeholder="e.g. গাণিতিক পদার্থবিজ্ঞান বা Master React in 30 Days"
+                  className="w-full px-4 py-3 bg-background border border-foreground/15 rounded-xl focus:outline-none focus:border-orange-500 transition-colors text-sm font-medium"
+                  required
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs sm:text-sm font-bold text-foreground/80">Course URL Slug (ইউআরএল স্লাগ)</label>
+                  <span className="text-[10px] text-orange-500 font-bold bg-orange-500/10 px-2 py-0.5 rounded-md">
+                    ℹ️ ইংরেজি অক্ষর (a-z, 0-9)
+                  </span>
+                </div>
+                <input 
+                  type="text" 
+                  value={customSlug}
+                  onChange={(e) => {
+                    setIsSlugTouched(true);
+                    const formatted = e.target.value
+                      .toLowerCase()
+                      .replace(/[\s_]+/g, '-')
+                      .replace(/[^\w-]/g, '')
+                      .replace(/-+/g, '-');
+                    setCustomSlug(formatted);
+                  }}
+                  placeholder="e.g. ganitik-physics or master-react"
+                  className="w-full px-4 py-3 bg-background border border-foreground/15 rounded-xl focus:outline-none focus:border-orange-500 transition-colors font-mono text-xs sm:text-sm"
+                />
+              </div>
             </div>
+
+            {/* Live URL Preview Bar */}
+            {(title || customSlug) && (
+              <div className="p-3.5 bg-gradient-to-r from-orange-500/10 via-amber-500/5 to-transparent border border-orange-500/20 rounded-xl flex flex-wrap items-center gap-2 text-xs font-mono">
+                <span className="font-bold text-orange-500 flex items-center gap-1 shrink-0">
+                  <span>🔗</span> লাইভ লিংক প্রিভিউ:
+                </span>
+                <span className="text-foreground/90 font-semibold bg-background/60 px-2.5 py-1 rounded-lg border border-foreground/10">
+                  sky-learners.com/courses/{generateCategorySlug(category)}/{generateCourseSlug(customSlug || title, (courseType === 'coaching' && coachingName) ? coachingName : (user?.displayName || user?.email?.split('@')[0] || ''))}
+                </span>
+              </div>
+            )}
 
             {/* Subtitle */}
             <div>

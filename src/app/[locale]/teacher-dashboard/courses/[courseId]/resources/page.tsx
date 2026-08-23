@@ -24,11 +24,14 @@ const TYPE_INFO: Record<string, { icon: React.FC<any>; color: string; bg: string
 
 const getTypeInfo = (type: string) => TYPE_INFO[type] || TYPE_INFO['Other Link'];
 
+import { resolveCourseBySlugOrId } from '@/lib/slug';
+
 export default function CourseResourcesPage() {
   const { user } = useAuth();
   const router = useRouter();
   const params = useParams();
   const courseId = params.courseId as string;
+  const [realCourseId, setRealCourseId] = useState(courseId);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -46,10 +49,10 @@ export default function CourseResourcesPage() {
     const fetchCourse = async () => {
       if (!user) return;
       try {
-        const docRef = doc(db, 'courses', courseId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
+        const data = await resolveCourseBySlugOrId(db, courseId);
+        if (data) {
+          const docRef = doc(db, 'courses', data.id);
+          setRealCourseId(data.id);
           const isOwner = data.teacherId === user.uid ||
             (user.email && (data.teacherEmail === user.email || data.instructorEmail === user.email)) ||
             (user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') ||
@@ -96,7 +99,7 @@ export default function CourseResourcesPage() {
     const updatedResources = [...resources, newResource];
     
     try {
-      await updateDoc(doc(db, 'courses', courseId), { resources: updatedResources });
+      await updateDoc(doc(db, 'courses', realCourseId || courseId), { resources: updatedResources });
       setResources(updatedResources);
       setIsAdding(false);
       setNewTitle('');
@@ -115,7 +118,7 @@ export default function CourseResourcesPage() {
     
     const updatedResources = resources.filter(r => r.id !== id);
     try {
-      await updateDoc(doc(db, 'courses', courseId), { resources: updatedResources });
+      await updateDoc(doc(db, 'courses', realCourseId || courseId), { resources: updatedResources });
       setResources(updatedResources);
     } catch (err) {
       console.error(err);

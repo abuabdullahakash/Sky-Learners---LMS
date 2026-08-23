@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, updateDoc, doc, orderBy, Timestamp } from 'firebase/firestore';
 import { Search, CheckCircle2, Clock, XCircle, FileText } from 'lucide-react';
+import { resolveCourseBySlugOrId } from '@/lib/slug';
 
 type Enrollment = {
   id: string;
@@ -29,9 +30,12 @@ export default function CourseEnrollmentsPage() {
   const fetchEnrollments = async () => {
     setIsLoading(true);
     try {
+      const cData = await resolveCourseBySlugOrId(db, courseId);
+      const targetIds = Array.from(new Set([cData?.id, courseId, cData?.slug].filter(Boolean)));
+      
       const q = query(
         collection(db, 'enrollments'),
-        where('courseId', '==', courseId)
+        where('courseId', 'in', targetIds)
       );
       const querySnapshot = await getDocs(q);
       const fetched: Enrollment[] = [];

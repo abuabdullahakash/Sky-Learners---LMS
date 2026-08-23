@@ -9,6 +9,7 @@ import { Plus, Trash2, Save, Users, ImagePlus, User, Edit2, Check, Sparkles, Bui
 import { useRouter } from '@/i18n/routing';
 import Image from 'next/image';
 import { uploadImageToImgBB } from '@/lib/imgbb';
+import { resolveCourseBySlugOrId } from '@/lib/slug';
 import toast from 'react-hot-toast';
 
 type Instructor = {
@@ -31,6 +32,7 @@ export default function CourseInstructorsPage() {
   const router = useRouter();
   const params = useParams();
   const courseId = params.courseId as string;
+  const [realCourseId, setRealCourseId] = useState(courseId);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -61,10 +63,10 @@ export default function CourseInstructorsPage() {
       if (!user) return;
       try {
         // Fetch course
-        const docRef = doc(db, 'courses', courseId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
+        const data = await resolveCourseBySlugOrId(db, courseId);
+        if (data) {
+          const docRef = doc(db, 'courses', data.id);
+          setRealCourseId(data.id);
           const isOwner = data.teacherId === user.uid ||
             (user.email && (data.teacherEmail === user.email || data.instructorEmail === user.email)) ||
             (user.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com') ||
@@ -126,7 +128,7 @@ export default function CourseInstructorsPage() {
       };
 
       const updated = [...instructors, newInstructor];
-      await updateDoc(doc(db, 'courses', courseId), { instructors: updated });
+      await updateDoc(doc(db, 'courses', realCourseId || courseId), { instructors: updated });
       setInstructors(updated);
       toast.success(`${faculty.name} কোর্সে যুক্ত হয়েছেন!`);
     } catch (err) {
@@ -235,7 +237,7 @@ export default function CourseInstructorsPage() {
         updatedInstructors = [...instructors, newInstructor];
       }
       
-      await updateDoc(doc(db, 'courses', courseId), { instructors: updatedInstructors });
+      await updateDoc(doc(db, 'courses', realCourseId || courseId), { instructors: updatedInstructors });
       setInstructors(updatedInstructors);
       
       resetForm();
@@ -252,7 +254,7 @@ export default function CourseInstructorsPage() {
     
     const updatedInstructors = instructors.filter(i => i.id !== id);
     try {
-      await updateDoc(doc(db, 'courses', courseId), { instructors: updatedInstructors });
+      await updateDoc(doc(db, 'courses', realCourseId || courseId), { instructors: updatedInstructors });
       setInstructors(updatedInstructors);
     } catch (err) {
       console.error(err);

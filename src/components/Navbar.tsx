@@ -441,6 +441,33 @@ export default function Navbar() {
                         </div>
                       )}
 
+                      {/* Dual Site Switcher (Main Site vs Teacher Site) */}
+                      {(isAdmin || isTeacher) && (
+                        <div className="pt-2 pb-1">
+                          <div className="grid grid-cols-2 gap-1.5 p-1 bg-foreground/[0.04] border border-foreground/10 rounded-xl">
+                            <Link 
+                              href="/?view=marketplace" 
+                              onClick={() => setShowProfileMenu(false)}
+                              className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-background hover:bg-blue-500/10 hover:border-blue-500/30 border border-foreground/10 text-foreground/80 hover:text-blue-500 text-[11px] font-bold transition-all text-center shadow-xs"
+                              title="মূল মার্কেটপ্লেস ওয়েবসাইট (সারাদেশের সব কোর্স)"
+                            >
+                              <Globe className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                              <span className="truncate">Main Site</span>
+                            </Link>
+
+                            <Link 
+                              href="/" 
+                              onClick={() => setShowProfileMenu(false)}
+                              className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-background hover:bg-orange-500/10 hover:border-orange-500/30 border border-foreground/10 text-foreground/80 hover:text-orange-500 text-[11px] font-bold transition-all text-center shadow-xs"
+                              title="আমার নিজস্ব শিক্ষক ওয়েবসাইট / স্টোরফ্রন্ট"
+                            >
+                              <Building2 className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                              <span className="truncate">Teacher Site</span>
+                            </Link>
+                          </div>
+                        </div>
+                      )}
+
                       <button 
                         onClick={() => setShowLogoutConfirm(true)} 
                         className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-red-500/10 text-red-500 text-xs font-medium transition-colors"
@@ -706,16 +733,35 @@ export default function Navbar() {
                         >
                           <Video className="w-3.5 h-3.5 text-foreground/60" /> My Created Courses
                         </Link>
-                        <Link 
-                          href="/"
-                          onClick={() => {
-                            setIsMobileMenuOpen(false);
-                            setShowProfileMenu(false);
-                          }} 
-                          className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
-                        >
-                          <Globe className="w-4 h-4 text-orange-500" /> View Live Website
-                        </Link>
+                        {/* Dual Site Switcher (Main Site vs Teacher Site) for Mobile */}
+                        <div className="pt-2 pb-1 px-1">
+                          <div className="grid grid-cols-2 gap-1.5 p-1 bg-foreground/[0.04] border border-foreground/10 rounded-xl">
+                            <Link 
+                              href="/?view=marketplace" 
+                              onClick={() => {
+                                setIsMobileMenuOpen(false);
+                                setShowProfileMenu(false);
+                              }}
+                              className="flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg bg-background hover:bg-blue-500/10 border border-foreground/10 text-foreground/80 hover:text-blue-500 text-xs font-bold transition-all text-center shadow-xs"
+                            >
+                              <Globe className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                              <span>Main Site</span>
+                            </Link>
+
+                            <Link 
+                              href="/" 
+                              onClick={() => {
+                                setIsMobileMenuOpen(false);
+                                setShowProfileMenu(false);
+                              }}
+                              className="flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg bg-background hover:bg-orange-500/10 border border-foreground/10 text-foreground/80 hover:text-orange-500 text-xs font-bold transition-all text-center shadow-xs"
+                            >
+                              <Building2 className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                              <span>Teacher Site</span>
+                            </Link>
+                          </div>
+                        </div>
+
                         <Link 
                           href="/teacher-dashboard/home-builder"
                           onClick={() => {

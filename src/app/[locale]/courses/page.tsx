@@ -15,6 +15,7 @@ export default function CoursesPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryTeacherId = searchParams.get('teacherId');
+  const isForcedMarketplace = searchParams.get('view') === 'marketplace';
 
   const [guestTeacherId, setGuestTeacherId] = useState<string | null>(null);
 
@@ -31,7 +32,7 @@ export default function CoursesPage() {
   const isTeacher = isAdmin || userData?.role === 'teacher';
 
   const preferredTeacherId = userData?.preferredTeacherId && userData.preferredTeacherId !== 'global' ? userData.preferredTeacherId : null;
-  const activeTeacherId = isTeacher ? user?.uid : (preferredTeacherId || queryTeacherId || (!user ? guestTeacherId : null));
+  const activeTeacherId = isForcedMarketplace ? null : (isTeacher ? user?.uid : (preferredTeacherId || queryTeacherId || (!user ? guestTeacherId : null)));
 
   const [courses, setCourses] = useState<any[]>([]);
   const [teacherProfile, setTeacherProfile] = useState<any>(null);

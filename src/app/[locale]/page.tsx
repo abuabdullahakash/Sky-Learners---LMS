@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { Link, useRouter } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore';
@@ -100,6 +101,8 @@ export default function HomePage() {
   const t = useTranslations('Index');
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isForcedMarketplace = searchParams.get('view') === 'marketplace';
   const { user, userData, loading } = useAuth();
 
   const isAdmin = userData?.isAdmin || userData?.role === 'admin' || user?.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com' || Boolean(user?.email?.toLowerCase().includes('abuabdullahakash'));
@@ -420,18 +423,18 @@ export default function HomePage() {
     );
   }
 
-  // If a logged-in user is a Teacher, immediately display their own Academy / Storefront Home Page (SS 2)
-  if (user && isTeacher && user.uid) {
+  // If a logged-in user is a Teacher, immediately display their own Academy / Storefront Home Page UNLESS viewing marketplace
+  if (!isForcedMarketplace && user && isTeacher && user.uid) {
     return <TeacherStorefrontView teacherId={user.uid} isOwner={true} />;
   }
 
   // If a logged-in user is a Student with a Focused Academy preference selected, immediately display that Teacher's Storefront!
-  if (user && isStudent && userData?.preferredTeacherId && userData.preferredTeacherId !== 'global') {
+  if (!isForcedMarketplace && user && isStudent && userData?.preferredTeacherId && userData.preferredTeacherId !== 'global') {
     return <TeacherStorefrontView teacherId={userData.preferredTeacherId} isOwner={false} />;
   }
 
   // If a Guest arrives via a referral link, immediately display that Teacher's Storefront!
-  if (!user && guestTeacherId && guestTeacherId !== 'global') {
+  if (!isForcedMarketplace && !user && guestTeacherId && guestTeacherId !== 'global') {
     return <TeacherStorefrontView teacherId={guestTeacherId} isOwner={false} />;
   }
 

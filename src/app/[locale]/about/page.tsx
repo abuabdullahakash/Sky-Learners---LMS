@@ -32,8 +32,11 @@ import {
   HeartHandshake,
   TrendingUp,
   Mountain,
-  Send
+  Send,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { VideoModal } from '@/components/ui/VideoModal';
 
 export default function AboutPage() {
@@ -49,6 +52,9 @@ export default function AboutPage() {
   // Video Modal State
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [videoModalUrl, setVideoModalUrl] = useState('');
+
+  // Interactive Team Showcase State
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
 
   useEffect(() => {
     if (authLoading) return;
@@ -117,6 +123,23 @@ export default function AboutPage() {
     // Story Team Image
     const storyImage = config.coverPhoto || teacherProfile?.coverPhoto || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200&auto=format&fit=crop';
     
+    // Combine all photos for interactive showcase
+    const customGalleryPhotos = (config.galleryPhotos && Array.isArray(config.galleryPhotos) && config.galleryPhotos.length > 0)
+      ? config.galleryPhotos.map((p: any) => typeof p === 'string' ? p : p.imageUrl).filter(Boolean)
+      : [];
+    
+    const combinedPhotos = [
+      storyImage,
+      ...customGalleryPhotos,
+      ...momentsList,
+      'https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=1200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?q=80&w=1200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=1200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop',
+    ];
+    const allTeamPhotos: string[] = Array.from(new Set(combinedPhotos)).filter(Boolean) as string[];
+
     // Promo Video
     const promoVideoUrl = config.introVideoUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
 
@@ -408,54 +431,106 @@ export default function AboutPage() {
         </section>
 
         {/* ========================================================================= */}
-        {/* 4. "টিম ও ক্লাসরুম মোমেন্টস" (TEAM & MOMENTS - Shikho Style)              */}
+        {/* 4. "টিম ও ক্লাসরুম মোমেন্টস" (100VH INTERACTIVE SLIDE SHOWCASE)          */}
         {/* ========================================================================= */}
-        <section className="py-20 sm:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        <section className="min-h-screen py-16 sm:py-24 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 flex flex-col justify-center space-y-8 sm:space-y-10">
           
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
               {displayName} <span className="text-orange-500">পরিবার</span>
             </h2>
             <div className="h-1 w-24 bg-orange-500 rounded-full mx-auto" />
-            <p className="text-foreground/70 text-sm sm:text-base font-medium pt-2">
-              অভিজ্ঞ শিক্ষকমণ্ডলী, একাডেমি মেন্টরস এবং টেকনোলজি টিমের সম্মিলিত প্রচেষ্টা
+            <p className="text-foreground/70 text-xs sm:text-sm md:text-base font-medium pt-1">
+              {displayName}-কে নেতৃত্ব দিচ্ছে প্রতিভাবান এবং দক্ষ একটি ডায়নামিক টিম। সবার জন্য মানসম্মত শিক্ষা সহজলভ্য করার লক্ষ্যে আমাদের সম্মিলিত প্রয়াস।
             </p>
           </div>
 
-          {/* Large Team Hero Card */}
-          <div className="rounded-[2.5rem] overflow-hidden border-2 border-foreground/10 bg-zinc-950 shadow-2xl relative aspect-[16/9] sm:aspect-[21/9] max-w-5xl mx-auto">
-            <img 
-              src={storyImage} 
-              alt="Team" 
-              className="w-full h-full object-cover" 
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-6 sm:p-10">
-              <div className="text-white space-y-1">
-                <div className="text-xs font-black uppercase tracking-wider text-orange-400">Core Team & Faculty</div>
-                <h3 className="text-xl sm:text-3xl font-black">শিক্ষার্থীদের স্বপ্ন পূরণে নিবেদিত একদল মেন্টর</h3>
+          {/* Large Interactive Slide Display Frame (Full Impact 100vh Feel) */}
+          <div className="relative w-full max-w-6xl mx-auto h-[55vh] sm:h-[68vh] lg:h-[75vh] rounded-[2rem] sm:rounded-[3rem] overflow-hidden bg-zinc-950 border-2 border-foreground/15 shadow-2xl group">
+            
+            {/* Framer Motion Smooth Animated Slide */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedPhotoIndex}
+                initial={{ opacity: 0, scale: 1.05, filter: 'blur(8px)' }}
+                animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, scale: 0.96, filter: 'blur(4px)' }}
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                className="w-full h-full relative"
+              >
+                <img 
+                  src={allTeamPhotos[selectedPhotoIndex] || storyImage} 
+                  alt={`Team Moment ${selectedPhotoIndex + 1}`}
+                  className="w-full h-full object-cover object-center" 
+                />
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Gradient Bottom Overlay with Caption */}
+            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end justify-between pointer-events-none z-10">
+              <div className="text-white space-y-1 drop-shadow-md">
+                <div className="inline-block px-3 py-1 rounded-full bg-orange-500 text-white text-[11px] font-black uppercase tracking-wider">
+                  ক্যাম্পাস ও ক্লাসরুম মুহূর্ত #{selectedPhotoIndex + 1}
+                </div>
+                <h3 className="text-lg sm:text-2xl lg:text-3xl font-black">
+                  শিক্ষার্থীদের স্বপ্ন পূরণে নিবেদিত একদল মেন্টর
+                </h3>
+              </div>
+              
+              <div className="text-xs font-bold text-white/90 bg-black/60 px-3.5 py-1.5 rounded-full border border-white/20 backdrop-blur-md hidden sm:block">
+                {selectedPhotoIndex + 1} / {allTeamPhotos.length}
               </div>
             </div>
+
+            {/* Navigation Arrows */}
+            <button
+              type="button"
+              onClick={() => setSelectedPhotoIndex(prev => (prev - 1 + allTeamPhotos.length) % allTeamPhotos.length)}
+              className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-13 sm:h-13 rounded-full bg-black/60 hover:bg-orange-500 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all opacity-0 group-hover:opacity-100 hover:scale-110 shadow-xl z-20"
+              title="Previous Photo"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedPhotoIndex(prev => (prev + 1) % allTeamPhotos.length)}
+              className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-13 sm:h-13 rounded-full bg-black/60 hover:bg-orange-500 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all opacity-0 group-hover:opacity-100 hover:scale-110 shadow-xl z-20"
+              title="Next Photo"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+
           </div>
 
-          {/* Candid Moments Grid Thumbnails */}
-          {momentsList.length > 0 && (
-            <div className="space-y-4">
-              <div className="text-center text-xs font-extrabold uppercase tracking-wider text-orange-500">
-                স্মরণীয় কিছু মুহূর্ত ও ক্লাসরুম
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-                {momentsList.map((imgUrl: string, idx: number) => (
-                  <div key={idx} className="aspect-square rounded-2xl overflow-hidden border border-foreground/10 shadow-sm group">
+          {/* 2-Row Thumbnails Grid (Exact Shikho Match) */}
+          <div className="w-full max-w-6xl mx-auto space-y-3 pt-2">
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-8 gap-2 sm:gap-3">
+              {allTeamPhotos.map((imgUrl: string, idx: number) => {
+                const isActive = idx === selectedPhotoIndex;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setSelectedPhotoIndex(idx)}
+                    className={`aspect-[16/10] sm:aspect-video rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-300 relative group cursor-pointer ${
+                      isActive 
+                        ? 'ring-4 ring-orange-500 ring-offset-2 ring-offset-background scale-105 shadow-xl shadow-orange-500/30 border-transparent' 
+                        : 'opacity-60 hover:opacity-100 hover:scale-105 border border-foreground/15'
+                    }`}
+                  >
                     <img 
                       src={imgUrl} 
-                      alt={`Moment ${idx + 1}`} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                      alt={`Thumbnail ${idx + 1}`} 
+                      className="w-full h-full object-cover" 
                     />
-                  </div>
-                ))}
-              </div>
+                    {isActive && (
+                      <div className="absolute inset-0 bg-orange-500/10 pointer-events-none" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
-          )}
+          </div>
 
         </section>
 

@@ -135,16 +135,6 @@ export default function HomePage() {
   const heroCtaRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
 
-  const activeTeacherId = isTeacher && user?.uid
-    ? user.uid
-    : (isStudent && userData?.preferredTeacherId && userData.preferredTeacherId !== 'global'
-        ? userData.preferredTeacherId
-        : (!user && guestTeacherId ? guestTeacherId : null));
-
-  if (activeTeacherId) {
-    return <TeacherStorefrontView teacherId={activeTeacherId} isOwner={Boolean(isTeacher && user?.uid === activeTeacherId)} />;
-  }
-
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
     
@@ -435,6 +425,11 @@ export default function HomePage() {
   // If a logged-in user is a Student with a Focused Academy preference selected, immediately display that Teacher's Storefront!
   if (user && isStudent && userData?.preferredTeacherId && userData.preferredTeacherId !== 'global') {
     return <TeacherStorefrontView teacherId={userData.preferredTeacherId} isOwner={false} />;
+  }
+
+  // If a Guest arrives via a referral link, immediately display that Teacher's Storefront!
+  if (!user && guestTeacherId && guestTeacherId !== 'global') {
+    return <TeacherStorefrontView teacherId={guestTeacherId} isOwner={false} />;
   }
 
   return (

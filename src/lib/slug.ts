@@ -20,12 +20,12 @@ export function generateCategorySlug(category?: string): string {
 
 /**
  * Generates a clean, URL-safe slug from a course title and optional teacher handle.
- * Handles both English and Bengali / Unicode characters properly.
+ * Handles English and cleans special characters.
  */
-export function generateCourseSlug(title: string, teacherHandle?: string): string {
-  if (!title) return `course-${Date.now().toString(36)}`;
+export function generateCourseSlug(titleOrSlug: string, teacherHandle?: string): string {
+  if (!titleOrSlug) return `course-${Date.now().toString(36)}`;
 
-  let baseSlug = title
+  let baseSlug = titleOrSlug
     .toLowerCase()
     .trim()
     .replace(/[^\w\s\u0980-\u09FF-]/g, '')
@@ -92,6 +92,11 @@ export async function resolveCourseBySlugOrId(db: Firestore, slugOrId: string) {
   if (!slugOrId) return null;
 
   try {
+    let decoded = slugOrId;
+    try {
+      decoded = decodeURIComponent(slugOrId);
+    } catch (_) {}
+
     // 1. Direct Document ID Lookup
     const docRef = doc(db, 'courses', slugOrId);
     const docSnap = await getDoc(docRef);
@@ -108,22 +113,29 @@ export async function resolveCourseBySlugOrId(db: Firestore, slugOrId: string) {
     }
 
     const normalizedSlug = slugOrId.toLowerCase().trim();
+    const normalizedDecoded = decoded.toLowerCase().trim();
+    const candidates = Array.from(new Set([normalizedSlug, normalizedDecoded])).filter(Boolean);
+
+    const coursesRef = collection(db, 'courses');
 
     // 2. Lookup by current clean slug
-    const coursesRef = collection(db, 'courses');
-    const slugQuery = query(coursesRef, where('slug', '==', normalizedSlug), limit(1));
-    const slugSnap = await getDocs(slugQuery);
-    if (!slugSnap.empty) {
-      const found = slugSnap.docs[0];
-      return { id: found.id, ...found.data() } as any;
+    for (const candidate of candidates) {
+      const slugQuery = query(coursesRef, where('slug', '==', candidate), limit(1));
+      const slugSnap = await getDocs(slugQuery);
+      if (!slugSnap.empty) {
+        const found = slugSnap.docs[0];
+        return { id: found.id, ...found.data() } as any;
+      }
     }
 
     // 3. Lookup by historical slug history (for 100% backwards compatibility)
-    const historyQuery = query(coursesRef, where('slugHistory', 'array-contains', normalizedSlug), limit(1));
-    const historySnap = await getDocs(historyQuery);
-    if (!historySnap.empty) {
-      const found = historySnap.docs[0];
-      return { id: found.id, ...found.data() } as any;
+    for (const candidate of candidates) {
+      const historyQuery = query(coursesRef, where('slugHistory', 'array-contains', candidate), limit(1));
+      const historySnap = await getDocs(historyQuery);
+      if (!historySnap.empty) {
+        const found = historySnap.docs[0];
+        return { id: found.id, ...found.data() } as any;
+      }
     }
 
   } catch (error) {

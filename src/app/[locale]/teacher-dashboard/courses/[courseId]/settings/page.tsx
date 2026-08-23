@@ -8,7 +8,7 @@ import { useParams } from 'next/navigation';
 import { Save, ImagePlus, Trash2, X, Loader2, Plus } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import { uploadImageToImgBB } from '@/lib/imgbb';
-import { generateCourseSlug } from '@/lib/slug';
+import { generateCourseSlug, generateCategorySlug } from '@/lib/slug';
 import { IconPicker } from '@/components/ui/IconPicker';
 import { RichTextEditor } from '@/components/ui/RichTextEditor';
 import toast from 'react-hot-toast';
@@ -160,7 +160,7 @@ export default function CourseSettingsPage() {
     setIsSaving(true);
     try {
       const teacherIdentifier = course.coachingName || user?.displayName || user?.email?.split('@')[0] || '';
-      const newSlug = generateCourseSlug(course.title, teacherIdentifier);
+      const newSlug = generateCourseSlug(course.customSlug !== undefined ? course.customSlug : (course.slug || course.title), teacherIdentifier);
       const existingHistory: string[] = course.slugHistory || [];
       const updatedHistory = existingHistory.includes(newSlug)
         ? existingHistory
@@ -235,12 +235,49 @@ export default function CourseSettingsPage() {
             <h2 className="text-base sm:text-lg md:text-xl font-extrabold bg-gradient-to-r from-orange-500 via-amber-500 to-red-500 bg-clip-text text-transparent border-b border-foreground/10 pb-3 sm:pb-4">
               1. Hero Section Information
             </h2>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium mb-1">Course Title</label>
-              <input 
-                type="text" value={course.title || ''} onChange={e => setCourse({...course, title: e.target.value})}
-                className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors text-sm"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs sm:text-sm font-medium mb-1">Course Title</label>
+                <input 
+                  type="text" 
+                  value={course.title || ''} 
+                  onChange={e => {
+                    const val = e.target.value;
+                    setCourse({
+                      ...course, 
+                      title: val,
+                      customSlug: course.customSlug !== undefined ? course.customSlug : val.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-')
+                    });
+                  }}
+                  className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors text-sm"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs sm:text-sm font-medium">Course URL Slug (ইউআরএল স্লাগ)</label>
+                  <span className="text-[10px] text-orange-500 font-bold bg-orange-500/10 px-2 py-0.5 rounded-md">
+                    ℹ️ ইংরেজি অক্ষর (a-z, 0-9)
+                  </span>
+                </div>
+                <input 
+                  type="text" 
+                  value={course.customSlug !== undefined ? course.customSlug : (course.slug || '')} 
+                  onChange={e => setCourse({...course, customSlug: e.target.value.toLowerCase().replace(/[^\w-]/g, '')})}
+                  placeholder="e.g. ganitik-physics or master-react"
+                  className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:border-orange-500 transition-colors font-mono text-xs sm:text-sm"
+                />
+              </div>
+            </div>
+
+            {/* Live URL Preview Bar */}
+            <div className="p-3 bg-gradient-to-r from-orange-500/10 via-amber-500/5 to-transparent border border-orange-500/20 rounded-xl flex flex-wrap items-center gap-2 text-xs font-mono">
+              <span className="font-bold text-orange-500 flex items-center gap-1 shrink-0">
+                <span>🔗</span> লাইভ লিংক প্রিভিউ:
+              </span>
+              <span className="text-foreground/90 font-semibold bg-background/60 px-2.5 py-1 rounded-lg border border-foreground/10">
+                sky-learners.com/courses/{generateCategorySlug(course.category)}/{generateCourseSlug(course.customSlug !== undefined ? course.customSlug : (course.slug || course.title), course.coachingName || user?.displayName || user?.email?.split('@')[0] || '')}
+              </span>
             </div>
             <div>
               <label className="block text-xs sm:text-sm font-medium mb-1">Subtitle</label>

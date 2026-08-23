@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { uploadImageToImgBB } from '@/lib/imgbb';
-import { generateCourseSlug } from '@/lib/slug';
+import { generateCourseSlug, generateCategorySlug } from '@/lib/slug';
 import { ImagePlus, Loader2, ArrowLeft } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
@@ -16,6 +16,8 @@ export default function CreateCoursePage() {
   const { user } = useAuth();
   
   const [title, setTitle] = useState('');
+  const [customSlug, setCustomSlug] = useState('');
+  const [isSlugTouched, setIsSlugTouched] = useState(false);
   const [subtitle, setSubtitle] = useState('');
   const [courseType, setCourseType] = useState('coaching');
   const [category, setCategory] = useState(''); // Education Level
@@ -98,7 +100,7 @@ export default function CreateCoursePage() {
       const thumbnailUrl = await uploadImageToImgBB(thumbnail);
 
       const teacherIdentifier = (courseType === 'coaching' && coachingName) ? coachingName : (user.displayName || user.email?.split('@')[0] || '');
-      const slug = generateCourseSlug(title, teacherIdentifier);
+      const slug = generateCourseSlug(customSlug || title, teacherIdentifier);
 
       // 2. Save Course to Firestore
       const courseData = {
@@ -186,26 +188,66 @@ export default function CreateCoursePage() {
                 <input 
                   type="text" 
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Master React in 30 Days"
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setTitle(val);
+                    if (!isSlugTouched) {
+                      const auto = val.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-');
+                      setCustomSlug(auto);
+                    }
+                  }}
+                  placeholder="e.g. গাণিতিক পদার্থবিজ্ঞান বা Master React in 30 Days"
                   className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all"
                   required
                 />
               </div>
 
-              {/* Course Type in 1 Row (2 Columns) */}
               <div>
-                <label className="block text-sm font-medium mb-1 text-foreground/80">Course Type <span className="text-red-500">*</span></label>
-                <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                  <label className={`flex items-center gap-2 cursor-pointer p-2.5 sm:p-3 rounded-xl border transition-all ${courseType === 'individual' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
-                    <input type="radio" name="courseType" value="individual" checked={courseType === 'individual'} onChange={() => setCourseType('individual')} className="accent-orange-500 w-4 h-4 shrink-0" />
-                    <span className="text-xs sm:text-sm font-bold truncate">Individual Teacher</span>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm font-medium text-foreground/80 flex items-center gap-1.5">
+                    <span>Course URL Slug (ইউআরএল স্লাগ)</span>
                   </label>
-                  <label className={`flex items-center gap-2 cursor-pointer p-2.5 sm:p-3 rounded-xl border transition-all ${courseType === 'coaching' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
-                    <input type="radio" name="courseType" value="coaching" checked={courseType === 'coaching'} onChange={() => setCourseType('coaching')} className="accent-orange-500 w-4 h-4 shrink-0" />
-                    <span className="text-xs sm:text-sm font-bold truncate">Coaching Center</span>
-                  </label>
+                  <span className="text-[11px] text-orange-500 font-bold bg-orange-500/10 px-2 py-0.5 rounded-md" title="এসইও ও ফেসবুক/হোয়াটসঅ্যাপে সুন্দর লিংকের জন্য শুধুমাত্র ছোট হাতের ইংরেজি অক্ষর ও সংখ্যা ব্যবহার করুন">
+                    ℹ️ ইংরেজি অক্ষর (a-z, 0-9)
+                  </span>
                 </div>
+                <input 
+                  type="text" 
+                  value={customSlug}
+                  onChange={(e) => {
+                    setIsSlugTouched(true);
+                    setCustomSlug(e.target.value.toLowerCase().replace(/[^\w-]/g, ''));
+                  }}
+                  placeholder="e.g. ganitik-physics or master-react"
+                  className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all font-mono text-sm"
+                />
+              </div>
+            </div>
+
+            {/* Live URL Preview Bar */}
+            {(title || customSlug) && (
+              <div className="p-3.5 bg-gradient-to-r from-orange-500/10 via-amber-500/5 to-transparent border border-orange-500/20 rounded-xl flex flex-wrap items-center gap-2 text-xs font-mono">
+                <span className="font-bold text-orange-500 flex items-center gap-1 shrink-0">
+                  <span>🔗</span> লাইভ লিংক প্রিভিউ:
+                </span>
+                <span className="text-foreground/90 font-semibold bg-background/60 px-2.5 py-1 rounded-lg border border-foreground/10">
+                  sky-learners.com/courses/{generateCategorySlug(category)}/{generateCourseSlug(customSlug || title, (courseType === 'coaching' && coachingName) ? coachingName : (user?.displayName || user?.email?.split('@')[0] || ''))}
+                </span>
+              </div>
+            )}
+
+            {/* Course Type in 1 Row (2 Columns) */}
+            <div>
+              <label className="block text-sm font-medium mb-1 text-foreground/80">Course Type <span className="text-red-500">*</span></label>
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                <label className={`flex items-center gap-2 cursor-pointer p-2.5 sm:p-3 rounded-xl border transition-all ${courseType === 'individual' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
+                  <input type="radio" name="courseType" value="individual" checked={courseType === 'individual'} onChange={() => setCourseType('individual')} className="accent-orange-500 w-4 h-4 shrink-0" />
+                  <span className="text-xs sm:text-sm font-bold truncate">Individual Teacher</span>
+                </label>
+                <label className={`flex items-center gap-2 cursor-pointer p-2.5 sm:p-3 rounded-xl border transition-all ${courseType === 'coaching' ? 'border-orange-500 bg-orange-500/5' : 'border-foreground/10 bg-foreground/5 hover:border-orange-500/30'}`}>
+                  <input type="radio" name="courseType" value="coaching" checked={courseType === 'coaching'} onChange={() => setCourseType('coaching')} className="accent-orange-500 w-4 h-4 shrink-0" />
+                  <span className="text-xs sm:text-sm font-bold truncate">Coaching Center</span>
+                </label>
               </div>
             </div>
 

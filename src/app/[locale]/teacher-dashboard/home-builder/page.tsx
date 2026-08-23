@@ -659,7 +659,7 @@ export default function TeacherHomePageBuilderPage() {
         <div className="p-3 border-t border-foreground/10 space-y-2">
           {user?.uid && (
             <Link
-              href={`/teachers/${user.uid}`}
+              href="/"
               target="_blank"
               className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-[11px] font-bold text-foreground transition-colors"
             >
@@ -727,7 +727,7 @@ export default function TeacherHomePageBuilderPage() {
           <div className="flex items-center gap-3">
             {user?.uid && (
               <Link
-                href={`/teachers/${user.uid}`}
+                href="/"
                 target="_blank"
                 className="px-4 py-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-xs font-bold flex items-center gap-2 transition-colors"
               >

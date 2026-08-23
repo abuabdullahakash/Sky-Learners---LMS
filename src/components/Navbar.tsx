@@ -120,7 +120,7 @@ export default function Navbar() {
   const isStudent = !isAdmin && userData?.role === 'student' && Boolean(userData?.onboardingComplete);
   const hasCompletedRole = isAdmin || isTeacher || isStudent;
   const userProfileLink = isAdmin ? '/admin' : (isTeacher ? '/teacher-dashboard' : (isStudent ? '/dashboard' : '/onboarding'));
-  const homeLink = isTeacher && user?.uid ? `/teachers/${user.uid}` : '/';
+  const homeLink = '/';
   const isHomeActive = pathname === '/' || (Boolean(isTeacher) && Boolean(user?.uid) && pathname === `/teachers/${user?.uid}`);
 
   // Dashboard Nav Links (Account Settings is handled in the bottom profile popup menu)
@@ -135,7 +135,7 @@ export default function Navbar() {
     { name: '+ Create New Course', href: '/teacher-dashboard/courses/create', icon: PlusCircle, isHighlight: true },
     { name: 'My Courses', href: '/teacher-dashboard/courses', icon: Video },
     { name: 'Home Builder', href: '/teacher-dashboard/home-builder', icon: Sparkles },
-    { name: 'My Website', href: user?.uid ? `/teachers/${user.uid}` : '/teacher-dashboard/profile', icon: Globe },
+    { name: 'My Website', href: '/', icon: Globe },
     { name: 'Posts & Notices', href: '/teacher-dashboard/posts', icon: Megaphone },
     { name: 'Students', href: '/teacher-dashboard/students', icon: Users },
     { name: 'Earnings', href: '/teacher-dashboard/earnings', icon: DollarSign },
@@ -269,7 +269,7 @@ export default function Navbar() {
 
                           {user?.uid && (
                             <Link 
-                              href={`/teachers/${user.uid}`}
+                              href="/"
                               className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
                             >
                               <Globe className="w-3.5 h-3.5 text-orange-500" /> View Live Website
@@ -623,7 +623,7 @@ export default function Navbar() {
                           <Video className="w-3.5 h-3.5 text-foreground/60" /> My Created Courses
                         </Link>
                         <Link 
-                          href={user?.uid ? `/teachers/${user.uid}` : '/teacher-dashboard/home-builder'}
+                          href="/"
                           onClick={() => {
                             setIsMobileMenuOpen(false);
                             setShowProfileMenu(false);

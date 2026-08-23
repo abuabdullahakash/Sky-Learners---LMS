@@ -7,7 +7,7 @@ import { ThemeToggle } from './ThemeToggle';
 import Image from 'next/image';
 import { LanguageToggle } from './LanguageToggle';
 import { useAuth } from '@/context/AuthContext';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { 
@@ -46,6 +46,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
+  const isForcedMarketplace = searchParams.get('view') === 'marketplace';
   const { user, userData, loading, logout } = useAuth();
   
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
@@ -162,16 +164,18 @@ export default function Navbar() {
   const isCustomTeacherMode = Boolean(isStudent && preferredTeacherId && preferredTeacherId !== 'global');
   
   // Active teacher for dynamic link routing
-  const effectiveTeacherId = isTeacher 
-    ? user?.uid 
-    : (isCustomTeacherMode && preferredTeacherId 
-        ? preferredTeacherId 
-        : (routeTeacherId || null));
+  const effectiveTeacherId = isForcedMarketplace
+    ? null
+    : (isTeacher 
+        ? user?.uid 
+        : (isCustomTeacherMode && preferredTeacherId 
+            ? preferredTeacherId 
+            : (routeTeacherId || null)));
 
   // 100% Clean URLs for seamless user experience:
-  const homeLink = '/';
-  const coursesLink = '/courses';
-  const aboutLink = '/about';
+  const homeLink = isForcedMarketplace ? '/?view=marketplace' : '/';
+  const coursesLink = isForcedMarketplace ? '/courses?view=marketplace' : '/courses';
+  const aboutLink = isForcedMarketplace ? '/about?view=marketplace' : '/about';
   const isHomeActive = pathname === '/' || pathname.startsWith('/teachers/');
   const isCoursesActive = pathname === '/courses' || pathname.startsWith('/courses');
   const isAboutActive = pathname === '/about' || pathname.startsWith('/about');
@@ -320,7 +324,7 @@ export default function Navbar() {
                             </div>
                           </Link>
 
-                          {user?.uid && (
+                          {user?.uid && !isAdmin && (
                             <Link 
                               href="/"
                               className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
@@ -441,27 +445,35 @@ export default function Navbar() {
                         </div>
                       )}
 
-                      {/* Dual Site Switcher (Main Site vs Teacher Site) */}
-                      {(isAdmin || isTeacher) && (
+                      {/* Dual Site Switcher (Main Site vs Teacher Site) - Strictly Super Admin */}
+                      {isAdmin && (
                         <div className="pt-2 pb-1">
                           <div className="grid grid-cols-2 gap-1.5 p-1 bg-foreground/[0.04] border border-foreground/10 rounded-xl">
                             <Link 
                               href="/?view=marketplace" 
                               onClick={() => setShowProfileMenu(false)}
-                              className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-background hover:bg-blue-500/10 hover:border-blue-500/30 border border-foreground/10 text-foreground/80 hover:text-blue-500 text-[11px] font-bold transition-all text-center shadow-xs"
+                              className={`flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg border text-[11px] font-bold transition-all text-center shadow-xs ${
+                                isForcedMarketplace 
+                                  ? 'bg-blue-500 text-white border-blue-600' 
+                                  : 'bg-background hover:bg-blue-500/10 hover:border-blue-500/30 border-foreground/10 text-foreground/80 hover:text-blue-500'
+                              }`}
                               title="মূল মার্কেটপ্লেস ওয়েবসাইট (সারাদেশের সব কোর্স)"
                             >
-                              <Globe className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                              <Globe className="w-3.5 h-3.5 shrink-0" />
                               <span className="truncate">Main Site</span>
                             </Link>
 
                             <Link 
                               href="/" 
                               onClick={() => setShowProfileMenu(false)}
-                              className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-background hover:bg-orange-500/10 hover:border-orange-500/30 border border-foreground/10 text-foreground/80 hover:text-orange-500 text-[11px] font-bold transition-all text-center shadow-xs"
+                              className={`flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg border text-[11px] font-bold transition-all text-center shadow-xs ${
+                                !isForcedMarketplace 
+                                  ? 'bg-orange-500 text-white border-orange-600' 
+                                  : 'bg-background hover:bg-orange-500/10 hover:border-orange-500/30 border-foreground/10 text-foreground/80 hover:text-orange-500'
+                              }`}
                               title="আমার নিজস্ব শিক্ষক ওয়েবসাইট / স্টোরফ্রন্ট"
                             >
-                              <Building2 className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                              <Building2 className="w-3.5 h-3.5 shrink-0" />
                               <span className="truncate">Teacher Site</span>
                             </Link>
                           </div>
@@ -733,34 +745,57 @@ export default function Navbar() {
                         >
                           <Video className="w-3.5 h-3.5 text-foreground/60" /> My Created Courses
                         </Link>
-                        {/* Dual Site Switcher (Main Site vs Teacher Site) for Mobile */}
-                        <div className="pt-2 pb-1 px-1">
-                          <div className="grid grid-cols-2 gap-1.5 p-1 bg-foreground/[0.04] border border-foreground/10 rounded-xl">
-                            <Link 
-                              href="/?view=marketplace" 
-                              onClick={() => {
-                                setIsMobileMenuOpen(false);
-                                setShowProfileMenu(false);
-                              }}
-                              className="flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg bg-background hover:bg-blue-500/10 border border-foreground/10 text-foreground/80 hover:text-blue-500 text-xs font-bold transition-all text-center shadow-xs"
-                            >
-                              <Globe className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                              <span>Main Site</span>
-                            </Link>
+                        {!isAdmin && (
+                          <Link 
+                            href="/"
+                            onClick={() => {
+                              setIsMobileMenuOpen(false);
+                              setShowProfileMenu(false);
+                            }} 
+                            className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
+                          >
+                            <Globe className="w-4 h-4 text-orange-500" /> View Live Website
+                          </Link>
+                        )}
 
-                            <Link 
-                              href="/" 
-                              onClick={() => {
-                                setIsMobileMenuOpen(false);
-                                setShowProfileMenu(false);
-                              }}
-                              className="flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg bg-background hover:bg-orange-500/10 border border-foreground/10 text-foreground/80 hover:text-orange-500 text-xs font-bold transition-all text-center shadow-xs"
-                            >
-                              <Building2 className="w-3.5 h-3.5 text-orange-500 shrink-0" />
-                              <span>Teacher Site</span>
-                            </Link>
+                        {/* Dual Site Switcher (Main Site vs Teacher Site) - Strictly Super Admin */}
+                        {isAdmin && (
+                          <div className="pt-2 pb-1 px-1">
+                            <div className="grid grid-cols-2 gap-1.5 p-1 bg-foreground/[0.04] border border-foreground/10 rounded-xl">
+                              <Link 
+                                href="/?view=marketplace" 
+                                onClick={() => {
+                                  setIsMobileMenuOpen(false);
+                                  setShowProfileMenu(false);
+                                }}
+                                className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg border text-xs font-bold transition-all text-center shadow-xs ${
+                                  isForcedMarketplace 
+                                    ? 'bg-blue-500 text-white border-blue-600' 
+                                    : 'bg-background hover:bg-blue-500/10 border-foreground/10 text-foreground/80 hover:text-blue-500'
+                                }`}
+                              >
+                                <Globe className="w-3.5 h-3.5 shrink-0" />
+                                <span>Main Site</span>
+                              </Link>
+
+                              <Link 
+                                href="/" 
+                                onClick={() => {
+                                  setIsMobileMenuOpen(false);
+                                  setShowProfileMenu(false);
+                                }}
+                                className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg border text-xs font-bold transition-all text-center shadow-xs ${
+                                  !isForcedMarketplace 
+                                    ? 'bg-orange-500 text-white border-orange-600' 
+                                    : 'bg-background hover:bg-orange-500/10 border-foreground/10 text-foreground/80 hover:text-orange-500'
+                                }`}
+                              >
+                                <Building2 className="w-3.5 h-3.5 shrink-0" />
+                                <span>Teacher Site</span>
+                              </Link>
+                            </div>
                           </div>
-                        </div>
+                        )}
 
                         <Link 
                           href="/teacher-dashboard/home-builder"

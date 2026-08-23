@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, collection, addDoc, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, collection, addDoc, Timestamp, setDoc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { CheckCircle2, ShieldCheck, ArrowRight, Loader2, AlertCircle, UserCircle, Phone, Link, Mail, Camera, Upload } from 'lucide-react';
 import { uploadImageToImgBB } from '@/lib/imgbb';
@@ -150,6 +150,15 @@ export default function CheckoutPage({ params }: { params: Promise<{ courseId: s
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
       });
+
+      // Auto-set student's focused academy to this course teacher if currently on global mode
+      if (course?.teacherId && (!userData?.preferredTeacherId || userData.preferredTeacherId === 'global')) {
+        try {
+          await setDoc(doc(db, 'users', user.uid), { preferredTeacherId: course.teacherId }, { merge: true });
+        } catch (e) {
+          console.error("Error setting default preferred teacher on enrollment:", e);
+        }
+      }
       
       setSuccess(true);
     } catch (err) {

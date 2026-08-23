@@ -15,6 +15,7 @@ import {
 import { auth, db } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useRouter } from '@/i18n/routing';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import gsap from 'gsap';
 import { Eye, EyeOff, X, CheckCircle2 } from 'lucide-react';
@@ -28,6 +29,8 @@ export default function AuthModal({ initialMode }: AuthModalProps) {
   const t = useTranslations('Auth');
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryRef = searchParams.get('ref');
 
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
   const [name, setName] = useState('');
@@ -137,11 +140,16 @@ export default function AuthModal({ initialMode }: AuthModalProps) {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(userCredential.user, { displayName: name });
         
+        const storedRef = typeof window !== 'undefined' 
+          ? (queryRef || sessionStorage.getItem('referralTeacherId') || localStorage.getItem('referralTeacherId')) 
+          : queryRef;
+
         await setDoc(doc(db, "users", userCredential.user.uid), {
           name,
           email,
           role: null,
           onboardingComplete: false,
+          preferredTeacherId: storedRef || 'global',
           createdAt: new Date().toISOString()
         });
 
@@ -193,11 +201,16 @@ export default function AuthModal({ initialMode }: AuthModalProps) {
         // Register Mode
         let redirectUrl = '/onboarding';
         if (!userDoc.exists()) {
+          const storedRef = typeof window !== 'undefined' 
+            ? (queryRef || sessionStorage.getItem('referralTeacherId') || localStorage.getItem('referralTeacherId')) 
+            : queryRef;
+
           await setDoc(userDocRef, {
             name: userCredential.user.displayName,
             email: userCredential.user.email,
             role: null,
             onboardingComplete: false,
+            preferredTeacherId: storedRef || 'global',
             createdAt: new Date().toISOString()
           });
         } else {

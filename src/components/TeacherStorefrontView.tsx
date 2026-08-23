@@ -84,6 +84,11 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
   const slideTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && teacherId) {
+      sessionStorage.setItem('referralTeacherId', teacherId);
+      localStorage.setItem('referralTeacherId', teacherId);
+    }
+
     const fetchAcademyStorefront = async () => {
       if (!teacherId) {
         setIsLoading(false);

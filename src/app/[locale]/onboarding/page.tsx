@@ -64,6 +64,15 @@ export default function OnboardingPage() {
       };
 
       if (role === 'student') {
+        const storedRef = typeof window !== 'undefined' 
+          ? (searchParams.get('ref') || sessionStorage.getItem('referralTeacherId') || localStorage.getItem('referralTeacherId')) 
+          : null;
+        if (storedRef && (!userData?.preferredTeacherId || userData?.preferredTeacherId === 'global')) {
+          dataToSave.preferredTeacherId = storedRef;
+        } else if (!userData?.preferredTeacherId) {
+          dataToSave.preferredTeacherId = 'global';
+        }
+
         dataToSave.dob = dob;
         dataToSave.gender = gender;
         dataToSave.eduLevel = eduLevel;

@@ -149,12 +149,31 @@ export default function Navbar() {
     }
   }, [isStudent, userData?.preferredTeacherId]);
 
+  // Check if current route has a teacher context
+  let routeTeacherId: string | null = null;
+  if (pathname.includes('/teachers/')) {
+    const parts = pathname.split('/teachers/');
+    if (parts[1]) {
+      routeTeacherId = parts[1].split('/')[0].split('#')[0].split('?')[0];
+    }
+  }
+
   const preferredTeacherId = userData?.preferredTeacherId;
   const isCustomTeacherMode = Boolean(isStudent && preferredTeacherId && preferredTeacherId !== 'global');
-  const homeLink = isCustomTeacherMode && preferredTeacherId ? `/teachers/${preferredTeacherId}` : '/';
-  const coursesLink = isCustomTeacherMode && preferredTeacherId ? `/teachers/${preferredTeacherId}#courses` : '/courses';
-  const aboutLink = isCustomTeacherMode && preferredTeacherId ? `/about?teacherId=${preferredTeacherId}` : '/about';
-  const isHomeActive = pathname === '/' || (Boolean(isTeacher) && Boolean(user?.uid) && pathname === `/teachers/${user?.uid}`) || Boolean(isCustomTeacherMode && preferredTeacherId && pathname === `/teachers/${preferredTeacherId}`);
+  
+  // Active teacher for dynamic link routing
+  const effectiveTeacherId = isTeacher 
+    ? user?.uid 
+    : (isCustomTeacherMode && preferredTeacherId 
+        ? preferredTeacherId 
+        : (routeTeacherId || null));
+
+  const homeLink = effectiveTeacherId && !isTeacher ? `/teachers/${effectiveTeacherId}` : '/';
+  const coursesLink = effectiveTeacherId && !isTeacher ? `/courses?teacherId=${effectiveTeacherId}` : '/courses';
+  const aboutLink = effectiveTeacherId && !isTeacher ? `/about?teacherId=${effectiveTeacherId}` : '/about';
+  const isHomeActive = pathname === '/' || (Boolean(isTeacher) && Boolean(user?.uid) && pathname === `/teachers/${user?.uid}`) || Boolean(effectiveTeacherId && pathname === `/teachers/${effectiveTeacherId}`);
+  const isCoursesActive = pathname === '/courses' || (Boolean(effectiveTeacherId) && pathname.startsWith('/courses'));
+  const isAboutActive = pathname === '/about' || (Boolean(effectiveTeacherId) && pathname.startsWith('/about'));
 
   // Dashboard Nav Links (Account Settings is handled in the bottom profile popup menu)
   const studentDashboardLinks = [
@@ -430,7 +449,10 @@ export default function Navbar() {
                     </div>
                   </div>
                 ) : (
-                  <Link href="/register" className="px-6 py-2 bg-primary text-primary-foreground font-bold rounded-full hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all">
+                  <Link 
+                    href={effectiveTeacherId ? `/register?ref=${effectiveTeacherId}` : '/register'} 
+                    className="px-6 py-2 bg-primary text-primary-foreground font-bold rounded-full hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all"
+                  >
                     Login / Join
                   </Link>
                 )}
@@ -609,31 +631,31 @@ export default function Navbar() {
                   href={coursesLink}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
-                    pathname === '/courses' 
+                    isCoursesActive 
                       ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 border-orange-400/40 ring-1 ring-orange-400/30' 
                       : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
                   }`}
                 >
                   <span className="flex items-center gap-2.5">
-                    <span className={`w-2 h-2 rounded-full ${pathname === '/courses' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
+                    <span className={`w-2 h-2 rounded-full ${isCoursesActive ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
                     <span>{t('courses')}</span>
                   </span>
-                  <ChevronRight className={`w-4 h-4 transition-transform ${pathname === '/courses' ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
+                  <ChevronRight className={`w-4 h-4 transition-transform ${isCoursesActive ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
                 </Link>
                 <Link
                   href={aboutLink}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
-                    pathname === '/about' 
+                    isAboutActive 
                       ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 border-orange-400/40 ring-1 ring-orange-400/30' 
                       : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
                   }`}
                 >
                   <span className="flex items-center gap-2.5">
-                    <span className={`w-2 h-2 rounded-full ${pathname === '/about' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
+                    <span className={`w-2 h-2 rounded-full ${isAboutActive ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
                     <span>About</span>
                   </span>
-                  <ChevronRight className={`w-4 h-4 transition-transform ${pathname === '/about' ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
+                  <ChevronRight className={`w-4 h-4 transition-transform ${isAboutActive ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
                 </Link>
 
                 {user && (

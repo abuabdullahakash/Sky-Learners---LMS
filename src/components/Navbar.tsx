@@ -214,18 +214,7 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-              {isCustomTeacherMode && preferredTeacherName && (
-                <Link 
-                  href="/dashboard/settings"
-                  className="px-3 py-1 rounded-full bg-gradient-to-r from-orange-500/15 to-amber-500/15 hover:from-orange-500/25 hover:to-amber-500/25 text-orange-500 border border-orange-500/30 text-xs font-black flex items-center gap-1.5 transition-all shadow-xs"
-                  title="আপনার ফোকাসড একাডেমি ভিউ। মোড পরিবর্তন করতে সেটিংস এ যান।"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-orange-500" />
-                  <span className="truncate max-w-[130px]">{preferredTeacherName}</span>
-                </Link>
-              )}
-
+            <div className="hidden md:flex items-center space-x-8">
               <Link href={homeLink} className={`font-medium transition-colors hover:text-primary ${isHomeActive ? 'text-primary' : 'text-foreground/80'}`}>
                 {t('home')}
               </Link>
@@ -569,13 +558,8 @@ export default function Navbar() {
             ) : (
               /* CASE 3: Public Site Pages (Home, Courses, About) */
               <div className="space-y-2">
-                <div className="flex items-center justify-between px-3 mb-2">
-                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/40">Navigation</span>
-                  {isCustomTeacherMode && preferredTeacherName && (
-                    <span className="text-[10px] font-black text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">
-                      {preferredTeacherName}
-                    </span>
-                  )}
+                <div className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/40 px-3 mb-2">
+                  Navigation
                 </div>
                 <Link
                   href={homeLink}

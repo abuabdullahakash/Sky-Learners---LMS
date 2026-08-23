@@ -14,6 +14,8 @@ import {
   GraduationCap, 
   BookOpen, 
   ShieldCheck, 
+  Shield,
+  Lock,
   Video, 
   Phone, 
   Mail, 
@@ -30,15 +32,149 @@ import {
   Target, 
   Lightbulb, 
   HeartHandshake, 
+  Heart,
+  HeartPulse,
   TrendingUp, 
+  BarChart3,
+  Activity,
   Mountain, 
+  Medal,
   Send, 
   ChevronLeft, 
   ChevronRight,
-  Quote
+  Quote,
+  Rocket,
+  Bookmark,
+  UserCheck,
+  Smile,
+  Laptop,
+  Code,
+  FileText,
+  Sun,
+  Cpu,
+  type LucideIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VideoModal } from '@/components/ui/VideoModal';
+
+export interface ValueCardItem {
+  id: string;
+  icon: string;
+  title: string;
+  subtitle: string;
+  desc: string;
+  colorTheme?: string;
+}
+
+export const DEFAULT_VALUE_CARDS: ValueCardItem[] = [
+  {
+    id: 'val-1',
+    icon: 'HeartHandshake',
+    title: 'LEARNER FIRST',
+    subtitle: 'শিক্ষার্থীই সবার আগে',
+    desc: 'আমাদের প্রতিটি কোর্স ও সিদ্ধান্তের কেন্দ্রে থাকে শিক্ষার্থীর সর্বোচ্চ সুবিধা ও তার ভবিষ্যৎ সাফল্যের নিশ্চয়তা।',
+    colorTheme: 'rose'
+  },
+  {
+    id: 'val-2',
+    icon: 'Zap',
+    title: 'EXECUTE AT SPEED',
+    subtitle: 'গতি ও নিখুঁত পাঠদান',
+    desc: 'সিলেবাস দ্রুত ও নিখুঁতভাবে শেষ করা এবং যেকোনো প্রশ্ন বা ডাউট তাৎক্ষণিকভাবে সমাধান করাই আমাদের অঙ্গীকার।',
+    colorTheme: 'amber'
+  },
+  {
+    id: 'val-3',
+    icon: 'TrendingUp',
+    title: 'GROW 100X',
+    subtitle: 'শতগুণ প্রবৃদ্ধি ও রূপান্তর',
+    desc: 'একজন সাধারণ শিক্ষার্থীকেও ধারাবাহিক চর্চা ও সঠিক গাইডলাইনের মাধ্যমে মেধার শীর্ষে পৌঁছে দেওয়ার মানসিকতা।',
+    colorTheme: 'blue'
+  },
+  {
+    id: 'val-4',
+    icon: 'ShieldCheck',
+    title: 'SEIZE OWNERSHIP',
+    subtitle: 'পূর্ণ দায়বদ্ধতা ও দায়িত্বশীলতা',
+    desc: 'শিক্ষার্থীদের প্রতিটি পরীক্ষার ফলাফল ও প্রস্তুতির দায় আমরা নিজের কাঁধে তুলে নিই এবং শেষ পর্যন্ত পাশে থাকি।',
+    colorTheme: 'emerald'
+  },
+  {
+    id: 'val-5',
+    icon: 'Mountain',
+    title: 'STRIVE FOR EXCELLENCE',
+    subtitle: 'শ্রেষ্ঠত্বের নিরন্তর সাধনা',
+    desc: 'লেকচার শিট, পরীক্ষা পদ্ধতি কিংবা ভিডিও কোয়ালিটি—প্রতিটি ক্ষেত্রে সেরা মান নিশ্চিত করাই আমাদের লক্ষ্য।',
+    colorTheme: 'orange'
+  },
+  {
+    id: 'val-6',
+    icon: 'Lightbulb',
+    title: 'THINK DIFFERENT',
+    subtitle: 'ভিন্ন ও আধুনিক দৃষ্টিভঙ্গি',
+    desc: 'গতানুগতিক নিয়মের বাইরে গিয়ে বাস্তব উদাহরণ ও সহজ টেকনিকের সাহায্যে কঠিন বিষয়গুলোকে সহজবোধ্য করে তোলা।',
+    colorTheme: 'purple'
+  }
+];
+
+export const VALUE_ICON_MAP: Record<string, LucideIcon> = {
+  HeartHandshake, Heart, HeartPulse,
+  Zap, Flame, Sparkles, Sun,
+  TrendingUp, BarChart3, Activity,
+  ShieldCheck, Shield, Lock, CheckCircle2,
+  Mountain, Trophy, Award, Medal, Target,
+  Lightbulb, Compass, Rocket, Star,
+  BookOpen, GraduationCap, Bookmark,
+  Users, UserCheck, Smile,
+  Laptop, Video, Globe, Code, FileText, Cpu
+};
+
+export const COLOR_THEMES: Record<string, {
+  cardBg: string;
+  badgeBg: string;
+  badgeText: string;
+}> = {
+  rose: {
+    cardBg: 'from-rose-500/10 via-background to-orange-500/5 border-rose-500/20 hover:border-rose-500/50',
+    badgeBg: 'bg-rose-500/15 text-rose-500',
+    badgeText: 'text-rose-500'
+  },
+  amber: {
+    cardBg: 'from-amber-500/10 via-background to-orange-500/5 border-amber-500/20 hover:border-amber-500/50',
+    badgeBg: 'bg-amber-500/15 text-amber-500',
+    badgeText: 'text-amber-500'
+  },
+  blue: {
+    cardBg: 'from-blue-500/10 via-background to-cyan-500/5 border-blue-500/20 hover:border-blue-500/50',
+    badgeBg: 'bg-blue-500/15 text-blue-500',
+    badgeText: 'text-blue-500'
+  },
+  emerald: {
+    cardBg: 'from-emerald-500/10 via-background to-teal-500/5 border-emerald-500/20 hover:border-emerald-500/50',
+    badgeBg: 'bg-emerald-500/15 text-emerald-500',
+    badgeText: 'text-emerald-500'
+  },
+  orange: {
+    cardBg: 'from-orange-500/10 via-background to-amber-500/5 border-orange-500/20 hover:border-orange-500/50',
+    badgeBg: 'bg-orange-500/15 text-orange-500',
+    badgeText: 'text-orange-500'
+  },
+  purple: {
+    cardBg: 'from-purple-500/10 via-background to-indigo-500/5 border-purple-500/20 hover:border-purple-500/50',
+    badgeBg: 'bg-purple-500/15 text-purple-500',
+    badgeText: 'text-purple-500'
+  },
+  cyan: {
+    cardBg: 'from-cyan-500/10 via-background to-blue-500/5 border-cyan-500/20 hover:border-cyan-500/50',
+    badgeBg: 'bg-cyan-500/15 text-cyan-500',
+    badgeText: 'text-cyan-500'
+  },
+  indigo: {
+    cardBg: 'from-indigo-500/10 via-background to-pink-500/5 border-indigo-500/20 hover:border-indigo-500/50',
+    badgeBg: 'bg-indigo-500/15 text-indigo-500',
+    badgeText: 'text-indigo-500'
+  }
+};
 
 export default function AboutPage() {
   const { user, userData, loading: authLoading } = useAuth();
@@ -344,118 +480,47 @@ export default function AboutPage() {
               </p>
             </div>
 
-            {/* 6 Core Value Posters Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              
-              {/* Card 1: LEARNER FIRST */}
-              <div className="rounded-3xl p-8 bg-gradient-to-br from-rose-500/10 via-background to-orange-500/5 border border-rose-500/20 shadow-lg hover:border-rose-500/50 transition-all duration-300 flex flex-col justify-between space-y-6 group hover:-translate-y-1">
-                <div className="space-y-4">
-                  <div className="w-14 h-14 rounded-2xl bg-rose-500/15 text-rose-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <HeartHandshake className="w-7 h-7" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-black text-foreground tracking-wide uppercase">
-                      LEARNER FIRST
-                    </h3>
-                    <p className="text-xs font-bold text-rose-500 mt-0.5">শিক্ষার্থীই সবার আগে</p>
-                  </div>
-                </div>
-                <p className="text-foreground/70 text-sm leading-relaxed">
-                  আমাদের প্রতিটি কোর্স ও সিদ্ধান্তের কেন্দ্রে থাকে শিক্ষার্থীর সর্বোচ্চ সুবিধা ও তার ভবিষ্যৎ সাফল্যের নিশ্চয়তা।
-                </p>
-              </div>
+            {/* Dynamic Value Posters Grid */}
+            {(() => {
+              const valueCards: ValueCardItem[] = (ab.valueCards && Array.isArray(ab.valueCards) && ab.valueCards.length > 0) 
+                ? ab.valueCards 
+                : DEFAULT_VALUE_CARDS;
 
-              {/* Card 2: EXECUTE AT SPEED */}
-              <div className="rounded-3xl p-8 bg-gradient-to-br from-amber-500/10 via-background to-orange-500/5 border border-amber-500/20 shadow-lg hover:border-amber-500/50 transition-all duration-300 flex flex-col justify-between space-y-6 group hover:-translate-y-1">
-                <div className="space-y-4">
-                  <div className="w-14 h-14 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Zap className="w-7 h-7" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-black text-foreground tracking-wide uppercase">
-                      EXECUTE AT SPEED
-                    </h3>
-                    <p className="text-xs font-bold text-amber-500 mt-0.5">গতি ও নিখুঁত পাঠদান</p>
-                  </div>
-                </div>
-                <p className="text-foreground/70 text-sm leading-relaxed">
-                  সিলেবাস দ্রুত ও নিখুঁতভাবে শেষ করা এবং যেকোনো প্রশ্ন বা ডাউট তাৎক্ষণিকভাবে সমাধান করাই আমাদের অঙ্গীকার।
-                </p>
-              </div>
+              return (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                  {valueCards.map((card, idx) => {
+                    const IconComponent = VALUE_ICON_MAP[card.icon] || Award;
+                    const theme = COLOR_THEMES[card.colorTheme || 'rose'] || COLOR_THEMES.rose;
 
-              {/* Card 3: GROW 100X */}
-              <div className="rounded-3xl p-8 bg-gradient-to-br from-blue-500/10 via-background to-cyan-500/5 border border-blue-500/20 shadow-lg hover:border-blue-500/50 transition-all duration-300 flex flex-col justify-between space-y-6 group hover:-translate-y-1">
-                <div className="space-y-4">
-                  <div className="w-14 h-14 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <TrendingUp className="w-7 h-7" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-black text-foreground tracking-wide uppercase">
-                      GROW 100X
-                    </h3>
-                    <p className="text-xs font-bold text-blue-500 mt-0.5">শতগুণ প্রবৃদ্ধি ও রূপান্তর</p>
-                  </div>
+                    return (
+                      <div 
+                        key={card.id || idx}
+                        className={`rounded-3xl p-8 bg-gradient-to-br ${theme.cardBg} shadow-lg transition-all duration-300 flex flex-col justify-between space-y-6 group hover:-translate-y-1`}
+                      >
+                        <div className="space-y-4">
+                          <div className={`w-14 h-14 rounded-2xl ${theme.badgeBg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                            <IconComponent className="w-7 h-7" />
+                          </div>
+                          <div>
+                            <h3 className="text-2xl font-black text-foreground tracking-wide uppercase">
+                              {card.title}
+                            </h3>
+                            {card.subtitle && (
+                              <p className={`text-xs font-bold ${theme.badgeText} mt-0.5`}>
+                                {card.subtitle}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-foreground/70 text-sm leading-relaxed whitespace-pre-line">
+                          {card.desc}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
-                <p className="text-foreground/70 text-sm leading-relaxed">
-                  একজন সাধারণ শিক্ষার্থীকেও ধারাবাহিক চর্চা ও সঠিক গাইডলাইনের মাধ্যমে মেধার শীর্ষে পৌঁছে দেওয়ার মানসিকতা।
-                </p>
-              </div>
-
-              {/* Card 4: SEIZE OWNERSHIP */}
-              <div className="rounded-3xl p-8 bg-gradient-to-br from-emerald-500/10 via-background to-teal-500/5 border border-emerald-500/20 shadow-lg hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between space-y-6 group hover:-translate-y-1">
-                <div className="space-y-4">
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <ShieldCheck className="w-7 h-7" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-black text-foreground tracking-wide uppercase">
-                      SEIZE OWNERSHIP
-                    </h3>
-                    <p className="text-xs font-bold text-emerald-500 mt-0.5">পূর্ণ দায়বদ্ধতা ও দায়িত্বশীলতা</p>
-                  </div>
-                </div>
-                <p className="text-foreground/70 text-sm leading-relaxed">
-                  শিক্ষার্থীদের প্রতিটি পরীক্ষার ফলাফল ও প্রস্তুতির দায় আমরা নিজের কাঁধে তুলে নিই এবং শেষ পর্যন্ত পাশে থাকি।
-                </p>
-              </div>
-
-              {/* Card 5: STRIVE FOR EXCELLENCE */}
-              <div className="rounded-3xl p-8 bg-gradient-to-br from-orange-500/10 via-background to-amber-500/5 border border-orange-500/20 shadow-lg hover:border-orange-500/50 transition-all duration-300 flex flex-col justify-between space-y-6 group hover:-translate-y-1">
-                <div className="space-y-4">
-                  <div className="w-14 h-14 rounded-2xl bg-orange-500/15 text-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Mountain className="w-7 h-7" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-black text-foreground tracking-wide uppercase">
-                      STRIVE FOR EXCELLENCE
-                    </h3>
-                    <p className="text-xs font-bold text-orange-500 mt-0.5">শ্রেষ্ঠত্বের নিরন্তর সাধনা</p>
-                  </div>
-                </div>
-                <p className="text-foreground/70 text-sm leading-relaxed">
-                  লেকচার শিট, পরীক্ষা পদ্ধতি কিংবা ভিডিও কোয়ালিটি—প্রতিটি ক্ষেত্রে সেরা মান নিশ্চিত করাই আমাদের লক্ষ্য।
-                </p>
-              </div>
-
-              {/* Card 6: THINK DIFFERENT */}
-              <div className="rounded-3xl p-8 bg-gradient-to-br from-purple-500/10 via-background to-indigo-500/5 border border-purple-500/20 shadow-lg hover:border-purple-500/50 transition-all duration-300 flex flex-col justify-between space-y-6 group hover:-translate-y-1">
-                <div className="space-y-4">
-                  <div className="w-14 h-14 rounded-2xl bg-purple-500/15 text-purple-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Lightbulb className="w-7 h-7" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-black text-foreground tracking-wide uppercase">
-                      THINK DIFFERENT
-                    </h3>
-                    <p className="text-xs font-bold text-purple-500 mt-0.5">ভিন্ন ও আধুনিক দৃষ্টিভঙ্গি</p>
-                  </div>
-                </div>
-                <p className="text-foreground/70 text-sm leading-relaxed">
-                  গতানুগতিক নিয়মের বাইরে গিয়ে বাস্তব উদাহরণ ও সহজ টেকনিকের সাহায্যে কঠিন বিষয়গুলোকে সহজবোধ্য করে তোলা।
-                </p>
-              </div>
-
-            </div>
+              );
+            })()}
 
           </div>
         </section>

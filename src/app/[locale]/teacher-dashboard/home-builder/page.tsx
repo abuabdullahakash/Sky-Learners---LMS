@@ -45,9 +45,156 @@ import {
   Upload,
   Edit2,
   Camera,
-  X
+  X,
+  Search,
+  RotateCcw,
+  Palette,
+  HeartHandshake,
+  Heart,
+  HeartPulse,
+  Zap,
+  Sun,
+  TrendingUp,
+  BarChart3,
+  Activity,
+  ShieldCheck,
+  Shield,
+  Lock,
+  Mountain,
+  Medal,
+  Lightbulb,
+  Rocket,
+  Star,
+  Bookmark,
+  UserCheck,
+  Smile,
+  Laptop,
+  Code,
+  Cpu,
+  type LucideIcon
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+export interface ValueCardItem {
+  id: string;
+  icon: string;
+  title: string;
+  subtitle: string;
+  desc: string;
+  colorTheme?: string;
+}
+
+export const DEFAULT_VALUE_CARDS: ValueCardItem[] = [
+  {
+    id: 'val-1',
+    icon: 'HeartHandshake',
+    title: 'LEARNER FIRST',
+    subtitle: 'শিক্ষার্থীই সবার আগে',
+    desc: 'আমাদের প্রতিটি কোর্স ও সিদ্ধান্তের কেন্দ্রে থাকে শিক্ষার্থীর সর্বোচ্চ সুবিধা ও তার ভবিষ্যৎ সাফল্যের নিশ্চয়তা।',
+    colorTheme: 'rose'
+  },
+  {
+    id: 'val-2',
+    icon: 'Zap',
+    title: 'EXECUTE AT SPEED',
+    subtitle: 'গতি ও নিখুঁত পাঠদান',
+    desc: 'সিলেবাস দ্রুত ও নিখুঁতভাবে শেষ করা এবং যেকোনো প্রশ্ন বা ডাউট তাৎক্ষণিকভাবে সমাধান করাই আমাদের অঙ্গীকার।',
+    colorTheme: 'amber'
+  },
+  {
+    id: 'val-3',
+    icon: 'TrendingUp',
+    title: 'GROW 100X',
+    subtitle: 'শতগুণ প্রবৃদ্ধি ও রূপান্তর',
+    desc: 'একজন সাধারণ শিক্ষার্থীকেও ধারাবাহিক চর্চা ও সঠিক গাইডলাইনের মাধ্যমে মেধার শীর্ষে পৌঁছে দেওয়ার মানসিকতা।',
+    colorTheme: 'blue'
+  },
+  {
+    id: 'val-4',
+    icon: 'ShieldCheck',
+    title: 'SEIZE OWNERSHIP',
+    subtitle: 'পূর্ণ দায়বদ্ধতা ও দায়িত্বশীলতা',
+    desc: 'শিক্ষার্থীদের প্রতিটি পরীক্ষার ফলাফল ও প্রস্তুতির দায় আমরা নিজের কাঁধে তুলে নিই এবং শেষ পর্যন্ত পাশে থাকি।',
+    colorTheme: 'emerald'
+  },
+  {
+    id: 'val-5',
+    icon: 'Mountain',
+    title: 'STRIVE FOR EXCELLENCE',
+    subtitle: 'শ্রেষ্ঠত্বের নিরন্তর সাধনা',
+    desc: 'লেকচার শিট, পরীক্ষা পদ্ধতি কিংবা ভিডিও কোয়ালিটি—প্রতিটি ক্ষেত্রে সেরা মান নিশ্চিত করাই আমাদের লক্ষ্য।',
+    colorTheme: 'orange'
+  },
+  {
+    id: 'val-6',
+    icon: 'Lightbulb',
+    title: 'THINK DIFFERENT',
+    subtitle: 'ভিন্ন ও আধুনিক দৃষ্টিভঙ্গি',
+    desc: 'গতানুগতিক নিয়মের বাইরে গিয়ে বাস্তব উদাহরণ ও সহজ টেকনিকের সাহায্যে কঠিন বিষয়গুলোকে সহজবোধ্য করে তোলা।',
+    colorTheme: 'purple'
+  }
+];
+
+export const VALUE_ICON_MAP: Record<string, LucideIcon> = {
+  HeartHandshake, Heart, HeartPulse,
+  Zap, Flame, Sparkles, Sun,
+  TrendingUp, BarChart3, Activity,
+  ShieldCheck, Shield, Lock, CheckCircle2,
+  Mountain, Trophy, Award, Medal, Target,
+  Lightbulb, Compass, Rocket, Star,
+  BookOpen, GraduationCap, Bookmark,
+  Users, UserCheck, Smile,
+  Laptop, Video, Globe, Code, FileText, Cpu
+};
+
+export const COLOR_THEME_OPTIONS = [
+  { id: 'rose', name: 'গোলাপি / Rose', border: 'border-rose-500', text: 'text-rose-500', bg: 'bg-rose-500/10' },
+  { id: 'amber', name: 'সোনালী / Amber', border: 'border-amber-500', text: 'text-amber-500', bg: 'bg-amber-500/10' },
+  { id: 'blue', name: 'নীল / Ocean Blue', border: 'border-blue-500', text: 'text-blue-500', bg: 'bg-blue-500/10' },
+  { id: 'emerald', name: 'সবুজ / Emerald', border: 'border-emerald-500', text: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+  { id: 'orange', name: 'কমলা / Orange', border: 'border-orange-500', text: 'text-orange-500', bg: 'bg-orange-500/10' },
+  { id: 'purple', name: 'বেগুনি / Purple', border: 'border-purple-500', text: 'text-purple-500', bg: 'bg-purple-500/10' },
+  { id: 'cyan', name: 'সায়ান / Cyan Teal', border: 'border-cyan-500', text: 'text-cyan-500', bg: 'bg-cyan-500/10' },
+  { id: 'indigo', name: 'ইন্ডিগো / Indigo', border: 'border-indigo-500', text: 'text-indigo-500', bg: 'bg-indigo-500/10' },
+];
+
+export const AVAILABLE_ICONS = [
+  { id: 'HeartHandshake', name: 'সহমর্মিতা ও বিশ্বাস', category: 'values' },
+  { id: 'Heart', name: 'ভালোবাসা ও কেয়ার', category: 'values' },
+  { id: 'HeartPulse', name: 'উদ্যম ও স্পন্দন', category: 'values' },
+  { id: 'Zap', name: 'গতি ও বিদ্যুৎ', category: 'speed' },
+  { id: 'Flame', name: 'আগ্রহ ও প্রেরণা', category: 'speed' },
+  { id: 'Sparkles', name: 'চমক ও নতুনত্ব', category: 'innovation' },
+  { id: 'Rocket', name: 'দ্রুত প্রবৃদ্ধি ও রকেট', category: 'speed' },
+  { id: 'TrendingUp', name: 'অগ্রগতি ও প্রবৃদ্ধি', category: 'growth' },
+  { id: 'BarChart3', name: 'উন্নতি ও গ্রাফ', category: 'growth' },
+  { id: 'Activity', name: 'সক্রিয়তা ও এনার্জি', category: 'growth' },
+  { id: 'ShieldCheck', name: 'দায়বদ্ধতা ও সুরক্ষা', category: 'trust' },
+  { id: 'Shield', name: 'নিরাপত্তা শিল্ড', category: 'trust' },
+  { id: 'Lock', name: 'দৃঢ়তা ও গোপনীয়তা', category: 'trust' },
+  { id: 'CheckCircle2', name: 'নিশ্চয়তা ও নির্ভুলতা', category: 'trust' },
+  { id: 'Mountain', name: 'দৃঢ়তা ও পর্বত শিখর', category: 'excellence' },
+  { id: 'Trophy', name: 'সাফল্য ট্রফি', category: 'excellence' },
+  { id: 'Award', name: 'শ্রেষ্ঠত্ব ও মেডেল', category: 'excellence' },
+  { id: 'Medal', name: 'অসাধারণ সম্মাননা', category: 'excellence' },
+  { id: 'Target', name: 'টার্গেট ও ফোকাস', category: 'excellence' },
+  { id: 'Star', name: 'সেরা পারফরম্যান্স', category: 'excellence' },
+  { id: 'Lightbulb', name: 'সৃজনশীল চিন্তা ও আইডিয়া', category: 'innovation' },
+  { id: 'Compass', name: 'সঠিক দিকনির্দেশনা', category: 'guidance' },
+  { id: 'BookOpen', name: 'উন্মুক্ত বই ও জ্ঞান', category: 'education' },
+  { id: 'GraduationCap', name: 'উচ্চশিক্ষা ও ডিগ্রি', category: 'education' },
+  { id: 'Bookmark', name: 'গুরুত্বপূর্ণ রিসোর্স', category: 'education' },
+  { id: 'Users', name: 'টিম ও শিক্ষার্থী দল', category: 'community' },
+  { id: 'UserCheck', name: 'মেন্টরশিপ গাইডেন্স', category: 'community' },
+  { id: 'Smile', name: 'আনন্দময় লার্নিং', category: 'community' },
+  { id: 'Laptop', name: 'অনলাইন লার্নিং', category: 'tech' },
+  { id: 'Video', name: 'লাইভ ক্লাস ও ভিডিও', category: 'tech' },
+  { id: 'Globe', name: 'দেশব্যাপী বিস্তৃতি', category: 'tech' },
+  { id: 'Code', name: 'টেকনিক ও স্কিল', category: 'tech' },
+  { id: 'FileText', name: 'লেকচার শিট ও নোট', category: 'education' },
+  { id: 'Sun', name: 'উজ্জ্বল ভবিষ্যৎ', category: 'values' },
+  { id: 'Cpu', name: 'স্মার্ট মেথডলজি', category: 'tech' }
+];
 
 function ImageSizeGuideBadge({ size, note }: { size: string; note?: string }) {
   return (
@@ -266,6 +413,10 @@ export default function TeacherHomePageBuilderPage() {
 
   const [aboutValuesHeading, setAboutValuesHeading] = useState('আমাদের মূল ভিত্তি');
   const [aboutValuesSubtitle, setAboutValuesSubtitle] = useState('যে মূলনীতি ও দৃষ্টিভঙ্গির ওপর ভিত্তি করে আমাদের শিক্ষা কার্যক্রম পরিচালিত হয়');
+  const [aboutValueCards, setAboutValueCards] = useState<ValueCardItem[]>(DEFAULT_VALUE_CARDS);
+  const [iconPickerCardId, setIconPickerCardId] = useState<string | null>(null);
+  const [iconSearchQuery, setIconSearchQuery] = useState('');
+  const [iconCategoryFilter, setIconCategoryFilter] = useState('all');
 
   const [aboutShowcaseHeading, setAboutShowcaseHeading] = useState('');
   const [aboutShowcaseSubtitle, setAboutShowcaseSubtitle] = useState('');
@@ -386,6 +537,9 @@ export default function TeacherHomePageBuilderPage() {
             if (abConfig.storyStat4Label) setAboutStoryStat4Label(abConfig.storyStat4Label);
             if (abConfig.valuesHeading) setAboutValuesHeading(abConfig.valuesHeading);
             if (abConfig.valuesSubtitle) setAboutValuesSubtitle(abConfig.valuesSubtitle);
+            if (abConfig.valueCards && Array.isArray(abConfig.valueCards) && abConfig.valueCards.length > 0) {
+              setAboutValueCards(abConfig.valueCards);
+            }
             if (abConfig.showcaseHeading) setAboutShowcaseHeading(abConfig.showcaseHeading);
             if (abConfig.showcaseSubtitle) setAboutShowcaseSubtitle(abConfig.showcaseSubtitle);
             if (abConfig.founderTitle) setAboutFounderTitle(abConfig.founderTitle);
@@ -486,6 +640,7 @@ export default function TeacherHomePageBuilderPage() {
           storyStat4Label: aboutStoryStat4Label,
           valuesHeading: aboutValuesHeading,
           valuesSubtitle: aboutValuesSubtitle,
+          valueCards: aboutValueCards,
           showcaseHeading: aboutShowcaseHeading,
           showcaseSubtitle: aboutShowcaseSubtitle,
           founderTitle: aboutFounderTitle,
@@ -788,6 +943,48 @@ export default function TeacherHomePageBuilderPage() {
     } finally {
       setUploadingAboutFounderImg(false);
     }
+  };
+
+  // Value Cards Handlers
+  const handleRestoreDefaultValueCards = () => {
+    if (confirm(locale === 'bn' ? 'আপনি কি সত্যিই মূল ৬টি ডিফল্ট ভ্যালু কার্ড রিস্টোর করতে চান?' : 'Do you want to restore default value cards?')) {
+      setAboutValueCards(DEFAULT_VALUE_CARDS);
+      toast.success(locale === 'bn' ? 'ডিফল্ট ভ্যালু কার্ড রিস্টোর করা হয়েছে!' : 'Default value cards restored!');
+    }
+  };
+
+  const handleAddValueCard = () => {
+    const newCard: ValueCardItem = {
+      id: `val-${Date.now()}`,
+      icon: 'Sparkles',
+      title: 'NEW VALUE',
+      subtitle: 'নতুন মূল্যবোধ',
+      desc: 'আপনার একাডেমির বিশেষ অঙ্গীকার বা মূলনীতির সংক্ষিপ্ত বিবরণ এখানে লিখুন...',
+      colorTheme: 'orange'
+    };
+    setAboutValueCards(prev => [...prev, newCard]);
+    toast.success(locale === 'bn' ? 'নতুন ভ্যালু কার্ড যোগ করা হয়েছে!' : 'New value card added!');
+  };
+
+  const handleDeleteValueCard = (id: string) => {
+    if (aboutValueCards.length <= 1) {
+      toast.error(locale === 'bn' ? 'কমপক্ষে ১টি ভ্যালু কার্ড রাখা আবশ্যক!' : 'At least 1 value card required!');
+      return;
+    }
+    setAboutValueCards(prev => prev.filter(c => c.id !== id));
+    toast.success(locale === 'bn' ? 'কার্ড মুছে ফেলা হয়েছে' : 'Card removed');
+  };
+
+  const handleUpdateValueCard = (id: string, field: keyof ValueCardItem, value: any) => {
+    setAboutValueCards(prev => prev.map(c => c.id === id ? { ...c, [field]: value } : c));
+  };
+
+  const handleSelectIcon = (iconId: string) => {
+    if (!iconPickerCardId) return;
+    handleUpdateValueCard(iconPickerCardId, 'icon', iconId);
+    setIconPickerCardId(null);
+    setIconSearchQuery('');
+    toast.success(locale === 'bn' ? 'আইকন পরিবর্তন হয়েছে!' : 'Icon updated!');
   };
 
   const tabGroups = [
@@ -2629,21 +2826,33 @@ export default function TeacherHomePageBuilderPage() {
                     <span>৩. আমাদের মূল ভিত্তি (Core Values Section)</span>
                   </h3>
                   <p className="text-xs text-foreground/60 mt-1">
-                    অ্যাবাউট পেজের ৬টি ভ্যালু পোস্টারের শীর্ষ হেডিং ও সাবটাইটেল কাস্টমাইজ করুন।
+                    অ্যাবাউট পেজের ভ্যালু কার্ডগুলোর আইকন, শিরোনাম, সাবটাইটেল ও বিবরণ কাস্টমাইজ করুন।
                   </p>
                 </div>
-                <Link
-                  href="/about"
-                  target="_blank"
-                  className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-md shadow-orange-500/20 transition-all flex items-center gap-2 self-start sm:self-auto hover:scale-105 shrink-0"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>লাইভ পেজ দেখুন</span>
-                  <ExternalLink className="w-3 h-3" />
-                </Link>
+                <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleRestoreDefaultValueCards}
+                    className="px-3.5 py-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-foreground/80 hover:text-foreground font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                    title="মূল ৬টি ডিফল্ট কার্ড রিস্টোর করুন"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-orange-500" />
+                    <span>ডিফল্ট রিস্টোর</span>
+                  </button>
+                  <Link
+                    href="/about"
+                    target="_blank"
+                    className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-md shadow-orange-500/20 transition-all flex items-center gap-2 hover:scale-105"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>লাইভ পেজ দেখুন</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </Link>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Section Heading & Subtitle */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10">
                 <div>
                   <label className="text-xs font-bold text-foreground/80 block mb-1">সেকশন হেডিং (Default: "আমাদের মূল ভিত্তি")</label>
                   <input
@@ -2665,6 +2874,303 @@ export default function TeacherHomePageBuilderPage() {
                   />
                 </div>
               </div>
+
+              {/* Value Cards Grid Header */}
+              <div className="flex items-center justify-between pt-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-black text-foreground">ভ্যালু পোস্টার কার্ডসমূহ</span>
+                  <span className="px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-500 font-black text-xs">
+                    {aboutValueCards.length}টি কার্ড
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddValueCard}
+                  className="px-3.5 py-1.5 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/30 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>নতুন কার্ড যোগ করুন</span>
+                </button>
+              </div>
+
+              {/* Cards List */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {aboutValueCards.map((card, idx) => {
+                  const CurrentIcon = VALUE_ICON_MAP[card.icon] || Award;
+                  const currentTheme = COLOR_THEME_OPTIONS.find(t => t.id === card.colorTheme) || COLOR_THEME_OPTIONS[0];
+
+                  return (
+                    <div 
+                      key={card.id || idx}
+                      className="p-5 rounded-2xl bg-foreground/[0.02] hover:bg-foreground/[0.04] border border-foreground/10 space-y-4 relative transition-all shadow-xs"
+                    >
+                      {/* Top Header of Card */}
+                      <div className="flex items-center justify-between gap-3 border-b border-foreground/10 pb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-foreground/10 text-foreground font-black text-xs flex items-center justify-center">
+                            {idx + 1}
+                          </span>
+                          <span className="text-xs font-bold text-foreground/80">কার্ড #{idx + 1}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {/* Color Theme Selector */}
+                          <div className="flex items-center gap-1.5 bg-background px-2.5 py-1 rounded-xl border border-foreground/10">
+                            <Palette className="w-3.5 h-3.5 text-foreground/60" />
+                            <select
+                              value={card.colorTheme || 'rose'}
+                              onChange={(e) => handleUpdateValueCard(card.id, 'colorTheme', e.target.value)}
+                              className="bg-transparent text-[11px] font-bold text-foreground focus:outline-none cursor-pointer"
+                            >
+                              {COLOR_THEME_OPTIONS.map(opt => (
+                                <option key={opt.id} value={opt.id} className="bg-background text-foreground">
+                                  {opt.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Delete Card Button */}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteValueCard(card.id)}
+                            className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors cursor-pointer"
+                            title="এই কার্ডটি মুছে ফেলুন"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Icon Picker Trigger & Preview */}
+                      <div className="flex items-center gap-3.5 p-3 rounded-xl bg-background border border-foreground/10">
+                        <div className={`w-12 h-12 rounded-xl ${currentTheme.bg} ${currentTheme.text} flex items-center justify-center shrink-0 border border-foreground/10 shadow-xs`}>
+                          <CurrentIcon className="w-6 h-6" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[11px] font-bold text-foreground/60">বর্তমান আইকন: <span className="text-foreground font-black">{card.icon}</span></div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIconPickerCardId(card.id);
+                              setIconSearchQuery('');
+                              setIconCategoryFilter('all');
+                            }}
+                            className="mt-1 px-3 py-1 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition-all inline-flex items-center gap-1.5 shadow-xs cursor-pointer"
+                          >
+                            <Sparkles className="w-3 h-3" />
+                            <span>আইকন চুজ করুন</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Title & Subtitle Inputs */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[11px] font-bold text-foreground/80 block mb-1">কার্ড হেডিং (Title)</label>
+                          <input
+                            type="text"
+                            value={card.title}
+                            onChange={(e) => handleUpdateValueCard(card.id, 'title', e.target.value)}
+                            placeholder="LEARNER FIRST"
+                            className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs font-bold uppercase focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[11px] font-bold text-foreground/80 block mb-1">সাবটাইটেল (Subtitle)</label>
+                          <input
+                            type="text"
+                            value={card.subtitle}
+                            onChange={(e) => handleUpdateValueCard(card.id, 'subtitle', e.target.value)}
+                            placeholder="শিক্ষার্থীই সবার আগে"
+                            className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Description Textarea */}
+                      <div>
+                        <label className="text-[11px] font-bold text-foreground/80 block mb-1">সংক্ষিপ্ত বিবরণ (Description)</label>
+                        <textarea
+                          rows={3}
+                          value={card.desc}
+                          onChange={(e) => handleUpdateValueCard(card.id, 'desc', e.target.value)}
+                          placeholder="আমাদের প্রতিটি কোর্স ও সিদ্ধান্তের কেন্দ্রে থাকে শিক্ষার্থীর সর্বোচ্চ সুবিধা..."
+                          className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 leading-relaxed"
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Add New Value Card Button (Full Width Dashed) */}
+              <button
+                type="button"
+                onClick={handleAddValueCard}
+                className="w-full py-4 rounded-2xl border-2 border-dashed border-foreground/20 hover:border-orange-500/50 bg-foreground/[0.01] hover:bg-orange-500/[0.03] text-foreground/70 hover:text-orange-500 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>+ নতুন ভ্যালু পোস্টার কার্ড যোগ করুন</span>
+              </button>
+
+              {/* Interactive Lucide Icon Picker Modal */}
+              {iconPickerCardId && (
+                <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                  <div className="bg-card border border-foreground/15 rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                    
+                    {/* Modal Header */}
+                    <div className="p-5 border-b border-foreground/10 flex items-center justify-between bg-foreground/[0.02]">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center">
+                          <Sparkles className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h4 className="text-base font-black text-foreground">লুসিড আইকন নির্বাচন (Lucide Icons)</h4>
+                          <p className="text-xs text-foreground/60">আপনার ভ্যালু কার্ডের জন্য মানানসই একটি আইকন নির্বাচন করুন</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setIconPickerCardId(null)}
+                        className="w-8 h-8 rounded-full bg-foreground/5 hover:bg-foreground/10 text-foreground/70 hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Search & Filter Bar */}
+                    <div className="p-4 border-b border-foreground/10 space-y-3 bg-background">
+                      <div className="relative">
+                        <Search className="w-4 h-4 text-foreground/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          value={iconSearchQuery}
+                          onChange={(e) => setIconSearchQuery(e.target.value)}
+                          placeholder="আইকন খুঁজুন (যেমন: Heart, Zap, Star, Trophy, Shield...)"
+                          className="w-full pl-10 pr-4 py-2 rounded-xl bg-foreground/[0.03] border border-foreground/10 text-xs font-medium focus:outline-none focus:border-orange-500"
+                        />
+                        {iconSearchQuery && (
+                          <button
+                            type="button"
+                            onClick={() => setIconSearchQuery('')}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground text-xs font-bold"
+                          >
+                            মুছুন
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Category Chips */}
+                      <div className="flex flex-wrap gap-1.5">
+                        {[
+                          { id: 'all', label: 'সবগুলো' },
+                          { id: 'values', label: 'মূল্যবোধ' },
+                          { id: 'speed', label: 'গতি ও উদ্যম' },
+                          { id: 'growth', label: 'উন্নতি ও গ্রাফ' },
+                          { id: 'trust', label: 'সুরক্ষা ও নিশ্চয়তা' },
+                          { id: 'excellence', label: 'শ্রেষ্ঠত্ব ও ট্রফি' },
+                          { id: 'innovation', label: 'উদ্ভাবন ও আইডিয়া' },
+                          { id: 'education', label: 'শিক্ষা ও জ্ঞান' },
+                          { id: 'tech', label: 'টেকনোলজি' },
+                          { id: 'community', label: 'কমিউনিটি' }
+                        ].map(cat => (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => setIconCategoryFilter(cat.id)}
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                              iconCategoryFilter === cat.id
+                                ? 'bg-orange-500 text-white shadow-xs'
+                                : 'bg-foreground/5 hover:bg-foreground/10 text-foreground/70'
+                            }`}
+                          >
+                            {cat.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Icons Grid Content */}
+                    <div className="p-4 overflow-y-auto max-h-[420px] bg-foreground/[0.01]">
+                      {(() => {
+                        const filtered = AVAILABLE_ICONS.filter(item => {
+                          const matchesSearch = iconSearchQuery === '' || 
+                            item.id.toLowerCase().includes(iconSearchQuery.toLowerCase()) || 
+                            item.name.toLowerCase().includes(iconSearchQuery.toLowerCase());
+                          const matchesCat = iconCategoryFilter === 'all' || item.category === iconCategoryFilter;
+                          return matchesSearch && matchesCat;
+                        });
+
+                        if (filtered.length === 0) {
+                          return (
+                            <div className="py-12 text-center text-foreground/60 text-xs font-bold space-y-2">
+                              <p>কোনো আইকন খুঁজে পাওয়া যায়নি!</p>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setIconSearchQuery('');
+                                  setIconCategoryFilter('all');
+                                }}
+                                className="text-orange-500 underline"
+                              >
+                                সব আইকন দেখুন
+                              </button>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+                            {filtered.map(item => {
+                              const ItemIcon = VALUE_ICON_MAP[item.id] || Sparkles;
+                              const currentCard = aboutValueCards.find(c => c.id === iconPickerCardId);
+                              const isSelected = currentCard?.icon === item.id;
+
+                              return (
+                                <button
+                                  key={item.id}
+                                  type="button"
+                                  onClick={() => handleSelectIcon(item.id)}
+                                  className={`p-3 rounded-xl border flex flex-col items-center text-center gap-2 transition-all cursor-pointer group ${
+                                    isSelected
+                                      ? 'bg-orange-500/10 border-orange-500 text-orange-500 font-bold shadow-xs'
+                                      : 'bg-background hover:bg-foreground/5 border-foreground/10 text-foreground/80 hover:text-foreground'
+                                  }`}
+                                >
+                                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${
+                                    isSelected ? 'bg-orange-500 text-white' : 'bg-foreground/5 text-foreground'
+                                  }`}>
+                                    <ItemIcon className="w-5 h-5" />
+                                  </div>
+                                  <div className="min-w-0 w-full">
+                                    <p className="text-xs font-bold truncate">{item.id}</p>
+                                    <p className="text-[10px] text-foreground/50 truncate">{item.name}</p>
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        );
+                      })()}
+                    </div>
+
+                    {/* Modal Footer */}
+                    <div className="p-3 border-t border-foreground/10 bg-background flex items-center justify-between text-xs text-foreground/60 px-5">
+                      <span>আইকনের ওপর ক্লিক করলে স্বয়ংক্রিয়ভাবে কার্ডে যুক্ত হবে।</span>
+                      <button
+                        type="button"
+                        onClick={() => setIconPickerCardId(null)}
+                        className="px-4 py-1.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-foreground font-bold transition-colors cursor-pointer"
+                      >
+                        বন্ধ করুন
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              )}
+
             </div>
           )}
 

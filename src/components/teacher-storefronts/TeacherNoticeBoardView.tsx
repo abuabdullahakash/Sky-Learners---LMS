@@ -22,7 +22,11 @@ import {
   GraduationCap,
   ShieldCheck,
   Eye,
-  FileCheck
+  FileCheck,
+  Building2,
+  Bookmark,
+  Layers,
+  BookOpen
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -212,7 +216,7 @@ export default function TeacherNoticeBoardView({
       
       {/* 1. URGENT BREAKING NOTICE TICKER (জরুরি স্ক্রোলিং নোটিশ বার) */}
       {pinnedNotice && (
-        <div className="rounded-2xl bg-rose-500/10 dark:bg-rose-950/40 border border-rose-500/30 p-3 flex items-center justify-between gap-3 shadow-md overflow-hidden relative">
+        <div className="rounded-2xl bg-rose-500/10 dark:bg-rose-950/40 border border-rose-500/30 p-3 flex items-center justify-between gap-3 shadow-md overflow-hidden relative backdrop-blur-sm">
           <div className="flex items-center gap-3 min-w-0">
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-rose-500/20 text-rose-600 dark:text-rose-300 border border-rose-500/40 text-[11px] font-black uppercase shrink-0">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
@@ -232,86 +236,130 @@ export default function TeacherNoticeBoardView({
         </div>
       )}
 
-      {/* 2. NOTICE BOARD MAIN BANNER & SEARCH TOOLBAR */}
-      <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl relative overflow-hidden backdrop-blur-xl">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
+      {/* ========================================================================= */}
+      {/* 2. STUNNING HERO SECTION WITH IMAGE & OVERLAY GRADIENT                     */}
+      {/* ========================================================================= */}
+      <div className="relative rounded-3xl overflow-hidden border border-border shadow-2xl bg-slate-950 text-white">
         
-        {/* Header Title Row */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative z-10">
-          <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-primary" />
-              <span>অফিসিয়াল নোটিশ বোর্ড ও সার্কুলার সেন্টার</span>
+        {/* Hero Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 hover:scale-105"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1600&auto=format&fit=crop')`
+          }}
+        />
+
+        {/* Multi-layer Gradient Color Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-purple-950/90 to-slate-950/85 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-purple-950/30" />
+        
+        {/* Decorative Glowing Orbs */}
+        <div className="absolute -top-20 -right-20 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-orange-500/15 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Hero Content Area */}
+        <div className="relative z-10 p-6 sm:p-10 lg:p-12 space-y-6">
+          
+          {/* Top Badges Row */}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-xs font-black uppercase tracking-wider shadow-lg">
+              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+              <span>{teacherName}&apos;s Official Notice Board</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
-              {teacherName}-এর নোটিশ ও সার্কুলার
-            </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl">
-              একাডেমির সকল ব্যাচের ক্লাস রুটিন, পরীক্ষার সময়সূচি, ফলাফল, ফি এবং জরুরি আপডেটসমূহ এখান থেকে সরাসরি সংগ্রহ করুন।
+
+            <div className="flex items-center gap-2">
+              <div className="px-3.5 py-1.5 rounded-2xl bg-black/50 border border-purple-500/30 text-right backdrop-blur-md">
+                <span className="text-[10px] text-purple-200 block font-medium">শিক্ষাবর্ষ</span>
+                <span className="text-xs font-black text-amber-400 font-mono">২০২৬ সেশন (Active)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Hero Headline & Subtitle */}
+          <div className="space-y-3 max-w-3xl">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight sm:leading-snug drop-shadow-md">
+              সকল ব্যাচের একাডেমিক নোটিশ ও অফিসিয়াল সার্কুলার
+            </h1>
+            <p className="text-xs sm:text-sm md:text-base text-slate-200 leading-relaxed max-w-2xl font-medium">
+              {teacherName}-এর সকল অনলাইন ও অফলাইন ব্যাচের ক্লাস রুটিন, পরীক্ষার সময়সূচি, ফলাফল, ফি এবং জরুরি আপডেটসমূহ এখান থেকে সরাসরি সংগ্রহ করুন।
             </p>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            <div className="px-3.5 py-2 rounded-2xl bg-foreground/5 border border-border text-right">
-              <span className="text-[10px] text-muted-foreground block font-medium">শিক্ষাবর্ষ</span>
-              <span className="text-xs font-black text-primary font-mono">২০২৬ সেশন (Active)</span>
+          {/* 4 Quick Stat Badges */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+            <div className="p-3 rounded-2xl bg-slate-900/60 border border-purple-500/20 backdrop-blur-md space-y-0.5">
+              <span className="text-[10px] text-slate-400 block font-medium">মোট সক্রিয় নোটিশ</span>
+              <span className="text-sm font-black text-white font-mono">{allNotices.length}টি প্রকাশনা</span>
+            </div>
+            <div className="p-3 rounded-2xl bg-slate-900/60 border border-purple-500/20 backdrop-blur-md space-y-0.5">
+              <span className="text-[10px] text-slate-400 block font-medium">সর্বশেষ আপডেট</span>
+              <span className="text-sm font-black text-emerald-400 font-mono">আজ প্রকাশিত</span>
+            </div>
+            <div className="p-3 rounded-2xl bg-slate-900/60 border border-purple-500/20 backdrop-blur-md space-y-0.5">
+              <span className="text-[10px] text-slate-400 block font-medium">ক্যাটারগরি ফিল্টার</span>
+              <span className="text-sm font-black text-purple-300 font-mono">৬টি বিষয়ভিত্তিক</span>
+            </div>
+            <div className="p-3 rounded-2xl bg-slate-900/60 border border-purple-500/20 backdrop-blur-md space-y-0.5">
+              <span className="text-[10px] text-slate-400 block font-medium">অনুমোদন স্ট্যাটাস</span>
+              <span className="text-sm font-black text-amber-300 font-mono">১০০% ভেরিফাইড</span>
             </div>
           </div>
-        </div>
 
-        {/* Search Bar & Stats */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 pt-2 relative z-10">
-          <div className="relative flex-1 w-full">
-            <Search className="w-4 h-4 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="নোটিশের শিরোনাম, স্মারক নম্বর (Ref No) বা কিওয়ার্ড দিয়ে খুঁজুন..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-inner"
-            />
-            {searchQuery && (
-              <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+          {/* Search Bar & Reset Toolbar */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 pt-3">
+            <div className="relative flex-1 w-full">
+              <Search className="w-4 h-4 text-purple-300 absolute left-4 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="নোটিশের শিরোনাম, স্মারক নম্বর (Ref No) বা বিষয় দিয়ে খুঁজুন..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-900/80 border border-purple-500/30 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/40 transition-all shadow-inner backdrop-blur-md"
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <button
-              onClick={() => { setSearchQuery(''); setActiveCategory('all'); }}
-              className="px-4 py-2.5 rounded-2xl bg-foreground/5 hover:bg-foreground/10 text-foreground text-xs font-bold transition-colors border border-border w-full sm:w-auto text-center"
-            >
-              রিসেট
-            </button>
-          </div>
-        </div>
-
-        {/* Category Pills Slider */}
-        <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1 pt-2 relative z-10">
-          {categoryFilters.map((cat) => {
-            const Icon = cat.icon;
-            const isActive = activeCategory === cat.id;
-            return (
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`px-3.5 py-2 rounded-2xl text-xs font-extrabold whitespace-nowrap transition-all flex items-center gap-2 border select-none ${
-                  isActive
-                    ? 'bg-primary border-primary text-white shadow-lg shadow-primary/30 scale-105'
-                    : 'bg-card border-border text-muted-foreground hover:bg-foreground/5 hover:text-foreground'
-                }`}
+                onClick={() => { setSearchQuery(''); setActiveCategory('all'); }}
+                className="px-5 py-3 rounded-2xl bg-purple-600/30 hover:bg-purple-600/50 text-white text-xs font-bold transition-all border border-purple-500/40 w-full sm:w-auto text-center backdrop-blur-md"
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : (cat.color || 'text-primary')}`} />
-                <span>{cat.label}</span>
-                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                  isActive ? 'bg-primary-foreground/20 text-white' : 'bg-foreground/10 text-muted-foreground'
-                }`}>
-                  {cat.count}
-                </span>
+                রিসেট
               </button>
-            );
-          })}
+            </div>
+          </div>
+
+          {/* Category Filter Tabs */}
+          <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1 pt-1">
+            {categoryFilters.map((cat) => {
+              const Icon = cat.icon;
+              const isActive = activeCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`px-3.5 py-2 rounded-2xl text-xs font-extrabold whitespace-nowrap transition-all flex items-center gap-2 border select-none ${
+                    isActive
+                      ? 'bg-purple-600 border-purple-400 text-white shadow-lg shadow-purple-600/40 scale-105'
+                      : 'bg-slate-900/70 border-purple-500/20 text-slate-200 hover:bg-slate-800/80 hover:text-white backdrop-blur-md'
+                  }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : (cat.color || 'text-purple-300')}`} />
+                  <span>{cat.label}</span>
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                    isActive ? 'bg-purple-800 text-white' : 'bg-slate-800 text-slate-300'
+                  }`}>
+                    {cat.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
         </div>
 
       </div>

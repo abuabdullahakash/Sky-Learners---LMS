@@ -174,19 +174,19 @@ function ContactPageContent() {
   // Helper variables for Teacher Mode
   const academyName = teacherProfile?.displayName || teacherProfile?.academyName || (locale === 'bn' ? 'আমাদের একাডেমি' : 'Our Academy');
   const headline = teacherProfile?.headline || (locale === 'bn' ? 'দেশসেরা মেন্টরদের সাথে শতভাগ প্রস্তুতি' : 'Top-tier mentorship & learning');
-  const phone = teacherProfile?.contactPhone || teacherProfile?.helpBarPhone || teacherProfile?.phone || '01700000000';
-  const rawWhatsapp = teacherProfile?.contactWhatsapp || teacherProfile?.whatsappNumber || phone;
+  const phone = teacherProfile?.contactPhone || teacherProfile?.homePageConfig?.contactPhone || teacherProfile?.helpBarPhone || teacherProfile?.phone || '01700000000';
+  const rawWhatsapp = teacherProfile?.contactWhatsapp || teacherProfile?.homePageConfig?.contactWhatsapp || teacherProfile?.whatsappNumber || phone;
   const whatsappClean = (rawWhatsapp || '').replace(/[^0-9]/g, '');
   const whatsappNumber = whatsappClean.startsWith('880') ? whatsappClean : (whatsappClean.startsWith('0') ? `88${whatsappClean}` : `880${whatsappClean}`);
-  const email = teacherProfile?.contactEmail || teacherProfile?.email || 'support@skylearners.com';
-  const address = teacherProfile?.contactAddress || teacherProfile?.address || (locale === 'bn' ? 'ফার্মগেট / মৌচাক শাখা, ঢাকা, বাংলাদেশ' : 'Farmgate / Mouchak Branch, Dhaka, Bangladesh');
-  const officeHours = teacherProfile?.contactOfficeHours || (locale === 'bn' ? 'প্রতিদিন সকাল ৯:০০ টা — রাত ১০:০০ টা' : 'Daily 9:00 AM — 10:00 PM');
+  const email = teacherProfile?.contactEmail || teacherProfile?.homePageConfig?.contactEmail || teacherProfile?.email || 'support@skylearners.com';
+  const address = teacherProfile?.contactAddress || teacherProfile?.homePageConfig?.contactAddress || teacherProfile?.address || (locale === 'bn' ? 'ফার্মগেট / মৌচাক শাখা, ঢাকা, বাংলাদেশ' : 'Farmgate / Mouchak Branch, Dhaka, Bangladesh');
+  const officeHours = teacherProfile?.contactOfficeHours || teacherProfile?.homePageConfig?.contactOfficeHours || (locale === 'bn' ? 'প্রতিদিন সকাল ৯:০০ টা — রাত ১০:০০ টা' : 'Daily 9:00 AM — 10:00 PM');
   
   // Social channels
-  const facebookPage = teacherProfile?.contactFacebookPage || teacherProfile?.facebookUrl || 'https://facebook.com';
-  const facebookGroup = teacherProfile?.contactFacebookGroup || teacherProfile?.facebookGroupUrl || 'https://facebook.com/groups';
-  const telegram = teacherProfile?.contactTelegram || teacherProfile?.telegramUrl || 'https://t.me';
-  const youtube = teacherProfile?.contactYoutube || teacherProfile?.youtubeUrl || 'https://youtube.com';
+  const facebookPage = teacherProfile?.contactFacebookPage || teacherProfile?.homePageConfig?.contactFacebookPage || teacherProfile?.facebookUrl || 'https://facebook.com';
+  const facebookGroup = teacherProfile?.contactFacebookGroup || teacherProfile?.homePageConfig?.contactFacebookGroup || teacherProfile?.facebookGroupUrl || 'https://facebook.com/groups';
+  const telegram = teacherProfile?.contactTelegram || teacherProfile?.homePageConfig?.contactTelegram || teacherProfile?.telegramUrl || 'https://t.me';
+  const youtube = teacherProfile?.contactYoutube || teacherProfile?.homePageConfig?.contactYoutube || teacherProfile?.youtubeUrl || 'https://youtube.com';
 
   const defaultFaqs = [
     {
@@ -227,7 +227,7 @@ function ContactPageContent() {
   ];
 
   // Dynamic Contact Page Config from Website Builder
-  const ctConfig = teacherProfile?.contactPageConfig || {};
+  const ctConfig = teacherProfile?.contactPageConfig || teacherProfile?.homePageConfig?.contactPageConfig || {};
   const heroTag = ctConfig.heroTag || (activeTeacherId ? (locale === 'bn' ? `${academyName} • স্টুডেন্ট সাপোর্ট সেন্টার` : `${academyName} • Student Support Center`) : (locale === 'bn' ? 'SkyLearners প্ল্যাটফর্ম হেল্পডেস্ক' : 'SkyLearners Platform Helpdesk'));
   const heroTitle = ctConfig.heroTitle || (locale === 'bn' ? 'যেকোনো প্রয়োজনে আমরা আছি তোমার পাশে' : 'We are here to Support Your Journey');
   const heroSubtitle = ctConfig.heroSubtitle || headline;

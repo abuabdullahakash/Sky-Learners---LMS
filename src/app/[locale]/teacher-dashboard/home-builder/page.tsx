@@ -913,8 +913,18 @@ export default function TeacherHomePageBuilderPage() {
         photoUrl: profilePhoto,
         coverPhoto,
         teachersRoster,
+        contactPhone,
+        contactWhatsapp,
+        contactEmail,
+        contactAddress,
+        contactOfficeHours,
+        contactFacebookPage,
+        contactFacebookGroup,
+        contactYoutube,
+        contactTelegram,
         homePageConfig: fullConfig,
-        aboutPageConfig: fullConfig.aboutPageConfig
+        aboutPageConfig: fullConfig.aboutPageConfig,
+        contactPageConfig: fullConfig.contactPageConfig
       }, { merge: true });
 
       // Also update users collection if displayName or photo changed

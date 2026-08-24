@@ -187,14 +187,14 @@ export default function Navbar() {
     guestTeacherId
   );
 
-  // 1. Marketplace Navigation Menu Category (গ্লোবাল মার্কেটপ্লেস মেনু)
+  // 1. Marketplace Navigation Menu Category (১০০% ক্লিন ও পিওর SEO URL)
   const marketplaceNavLinks = [
-    { name: t('home') || 'হোম', href: isForcedMarketplace ? '/?view=marketplace' : '/', isActive: isHomeActive },
-    { name: t('courses') || 'কোর্স', href: isForcedMarketplace ? '/courses?view=marketplace' : '/courses', isActive: isCoursesActive },
-    { name: 'About', href: isForcedMarketplace ? '/about?view=marketplace' : '/about', isActive: isAboutActive },
+    { name: t('home') || 'হোম', href: '/', isActive: isHomeActive },
+    { name: t('courses') || 'কোর্স', href: '/courses', isActive: isCoursesActive },
+    { name: 'About', href: '/about', isActive: isAboutActive },
   ];
 
-  // 2. Teacher Storefront Navigation Menu Category (শিক্ষকের নিজস্ব কাস্টম একাডেমি মেনু)
+  // 2. Teacher Storefront Navigation Menu Category (শিক্ষকের নিজস্ব কাস্টম একাডেমি মেনু - ১০০% ক্লিন URL)
   const teacherStorefrontNavLinks = [
     { name: t('home') || 'হোম', href: '/', isActive: isHomeActive },
     { name: t('courses') || 'কোর্স', href: '/courses', isActive: isCoursesActive },

@@ -64,12 +64,12 @@ Whenever developing or updating the website:
 
 In `src/components/Navbar.tsx`, public navigation links are cleanly divided into two explicit categories:
 
-1. **`marketplaceNavLinks` (Marketplace Menu Category):**
-   - Contains: `Home`, `Courses`, `About` (and any new marketplace pages).
+1. **`marketplaceNavLinks` (Marketplace Menu Category - 100% Clean URLs):**
+   - Contains: `Home` (`/`), `Courses` (`/courses`), `About` (`/about`) (and any new marketplace pages).
+   - URLs are 100% clean and pure without any query parameters.
    - Only shown to:
      - Organic / non-logged-in visitors (no referral link).
      - Logged-in students in Global Marketplace Mode.
-     - Any URL with `?view=marketplace`.
 
 2. **`teacherStorefrontNavLinks` (Teacher Storefront Menu Category):**
    - Contains: `Home`, `Courses`, `About`, `যোগাযোগ (Contact)` (and any new teacher pages).

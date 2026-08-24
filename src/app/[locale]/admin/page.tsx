@@ -53,6 +53,8 @@ import {
   ToggleLeft,
   ToggleRight,
   UserPlus,
+  UserX,
+  UserMinus,
   ArrowLeft,
   MapPin,
   Clock,
@@ -162,8 +164,9 @@ export default function AdminDashboardPage() {
   // Global Page Management States
   const [globalPages, setGlobalPages] = useState<GlobalPageItem[]>(defaultGlobalBasePages);
   const [isAddGlobalModalOpen, setIsAddGlobalModalOpen] = useState(false);
-  const [isExcludeGlobalModalOpen, setIsExcludeGlobalModalOpen] = useState(false);
-  const [selectedGlobalPageForExclusion, setSelectedGlobalPageForExclusion] = useState<GlobalPageItem | null>(null);
+  const [activeExclusionPage, setActiveExclusionPage] = useState<GlobalPageItem | null>(null);
+  const [tempExcludedTeacherIds, setTempExcludedTeacherIds] = useState<string[]>([]);
+  const [exclusionSearch, setExclusionSearch] = useState('');
   const [newGlobalPageName, setNewGlobalPageName] = useState('');
   const [newGlobalPageSlug, setNewGlobalPageSlug] = useState('');
   const [teacherSearch, setTeacherSearch] = useState('');
@@ -432,15 +435,27 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleToggleExcludeTeacher = async (pageId: string, teacherId: string) => {
+  const openPageExclusionModal = (gp: GlobalPageItem) => {
+    setActiveExclusionPage(gp);
+    setTempExcludedTeacherIds(gp.excludedTeacherIds || []);
+    setExclusionSearch('');
+  };
+
+  const toggleTeacherInTempExclusion = (teacherId: string) => {
+    setTempExcludedTeacherIds(prev => 
+      prev.includes(teacherId) 
+        ? prev.filter(id => id !== teacherId) 
+        : [...prev, teacherId]
+    );
+  };
+
+  const handleSavePageExclusion = async () => {
+    if (!activeExclusionPage) return;
+    setPageSaving(true);
+
     const updated = globalPages.map(gp => {
-      if (gp.id === pageId) {
-        const currentExcluded = gp.excludedTeacherIds || [];
-        const exists = currentExcluded.includes(teacherId);
-        const nextExcluded = exists 
-          ? currentExcluded.filter(id => id !== teacherId) 
-          : [...currentExcluded, teacherId];
-        return { ...gp, excludedTeacherIds: nextExcluded };
+      if (gp.id === activeExclusionPage.id) {
+        return { ...gp, excludedTeacherIds: tempExcludedTeacherIds };
       }
       return gp;
     });
@@ -448,10 +463,13 @@ export default function AdminDashboardPage() {
     setGlobalPages(updated);
     try {
       await setDoc(doc(db, 'platformSettings', 'globalTeacherPages'), { pages: updated }, { merge: true });
-      toast.success('টিচার এক্সক্লুশন আপডেট হয়েছে!');
+      toast.success(`"${activeExclusionPage.name}" পেজের টিচার এক্সক্লুশন সংরক্ষিত হয়েছে!`);
+      setActiveExclusionPage(null);
     } catch (err) {
       console.error("Error updating exclusion:", err);
-      toast.error('এক্সক্লুশন আপডেট ব্যর্থ হয়েছে');
+      toast.error('এক্সক্লুশন সংরক্ষণ করতে সমস্যা হয়েছে');
+    } finally {
+      setPageSaving(false);
     }
   };
 
@@ -1061,29 +1079,22 @@ export default function AdminDashboardPage() {
                   <PlusCircle className="w-4 h-4" />
                   <span>+ নতুন গ্লোবাল পেজ যোগ করুন</span>
                 </button>
-                <button
-                  onClick={() => setIsExcludeGlobalModalOpen(true)}
-                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs flex items-center gap-2 transition-all"
-                >
-                  <SlidersHorizontal className="w-4 h-4 text-purple-400" />
-                  <span>টিচার এক্সক্লুশন রুলস</span>
-                </button>
               </div>
             </div>
 
-            {/* Global Pages Active Pills Grid */}
+            {/* Global Pages Active Pills Grid with Per-Page Exclusion */}
             <div className="pt-2 border-t border-slate-800/80">
-              <div className="flex flex-wrap items-center gap-2.5">
+              <div className="flex flex-wrap items-center gap-3">
                 {globalPages.map((gp) => {
                   const excludedCount = gp.excludedTeacherIds?.length || 0;
                   return (
                     <div 
                       key={gp.id}
-                      className="px-3.5 py-2 rounded-xl bg-slate-800/80 border border-slate-700/80 flex items-center gap-2.5 text-xs text-slate-200 shadow-sm"
+                      className="px-3.5 py-2.5 rounded-2xl bg-slate-900/90 border border-slate-700/80 flex items-center gap-2.5 text-xs text-slate-200 shadow-md hover:border-slate-600 transition-all"
                     >
-                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
                       <span className="font-bold text-white">{gp.name}</span>
-                      <span className="text-[11px] text-slate-400 font-mono bg-slate-900/60 px-1.5 py-0.5 rounded border border-slate-700">{gp.slug}</span>
+                      <span className="text-[11px] text-slate-400 font-mono bg-slate-950 px-2 py-0.5 rounded border border-slate-800">{gp.slug}</span>
                       
                       {gp.isDefault ? (
                         <span className="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-extrabold uppercase">Base</span>
@@ -1091,17 +1102,26 @@ export default function AdminDashboardPage() {
                         <button
                           onClick={() => handleDeleteGlobalPage(gp.id)}
                           title="Delete Global Page"
-                          className="text-slate-400 hover:text-rose-400 p-0.5 transition-colors"
+                          className="text-slate-400 hover:text-rose-400 p-1 transition-colors rounded-lg hover:bg-slate-800"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}
 
-                      {excludedCount > 0 && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold">
-                          {excludedCount} Excluded
-                        </span>
-                      )}
+                      {/* Per-Page Teacher Exclusion Trigger */}
+                      <button
+                        type="button"
+                        onClick={() => openPageExclusionModal(gp)}
+                        title={`এই "${gp.name}" পেজ থেকে নির্দিষ্ট শিক্ষককে বাদ (Exclude) দিন`}
+                        className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1.5 border shadow-sm ${
+                          excludedCount > 0 
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 hover:bg-amber-500/30' 
+                            : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-amber-300 hover:border-amber-500/50'
+                        }`}
+                      >
+                        <UserX className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{excludedCount > 0 ? `${excludedCount} Excluded` : 'Exclude'}</span>
+                      </button>
                     </div>
                   );
                 })}
@@ -1902,75 +1922,127 @@ export default function AdminDashboardPage() {
       )}
 
       {/* ========================================================================= */}
-      {/* 5. GLOBAL PAGE EXCLUSION RULES MODAL                                     */}
+      {/* 5. DEDICATED PER-PAGE TEACHER EXCLUSION MODAL                            */}
       {/* ========================================================================= */}
-      {isExcludeGlobalModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-200 text-slate-200 max-h-[85vh] overflow-y-auto">
+      {activeExclusionPage && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-200 text-slate-200">
+            
+            {/* Modal Header */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <div className="flex items-center gap-2.5 text-purple-400">
-                <SlidersHorizontal className="w-5 h-5" />
-                <h3 className="font-extrabold text-base text-white">গ্লোবাল পেজ টিচার এক্সক্লুশন রুলস</h3>
+              <div className="flex items-center gap-3 text-amber-400">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">
+                  <UserX className="w-5 h-5 text-amber-400" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base text-white">
+                    Exclude Teachers from &quot;{activeExclusionPage.name}&quot;
+                  </h3>
+                  <p className="text-[11px] text-slate-400 font-mono">Page URL: {activeExclusionPage.slug}</p>
+                </div>
               </div>
-              <button onClick={() => setIsExcludeGlobalModalOpen(false)} className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white">
+              <button 
+                onClick={() => setActiveExclusionPage(null)} 
+                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-300">
-              যেকোনো গ্লোবাল পেজ সিলেক্ট করুন এবং কোন কোন শিক্ষকের মেনু থেকে এই পেজটি **বাদ (Exclude)** থাকবে তা নির্ধারণ করুন:
+            <p className="text-xs text-slate-300 leading-relaxed">
+              যেসব শিক্ষকের নামের পাশে <strong className="text-amber-400">টিক (Check)</strong> দিবেন, এই <span className="font-bold text-white">&quot;{activeExclusionPage.name}&quot;</span> পেজটি শুধুমাত্র তাদের স্টোরফ্রন্ট মেনু থেকে হাইড/রিমুভ হয়ে যাবে:
             </p>
 
-            <div className="space-y-4">
-              {globalPages.map((gp) => {
-                const excludedIds = gp.excludedTeacherIds || [];
-                return (
-                  <div key={gp.id} className="p-4 rounded-2xl bg-slate-800/60 border border-slate-700/80 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-xs text-white">{gp.name}</span>
-                        <span className="text-[10px] text-slate-400 font-mono">{gp.slug}</span>
+            {/* Teacher Search Input */}
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="শিক্ষকের নাম / ইমেইল / ফোন দিয়ে খুঁজুন..."
+                value={exclusionSearch}
+                onChange={(e) => setExclusionSearch(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-800/80 border border-slate-700 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-amber-500"
+              />
+            </div>
+
+            {/* Teachers Checkbox List */}
+            <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar pr-1">
+              {teachersList
+                .filter(t => {
+                  const match = (t.name || t.displayName || '').toLowerCase().includes(exclusionSearch.toLowerCase()) ||
+                                (t.email || '').toLowerCase().includes(exclusionSearch.toLowerCase()) ||
+                                (t.phone || '').toLowerCase().includes(exclusionSearch.toLowerCase());
+                  return match;
+                })
+                .map(t => {
+                  const isChecked = tempExcludedTeacherIds.includes(t.id);
+                  const avatar = t.profilePhoto || t.photoURL || t.photoUrl;
+
+                  return (
+                    <div
+                      key={t.id}
+                      onClick={() => toggleTeacherInTempExclusion(t.id)}
+                      className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 select-none ${
+                        isChecked
+                          ? 'bg-amber-500/15 border-amber-500/50 text-amber-200 ring-1 ring-amber-500/30 shadow-sm'
+                          : 'bg-slate-800/50 border-slate-750 hover:bg-slate-800 text-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center font-bold text-xs text-white overflow-hidden shrink-0 border border-slate-600">
+                          {avatar ? (
+                            <img src={avatar} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            (t.name || 'T')[0].toUpperCase()
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-xs text-white truncate">{t.name || t.displayName || 'Teacher'}</p>
+                          <p className="text-[10px] text-slate-400 truncate">{t.email || t.phone || 'No contact'}</p>
+                        </div>
                       </div>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-900 text-slate-300">
-                        {excludedIds.length} জন বাদ দেওয়া আছে
-                      </span>
-                    </div>
 
-                    {/* Teacher Checklist */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 max-h-36 overflow-y-auto custom-scrollbar">
-                      {teachersList.map((t) => {
-                        const isExcluded = excludedIds.includes(t.id);
-                        return (
-                          <div 
-                            key={t.id}
-                            onClick={() => handleToggleExcludeTeacher(gp.id, t.id)}
-                            className={`p-2 rounded-xl border text-xs cursor-pointer flex items-center justify-between select-none transition-all ${
-                              isExcluded 
-                                ? 'bg-amber-500/15 border-amber-500/50 text-amber-300' 
-                                : 'bg-slate-900/60 border-slate-750 text-slate-300 hover:bg-slate-800'
-                            }`}
-                          >
-                            <span className="truncate max-w-[140px] font-medium">{t.name || t.displayName || t.email}</span>
-                            <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded ${isExcluded ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-800 text-slate-400'}`}>
-                              {isExcluded ? 'Excluded' : 'Active'}
-                            </span>
-                          </div>
-                        );
-                      })}
+                      <div className="flex items-center gap-2.5">
+                        <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
+                          isChecked ? 'bg-amber-500/25 text-amber-300' : 'bg-slate-800 text-slate-400'
+                        }`}>
+                          {isChecked ? 'Excluded (হাইড থাকবে)' : 'Active (দেখাবে)'}
+                        </span>
+                        <div className={`w-5 h-5 rounded-lg flex items-center justify-center border transition-all ${
+                          isChecked ? 'bg-amber-500 border-amber-500 text-black shadow-sm' : 'border-slate-600 bg-slate-800'
+                        }`}>
+                          {isChecked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
             </div>
 
-            <div className="text-right pt-2">
-              <button
-                onClick={() => setIsExcludeGlobalModalOpen(false)}
-                className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-colors"
-              >
-                হয়েছে (Done)
-              </button>
+            {/* Modal Actions */}
+            <div className="flex items-center justify-between pt-3 border-t border-slate-800">
+              <span className="text-xs text-slate-400 font-medium">
+                মোট <strong className="text-amber-400 font-bold">{tempExcludedTeacherIds.length}</strong> জন শিক্ষক বাদ দেওয়া হচ্ছে
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveExclusionPage(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-colors"
+                >
+                  বাতিল
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSavePageExclusion}
+                  disabled={pageSaving}
+                  className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs transition-all shadow-md shadow-amber-500/20 disabled:opacity-50"
+                >
+                  {pageSaving ? 'সংরক্ষণ হচ্ছে...' : 'Save Changes'}
+                </button>
+              </div>
             </div>
+
           </div>
         </div>
       )}

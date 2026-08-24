@@ -125,6 +125,11 @@ export default function Navbar() {
   const userProfileLink = isAdmin ? '/admin' : (isTeacher ? '/teacher-dashboard' : (isStudent ? '/dashboard' : '/onboarding'));
   const [preferredTeacherName, setPreferredTeacherName] = useState<string>('');
   const [guestTeacherId, setGuestTeacherId] = useState<string | null>(null);
+  const [storefrontTeacherData, setStorefrontTeacherData] = useState<{
+    disabledPages?: string[];
+    customNavLinks?: Array<{ id: string; name: string; slug: string; enabled: boolean }>;
+  } | null>(null);
+  const [platformGlobalPages, setPlatformGlobalPages] = useState<Array<{ id: string; name: string; slug: string; excludedTeacherIds?: string[] }>>([]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -135,31 +140,23 @@ export default function Navbar() {
     }
   }, []);
 
-  // Fetch preferred teacher details if student has chosen focused academy mode
+  // Fetch Global Platform Pages
   useEffect(() => {
-    if (isStudent && userData?.preferredTeacherId && userData.preferredTeacherId !== 'global') {
-      const fetchTeacher = async () => {
-        try {
-          const tDoc = await getDoc(doc(db, 'teacherProfiles', userData.preferredTeacherId));
-          if (tDoc.exists()) {
-            const data = tDoc.data();
-            setPreferredTeacherName(data.displayName || data.academyName || 'Teacher Academy');
-          } else {
-            const uDoc = await getDoc(doc(db, 'users', userData.preferredTeacherId));
-            if (uDoc.exists()) {
-              const uData = uDoc.data();
-              setPreferredTeacherName(uData.name || uData.displayName || 'Teacher Academy');
-            }
+    const fetchGlobalPages = async () => {
+      try {
+        const gpDoc = await getDoc(doc(db, 'platformSettings', 'globalTeacherPages'));
+        if (gpDoc.exists()) {
+          const data = gpDoc.data();
+          if (data.pages && Array.isArray(data.pages)) {
+            setPlatformGlobalPages(data.pages);
           }
-        } catch (e) {
-          console.error("Error fetching preferred teacher in navbar:", e);
         }
-      };
-      fetchTeacher();
-    } else {
-      setPreferredTeacherName('');
-    }
-  }, [isStudent, userData?.preferredTeacherId]);
+      } catch (e) {
+        console.error("Error fetching global pages in navbar:", e);
+      }
+    };
+    fetchGlobalPages();
+  }, []);
 
   // Check if current route has a teacher context
   let routeTeacherId: string | null = null;
@@ -181,6 +178,38 @@ export default function Navbar() {
         : (isCustomTeacherMode && preferredTeacherId 
             ? preferredTeacherId 
             : (routeTeacherId || guestTeacherId || null)));
+
+  // Fetch active teacher storefront config
+  useEffect(() => {
+    if (effectiveTeacherId) {
+      const fetchTeacherData = async () => {
+        try {
+          const tDoc = await getDoc(doc(db, 'teacherProfiles', effectiveTeacherId));
+          if (tDoc.exists()) {
+            const data = tDoc.data();
+            setPreferredTeacherName(data.displayName || data.academyName || 'Teacher Academy');
+            setStorefrontTeacherData({
+              disabledPages: data.disabledPages || [],
+              customNavLinks: data.customNavLinks || []
+            });
+          } else {
+            const uDoc = await getDoc(doc(db, 'users', effectiveTeacherId));
+            if (uDoc.exists()) {
+              const uData = uDoc.data();
+              setPreferredTeacherName(uData.name || uData.displayName || 'Teacher Academy');
+            }
+            setStorefrontTeacherData({ disabledPages: [], customNavLinks: [] });
+          }
+        } catch (e) {
+          console.error("Error fetching teacher storefront config in navbar:", e);
+        }
+      };
+      fetchTeacherData();
+    } else {
+      setPreferredTeacherName('');
+      setStorefrontTeacherData(null);
+    }
+  }, [effectiveTeacherId]);
 
   // 100% Clean URLs for seamless user experience:
   const homeLink = '/';
@@ -205,12 +234,51 @@ export default function Navbar() {
     { name: 'About', href: '/about', isActive: isAboutActive },
   ];
 
-  // 2. Teacher Storefront Navigation Menu Category (শিক্ষকের নিজস্ব কাস্টম একাডেমি মেনু - ১০০% ক্লিন URL)
+  // 2. Dynamic Teacher Storefront Navigation Menu Category (শিক্ষকের নিজস্ব কাস্টম একাডেমি মেনু - ১০০% ক্লিন URL)
+  const defaultTeacherBasePages = [
+    { id: 'home', name: t('home') || 'হোম', href: '/' },
+    { id: 'courses', name: t('courses') || 'কোর্স', href: '/courses' },
+    { id: 'about', name: 'About', href: '/about' },
+    { id: 'contact', name: t('contact') || (pathname.includes('/bn') ? 'যোগাযোগ' : 'Contact'), href: '/contact' },
+  ];
+
+  // Merge platform global pages with default base pages
+  const allMergedGlobalPages = [...defaultTeacherBasePages];
+  platformGlobalPages.forEach(gp => {
+    if (!allMergedGlobalPages.some(bp => bp.id === gp.id || bp.href === gp.slug)) {
+      allMergedGlobalPages.push({
+        id: gp.id,
+        name: gp.name,
+        href: gp.slug,
+        excludedTeacherIds: gp.excludedTeacherIds
+      } as any);
+    }
+  });
+
+  const teacherDisabledPages = storefrontTeacherData?.disabledPages || [];
+  const teacherCustomNavs = (storefrontTeacherData?.customNavLinks || []).filter(c => c.enabled !== false);
+
+  // Filter out excluded / disabled global pages
+  const filteredBasePages = allMergedGlobalPages.filter(page => {
+    const isGloballyExcluded = effectiveTeacherId ? (page as any).excludedTeacherIds?.includes(effectiveTeacherId) : false;
+    const isManuallyDisabled = teacherDisabledPages.includes(page.id);
+    return !isGloballyExcluded && !isManuallyDisabled;
+  });
+
+  // Dynamic Storefront Menu
   const teacherStorefrontNavLinks = [
-    { name: t('home') || 'হোম', href: '/', isActive: isHomeActive },
-    { name: t('courses') || 'কোর্স', href: '/courses', isActive: isCoursesActive },
-    { name: 'About', href: '/about', isActive: isAboutActive },
-    { name: t('contact') || (pathname.includes('/bn') ? 'যোগাযোগ' : 'Contact'), href: '/contact', isActive: isContactActive },
+    ...filteredBasePages.map(p => ({
+      name: p.name,
+      href: p.href,
+      isActive: p.href === '/' 
+        ? (pathname === '/' || pathname.startsWith('/teachers/')) 
+        : (pathname === p.href || pathname.startsWith(p.href))
+    })),
+    ...teacherCustomNavs.map(c => ({
+      name: c.name,
+      href: c.slug,
+      isActive: pathname === c.slug || pathname.startsWith(c.slug)
+    }))
   ];
 
   // Active Menu List based on platform mode

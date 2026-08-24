@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useState, useEffect, Suspense } from 'react';
@@ -22,6 +21,7 @@ import {
   ChevronUp, 
   Building2, 
   User, 
+  Users,
   GraduationCap, 
   Globe, 
   ExternalLink, 

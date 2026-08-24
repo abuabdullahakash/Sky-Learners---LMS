@@ -54,6 +54,7 @@ interface TeacherNoticeBoardViewProps {
   teacherPhone?: string;
   teacherWhatsapp?: string;
   firestoreNotices?: any[];
+  pageConfig?: any;
 }
 
 export default function TeacherNoticeBoardView({
@@ -63,11 +64,21 @@ export default function TeacherNoticeBoardView({
   teacherId,
   teacherPhone,
   teacherWhatsapp,
-  firestoreNotices = []
+  firestoreNotices = [],
+  pageConfig = {}
 }: TeacherNoticeBoardViewProps) {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedNotice, setSelectedNotice] = useState<NoticeItem | null>(null);
+
+  // Dynamic values configured from Teacher Website Builder
+  const heroHeading = pageConfig?.heroHeading || 'সকল ব্যাচের একাডেমিক নোটিশ ও অফিসিয়াল সার্কুলার';
+  const heroSubtitle = pageConfig?.heroSubtitle || `${teacherName}-এর সকল অনলাইন ও অফলাইন ব্যাচের ক্লাস রুটিন, পরীক্ষার সময়সূচি, ফলাফল, ফি এবং জরুরি আপডেটসমূহ এখান থেকে সরাসরি সংগ্রহ করুন।`;
+  const heroTopBadge = pageConfig?.heroTopBadge || `${teacherName}'s Official Notice Board`;
+  const heroBgImage = pageConfig?.heroBgImage || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1600&auto=format&fit=crop';
+  const sessionYear = pageConfig?.sessionYear || '২০২৬ সেশন (Active)';
+  const effectiveWhatsapp = pageConfig?.noticeWhatsapp || teacherWhatsapp;
+  const customUploadedNotices: NoticeItem[] = Array.isArray(pageConfig?.notices) ? pageConfig.notices : [];
 
   // Realistic Bangladeshi Institutional Notices tailored for Teacher Academy
   const defaultInstitutionalNotices: NoticeItem[] = useMemo(() => [
@@ -149,15 +160,21 @@ export default function TeacherNoticeBoardView({
     }
   ], [teacherName]);
 
-  // Combine Firestore Live Posts (if any) with Institutional Notices
+  // Combine Custom Uploaded Notices + Firestore Live Posts + Institutional Notices
   const allNotices: NoticeItem[] = useMemo(() => {
+    let combined: NoticeItem[] = [];
+
+    if (customUploadedNotices.length > 0) {
+      combined = [...customUploadedNotices];
+    }
+
     if (firestoreNotices.length > 0) {
       const mappedFirestore: NoticeItem[] = firestoreNotices.map((fn, idx) => ({
         id: fn.id || `fs_${idx}`,
-        refNo: `FB/NOT-2026/${String(idx + 10).padStart(2, '0')}`,
+        refNo: fn.refNo || `FB/NOT-2026/${String(idx + 10).padStart(2, '0')}`,
         title: fn.title || 'অফিসিয়াল বিজ্ঞপ্তি',
         category: (fn.category as any) || 'general',
-        categoryLabel: fn.category === 'exam' ? 'পরীক্ষা' : (fn.category === 'routine' ? 'রুটিন' : 'সাধারণ বিজ্ঞপ্তি'),
+        categoryLabel: fn.category === 'exam' ? 'পরীক্ষা ও ফলাফল' : (fn.category === 'routine' ? 'ক্লাস রুটিন' : 'সাধারণ বিজ্ঞপ্তি'),
         date: fn.createdAt?.toDate ? fn.createdAt.toDate().toLocaleDateString('bn-BD') : 'সম্প্রতি',
         isPinned: Boolean(fn.isPinned),
         isUrgent: Boolean(fn.isUrgent),
@@ -167,10 +184,15 @@ export default function TeacherNoticeBoardView({
         attachmentName: fn.attachmentName || 'Official-Notice-Document.pdf',
         attachmentSize: fn.attachmentSize || '১.২ মেগাবাইট'
       }));
-      return [...mappedFirestore, ...defaultInstitutionalNotices];
+      combined = [...combined, ...mappedFirestore];
     }
-    return defaultInstitutionalNotices;
-  }, [firestoreNotices, defaultInstitutionalNotices, teacherName]);
+
+    if (combined.length === 0) {
+      combined = defaultInstitutionalNotices;
+    }
+
+    return combined;
+  }, [customUploadedNotices, firestoreNotices, defaultInstitutionalNotices, teacherName]);
 
   // Filter Notices by Category & Search
   const filteredNotices = useMemo(() => {
@@ -215,24 +237,27 @@ export default function TeacherNoticeBoardView({
     <div className="space-y-8 animate-in fade-in duration-300">
       
       {/* 1. URGENT BREAKING NOTICE TICKER (জরুরি স্ক্রোলিং নোটিশ বার) */}
-      {pinnedNotice && (
+      {(pageConfig?.tickerHeadline || pinnedNotice) && (
         <div className="rounded-2xl bg-rose-500/10 dark:bg-rose-950/40 border border-rose-500/30 p-3 flex items-center justify-between gap-3 shadow-md overflow-hidden relative backdrop-blur-sm">
           <div className="flex items-center gap-3 min-w-0">
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-rose-500/20 text-rose-600 dark:text-rose-300 border border-rose-500/40 text-[11px] font-black uppercase shrink-0">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
               <span>জরুরি বিজ্ঞপ্তি</span>
             </div>
-            <p className="text-xs text-foreground font-semibold truncate hover:text-primary transition-colors cursor-pointer" onClick={() => setSelectedNotice(pinnedNotice)}>
-              {pinnedNotice.refNo}: {pinnedNotice.title}
+            <p className="text-xs text-foreground font-semibold truncate hover:text-primary transition-colors cursor-pointer" onClick={() => pinnedNotice && setSelectedNotice(pinnedNotice)}>
+              {pageConfig?.tickerRefNo ? `${pageConfig.tickerRefNo}: ` : (pinnedNotice ? `${pinnedNotice.refNo}: ` : '')}
+              {pageConfig?.tickerHeadline || pinnedNotice?.title}
             </p>
           </div>
-          <button
-            onClick={() => setSelectedNotice(pinnedNotice)}
-            className="text-[11px] font-extrabold text-primary hover:text-primary/80 px-3 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/20 shrink-0 transition-all flex items-center gap-1"
-          >
-            <span>বিস্তারিত</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
+          {pinnedNotice && (
+            <button
+              onClick={() => setSelectedNotice(pinnedNotice)}
+              className="text-[11px] font-extrabold text-primary hover:text-primary/80 px-3 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/20 shrink-0 transition-all flex items-center gap-1"
+            >
+              <span>বিস্তারিত</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       )}
 
@@ -245,7 +270,7 @@ export default function TeacherNoticeBoardView({
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 hover:scale-105"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1600&auto=format&fit=crop')`
+            backgroundImage: `url('${heroBgImage}')`
           }}
         />
 
@@ -264,13 +289,13 @@ export default function TeacherNoticeBoardView({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-xs font-black uppercase tracking-wider shadow-lg">
               <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-              <span>{teacherName}&apos;s Official Notice Board</span>
+              <span>{heroTopBadge}</span>
             </div>
 
             <div className="flex items-center gap-2">
               <div className="px-3.5 py-1.5 rounded-2xl bg-black/50 border border-purple-500/30 text-right backdrop-blur-md">
                 <span className="text-[10px] text-purple-200 block font-medium">শিক্ষাবর্ষ</span>
-                <span className="text-xs font-black text-amber-400 font-mono">২০২৬ সেশন (Active)</span>
+                <span className="text-xs font-black text-amber-400 font-mono">{sessionYear}</span>
               </div>
             </div>
           </div>
@@ -278,10 +303,10 @@ export default function TeacherNoticeBoardView({
           {/* Main Hero Headline & Subtitle */}
           <div className="space-y-3 max-w-3xl">
             <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight sm:leading-snug drop-shadow-md">
-              সকল ব্যাচের একাডেমিক নোটিশ ও অফিসিয়াল সার্কুলার
+              {heroHeading}
             </h1>
             <p className="text-xs sm:text-sm md:text-base text-slate-200 leading-relaxed max-w-2xl font-medium">
-              {teacherName}-এর সকল অনলাইন ও অফলাইন ব্যাচের ক্লাস রুটিন, পরীক্ষার সময়সূচি, ফলাফল, ফি এবং জরুরি আপডেটসমূহ এখান থেকে সরাসরি সংগ্রহ করুন।
+              {heroSubtitle}
             </p>
           </div>
 

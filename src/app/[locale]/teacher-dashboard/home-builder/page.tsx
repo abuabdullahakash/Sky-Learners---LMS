@@ -20,6 +20,10 @@ import {
   CheckCircle2, 
   BadgeCheck,
   FileCheck,
+  FilePlus,
+  Pin,
+  AlertCircle,
+  Copy,
   ExternalLink,
   Layers,
   Boxes,
@@ -650,6 +654,19 @@ export default function TeacherHomePageBuilderPage() {
   const [customNavLinks, setCustomNavLinks] = useState<any[]>([]);
   const [customPagesConfig, setCustomPagesConfig] = useState<Record<string, any>>({});
 
+  // Notice Form State for Notice Management Tab
+  const [newNoticeTitle, setNewNoticeTitle] = useState('');
+  const [newNoticeRefNo, setNewNoticeRefNo] = useState('');
+  const [newNoticeCategory, setNewNoticeCategory] = useState<'urgent' | 'exam' | 'routine' | 'fees' | 'holiday' | 'general'>('exam');
+  const [newNoticeDate, setNewNoticeDate] = useState('');
+  const [newNoticeContent, setNewNoticeContent] = useState('');
+  const [newNoticeAttachmentName, setNewNoticeAttachmentName] = useState('');
+  const [newNoticeAttachmentSize, setNewNoticeAttachmentSize] = useState('');
+  const [newNoticeAttachmentUrl, setNewNoticeAttachmentUrl] = useState('');
+  const [newNoticeIsPinned, setNewNoticeIsPinned] = useState(false);
+  const [newNoticeIsUrgent, setNewNoticeIsUrgent] = useState(false);
+  const [uploadingNoticeHeroBg, setUploadingNoticeHeroBg] = useState(false);
+
   // Fetch initial data
   useEffect(() => {
     const fetchData = async () => {
@@ -985,6 +1002,98 @@ export default function TeacherHomePageBuilderPage() {
     } finally {
       setUploadingCoverPhoto(false);
     }
+  };
+
+  // Notice Hero Background upload handler
+  const handleUploadNoticeHeroBg = async (e: React.ChangeEvent<HTMLInputElement>, slugKey: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingNoticeHeroBg(true);
+    try {
+      const url = await uploadImageToImgBB(file);
+      setCustomPagesConfig(prev => ({
+        ...prev,
+        [slugKey]: {
+          ...(prev[slugKey] || {}),
+          heroBgImage: url
+        }
+      }));
+      toast.success('হিরো ব্যাকগ্রাউন্ড ইমেজ সফলভাবে আপলোড হয়েছে!');
+    } catch (err) {
+      toast.error('ছবি আপলোড ব্যর্থ হয়েছে');
+    } finally {
+      setUploadingNoticeHeroBg(false);
+    }
+  };
+
+  // Add Notice Item Helper
+  const handleAddCustomNotice = (slugKey: string) => {
+    if (!newNoticeTitle.trim()) {
+      toast.error('দয়া করে নোটিশের শিরোনাম লিখুন');
+      return;
+    }
+    const categoryLabels: Record<string, string> = {
+      urgent: 'জরুরি বিজ্ঞপ্তি',
+      exam: 'পরীক্ষা ও ফলাফল',
+      routine: 'ক্লাস রুটিন',
+      fees: 'ফি ও ভর্তি',
+      holiday: 'ছুটির নোটিশ',
+      general: 'সাধারণ বিজ্ঞপ্তি'
+    };
+
+    const newNoticeItem = {
+      id: `custom_not_${Date.now()}`,
+      refNo: newNoticeRefNo.trim() || `FB/NOT-2026/${String(Math.floor(Math.random() * 90) + 10)}`,
+      title: newNoticeTitle.trim(),
+      category: newNoticeCategory,
+      categoryLabel: categoryLabels[newNoticeCategory] || 'সাধারণ বিজ্ঞপ্তি',
+      date: newNoticeDate.trim() || new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+      content: newNoticeContent.trim() || newNoticeTitle.trim(),
+      hasAttachment: Boolean(newNoticeAttachmentName.trim() || newNoticeAttachmentUrl.trim()),
+      attachmentName: newNoticeAttachmentName.trim() || (newNoticeAttachmentUrl.trim() ? 'Notice-Attachment.pdf' : ''),
+      attachmentSize: newNoticeAttachmentSize.trim() || '১.২ মেগাবাইট',
+      attachmentUrl: newNoticeAttachmentUrl.trim(),
+      isPinned: newNoticeIsPinned,
+      isUrgent: newNoticeIsUrgent,
+      publishedBy: displayName || user?.displayName || 'Instructor'
+    };
+
+    const currentNotices = customPagesConfig[slugKey]?.notices || [];
+    const updatedNotices = [newNoticeItem, ...currentNotices];
+
+    setCustomPagesConfig(prev => ({
+      ...prev,
+      [slugKey]: {
+        ...(prev[slugKey] || {}),
+        notices: updatedNotices
+      }
+    }));
+
+    // Reset Form
+    setNewNoticeTitle('');
+    setNewNoticeRefNo('');
+    setNewNoticeContent('');
+    setNewNoticeAttachmentName('');
+    setNewNoticeAttachmentSize('');
+    setNewNoticeAttachmentUrl('');
+    setNewNoticeIsPinned(false);
+    setNewNoticeIsUrgent(false);
+
+    toast.success('নতুন নোটিশ সফলভাবে যুক্ত হয়েছে! স্থায়ী করতে "সেটিংস সংরক্ষণ করুন" চাপুন।');
+  };
+
+  // Delete Notice Item Helper
+  const handleDeleteCustomNotice = (slugKey: string, noticeId: string) => {
+    const currentNotices = customPagesConfig[slugKey]?.notices || [];
+    const updatedNotices = currentNotices.filter((n: any) => n.id !== noticeId);
+    setCustomPagesConfig(prev => ({
+      ...prev,
+      [slugKey]: {
+        ...(prev[slugKey] || {}),
+        notices: updatedNotices
+      }
+    }));
+    toast.success('নোটিশটি তালিকা থেকে মুছে ফেলা হয়েছে');
   };
 
   // Faculty Photo upload handler
@@ -1346,19 +1455,38 @@ export default function TeacherHomePageBuilderPage() {
     ...(customNavLinks && customNavLinks.length > 0 ? customNavLinks.map((customPage: any, idx: number) => {
       const cleanSlug = (customPage.slug || `page_${idx}`).replace('/', '').toLowerCase();
       const groupKey = `custom_${cleanSlug}`;
+      const isNotice = cleanSlug === 'notice';
+
+      const items = isNotice
+        ? [
+            { 
+              id: `${groupKey}_settings`, 
+              label: `১. ${customPage.name} পেজ ও হিরো সেটিংস`, 
+              icon: Sliders,
+              customPage: customPage
+            },
+            { 
+              id: `${groupKey}_manager`, 
+              label: `২. নোটিশ আপলোড ও ম্যানেজমেন্ট`, 
+              icon: FilePlus,
+              customPage: customPage
+            }
+          ]
+        : [
+            { 
+              id: `${groupKey}_settings`, 
+              label: `১. ${customPage.name} পেজ কন্ট্রোলস`, 
+              icon: Sliders,
+              customPage: customPage
+            }
+          ];
+
       return {
         id: groupKey,
         groupName: `📑 ${customPage.name.toUpperCase()} (${(customPage.slug || '').toUpperCase()})`,
         isCustomPage: true,
         customPageData: customPage,
-        items: [
-          { 
-            id: `${groupKey}_controls`, 
-            label: `১. ${customPage.name} পেজ কন্ট্রোলস`, 
-            icon: Sliders,
-            customPage: customPage
-          }
-        ]
+        items
       };
     }) : [])
   ];
@@ -1588,7 +1716,83 @@ export default function TeacherHomePageBuilderPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            {/* Context-aware Quick Action Tooltips */}
+            {(() => {
+              const currentGroup = tabGroups.find(g => g.items.some(it => it.id === activeTab));
+              const customPage = (currentGroup as any)?.customPageData;
+              
+              if (customPage) {
+                return (
+                  <div className="flex items-center gap-2">
+                    {/* Status Badge Tooltip */}
+                    <div className="relative group">
+                      <div className={`p-2.5 rounded-xl border flex items-center justify-center transition-all ${
+                        customPage.isPublished 
+                          ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/30' 
+                          : 'bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-500/30'
+                      }`}>
+                        <Sparkles className="w-4 h-4" />
+                      </div>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 rounded-lg bg-slate-950 text-white text-[11px] font-bold whitespace-nowrap shadow-2xl border border-foreground/10 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-30">
+                        {customPage.isPublished ? '🟢 লাইভ পাবলিশড (Live Published)' : '🟡 ড্রাফট মোড (Draft Mode)'}
+                      </div>
+                    </div>
+
+                    {/* Live Preview Button Tooltip */}
+                    <div className="relative group">
+                      <a
+                        href={customPage.slug}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-2.5 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/25 transition-all shadow-sm flex items-center justify-center"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </a>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 rounded-lg bg-slate-950 text-orange-200 text-[11px] font-bold whitespace-nowrap shadow-2xl border border-orange-500/30 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-30">
+                        👁️ লাইভ প্রিভিউ দেখুন (নতুন ট্যাব)
+                      </div>
+                    </div>
+
+                    {/* Copy Link Tooltip */}
+                    <div className="relative group">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const url = typeof window !== 'undefined' ? `${window.location.origin}${customPage.slug}` : customPage.slug;
+                          navigator.clipboard.writeText(url);
+                          toast.success('পেজের লিংক কপি করা হয়েছে!', { icon: '🔗' });
+                        }}
+                        className="p-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-foreground/70 border border-foreground/10 transition-all flex items-center justify-center"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 rounded-lg bg-slate-950 text-slate-200 text-[11px] font-bold whitespace-nowrap shadow-2xl border border-foreground/15 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-30">
+                        🔗 পেজ লিংক কপি করুন
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Default Storefront Preview Button
+              return (
+                <div className="relative group">
+                  <a
+                    href={`/teachers/${user?.uid || ''}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="p-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-foreground/70 border border-foreground/10 transition-all flex items-center justify-center"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </a>
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 rounded-lg bg-slate-950 text-white text-[11px] font-bold whitespace-nowrap shadow-2xl border border-foreground/10 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-30">
+                    👁️ টিচার স্টোরফ্রন্ট লাইভ দেখুন
+                  </div>
+                </div>
+              );
+            })()}
+
             <button
               type="button"
               onClick={handleSaveConfig}
@@ -4457,56 +4661,339 @@ export default function TeacherHomePageBuilderPage() {
             };
 
             const isNotice = slugKey === 'notice';
+            const isNoticeManager = isNotice && activeTab.endsWith('_manager');
+            const noticeList = pageConfig.notices || [];
 
             return (
               <div className="space-y-8 animate-in fade-in duration-200">
-                {/* Header Row with Status Badge & Live Preview link */}
-                <div className="border-b border-foreground/10 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-black text-foreground flex items-center gap-2">
-                        <Sliders className="w-5 h-5 text-orange-500" />
-                        <span>{customPage.name} পেজ কন্ট্রোলস ও সেটিংস</span>
-                      </h3>
-                      <span className="text-xs font-mono bg-foreground/5 text-foreground/70 px-2 py-0.5 rounded border border-foreground/10">
-                        {customPage.slug}
-                      </span>
-                    </div>
-                    <p className="text-xs text-foreground/60 mt-1">
-                      {customPage.name} পেজের তথ্যাবলী ও সেকশন কাস্টমাইজেশন ম্যানেজ করুন।
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className={`px-3 py-1 rounded-xl text-xs font-black flex items-center gap-1.5 ${
-                      customPage.isPublished 
-                        ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30' 
-                        : 'bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-500/30'
-                    }`}>
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>{customPage.isPublished ? 'Live Published' : 'Draft Mode'}</span>
+                {/* Clean Header Info */}
+                <div className="border-b border-foreground/10 pb-4">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-black text-foreground flex items-center gap-2">
+                      {isNoticeManager ? (
+                        <>
+                          <FilePlus className="w-5 h-5 text-orange-500" />
+                          <span>নোটিশ আপলোড ও ম্যানেজমেন্ট প্যানেল</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sliders className="w-5 h-5 text-orange-500" />
+                          <span>{customPage.name} পেজ ও হিরো সেটিংস</span>
+                        </>
+                      )}
+                    </h3>
+                    <span className="text-xs font-mono bg-foreground/5 text-foreground/70 px-2.5 py-0.5 rounded-lg border border-foreground/10">
+                      {customPage.slug}
                     </span>
-
-                    <a
-                      href={customPage.slug}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-3.5 py-1.5 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/25 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>লাইভ দেখুন</span>
-                    </a>
                   </div>
+                  <p className="text-xs text-foreground/60 mt-1">
+                    {isNoticeManager 
+                      ? 'শিক্ষার্থীদের জন্য নতুন নোটিশ, পরীক্ষার সময়সূচি বা ছুটির সার্কুলার প্রকাশ ও নিয়ন্ত্রণ করুন।' 
+                      : `${customPage.name} পেজের হিরো ব্যানার, শিরোনাম ও টেক্সট কাস্টমাইজেশন ম্যানেজ করুন।`}
+                  </p>
                 </div>
 
-                {/* Specific Notice Board Controls if slug is notice */}
-                {isNotice ? (
-                  <div className="space-y-6">
-                    {/* 1. Breaking Notice Ticker */}
-                    <div className="p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-4">
+                {/* ------------------------------------------------------------- */}
+                {/* 1. NOTICE TAB 2: NOTICE UPLOAD & MANAGEMENT                   */}
+                {/* ------------------------------------------------------------- */}
+                {isNoticeManager ? (
+                  <div className="space-y-8">
+                    {/* Add New Notice Form */}
+                    <div className="p-6 rounded-3xl bg-foreground/[0.02] border border-foreground/10 space-y-5">
                       <div className="flex items-center gap-2">
-                        <Flame className="w-4 h-4 text-rose-500" />
-                        <h4 className="text-sm font-bold text-foreground">১. জরুরি স্ক্রোলিং নোটিশ বার (Breaking Urgent Notice Ticker)</h4>
+                        <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 border border-orange-500/20">
+                          <Plus className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-foreground">১. নতুন অফিসিয়াল নোটিশ প্রকাশ করুন</h4>
+                          <p className="text-xs text-foreground/60">ফর্মটি পূরণ করে নিচে &quot;নোটিশ যুক্ত করুন&quot; বাটনে চাপুন।</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="sm:col-span-2">
+                          <label className="text-xs font-semibold text-foreground/70 block mb-1">
+                            নোটিশের শিরোনাম <span className="text-rose-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={newNoticeTitle}
+                            onChange={(e) => setNewNoticeTitle(e.target.value)}
+                            placeholder="যেমন: এইচএসসি ২০২৬ চূড়ান্ত মডেল টেস্ট ও বিশেষ ক্লাসের সময়সূচি"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-semibold text-foreground/70 block mb-1">স্মারক নম্বর (Reference No)</label>
+                          <input
+                            type="text"
+                            value={newNoticeRefNo}
+                            onChange={(e) => setNewNoticeRefNo(e.target.value)}
+                            placeholder="FB/NOT-2026/08-06"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-semibold text-foreground/70 block mb-1">নোটিশের ক্যাটাগরি</label>
+                          <select
+                            value={newNoticeCategory}
+                            onChange={(e: any) => setNewNoticeCategory(e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                          >
+                            <option value="urgent">🚨 জরুরি বিজ্ঞপ্তি</option>
+                            <option value="exam">📝 পরীক্ষা ও ফলাফল</option>
+                            <option value="routine">📅 ক্লাস রুটিন</option>
+                            <option value="fees">💳 ফি ও ভর্তি</option>
+                            <option value="holiday">🏖️ ছুটির নোটিশ</option>
+                            <option value="general">📄 সাধারণ বিজ্ঞপ্তি</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-semibold text-foreground/70 block mb-1">প্রকাশের তারিখ</label>
+                          <input
+                            type="text"
+                            value={newNoticeDate}
+                            onChange={(e) => setNewNoticeDate(e.target.value)}
+                            placeholder="২৪ আগস্ট, ২০২৬ (খালি রাখলে আজকের তারিখ বসবে)"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-semibold text-foreground/70 block mb-1">সংযুক্ত PDF ফাইলের নাম (ঐচ্ছিক)</label>
+                          <input
+                            type="text"
+                            value={newNoticeAttachmentName}
+                            onChange={(e) => setNewNoticeAttachmentName(e.target.value)}
+                            placeholder="Model-Test-Routine-2026.pdf"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <label className="text-xs font-semibold text-foreground/70 block mb-1">নোটিশের পূর্ণ বিবরণ ও নির্দেশনা</label>
+                          <textarea
+                            rows={4}
+                            value={newNoticeContent}
+                            onChange={(e) => setNewNoticeContent(e.target.value)}
+                            placeholder="এখানে নোটিশের যাবতীয় বিস্তারিত নির্দেশনা ও তথ্য লিখুন..."
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-2 flex flex-wrap items-center gap-6 p-3 rounded-2xl bg-background border border-foreground/10">
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-foreground">
+                            <input
+                              type="checkbox"
+                              checked={newNoticeIsPinned}
+                              onChange={(e) => setNewNoticeIsPinned(e.target.checked)}
+                              className="w-4 h-4 rounded text-orange-500 focus:ring-orange-500"
+                            />
+                            <span>📌 গুরুত্বপূর্ণ নোটিশ হিসেবে শীর্ষে পিন করুন</span>
+                          </label>
+
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-foreground">
+                            <input
+                              type="checkbox"
+                              checked={newNoticeIsUrgent}
+                              onChange={(e) => setNewNoticeIsUrgent(e.target.checked)}
+                              className="w-4 h-4 rounded text-rose-500 focus:ring-rose-500"
+                            />
+                            <span>🚨 জরুরি নোটিশ হিসেবে মার্ক করুন</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end pt-2">
+                        <button
+                          type="button"
+                          onClick={() => handleAddCustomNotice(slugKey)}
+                          className="px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>নোটিশ যুক্ত করুন (Add Notice)</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Published Notices List */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-orange-500" />
+                          <span>আপনার প্রকাশিত কাস্টম নোটিশসমূহ ({noticeList.length})</span>
+                        </h4>
+                      </div>
+
+                      {noticeList.length === 0 ? (
+                        <div className="p-8 rounded-3xl bg-foreground/[0.02] border border-dashed border-foreground/15 text-center space-y-2">
+                          <p className="text-xs font-bold text-foreground">এখনো কোনো কাস্টম নোটিশ যোগ করা হয়নি।</p>
+                          <p className="text-[11px] text-foreground/60 max-w-md mx-auto">
+                            আপনি উপরের ফর্ম থেকে নতুন নোটিশ যোগ করলে তা সরাসরি নোটিশ বোর্ডে প্রদর্শিত হবে। কোনো নোটিশ যোগ না করা থাকলে সিস্টেম ডিফল্ট প্রাতিষ্ঠানিক নোটিশগুলো লাইভ থাকবে।
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 gap-3">
+                          {noticeList.map((not: any) => (
+                            <div
+                              key={not.id}
+                              className="p-4 rounded-2xl bg-card border border-foreground/10 flex items-start justify-between gap-4 shadow-sm"
+                            >
+                              <div className="space-y-1 min-w-0">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className="px-2 py-0.5 rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-300 text-[10px] font-black uppercase">
+                                    {not.categoryLabel || not.category}
+                                  </span>
+                                  <span className="text-[11px] font-mono text-foreground/60 bg-foreground/5 px-2 py-0.5 rounded">
+                                    {not.refNo}
+                                  </span>
+                                  {not.isPinned && (
+                                    <span className="text-[10px] text-amber-500 font-bold flex items-center gap-1">
+                                      <Pin className="w-3 h-3 fill-amber-500" />
+                                      <span>Pinned</span>
+                                    </span>
+                                  )}
+                                  <span className="text-[11px] text-foreground/50">{not.date}</span>
+                                </div>
+                                <h5 className="font-bold text-xs text-foreground truncate">{not.title}</h5>
+                                <p className="text-[11px] text-foreground/60 line-clamp-1">{not.content}</p>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteCustomNotice(slugKey, not.id)}
+                                className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition-colors shrink-0"
+                                title="নোটিশটি মুছে ফেলুন"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : isNotice ? (
+                  /* ------------------------------------------------------------- */
+                  /* 2. NOTICE TAB 1: HERO SECTION & GENERAL NOTICE SETTINGS       */
+                  /* ------------------------------------------------------------- */
+                  <div className="space-y-8">
+                    {/* 1. HERO SECTION CONTROLS */}
+                    <div className="p-6 rounded-3xl bg-foreground/[0.02] border border-foreground/10 space-y-5">
+                      <div className="flex items-center gap-2">
+                        <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 border border-orange-500/20">
+                          <Sparkles className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-foreground">১. হিরো সেকশন ও ব্যানার ডিজাইন (Hero Section Controls)</h4>
+                          <p className="text-xs text-foreground/60">নোটিশ বোর্ডের মূল হেডার ব্যানার, শিরোনাম, বিবরণ ও ব্যাকগ্রাউন্ড ইমেজ পরিবর্তন করুন।</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        {/* Hero Headline */}
+                        <div>
+                          <label className="text-xs font-semibold text-foreground/70 block mb-1">
+                            হিরো প্রধান শিরোনাম (Hero Main Headline)
+                          </label>
+                          <input
+                            type="text"
+                            value={pageConfig.heroHeading || ''}
+                            onChange={(e) => updateCustomPageField('heroHeading', e.target.value)}
+                            placeholder="সকল ব্যাচের একাডেমিক নোটিশ ও অফিসিয়াল সার্কুলার"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500 font-bold"
+                          />
+                        </div>
+
+                        {/* Hero Subtitle */}
+                        <div>
+                          <label className="text-xs font-semibold text-foreground/70 block mb-1">
+                            হিরো সাবটাইটেল / বিবরণ (Hero Subtitle / Description)
+                          </label>
+                          <textarea
+                            rows={3}
+                            value={pageConfig.heroSubtitle || ''}
+                            onChange={(e) => updateCustomPageField('heroSubtitle', e.target.value)}
+                            placeholder={`${displayName || 'আমাদের'}-এর সকল অনলাইন ও অফলাইন ব্যাচের ক্লাস রুটিন, পরীক্ষার সময়সূচি, ফলাফল, ফি এবং জরুরি আপডেটসমূহ এখান থেকে সরাসরি সংগ্রহ করুন।`}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+
+                        {/* Hero Top Badge Text */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-xs font-semibold text-foreground/70 block mb-1">
+                              হিরো টপ ব্যাজ টেক্সট (Top Pill Badge)
+                            </label>
+                            <input
+                              type="text"
+                              value={pageConfig.heroTopBadge || ''}
+                              onChange={(e) => updateCustomPageField('heroTopBadge', e.target.value)}
+                              placeholder={`${displayName || 'Teacher'}'s Official Notice Board`}
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                            />
+                          </div>
+
+                          {/* Hero Background Image URL */}
+                          <div>
+                            <label className="text-xs font-semibold text-foreground/70 block mb-1">
+                              হিরো ব্যাকগ্রাউন্ড ইমেজ URL
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                value={pageConfig.heroBgImage || ''}
+                                onChange={(e) => updateCustomPageField('heroBgImage', e.target.value)}
+                                placeholder="https://images.unsplash.com/photo-..."
+                                className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                              />
+                              <label className="px-3.5 py-2.5 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/25 cursor-pointer text-xs font-bold shrink-0 flex items-center gap-1.5 transition-all">
+                                {uploadingNoticeHeroBg ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                                <span>আপলোড</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => handleUploadNoticeHeroBg(e, slugKey)}
+                                  className="hidden"
+                                />
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Live Hero Preview Box */}
+                        <div className="p-5 rounded-2xl bg-slate-950 text-white border border-purple-500/30 space-y-2 relative overflow-hidden shadow-lg">
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 font-bold">
+                              {pageConfig.heroTopBadge || `${displayName || 'Teacher'}'s Official Notice Board`}
+                            </span>
+                            <span className="text-amber-400 font-mono font-bold">
+                              {pageConfig.sessionYear || '২০২৬ সেশন (Active)'}
+                            </span>
+                          </div>
+                          <h5 className="font-black text-sm text-white pt-1">
+                            {pageConfig.heroHeading || 'সকল ব্যাচের একাডেমিক নোটিশ ও অফিসিয়াল সার্কুলার'}
+                          </h5>
+                          <p className="text-[11px] text-slate-300 line-clamp-2">
+                            {pageConfig.heroSubtitle || `${displayName || 'আমাদের'}-এর সকল অনলাইন ও অফলাইন ব্যাচের ক্লাস রুটিন, পরীক্ষার সময়সূচি, ফলাফল, ফি এবং জরুরি আপডেটসমূহ এখান থেকে সরাসরি সংগ্রহ করুন।`}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2. BREAKING NOTICE TICKER */}
+                    <div className="p-6 rounded-3xl bg-foreground/[0.02] border border-foreground/10 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <div className="p-2 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20">
+                          <Flame className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-foreground">২. জরুরি স্ক্রোলিং নোটিশ বার (Breaking Urgent Notice Ticker)</h4>
+                          <p className="text-xs text-foreground/60">পেজের শীর্ষে চলমান লাল ব্রেকিং নিউজের শিরোনাম নির্ধারণ করুন।</p>
+                        </div>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
@@ -4516,7 +5003,7 @@ export default function TeacherHomePageBuilderPage() {
                             value={pageConfig.tickerHeadline || ''}
                             onChange={(e) => updateCustomPageField('tickerHeadline', e.target.value)}
                             placeholder="এইচএসসি ২০২৬ চূড়ান্ত মডেল টেস্ট ও স্পেশাল রিভিশন ক্লাসের সময়সূচি প্রকাশ"
-                            className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
                           />
                         </div>
                         <div>
@@ -4526,17 +5013,22 @@ export default function TeacherHomePageBuilderPage() {
                             value={pageConfig.tickerRefNo || ''}
                             onChange={(e) => updateCustomPageField('tickerRefNo', e.target.value)}
                             placeholder="FB/NOT-2026/08-01"
-                            className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
                           />
                         </div>
                       </div>
                     </div>
 
-                    {/* 2. Header & Academic Session */}
-                    <div className="p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-4">
+                    {/* 3. SESSION & HELPLINE */}
+                    <div className="p-6 rounded-3xl bg-foreground/[0.02] border border-foreground/10 space-y-4">
                       <div className="flex items-center gap-2">
-                        <GraduationCap className="w-4 h-4 text-orange-500" />
-                        <h4 className="text-sm font-bold text-foreground">২. শিক্ষাবর্ষ ও হেডার বিবরণ</h4>
+                        <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 border border-orange-500/20">
+                          <GraduationCap className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-foreground">৩. শিক্ষাবর্ষ ও নোটিশ হেল্পলাইন</h4>
+                          <p className="text-xs text-foreground/60">সেশন ব্যাজ ও হোয়াটসঅ্যাপ নোটিফিকেশন নম্বর কাস্টমাইজ করুন।</p>
+                        </div>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
@@ -4546,7 +5038,7 @@ export default function TeacherHomePageBuilderPage() {
                             value={pageConfig.sessionYear || ''}
                             onChange={(e) => updateCustomPageField('sessionYear', e.target.value)}
                             placeholder="২০২৬ সেশন (Active)"
-                            className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
                           />
                         </div>
                         <div>
@@ -4556,31 +5048,23 @@ export default function TeacherHomePageBuilderPage() {
                             value={pageConfig.noticeWhatsapp || ''}
                             onChange={(e) => updateCustomPageField('noticeWhatsapp', e.target.value)}
                             placeholder="017XXXXXXXX"
-                            className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
                           />
                         </div>
                       </div>
                     </div>
-
-                    <div className="p-4 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-xs text-foreground space-y-1">
-                      <p className="font-bold flex items-center gap-1.5 text-orange-500">
-                        <Sparkles className="w-4 h-4" />
-                        <span>স্মার্ট নোটিশ কন্ট্রোল একটিভ</span>
-                      </p>
-                      <p className="text-foreground/70">
-                        সুপার অ্যাডমিন থেকে রিকোয়ারমেন্ট অনুযায়ী নতুন নোটিশ যোগ, পিডিএফ আপলোড বা পরীক্ষার ফলাফল প্রকাশ করার আরও ফিচার যেকোনো সময় যুক্ত করা যাবে।
-                      </p>
-                    </div>
                   </div>
                 ) : (
-                  /* General Custom Page Controls */
+                  /* ------------------------------------------------------------- */
+                  /* 3. GENERAL CUSTOM PAGE CONTROLS                               */
+                  /* ------------------------------------------------------------- */
                   <div className="space-y-6">
-                    <div className="p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-4">
+                    <div className="p-6 rounded-3xl bg-foreground/[0.02] border border-foreground/10 space-y-4">
                       <div className="flex items-center gap-2">
                         <FileText className="w-4 h-4 text-orange-500" />
                         <h4 className="text-sm font-bold text-foreground">১. মূল শিরোনাম ও বর্ণনা</h4>
                       </div>
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         <div>
                           <label className="text-xs font-semibold text-foreground/70 block mb-1">পেজ শিরোনাম (Heading)</label>
                           <input
@@ -4588,7 +5072,7 @@ export default function TeacherHomePageBuilderPage() {
                             value={pageConfig.heading || ''}
                             onChange={(e) => updateCustomPageField('heading', e.target.value)}
                             placeholder={`${customPage.name} - ${displayName || 'আমাদের একাডেমি'}`}
-                            className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
                           />
                         </div>
                         <div>
@@ -4598,7 +5082,7 @@ export default function TeacherHomePageBuilderPage() {
                             value={pageConfig.description || ''}
                             onChange={(e) => updateCustomPageField('description', e.target.value)}
                             placeholder="এই পেজের মূল বিষয়বস্তু ও বিবরণ এখানে লিখুন..."
-                            className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
                           />
                         </div>
                       </div>

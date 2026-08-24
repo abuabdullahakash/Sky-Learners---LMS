@@ -192,6 +192,7 @@ export default function DynamicTeacherCustomPage({ params }: CustomPageProps) {
               teacherPhone={teacherProfile?.contactPhone}
               teacherWhatsapp={teacherProfile?.contactWhatsapp}
               firestoreNotices={teacherNotices}
+              pageConfig={teacherProfile?.homePageConfig?.customPagesConfig?.notice || teacherProfile?.customPagesConfig?.notice || {}}
             />
           </div>
         ) : (

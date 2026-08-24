@@ -173,6 +173,7 @@ export default function Navbar() {
             : (routeTeacherId || guestTeacherId || null)));
 
   // 100% Clean URLs for seamless user experience:
+  const homeLink = '/';
   const isHomeActive = pathname === '/' || pathname.startsWith('/teachers/');
   const isCoursesActive = pathname === '/courses' || pathname.startsWith('/courses');
   const isAboutActive = pathname === '/about' || pathname.startsWith('/about');

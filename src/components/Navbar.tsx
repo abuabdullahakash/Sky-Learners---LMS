@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { LanguageToggle } from './LanguageToggle';
 import { useAuth } from '@/context/AuthContext';
 import { useParams, useSearchParams } from 'next/navigation';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { 
   User as UserIcon, 
@@ -140,22 +140,20 @@ export default function Navbar() {
     }
   }, []);
 
-  // Fetch Global Platform Pages
+  // Real-Time Listener for Global Platform Pages & Exclusion Rules
   useEffect(() => {
-    const fetchGlobalPages = async () => {
-      try {
-        const gpDoc = await getDoc(doc(db, 'platformSettings', 'globalTeacherPages'));
-        if (gpDoc.exists()) {
-          const data = gpDoc.data();
-          if (data.pages && Array.isArray(data.pages)) {
-            setPlatformGlobalPages(data.pages);
-          }
+    const unsubGlobalPages = onSnapshot(doc(db, 'platformSettings', 'globalTeacherPages'), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.pages && Array.isArray(data.pages)) {
+          setPlatformGlobalPages(data.pages);
         }
-      } catch (e) {
-        console.error("Error fetching global pages in navbar:", e);
       }
-    };
-    fetchGlobalPages();
+    }, (err) => {
+      console.error("Error listening to global pages in navbar:", err);
+    });
+
+    return () => unsubGlobalPages();
   }, []);
 
   // Check if current route has a teacher context
@@ -179,36 +177,36 @@ export default function Navbar() {
             ? preferredTeacherId 
             : (routeTeacherId || guestTeacherId || null)));
 
-  // Fetch active teacher storefront config
+  // Real-Time Listener for Active Teacher Storefront Config
   useEffect(() => {
-    if (effectiveTeacherId) {
-      const fetchTeacherData = async () => {
-        try {
-          const tDoc = await getDoc(doc(db, 'teacherProfiles', effectiveTeacherId));
-          if (tDoc.exists()) {
-            const data = tDoc.data();
-            setPreferredTeacherName(data.displayName || data.academyName || 'Teacher Academy');
-            setStorefrontTeacherData({
-              disabledPages: data.disabledPages || [],
-              customNavLinks: data.customNavLinks || []
-            });
-          } else {
-            const uDoc = await getDoc(doc(db, 'users', effectiveTeacherId));
-            if (uDoc.exists()) {
-              const uData = uDoc.data();
-              setPreferredTeacherName(uData.name || uData.displayName || 'Teacher Academy');
-            }
-            setStorefrontTeacherData({ disabledPages: [], customNavLinks: [] });
-          }
-        } catch (e) {
-          console.error("Error fetching teacher storefront config in navbar:", e);
-        }
-      };
-      fetchTeacherData();
-    } else {
+    if (!effectiveTeacherId) {
       setPreferredTeacherName('');
       setStorefrontTeacherData(null);
+      return;
     }
+
+    const unsubProfile = onSnapshot(doc(db, 'teacherProfiles', effectiveTeacherId), (tDoc) => {
+      if (tDoc.exists()) {
+        const data = tDoc.data();
+        setPreferredTeacherName(data.displayName || data.academyName || 'Teacher Academy');
+        setStorefrontTeacherData({
+          disabledPages: data.disabledPages || [],
+          customNavLinks: data.customNavLinks || []
+        });
+      } else {
+        getDoc(doc(db, 'users', effectiveTeacherId)).then(uDoc => {
+          if (uDoc.exists()) {
+            const uData = uDoc.data();
+            setPreferredTeacherName(uData.name || uData.displayName || 'Teacher Academy');
+          }
+        }).catch(() => {});
+        setStorefrontTeacherData({ disabledPages: [], customNavLinks: [] });
+      }
+    }, (err) => {
+      console.error("Error listening to teacher storefront in navbar:", err);
+    });
+
+    return () => unsubProfile();
   }, [effectiveTeacherId]);
 
   // 100% Clean URLs for seamless user experience:
@@ -242,15 +240,23 @@ export default function Navbar() {
     { id: 'contact', name: t('contact') || (pathname.includes('/bn') ? 'যোগাযোগ' : 'Contact'), href: '/contact' },
   ];
 
-  // Merge platform global pages with default base pages
-  const allMergedGlobalPages = [...defaultTeacherBasePages];
+  // Merge platform global pages with default base pages ensuring excludedTeacherIds are preserved
+  const allMergedGlobalPages = defaultTeacherBasePages.map(bp => {
+    const matched = platformGlobalPages.find(gp => gp.id === bp.id || gp.slug === bp.href);
+    return {
+      ...bp,
+      excludedTeacherIds: matched?.excludedTeacherIds || []
+    };
+  });
+
+  // Also append any custom global pages created by Super Admin
   platformGlobalPages.forEach(gp => {
     if (!allMergedGlobalPages.some(bp => bp.id === gp.id || bp.href === gp.slug)) {
       allMergedGlobalPages.push({
         id: gp.id,
         name: gp.name,
         href: gp.slug,
-        excludedTeacherIds: gp.excludedTeacherIds
+        excludedTeacherIds: gp.excludedTeacherIds || []
       } as any);
     }
   });
@@ -260,7 +266,7 @@ export default function Navbar() {
 
   // Filter out excluded / disabled global pages
   const filteredBasePages = allMergedGlobalPages.filter(page => {
-    const isGloballyExcluded = effectiveTeacherId ? (page as any).excludedTeacherIds?.includes(effectiveTeacherId) : false;
+    const isGloballyExcluded = effectiveTeacherId ? ((page as any).excludedTeacherIds || []).includes(effectiveTeacherId) : false;
     const isManuallyDisabled = teacherDisabledPages.includes(page.id);
     return !isGloballyExcluded && !isManuallyDisabled;
   });

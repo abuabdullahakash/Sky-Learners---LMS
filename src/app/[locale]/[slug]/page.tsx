@@ -68,6 +68,17 @@ export default function DynamicTeacherCustomPage({ params }: CustomPageProps) {
               setPageTitle(matched.name);
               setPageData(matched);
             }
+          } else {
+            const uDoc = await getDoc(doc(db, 'users', effectiveTeacherId));
+            if (uDoc.exists()) {
+              const uData = uDoc.data();
+              setTeacherProfile({
+                displayName: uData.name || uData.displayName || 'Instructor',
+                headline: uData.subject || 'Academic Instructor',
+                profilePhoto: uData.profilePhoto || uData.photoURL || uData.photoUrl,
+                bio: uData.bio || ''
+              });
+            }
           }
         }
 

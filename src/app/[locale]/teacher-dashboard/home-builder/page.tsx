@@ -1865,16 +1865,6 @@ export default function TeacherHomePageBuilderPage() {
               <span className="font-bold">{completedCount}/{checklist.length} টি পূর্ণ</span>
             </div>
           </div>
-
-          <button
-            type="button"
-            onClick={handleSaveConfig}
-            disabled={saving}
-            className="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition-all disabled:opacity-50"
-          >
-            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-            <span>{saving ? 'সংরক্ষণ হচ্ছে...' : 'সেটিংস সেভ করুন'}</span>
-          </button>
         </div>
 
       </aside>
@@ -1996,15 +1986,6 @@ export default function TeacherHomePageBuilderPage() {
               );
             })()}
 
-            <button
-              type="button"
-              onClick={handleSaveConfig}
-              disabled={saving}
-              className="px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-orange-500/30 transition-all disabled:opacity-50"
-            >
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              <span>{saving ? 'সংরক্ষণ হচ্ছে...' : 'সেটিংস সংরক্ষণ করুন'}</span>
-            </button>
           </div>
         </div>
 
@@ -5390,6 +5371,32 @@ export default function TeacherHomePageBuilderPage() {
 
         </div>
 
+      </div>
+
+      {/* Floating Circular Master Save Button (Bottom Right) */}
+      <div className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 group">
+        <button
+          type="button"
+          onClick={handleSaveConfig}
+          disabled={saving}
+          aria-label="সেটিংস সংরক্ষণ করুন"
+          className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-orange-600 via-orange-500 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white flex items-center justify-center shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/80 transition-all duration-300 hover:scale-110 active:scale-95 ring-4 ring-orange-500/25 border-2 border-white/30 disabled:opacity-50 cursor-pointer ${
+            saving ? 'animate-pulse' : ''
+          }`}
+          title="সেটিংস সংরক্ষণ করুন (Save All Settings)"
+        >
+          {saving ? (
+            <Loader2 className="w-6 h-6 sm:w-7 sm:h-7 animate-spin text-white" />
+          ) : (
+            <Save className="w-6 h-6 sm:w-7 sm:h-7 text-white transition-transform duration-300 group-hover:scale-110" />
+          )}
+        </button>
+
+        {/* Floating Tooltip */}
+        <div className="absolute bottom-full right-0 mb-3 px-3.5 py-1.5 rounded-xl bg-slate-950/95 text-white text-xs font-bold whitespace-nowrap shadow-2xl border border-white/10 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 flex items-center gap-1.5 z-50 backdrop-blur-md">
+          <Save className="w-3.5 h-3.5 text-orange-400" />
+          <span>{saving ? 'সংরক্ষণ হচ্ছে...' : 'সেটিংস সংরক্ষণ করুন (Save All)'}</span>
+        </div>
       </div>
 
     </div>

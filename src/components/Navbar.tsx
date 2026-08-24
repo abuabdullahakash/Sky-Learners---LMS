@@ -124,6 +124,16 @@ export default function Navbar() {
   const hasCompletedRole = isAdmin || isTeacher || isStudent;
   const userProfileLink = isAdmin ? '/admin' : (isTeacher ? '/teacher-dashboard' : (isStudent ? '/dashboard' : '/onboarding'));
   const [preferredTeacherName, setPreferredTeacherName] = useState<string>('');
+  const [guestTeacherId, setGuestTeacherId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('referralTeacherId') || localStorage.getItem('referralTeacherId');
+      if (stored && stored !== 'global') {
+        setGuestTeacherId(stored);
+      }
+    }
+  }, []);
 
   // Fetch preferred teacher details if student has chosen focused academy mode
   useEffect(() => {

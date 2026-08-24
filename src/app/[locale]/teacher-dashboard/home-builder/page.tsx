@@ -34,6 +34,9 @@ import {
   Info,
   Phone,
   HelpCircle,
+  Clock,
+  Mail,
+  MapPin,
   Award,
   Trophy,
   Medal,
@@ -397,7 +400,7 @@ export default function TeacherHomePageBuilderPage() {
   const [saving, setSaving] = useState(false);
   const [courses, setCourses] = useState<{ id: string; title: string }[]>([]);
   const [activeTab, setActiveTab] = useState<
-    'branding' | 'faculty' | 'sliders' | 'quickCards' | 'categories' | 'features' | 'admission' | 'about' | 'contact' | 'trustBanner' | 'gallery' | 'helpBar' | 'aboutHero' | 'aboutStory' | 'aboutValues' | 'aboutShowcase' | 'aboutFounder' | 'aboutCta'
+    'branding' | 'faculty' | 'sliders' | 'quickCards' | 'categories' | 'features' | 'admission' | 'about' | 'contact' | 'trustBanner' | 'gallery' | 'helpBar' | 'aboutHero' | 'aboutStory' | 'aboutValues' | 'aboutShowcase' | 'aboutFounder' | 'aboutCta' | 'contactHero' | 'contactCards' | 'contactSchedule' | 'contactSocial' | 'contactFaq' | 'contactCta'
   >('branding');
 
   // 0. Branding & Identity State
@@ -602,6 +605,47 @@ export default function TeacherHomePageBuilderPage() {
   const [uploadingAboutStoryImg, setUploadingAboutStoryImg] = useState(false);
   const [uploadingAboutFounderImg, setUploadingAboutFounderImg] = useState(false);
 
+  // 12. Full Contact Page Builder State (📞 যোগাযোগ পেজ)
+  const [contactHeroTag, setContactHeroTag] = useState('');
+  const [contactHeroTitle, setContactHeroTitle] = useState('যেকোনো প্রয়োজনে আমরা আছি তোমার পাশে');
+  const [contactHeroSubtitle, setContactHeroSubtitle] = useState('দেশসেরা মেন্টরদের সাথে শতভাগ প্রস্তুতি');
+  const [contactBadge1, setContactBadge1] = useState('ইনস্ট্যান্ট হোয়াটসঅ্যাপ রিপ্লাই');
+  const [contactBadge2, setContactBadge2] = useState('২৪/৭ ডিরেক্ট কল সার্ভিস');
+  const [contactResponseTime, setContactResponseTime] = useState('৫ — ১৫ মিনিট');
+  const [contactMapUrl, setContactMapUrl] = useState('');
+  const [contactFaqs, setContactFaqs] = useState<Array<{ id: string; q: string; a: string }>>([
+    {
+      id: 'faq-1',
+      q: 'আমি কীভাবে পছন্দের কোর্সে ভর্তি নিশ্চিত করব?',
+      a: 'কোর্স পেজে গিয়ে পছন্দের কোর্সটি সিলেক্ট করে "এনরোল করুন" বাটনে চাপুন। এরপর বিকাশ, নগদ বা রকেটের মাধ্যমে কোর্স ফি পাঠিয়ে ট্রানজ্যাকশন আইডি (TrxID) সাবমিট করলেই কিছুক্ষণের মধ্যে ড্যাশবোর্ডে কোর্সটি আনলক হয়ে যাবে।'
+    },
+    {
+      id: 'faq-2',
+      q: 'পেমেন্ট সম্পন্ন করার পর কী করতে হবে?',
+      a: 'পেমেন্ট সাবমিটের পর আপনার রিকোয়েস্টটি পেন্ডিং থাকবে। শিক্ষক বা অ্যাডমিন ভেরিফাই করে অ্যাপ্রুভ করার সাথে সাথে আপনার ড্যাশবোর্ডে সব ক্লাস, লেকচার শিট ও এক্সাম স্বয়ংক্রিয়ভাবে ওপেন হয়ে যাবে।'
+    },
+    {
+      id: 'faq-3',
+      q: 'লাইভ ক্লাস মিস হলে পরবর্তীতে রেকর্ডেড ক্লাস পাওয়া যাবে কি?',
+      a: 'হ্যাঁ, অবশ্যই! প্রতিটি লাইভ ক্লাসের পর ফুল এইচডি রেকর্ডেড ভিডিও লেকচার স্টুডেন্ট ড্যাশবোর্ডের "রেকর্ডেড ক্লাসেস" সেকশনে যুক্ত হয়ে যায়, যা কোর্স ভ্যালিডিটি চলাকালীন যতবার ইচ্ছা রিভিশন দেওয়া যায়।'
+    },
+    {
+      id: 'faq-4',
+      q: 'অফলাইন শিট ও দাগানো বই কীভাবে সংগ্রহ করব?',
+      a: 'আমাদের অফলাইন ব্রাঞ্চে এসে সরাসরি লেকচার শিট সংগ্রহ করা যাবে অথবা ড্যাশবোর্ডের রিসোর্স সেকশন থেকে হাই-কোয়ালিটি PDF ডাউনলোড করে প্রিন্ট করে নিতে পারবেন।'
+    },
+    {
+      id: 'faq-5',
+      q: 'যেকোনো জরুরি প্রয়োজনে তাৎক্ষণিক সমাধান কীভাবে পাব?',
+      a: 'আমাদের সরাসরি হোয়াটসঅ্যাপ হেল্পলাইনে মেসেজ দিন অথবা এই পেজের ফর্মটি পূরণ করে পাঠান। আমাদের ডেডিকেটেড সাপোর্ট টিম দ্রুততম সময়ে সমাধান করে দেবে।'
+    }
+  ]);
+  const [contactCtaBadge, setContactCtaBadge] = useState('সাফল্যের সূচনা হোক আজই');
+  const [contactCtaTitle, setContactCtaTitle] = useState('তোমার স্বপ্নের সেরা প্রস্তুতিতে আমরা আছি সাথে');
+  const [contactCtaSubtitle, setContactCtaSubtitle] = useState('লাইভ ক্লাস, নিয়মিত মডেল টেস্ট ও স্পেশালাইজড শিটের সাথে এখনই তোমার পছন্দের ব্যাচে যুক্ত হও।');
+  const [contactCtaBtn1Text, setContactCtaBtn1Text] = useState('সকল কোর্সসমূহ দেখুন');
+  const [contactCtaBtn2Text, setContactCtaBtn2Text] = useState('হেল্পলাইনে কল দিন');
+
   // Fetch initial data
   useEffect(() => {
     const fetchData = async () => {
@@ -719,6 +763,24 @@ export default function TeacherHomePageBuilderPage() {
             if (abConfig.ctaFeature2) setAboutCtaFeature2(abConfig.ctaFeature2);
             if (abConfig.ctaFeature3) setAboutCtaFeature3(abConfig.ctaFeature3);
             if (abConfig.ctaFeature4) setAboutCtaFeature4(abConfig.ctaFeature4);
+
+            // Populate Contact Page Config
+            const ctConfig = config.contactPageConfig || data.contactPageConfig || {};
+            if (ctConfig.heroTag) setContactHeroTag(ctConfig.heroTag);
+            if (ctConfig.heroTitle) setContactHeroTitle(ctConfig.heroTitle);
+            if (ctConfig.heroSubtitle) setContactHeroSubtitle(ctConfig.heroSubtitle);
+            if (ctConfig.badge1) setContactBadge1(ctConfig.badge1);
+            if (ctConfig.badge2) setContactBadge2(ctConfig.badge2);
+            if (ctConfig.responseTime) setContactResponseTime(ctConfig.responseTime);
+            if (ctConfig.mapUrl) setContactMapUrl(ctConfig.mapUrl);
+            if (ctConfig.faqs && Array.isArray(ctConfig.faqs) && ctConfig.faqs.length > 0) {
+              setContactFaqs(ctConfig.faqs);
+            }
+            if (ctConfig.ctaBadge) setContactCtaBadge(ctConfig.ctaBadge);
+            if (ctConfig.ctaTitle) setContactCtaTitle(ctConfig.ctaTitle);
+            if (ctConfig.ctaSubtitle) setContactCtaSubtitle(ctConfig.ctaSubtitle);
+            if (ctConfig.ctaBtn1Text) setContactCtaBtn1Text(ctConfig.ctaBtn1Text);
+            if (ctConfig.ctaBtn2Text) setContactCtaBtn2Text(ctConfig.ctaBtn2Text);
           } else if (data.profilePhoto || data.photoUrl) {
             setAboutPhoto(data.profilePhoto || data.photoUrl);
           }
@@ -822,6 +884,21 @@ export default function TeacherHomePageBuilderPage() {
           ctaFeature2: aboutCtaFeature2,
           ctaFeature3: aboutCtaFeature3,
           ctaFeature4: aboutCtaFeature4
+        },
+        contactPageConfig: {
+          heroTag: contactHeroTag,
+          heroTitle: contactHeroTitle,
+          heroSubtitle: contactHeroSubtitle,
+          badge1: contactBadge1,
+          badge2: contactBadge2,
+          responseTime: contactResponseTime,
+          mapUrl: contactMapUrl,
+          faqs: contactFaqs,
+          ctaBadge: contactCtaBadge,
+          ctaTitle: contactCtaTitle,
+          ctaSubtitle: contactCtaSubtitle,
+          ctaBtn1Text: contactCtaBtn1Text,
+          ctaBtn2Text: contactCtaBtn2Text
         },
         updatedAt: new Date().toISOString()
       };
@@ -1230,6 +1307,18 @@ export default function TeacherHomePageBuilderPage() {
         { id: 'aboutShowcase', label: '৪. ক্যাম্পাস ও টিম মোমেন্টস', icon: ImageIcon },
         { id: 'aboutFounder', label: '৫. ফাউন্ডার ও মেন্টর প্রোফাইল', icon: User },
         { id: 'aboutCta', label: '৬. মেগা অ্যাকশন ব্যানার (CTA)', icon: Target },
+      ]
+    },
+    {
+      id: 'contactUs',
+      groupName: '📞 যোগাযোগ পেজ (CONTACT US)',
+      items: [
+        { id: 'contactHero', label: '১. হিরো ও লাইভ সাপোর্ট ব্যাজ', icon: Headphones },
+        { id: 'contactCards', label: '২. ৪টি কুইক অ্যাকশন কার্ডস', icon: Phone },
+        { id: 'contactSchedule', label: '৩. সাপোর্ট সময় ও ব্রাঞ্চ লোকেশন', icon: Clock },
+        { id: 'contactSocial', label: '৪. সোশ্যাল ও ভিআইপি কমিউনিটি', icon: Globe },
+        { id: 'contactFaq', label: '৫. সচরাচর জিজ্ঞাসা (FAQ Manager)', icon: HelpCircle },
+        { id: 'contactCta', label: '৬. মেগা অ্যাকশন ব্যানার (CTA)', icon: Target },
       ]
     }
   ];
@@ -3789,6 +3878,522 @@ export default function TeacherHomePageBuilderPage() {
                   </div>
                 </div>
 
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* CONTACT PAGE BUILDER TABS                                                */}
+          {/* ========================================================================= */}
+
+          {/* 1. TAB: CONTACT HERO */}
+          {activeTab === 'contactHero' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
+                <div>
+                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
+                    <Headphones className="w-5 h-5 text-orange-500" />
+                    <span>১. হিরো ও লাইভ সাপোর্ট ব্যাজ (Hero & Live Badges)</span>
+                  </h3>
+                  <p className="text-xs text-foreground/60 mt-1">
+                    যোগাযোগ পেজের শীর্ষ হিরো সেকশনের হেডিং, সাবটাইটেল এবং লাইভ স্ট্যাটাস ব্যাজগুলো কাস্টমাইজ করুন।
+                  </p>
+                </div>
+                <Link
+                  href="/contact"
+                  target="_blank"
+                  className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-md shadow-orange-500/20 transition-all flex items-center gap-2 self-start sm:self-auto hover:scale-105 shrink-0"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>লাইভ পেজ দেখুন</span>
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-foreground/80 block mb-1">শীর্ষ ট্যাগ / ব্যাজ (Hero Tag)</label>
+                  <input
+                    type="text"
+                    value={contactHeroTag}
+                    onChange={(e) => setContactHeroTag(e.target.value)}
+                    placeholder={displayName ? `${displayName} • স্টুডেন্ট সাপোর্ট সেন্টার` : 'আমাদের একাডেমি • স্টুডেন্ট সাপোর্ট সেন্টার'}
+                    className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs font-bold focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-foreground/80 block mb-1">প্রধান শিরোনাম (Hero Heading)</label>
+                  <input
+                    type="text"
+                    value={contactHeroTitle}
+                    onChange={(e) => setContactHeroTitle(e.target.value)}
+                    placeholder="যেকোনো প্রয়োজনে আমরা আছি তোমার পাশে"
+                    className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-sm font-bold focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="text-xs font-bold text-foreground/80 block mb-1">সাবটাইটেল / বিবরণ</label>
+                  <input
+                    type="text"
+                    value={contactHeroSubtitle}
+                    onChange={(e) => setContactHeroSubtitle(e.target.value)}
+                    placeholder={headline || 'দেশসেরা মেন্টরদের সাথে শতভাগ প্রস্তুতি'}
+                    className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+
+                {/* 3 Live Badges */}
+                <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3 sm:col-span-2">
+                  <span className="text-xs font-black text-orange-500">৩টি লাইভ সাপোর্ট স্ট্যাটাস ব্যাজ</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="text-[11px] font-bold text-foreground/70 block mb-1">ব্যাজ ১ (WhatsApp)</label>
+                      <input
+                        type="text"
+                        value={contactBadge1}
+                        onChange={(e) => setContactBadge1(e.target.value)}
+                        placeholder="ইনস্ট্যান্ট হোয়াটসঅ্যাপ রিপ্লাই"
+                        className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs font-bold text-emerald-600 dark:text-emerald-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-foreground/70 block mb-1">ব্যাজ ২ (Helpline)</label>
+                      <input
+                        type="text"
+                        value={contactBadge2}
+                        onChange={(e) => setContactBadge2(e.target.value)}
+                        placeholder="২৪/৭ ডিরেক্ট কল সার্ভিস"
+                        className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs font-bold text-blue-600 dark:text-blue-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-foreground/70 block mb-1">ব্যাজ ৩ (অফিস সময়)</label>
+                      <input
+                        type="text"
+                        value={contactOfficeHours}
+                        onChange={(e) => setContactOfficeHours(e.target.value)}
+                        placeholder="প্রতিদিন সকাল ৯:০০ টা — রাত ১০:০০ টা"
+                        className="w-full px-3 py-2 rounded-xl bg-background border border-foreground/10 text-xs font-bold text-purple-600 dark:text-purple-400"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 2. TAB: CONTACT CARDS */}
+          {activeTab === 'contactCards' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
+                <div>
+                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
+                    <Phone className="w-5 h-5 text-orange-500" />
+                    <span>২. ৪টি কুইক অ্যাকশন কার্ডস (Quick Action Cards)</span>
+                  </h3>
+                  <p className="text-xs text-foreground/60 mt-1">
+                    শিক্ষার্থীদের দ্রুত যোগাযোগের জন্য ফোন, হোয়াটসঅ্যাপ, ইমেইল ও ব্রাঞ্চ কার্ডের তথ্য কনফিগার করুন।
+                  </p>
+                </div>
+                <Link
+                  href="/contact"
+                  target="_blank"
+                  className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-md shadow-orange-500/20 transition-all flex items-center gap-2 self-start sm:self-auto hover:scale-105 shrink-0"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>লাইভ পেজ দেখুন</span>
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Helpline Phone */}
+                <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-bold text-orange-500">
+                    <Phone className="w-4 h-4" />
+                    <span>১. ২৪/৭ হেল্পলাইন ফোন নম্বর</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={contactPhone}
+                    onChange={(e) => setContactPhone(e.target.value)}
+                    placeholder="017XXXXXXXX"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs font-mono font-bold focus:outline-none focus:border-orange-500"
+                  />
+                  <p className="text-[10px] text-foreground/50">শিক্ষার্থী ক্লিক করলে সরাসরি ডায়াল প্যাড ওপেন হবে।</p>
+                </div>
+
+                {/* WhatsApp */}
+                <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-bold text-emerald-500">
+                    <MessageCircle className="w-4 h-4" />
+                    <span>২. WhatsApp সাপোর্ট নম্বর</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={contactWhatsapp}
+                    onChange={(e) => setContactWhatsapp(e.target.value)}
+                    placeholder="017XXXXXXXX"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs font-mono font-bold focus:outline-none focus:border-orange-500"
+                  />
+                  <p className="text-[10px] text-foreground/50">ক্লিক করলে প্রি-ফিল্ড মেসেজসহ WhatsApp চ্যাট ওপেন হবে।</p>
+                </div>
+
+                {/* Email */}
+                <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-bold text-blue-500">
+                    <Mail className="w-4 h-4" />
+                    <span>৩. অফিসিয়াল সাপোর্ট ইমেইল</span>
+                  </div>
+                  <input
+                    type="email"
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    placeholder="support@academy.com"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs font-mono font-bold focus:outline-none focus:border-orange-500"
+                  />
+                  <p className="text-[10px] text-foreground/50">যেকোনো দাপ্তরিক বা কোর্স ইনফো প্রেরণের জন্য।</p>
+                </div>
+
+                {/* Campus Address */}
+                <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-bold text-purple-500">
+                    <MapPin className="w-4 h-4" />
+                    <span>৪. অফলাইন ব্রাঞ্চ / ক্লাসরুম ঠিকানা</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={contactAddress}
+                    onChange={(e) => setContactAddress(e.target.value)}
+                    placeholder="ফার্মগেট / মৌচাক শাখা, ঢাকা, বাংলাদেশ"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs font-bold focus:outline-none focus:border-orange-500"
+                  />
+                  <p className="text-[10px] text-foreground/50">শিক্ষার্থী সরাসরি এসে ভর্তি ও পরামর্শ নিতে পারবে।</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 3. TAB: CONTACT SCHEDULE */}
+          {activeTab === 'contactSchedule' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
+                <div>
+                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-orange-500" />
+                    <span>৩. সাপোর্ট সময়সূচি ও ব্রাঞ্চ লোকেশন (Schedule & Branch)</span>
+                  </h3>
+                  <p className="text-xs text-foreground/60 mt-1">
+                    অফিস সময়সূচি, রেসপন্স টাইম এবং Google Maps লোকেশন লিঙ্ক কনফিগার করুন।
+                  </p>
+                </div>
+                <Link
+                  href="/contact"
+                  target="_blank"
+                  className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-md shadow-orange-500/20 transition-all flex items-center gap-2 self-start sm:self-auto hover:scale-105 shrink-0"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>লাইভ পেজ দেখুন</span>
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-foreground/80 block mb-1">সাপোর্ট ও অফিস সময়সূচি</label>
+                  <input
+                    type="text"
+                    value={contactOfficeHours}
+                    onChange={(e) => setContactOfficeHours(e.target.value)}
+                    placeholder="প্রতিদিন সকাল ৯:০০ টা — রাত ১০:০০ টা"
+                    className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs font-bold focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-foreground/80 block mb-1">গড় রেসপন্স টাইম প্রতিশ্রুতি</label>
+                  <input
+                    type="text"
+                    value={contactResponseTime}
+                    onChange={(e) => setContactResponseTime(e.target.value)}
+                    placeholder="৫ — ১৫ মিনিট"
+                    className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs font-bold focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="text-xs font-bold text-foreground/80 block mb-1">ক্যাম্পাস / ব্রাঞ্চের পূর্ণ ঠিকানা</label>
+                  <input
+                    type="text"
+                    value={contactAddress}
+                    onChange={(e) => setContactAddress(e.target.value)}
+                    placeholder="ফার্মগেট / মৌচাক শাখা, ঢাকা, বাংলাদেশ"
+                    className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="text-xs font-bold text-foreground/80 block mb-1">Google Maps লোকেশন বা ডিরেকশন লিংক (ঐচ্ছিক)</label>
+                  <input
+                    type="text"
+                    value={contactMapUrl}
+                    onChange={(e) => setContactMapUrl(e.target.value)}
+                    placeholder="https://maps.google.com/?q=..."
+                    className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs font-mono focus:outline-none focus:border-orange-500"
+                  />
+                  <p className="text-[10px] text-foreground/50 mt-1">খালি রাখলে ব্রাঞ্চের ঠিকানা অনুযায়ী স্বয়ংক্রিয়ভাবে ম্যাপ সার্চ ওপেন হবে।</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 4. TAB: CONTACT SOCIAL */}
+          {activeTab === 'contactSocial' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
+                <div>
+                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-orange-500" />
+                    <span>৪. সোশ্যাল ও ভিআইপি কমিউনিটি (Community & Social Hub)</span>
+                  </h3>
+                  <p className="text-xs text-foreground/60 mt-1">
+                    ফেসবুক ভিআইপি গ্রুপ, টেলিগ্রাম চ্যানেল, ইউটিউব লেকচার এবং অফিশিয়াল পেজের লিংক সেট করুন।
+                  </p>
+                </div>
+                <Link
+                  href="/contact"
+                  target="_blank"
+                  className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-md shadow-orange-500/20 transition-all flex items-center gap-2 self-start sm:self-auto hover:scale-105 shrink-0"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>লাইভ পেজ দেখুন</span>
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-foreground/80 block mb-1">Facebook VIP Group লিংক</label>
+                  <input
+                    type="text"
+                    value={contactFacebookGroup}
+                    onChange={(e) => setContactFacebookGroup(e.target.value)}
+                    placeholder="https://facebook.com/groups/yourgroup"
+                    className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-foreground/80 block mb-1">Telegram Channel লিংক</label>
+                  <input
+                    type="text"
+                    value={contactTelegram}
+                    onChange={(e) => setContactTelegram(e.target.value)}
+                    placeholder="https://t.me/yourchannel"
+                    className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-foreground/80 block mb-1">YouTube Channel লিংক</label>
+                  <input
+                    type="text"
+                    value={contactYoutube}
+                    onChange={(e) => setContactYoutube(e.target.value)}
+                    placeholder="https://youtube.com/@yourchannel"
+                    className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-foreground/80 block mb-1">Facebook Page লিংক</label>
+                  <input
+                    type="text"
+                    value={contactFacebookPage}
+                    onChange={(e) => setContactFacebookPage(e.target.value)}
+                    placeholder="https://facebook.com/yourpage"
+                    className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 5. TAB: CONTACT FAQ MANAGER */}
+          {activeTab === 'contactFaq' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
+                <div>
+                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
+                    <HelpCircle className="w-5 h-5 text-orange-500" />
+                    <span>৫. সচরাচর জিজ্ঞাসা (FAQ Manager)</span>
+                  </h3>
+                  <p className="text-xs text-foreground/60 mt-1">
+                    কন্টাক্ট পেজের জন্য প্রয়োজনীয় সাধারণ প্রশ্নোত্তর যুক্ত করুন এবং কাস্টমাইজ করুন।
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setContactFaqs(prev => [
+                        ...prev,
+                        { id: `faq-${Date.now()}`, q: '', a: '' }
+                      ]);
+                      toast.success(locale === 'bn' ? 'নতুন FAQ যুক্ত হয়েছে!' : 'New FAQ added!');
+                    }}
+                    className="px-4 py-2 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/30 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>নতুন FAQ যোগ করুন</span>
+                  </button>
+                  <Link
+                    href="/contact"
+                    target="_blank"
+                    className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-md shadow-orange-500/20 transition-all flex items-center gap-1.5"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>প্রিভিউ</span>
+                  </Link>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {contactFaqs.map((faq, index) => (
+                  <div key={faq.id || index} className="p-4 sm:p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-3 relative group">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-extrabold text-orange-500">FAQ #{index + 1}</span>
+                      {contactFaqs.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setContactFaqs(prev => prev.filter(f => f.id !== faq.id));
+                            toast.success(locale === 'bn' ? 'FAQ মুছে ফেলা হয়েছে' : 'FAQ removed');
+                          }}
+                          className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors"
+                          title="Remove FAQ"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-bold text-foreground/70 block mb-1">প্রশ্ন (Question)</label>
+                      <input
+                        type="text"
+                        value={faq.q}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setContactFaqs(prev => prev.map(f => f.id === faq.id ? { ...f, q: val } : f));
+                        }}
+                        placeholder="যেমন: আমি কীভাবে কোর্সে ভর্তি নিশ্চিত করব?"
+                        className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs font-bold text-foreground focus:outline-none focus:border-orange-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-bold text-foreground/70 block mb-1">উত্তর (Answer)</label>
+                      <textarea
+                        rows={3}
+                        value={faq.a}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setContactFaqs(prev => prev.map(f => f.id === faq.id ? { ...f, a: val } : f));
+                        }}
+                        placeholder="বিস্তারিত উত্তর লিখুন..."
+                        className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs text-foreground/80 focus:outline-none focus:border-orange-500 leading-relaxed"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 6. TAB: CONTACT CTA */}
+          {activeTab === 'contactCta' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
+                <div>
+                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
+                    <Target className="w-5 h-5 text-orange-500" />
+                    <span>৬. মেগা অ্যাকশন ব্যানার (Mega CTA Banner)</span>
+                  </h3>
+                  <p className="text-xs text-foreground/60 mt-1">
+                    কন্টাক্ট পেজের নিচের কল-টু-অ্যাকশন ব্যানার, শিরোনাম ও বাটনসমূহ কাস্টমাইজ করুন।
+                  </p>
+                </div>
+                <Link
+                  href="/contact"
+                  target="_blank"
+                  className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-md shadow-orange-500/20 transition-all flex items-center gap-2 self-start sm:self-auto hover:scale-105 shrink-0"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>লাইভ পেজ দেখুন</span>
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-foreground/80 block mb-1">শীর্ষ ব্যাজ টেক্সট</label>
+                  <input
+                    type="text"
+                    value={contactCtaBadge}
+                    onChange={(e) => setContactCtaBadge(e.target.value)}
+                    placeholder="সাফল্যের সূচনা হোক আজই"
+                    className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs font-bold focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-foreground/80 block mb-1">প্রধান হেডিং</label>
+                  <input
+                    type="text"
+                    value={contactCtaTitle}
+                    onChange={(e) => setContactCtaTitle(e.target.value)}
+                    placeholder="তোমার স্বপ্নের সেরা প্রস্তুতিতে আমরা আছি সাথে"
+                    className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-sm font-bold focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="text-xs font-bold text-foreground/80 block mb-1">সাবহেডিং / বিবরণ</label>
+                  <input
+                    type="text"
+                    value={contactCtaSubtitle}
+                    onChange={(e) => setContactCtaSubtitle(e.target.value)}
+                    placeholder="লাইভ ক্লাস, নিয়মিত মডেল টেস্ট ও স্পেশালাইজড শিটের সাথে এখনই তোমার পছন্দের ব্যাচে যুক্ত হও।"
+                    className="w-full px-4 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+
+                {/* Button 1 */}
+                <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2">
+                  <span className="text-xs font-black text-orange-500">প্রাইমারি অ্যাকশন বাটন টেক্সট</span>
+                  <input
+                    type="text"
+                    value={contactCtaBtn1Text}
+                    onChange={(e) => setContactCtaBtn1Text(e.target.value)}
+                    placeholder="সকল কোর্সসমূহ দেখুন"
+                    className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs font-bold focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+
+                {/* Button 2 */}
+                <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2">
+                  <span className="text-xs font-black text-foreground/70">হেল্পলাইন বাটন টেক্সট</span>
+                  <input
+                    type="text"
+                    value={contactCtaBtn2Text}
+                    onChange={(e) => setContactCtaBtn2Text(e.target.value)}
+                    placeholder="হেল্পলাইনে কল দিন"
+                    className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs font-bold focus:outline-none focus:border-orange-500"
+                  />
+                </div>
               </div>
             </div>
           )}

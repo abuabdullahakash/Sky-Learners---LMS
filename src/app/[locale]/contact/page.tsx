@@ -198,36 +198,57 @@ function ContactPageContent() {
 
   const defaultFaqs = [
     {
+      id: 'faq-1',
       q: locale === 'bn' ? 'আমি কীভাবে পছন্দের কোর্সে ভর্তি নিশ্চিত করব?' : 'How do I enroll in a course?',
       a: locale === 'bn' 
         ? 'কোর্স পেজে গিয়ে পছন্দের কোর্সটি সিলেক্ট করে "এনরোল করুন" বাটনে চাপুন। এরপর বিকাশ, নগদ বা রকেটের মাধ্যমে কোর্স ফি পাঠিয়ে ট্রানজ্যাকশন আইডি (TrxID) সাবমিট করলেই কিছুক্ষণের মধ্যে ড্যাশবোর্ডে কোর্সটি আনলক হয়ে যাবে।'
         : 'Visit the Courses page, select your course, and click "Enroll". Pay via bKash/Nagad/Rocket, submit the TrxID, and your access will be approved shortly.'
     },
     {
+      id: 'faq-2',
       q: locale === 'bn' ? 'পেমেন্ট সম্পন্ন করার পর কী করতে হবে?' : 'What should I do after completing payment?',
       a: locale === 'bn'
         ? 'পেমেন্ট সাবমিটের পর আপনার রিকোয়েস্টটি পেন্ডিং থাকবে। শিক্ষক বা অ্যাডমিন ভেরিফাই করে অ্যাপ্রুভ করার সাথে সাথে আপনার ড্যাশবোর্ডে সব ক্লাস, লেকচার শিট ও এক্সাম স্বয়ংক্রিয়ভাবে ওপেন হয়ে যাবে।'
         : 'After submitting the TrxID, your request will be reviewed. Once approved, all lectures, notes, and exams will unlock immediately on your dashboard.'
     },
     {
+      id: 'faq-3',
       q: locale === 'bn' ? 'লাইভ ক্লাস মিস হলে পরবর্তীতে রেকর্ডেড ক্লাস পাওয়া যাবে কি?' : 'Can I watch recorded lectures if I miss a live class?',
       a: locale === 'bn'
         ? 'হ্যাঁ, অবশ্যই! প্রতিটি লাইভ ক্লাসের পর ফুল এইচডি রেকর্ডেড ভিডিও লেকচার স্টুডেন্ট ড্যাশবোর্ডের "রেকর্ডেড ক্লাসেস" সেকশনে যুক্ত হয়ে যায়, যা কোর্স ভ্যালিডিটি চলাকালীন যতবার ইচ্ছা রিভিশন দেওয়া যায়।'
         : 'Yes, absolutely! Every live class is recorded in Full HD and uploaded to your Recorded Classes tab, accessible anytime for revision.'
     },
     {
+      id: 'faq-4',
       q: locale === 'bn' ? 'অফলাইন শিট ও দাগানো বই কীভাবে সংগ্রহ করব?' : 'How do I collect physical lecture sheets or books?',
       a: locale === 'bn'
         ? 'আমাদের অফলাইন ব্রাঞ্চে এসে সরাসরি লেকচার শিট সংগ্রহ করা যাবে অথবা ড্যাশবোর্ডের রিসোর্স সেকশন থেকে হাই-কোয়ালিটি PDF ডাউনলোড করে প্রিন্ট করে নিতে পারবেন।'
         : 'You can collect physical sheets from our branch or download printable high-resolution PDFs directly from the Resources tab.'
     },
     {
+      id: 'faq-5',
       q: locale === 'bn' ? 'যেকোনো জরুরি প্রয়োজনে তাৎক্ষণিক সমাধান কীভাবে পাব?' : 'How can I get instant support for technical issues?',
       a: locale === 'bn'
         ? 'আমাদের সরাসরি হোয়াটসঅ্যাপ হেল্পলাইনে মেসেজ দিন অথবা এই পেজের ফর্মটি পূরণ করে পাঠান। আমাদের ডেডিকেটেড সাপোর্ট টিম দ্রুততম সময়ে সমাধান করে দেবে।'
         : 'Message our official WhatsApp hotline directly or submit the inquiry form above. Our support team will resolve it swiftly.'
     }
   ];
+
+  // Dynamic Contact Page Config from Website Builder
+  const ctConfig = teacherProfile?.contactPageConfig || {};
+  const heroTag = ctConfig.heroTag || (activeTeacherId ? (locale === 'bn' ? `${academyName} • স্টুডেন্ট সাপোর্ট সেন্টার` : `${academyName} • Student Support Center`) : (locale === 'bn' ? 'SkyLearners প্ল্যাটফর্ম হেল্পডেস্ক' : 'SkyLearners Platform Helpdesk'));
+  const heroTitle = ctConfig.heroTitle || (locale === 'bn' ? 'যেকোনো প্রয়োজনে আমরা আছি তোমার পাশে' : 'We are here to Support Your Journey');
+  const heroSubtitle = ctConfig.heroSubtitle || headline;
+  const badge1 = ctConfig.badge1 || (locale === 'bn' ? 'ইনস্ট্যান্ট হোয়াটসঅ্যাপ রিপ্লাই' : 'Instant WhatsApp Response');
+  const badge2 = ctConfig.badge2 || (locale === 'bn' ? '২৪/৭ ডিরেক্ট কল সার্ভিস' : 'Direct Helpline Support');
+  const responseTime = ctConfig.responseTime || (locale === 'bn' ? '৫ — ১৫ মিনিট' : '5 — 15 Minutes');
+  const mapUrl = ctConfig.mapUrl || `https://maps.google.com/?q=${encodeURIComponent(address)}`;
+  const faqs = (ctConfig.faqs && Array.isArray(ctConfig.faqs) && ctConfig.faqs.length > 0) ? ctConfig.faqs : defaultFaqs;
+  const ctaBadge = ctConfig.ctaBadge || (locale === 'bn' ? 'সাফল্যের সূচনা হোক আজই' : 'Start Your Journey');
+  const ctaTitle = ctConfig.ctaTitle || (locale === 'bn' ? 'তোমার স্বপ্নের সেরা প্রস্তুতিতে আমরা আছি সাথে' : 'Prepare for Success with Top Mentors');
+  const ctaSubtitle = ctConfig.ctaSubtitle || (locale === 'bn' ? 'লাইভ ক্লাস, নিয়মিত মডেল টেস্ট ও স্পেশালাইজড শিটের সাথে এখনই তোমার পছন্দের ব্যাচে যুক্ত হও।' : 'Enroll in our specialized batches with live classes, exams, and comprehensive materials.');
+  const ctaBtn1Text = ctConfig.ctaBtn1Text || (locale === 'bn' ? 'সকল কোর্সসমূহ দেখুন' : 'Explore Courses');
+  const ctaBtn2Text = ctConfig.ctaBtn2Text || (locale === 'bn' ? 'হেল্পলাইনে কল দিন' : 'Call Helpline');
 
   if (loading) {
     return (
@@ -250,7 +271,7 @@ function ContactPageContent() {
         
         {/* Background Ambient Glows */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-orange-500/10 dark:bg-orange-500/15 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute -top-10 -right-10 w-72 h-72 bg-blue-500/10 dark:bg-blue-500/15 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute -top-10 -right-10 w-72 h-72 bg-blue-500/10 dark:blue-500/15 blur-[100px] rounded-full pointer-events-none" />
 
         <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
@@ -272,34 +293,28 @@ function ContactPageContent() {
             {/* Tag Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-600 dark:text-orange-400 text-xs sm:text-sm font-black tracking-wide uppercase shadow-xs">
               <Headphones className="w-4 h-4 text-orange-500 animate-pulse" />
-              <span>
-                {locale === 'bn' ? `${academyName} • স্টুডেন্ট সাপোর্ট সেন্টার` : `${academyName} • Student Support Center`}
-              </span>
+              <span>{heroTag}</span>
             </div>
 
             {/* Main Title */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-foreground leading-[1.15]">
-              {locale === 'bn' ? (
-                <>যেকোনো প্রয়োজনে <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-red-500 bg-clip-text text-transparent">আমরা আছি তোমার পাশে</span></>
-              ) : (
-                <>We are here to <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-red-500 bg-clip-text text-transparent">Support Your Journey</span></>
-              )}
+              {heroTitle}
             </h1>
 
             {/* Subtitle */}
             <p className="text-sm sm:text-base text-foreground/70 leading-relaxed max-w-2xl mx-auto">
-              {headline}
+              {heroSubtitle}
             </p>
 
             {/* Floating Live Support Status Badges */}
             <div className="pt-3 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5 text-xs font-bold">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 shadow-xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                <span>{locale === 'bn' ? 'ইনস্ট্যান্ট হোয়াটসঅ্যাপ রিপ্লাই' : 'Instant WhatsApp Response'}</span>
+                <span>{badge1}</span>
               </div>
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/25 shadow-xs">
                 <Phone className="w-3.5 h-3.5 text-blue-500" />
-                <span>{locale === 'bn' ? '২৪/৭ ডিরেক্ট কল সার্ভিস' : 'Direct Helpline Support'}</span>
+                <span>{badge2}</span>
               </div>
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/25 shadow-xs">
                 <Clock className="w-3.5 h-3.5 text-purple-500" />
@@ -400,7 +415,7 @@ function ContactPageContent() {
               <p className="text-xs font-semibold text-foreground/80 line-clamp-2 leading-relaxed">{address}</p>
             </div>
             <a 
-              href={`https://maps.google.com/?q=${encodeURIComponent(address)}`}
+              href={mapUrl}
               target="_blank"
               rel="noreferrer"
               className="mt-4 w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-purple-600/20"
@@ -580,7 +595,7 @@ function ContactPageContent() {
                 </div>
                 <div className="flex items-center justify-between p-2.5 rounded-xl bg-background/80 border border-foreground/10">
                   <span className="font-bold text-foreground/70">{locale === 'bn' ? 'গড় রেসপন্স টাইম:' : 'Avg. Response Time:'}</span>
-                  <span className="font-extrabold text-emerald-600 dark:text-emerald-400">{locale === 'bn' ? '৫ — ১৫ মিনিট' : '5 — 15 Minutes'}</span>
+                  <span className="font-extrabold text-emerald-600 dark:text-emerald-400">{responseTime}</span>
                 </div>
               </div>
             </div>
@@ -603,7 +618,7 @@ function ContactPageContent() {
                 <MapPin className="w-8 h-8 text-orange-500 animate-bounce mb-1" />
                 <p className="text-xs font-extrabold text-foreground line-clamp-1">{address}</p>
                 <a
-                  href={`https://maps.google.com/?q=${encodeURIComponent(address)}`}
+                  href={mapUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="mt-2 px-4 py-1.5 rounded-lg bg-orange-500 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-sm hover:scale-105 transition-all"
@@ -692,11 +707,11 @@ function ContactPageContent() {
         </div>
 
         <div className="space-y-3.5">
-          {defaultFaqs.map((faq, index) => {
+          {faqs.map((faq: any, index: number) => {
             const isOpen = openFaqIndex === index;
             return (
               <div 
-                key={index}
+                key={faq.id || index}
                 className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
                   isOpen 
                     ? 'bg-foreground/[0.03] dark:bg-card border-orange-500/30 shadow-md' 
@@ -705,7 +720,7 @@ function ContactPageContent() {
               >
                 <button
                   onClick={() => setOpenFaqIndex(isOpen ? null : index)}
-                  className="w-full px-5 sm:px-6 py-4 sm:py-5 flex items-center justify-between text-left gap-4"
+                  className="w-full px-5 sm:px-6 py-4 sm:py-5 flex items-center justify-between text-left gap-4 cursor-pointer"
                 >
                   <span className="font-extrabold text-sm sm:text-base text-foreground leading-snug">
                     {faq.q}
@@ -725,7 +740,7 @@ function ContactPageContent() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.25 }}
                     >
-                      <div className="px-5 sm:px-6 pb-5 pt-1 text-xs sm:text-sm text-foreground/75 leading-relaxed border-t border-foreground/5">
+                      <div className="px-5 sm:px-6 pb-5 pt-1 text-xs sm:text-sm text-foreground/75 leading-relaxed border-t border-foreground/5 whitespace-pre-line">
                         {faq.a}
                       </div>
                     </motion.div>
@@ -746,15 +761,13 @@ function ContactPageContent() {
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
             <div className="space-y-2 max-w-xl">
               <span className="px-3 py-1 bg-orange-500/20 text-orange-400 text-xs font-black rounded-full uppercase tracking-wider border border-orange-500/30">
-                {locale === 'bn' ? 'সাফল্যের সূচনা হোক আজই' : 'Start Your Journey'}
+                {ctaBadge}
               </span>
               <h3 className="text-2xl sm:text-3xl font-black leading-tight text-white">
-                {locale === 'bn' ? 'তোমার স্বপ্নের সেরা প্রস্তুতিতে আমরা আছি সাথে' : 'Prepare for Success with Top Mentors'}
+                {ctaTitle}
               </h3>
               <p className="text-xs sm:text-sm text-gray-300">
-                {locale === 'bn' 
-                  ? 'লাইভ ক্লাস, নিয়মিত মডেল টেস্ট ও স্পেশালাইজড শিটের সাথে এখনই তোমার পছন্দের ব্যাচে যুক্ত হও।' 
-                  : 'Enroll in our specialized batches with live classes, exams, and comprehensive materials.'}
+                {ctaSubtitle}
               </p>
             </div>
 
@@ -764,14 +777,14 @@ function ContactPageContent() {
                 className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-lg shadow-orange-500/30 hover:scale-105"
               >
                 <BookOpen className="w-4 h-4" />
-                <span>{locale === 'bn' ? 'সকল কোর্সসমূহ দেখুন' : 'Explore Courses'}</span>
+                <span>{ctaBtn1Text}</span>
               </Link>
               <a
                 href={`tel:${phone}`}
                 className="px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs sm:text-sm flex items-center gap-2 transition-all backdrop-blur-sm"
               >
                 <Phone className="w-4 h-4 text-orange-400" />
-                <span>{locale === 'bn' ? 'হেল্পলাইনে কল দিন' : 'Call Helpline'}</span>
+                <span>{ctaBtn2Text}</span>
               </a>
             </div>
           </div>

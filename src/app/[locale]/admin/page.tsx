@@ -575,18 +575,8 @@ export default function AdminDashboardPage() {
   };
 
   const handleCopyAIPrompt = (teacher: UserItem, page: CustomNavItem) => {
-    const promptText = `[SkyLearners LMS - Teacher Custom Page Requirement]
-Teacher Name: ${teacher.name || teacher.displayName || 'Teacher'}
-Teacher Email: ${teacher.email || 'N/A'}
-Teacher UID: ${teacher.id}
-Page Name: ${page.name}
-Page Slug: ${page.slug}
-Storefront URL: /teachers/${teacher.id}
-Custom Page Clean URL: ${page.slug}
-
-TASK FOR AI:
-Please build the custom page design for Teacher "${teacher.name || teacher.displayName}" at route "${page.slug}".
-Ensure this custom view renders when visiting in Teacher Storefront Mode for Teacher ID "${teacher.id}".`;
+    const promptText = `🎯 Target: ${teacher.name || teacher.displayName || 'Teacher'} (ID: ${teacher.id}) | Page: ${page.name} (${page.slug})
+📝 রিকোয়ারমেন্ট: `;
 
     navigator.clipboard.writeText(promptText);
     toast.success(`🤖 "${page.name}" পেজের AI Prompt কপি করা হয়েছে!`);

@@ -54,6 +54,29 @@ Whenever developing or updating the website:
 * Make the route clean, responsive, and SEO-friendly.
 
 ### When User Requests a **Teacher Site Page**:
-* Register the page under the **Teacher Storefront Navigation**.
+* Register the page under the **Teacher Storefront Navigation** (`teacherStorefrontNavLinks` in `Navbar.tsx`).
 * Integrate the page/section data with the **Teacher Website Builder** (`/teacher-dashboard/home-builder`) so the teacher can edit its content.
-* Ensure the page loads dynamically for visitors in Teacher Mode (`referralTeacherId` / `preferredTeacherId` / logged-in teacher).
+* Ensure the page loads dynamically for visitors in Teacher Mode (`guestTeacherId` / `preferredTeacherId` / logged-in teacher).
+
+---
+
+## 🗂️ 4. Header Menu Categorization & Dynamic Switching Architecture
+
+In `src/components/Navbar.tsx`, public navigation links are cleanly divided into two explicit categories:
+
+1. **`marketplaceNavLinks` (Marketplace Menu Category):**
+   - Contains: `Home`, `Courses`, `About` (and any new marketplace pages).
+   - Only shown to:
+     - Organic / non-logged-in visitors (no referral link).
+     - Logged-in students in Global Marketplace Mode.
+     - Any URL with `?view=marketplace`.
+
+2. **`teacherStorefrontNavLinks` (Teacher Storefront Menu Category):**
+   - Contains: `Home`, `Courses`, `About`, `যোগাযোগ (Contact)` (and any new teacher pages).
+   - Only shown when `isTeacherStorefrontMode` is `true`:
+     - Logged-in teacher (`isTeacher === true`).
+     - Visitor with referral link in session (`guestTeacherId` from `sessionStorage.getItem('referralTeacherId')`).
+     - Student who selected a specific teacher (`userData.preferredTeacherId`).
+     - On a `/teachers/[slug]` route.
+
+**AI Instruction:** When adding or modifying a public page, simply register its navigation object in either `marketplaceNavLinks` or `teacherStorefrontNavLinks` accordingly.

@@ -170,17 +170,40 @@ export default function Navbar() {
         ? user?.uid 
         : (isCustomTeacherMode && preferredTeacherId 
             ? preferredTeacherId 
-            : (routeTeacherId || null)));
+            : (routeTeacherId || guestTeacherId || null)));
 
   // 100% Clean URLs for seamless user experience:
-  const homeLink = isForcedMarketplace ? '/?view=marketplace' : '/';
-  const coursesLink = isForcedMarketplace ? '/courses?view=marketplace' : '/courses';
-  const aboutLink = isForcedMarketplace ? '/about?view=marketplace' : '/about';
-  const contactLink = isForcedMarketplace ? '/contact?view=marketplace' : '/contact';
   const isHomeActive = pathname === '/' || pathname.startsWith('/teachers/');
   const isCoursesActive = pathname === '/courses' || pathname.startsWith('/courses');
   const isAboutActive = pathname === '/about' || pathname.startsWith('/about');
   const isContactActive = pathname === '/contact' || pathname.startsWith('/contact');
+
+  // Determine Active Platform Mode:
+  // True if: Logged-in teacher, student with preferred teacher, referral visitor, or on a /teachers/[slug] route
+  const isTeacherStorefrontMode = !isForcedMarketplace && Boolean(
+    isTeacher || 
+    (isStudent && preferredTeacherId && preferredTeacherId !== 'global') || 
+    routeTeacherId || 
+    guestTeacherId
+  );
+
+  // 1. Marketplace Navigation Menu Category (গ্লোবাল মার্কেটপ্লেস মেনু)
+  const marketplaceNavLinks = [
+    { name: t('home') || 'হোম', href: isForcedMarketplace ? '/?view=marketplace' : '/', isActive: isHomeActive },
+    { name: t('courses') || 'কোর্স', href: isForcedMarketplace ? '/courses?view=marketplace' : '/courses', isActive: isCoursesActive },
+    { name: 'About', href: isForcedMarketplace ? '/about?view=marketplace' : '/about', isActive: isAboutActive },
+  ];
+
+  // 2. Teacher Storefront Navigation Menu Category (শিক্ষকের নিজস্ব কাস্টম একাডেমি মেনু)
+  const teacherStorefrontNavLinks = [
+    { name: t('home') || 'হোম', href: '/', isActive: isHomeActive },
+    { name: t('courses') || 'কোর্স', href: '/courses', isActive: isCoursesActive },
+    { name: 'About', href: '/about', isActive: isAboutActive },
+    { name: t('contact') || (pathname.includes('/bn') ? 'যোগাযোগ' : 'Contact'), href: '/contact', isActive: isContactActive },
+  ];
+
+  // Active Menu List based on platform mode
+  const activePublicNavLinks = isTeacherStorefrontMode ? teacherStorefrontNavLinks : marketplaceNavLinks;
 
   // Dashboard Nav Links (Account Settings is handled in the bottom profile popup menu)
   const studentDashboardLinks = [
@@ -242,20 +265,15 @@ export default function Navbar() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <Link href={homeLink} className={`font-medium transition-colors hover:text-primary ${isHomeActive ? 'text-primary' : 'text-foreground/80'}`}>
-                {t('home')}
-              </Link>
-              <Link href={coursesLink} className={`font-medium transition-colors hover:text-primary ${pathname === '/courses' ? 'text-primary' : 'text-foreground/80'}`}>
-                {t('courses')}
-              </Link>
-              <Link href={aboutLink} className={`font-medium transition-colors hover:text-primary ${isAboutActive ? 'text-primary' : 'text-foreground/80'}`}>
-                About
-              </Link>
-              {(effectiveTeacherId || isTeacher || isCustomTeacherMode) && !isForcedMarketplace && (
-                <Link href={contactLink} className={`font-medium transition-colors hover:text-primary ${isContactActive ? 'text-primary' : 'text-foreground/80'}`}>
-                  {t('contact') || (pathname.includes('/bn') ? 'যোগাযোগ' : 'Contact')}
+              {activePublicNavLinks.map((item) => (
+                <Link 
+                  key={item.href + item.name} 
+                  href={item.href} 
+                  className={`font-medium transition-colors hover:text-primary ${item.isActive ? 'text-primary' : 'text-foreground/80'}`}
+                >
+                  {item.name}
                 </Link>
-              )}
+              ))}
               
               <div className="flex items-center gap-4 pl-4 border-l border-foreground/10">
                 <ThemeToggle />
@@ -654,73 +672,32 @@ export default function Navbar() {
                 </div>
               </div>
             ) : (
-              /* CASE 3: Public Site Pages (Home, Courses, About) */
+              /* CASE 3: Public Site Pages (Marketplace vs Teacher Storefront Menu) */
               <div className="space-y-2">
-                <div className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/40 px-3 mb-2">
-                  Navigation
+                <div className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/40 px-3 mb-2 flex items-center justify-between">
+                  <span>Navigation</span>
+                  <span className="text-[9px] px-2 py-0.5 rounded-full bg-foreground/5 text-foreground/60 font-mono">
+                    {isTeacherStorefrontMode ? 'Teacher Academy' : 'Marketplace'}
+                  </span>
                 </div>
-                <Link
-                  href={homeLink}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
-                    isHomeActive 
-                      ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 border-orange-400/40 ring-1 ring-orange-400/30' 
-                      : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
-                  }`}
-                >
-                  <span className="flex items-center gap-2.5">
-                    <span className={`w-2 h-2 rounded-full ${isHomeActive ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
-                    <span>{t('home')}</span>
-                  </span>
-                  <ChevronRight className={`w-4 h-4 transition-transform ${isHomeActive ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
-                </Link>
-                <Link
-                  href={coursesLink}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
-                    isCoursesActive 
-                      ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 border-orange-400/40 ring-1 ring-orange-400/30' 
-                      : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
-                  }`}
-                >
-                  <span className="flex items-center gap-2.5">
-                    <span className={`w-2 h-2 rounded-full ${isCoursesActive ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
-                    <span>{t('courses')}</span>
-                  </span>
-                  <ChevronRight className={`w-4 h-4 transition-transform ${isCoursesActive ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
-                </Link>
-                <Link
-                  href={aboutLink}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
-                    isAboutActive 
-                      ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 border-orange-400/40 ring-1 ring-orange-400/30' 
-                      : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
-                  }`}
-                >
-                  <span className="flex items-center gap-2.5">
-                    <span className={`w-2 h-2 rounded-full ${isAboutActive ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
-                    <span>About</span>
-                  </span>
-                  <ChevronRight className={`w-4 h-4 transition-transform ${isAboutActive ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
-                </Link>
-                {(effectiveTeacherId || isTeacher || isCustomTeacherMode) && !isForcedMarketplace && (
+                {activePublicNavLinks.map((item) => (
                   <Link
-                    href={contactLink}
+                    key={item.href + item.name}
+                    href={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
-                      isContactActive 
+                      item.isActive 
                         ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 border-orange-400/40 ring-1 ring-orange-400/30' 
                         : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
-                      <span className={`w-2 h-2 rounded-full ${isContactActive ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
-                      <span>{pathname.includes('/bn') ? 'যোগাযোগ' : 'Contact'}</span>
+                      <span className={`w-2 h-2 rounded-full ${item.isActive ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
+                      <span>{item.name}</span>
                     </span>
-                    <ChevronRight className={`w-4 h-4 transition-transform ${isContactActive ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
+                    <ChevronRight className={`w-4 h-4 transition-transform ${item.isActive ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
                   </Link>
-                )}
+                ))}
 
                 {user && (
                   <Link

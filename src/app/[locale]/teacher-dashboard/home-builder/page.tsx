@@ -667,6 +667,10 @@ export default function TeacherHomePageBuilderPage() {
   const [newNoticeIsUrgent, setNewNoticeIsUrgent] = useState(false);
   const [uploadingNoticeHeroBg, setUploadingNoticeHeroBg] = useState(false);
 
+  // Excluded & Disabled Pages State
+  const [disabledStandardPages, setDisabledStandardPages] = useState<string[]>([]);
+  const [globallyExcludedPages, setGloballyExcludedPages] = useState<string[]>([]);
+
   // Fetch initial data
   useEffect(() => {
     const fetchData = async () => {
@@ -700,6 +704,34 @@ export default function TeacherHomePageBuilderPage() {
           }
           if (data.customNavLinks && Array.isArray(data.customNavLinks)) {
             setCustomNavLinks(data.customNavLinks);
+          }
+          if (data.disabledPages && Array.isArray(data.disabledPages)) {
+            setDisabledStandardPages(data.disabledPages);
+          } else if (data.disabledStandardPages && Array.isArray(data.disabledStandardPages)) {
+            setDisabledStandardPages(data.disabledStandardPages);
+          }
+
+          // Fetch globally excluded pages for this teacher
+          try {
+            const globalPagesSnap = await getDoc(doc(db, 'platformSettings', 'globalTeacherPages'));
+            if (globalPagesSnap.exists()) {
+              const gData = globalPagesSnap.data();
+              if (gData.pages && Array.isArray(gData.pages)) {
+                const excludedIds: string[] = [];
+                gData.pages.forEach((gp: any) => {
+                  if (gp.excludedTeacherIds && Array.isArray(gp.excludedTeacherIds) && gp.excludedTeacherIds.includes(user.uid)) {
+                    if (gp.id) excludedIds.push(gp.id.toLowerCase());
+                    if (gp.slug) {
+                      excludedIds.push(gp.slug.toLowerCase());
+                      excludedIds.push(gp.slug.replace('/', '').toLowerCase());
+                    }
+                  }
+                });
+                setGloballyExcludedPages(excludedIds);
+              }
+            }
+          } catch (gErr) {
+            console.error("Error fetching global excluded pages in builder:", gErr);
           }
 
           const config = data.homePageConfig;
@@ -1402,6 +1434,9 @@ export default function TeacherHomePageBuilderPage() {
     toast.success(locale === 'bn' ? 'কাস্টম SVG আইকন সফলভাবে সেট হয়েছে!' : 'Custom SVG icon applied!');
   };
 
+  const isAboutDisabled = disabledStandardPages.includes('about') || globallyExcludedPages.includes('about') || globallyExcludedPages.includes('/about');
+  const isContactDisabled = disabledStandardPages.includes('contact') || globallyExcludedPages.includes('contact') || globallyExcludedPages.includes('/contact');
+
   const tabGroups = [
     {
       id: 'branding',
@@ -1427,7 +1462,7 @@ export default function TeacherHomePageBuilderPage() {
         { id: 'helpBar', label: '১১. হেল্প ও সাপোর্ট বার', icon: HelpCircle },
       ]
     },
-    {
+    ...(!isAboutDisabled ? [{
       id: 'aboutUs',
       groupName: '📄 অ্যাবাউট পেজ (ABOUT US)',
       items: [
@@ -1438,8 +1473,8 @@ export default function TeacherHomePageBuilderPage() {
         { id: 'aboutFounder', label: '৫. ফাউন্ডার ও মেন্টর প্রোফাইল', icon: User },
         { id: 'aboutCta', label: '৬. মেগা অ্যাকশন ব্যানার (CTA)', icon: Target },
       ]
-    },
-    {
+    }] : []),
+    ...(!isContactDisabled ? [{
       id: 'contactUs',
       groupName: '📞 যোগাযোগ পেজ (CONTACT US)',
       items: [
@@ -1450,7 +1485,7 @@ export default function TeacherHomePageBuilderPage() {
         { id: 'contactFaq', label: '৫. সচরাচর জিজ্ঞাসা (FAQ Manager)', icon: HelpCircle },
         { id: 'contactCta', label: '৬. মেগা অ্যাকশন ব্যানার (CTA)', icon: Target },
       ]
-    },
+    }] : []),
     // Dynamic Custom Pages Created for this Teacher
     ...(customNavLinks && customNavLinks.length > 0 ? customNavLinks.map((customPage: any, idx: number) => {
       const cleanSlug = (customPage.slug || `page_${idx}`).replace('/', '').toLowerCase();
@@ -1503,6 +1538,14 @@ export default function TeacherHomePageBuilderPage() {
       setOpenGroup(parentGroup.id);
     }
   }, [activeTab]);
+
+  // Auto-switch away if activeTab belongs to an excluded or hidden group
+  useEffect(() => {
+    const isTabAvailable = allTabs.some(t => t.id === activeTab);
+    if (!isTabAvailable && allTabs.length > 0) {
+      setActiveTab('sliders');
+    }
+  }, [allTabs, activeTab]);
 
   // Website Setup Progress Calculation
   const checklist = [

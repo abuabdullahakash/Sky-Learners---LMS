@@ -60,7 +60,8 @@ import {
   Clock,
   Compass,
   Sliders,
-  Power
+  Power,
+  Lock
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -1744,9 +1745,11 @@ export default function AdminDashboardPage() {
                               <div 
                                 key={gp.id}
                                 className={`p-3.5 rounded-2xl border transition-all flex items-center justify-between ${
-                                  isPageActive 
-                                    ? 'bg-slate-800/60 border-slate-700/80' 
-                                    : 'bg-slate-900/40 border-slate-800/80 opacity-60'
+                                  isExcludedGlobally
+                                    ? 'bg-slate-900/50 border-amber-500/30 opacity-80'
+                                    : isPageActive 
+                                      ? 'bg-slate-800/60 border-slate-700/80' 
+                                      : 'bg-slate-900/40 border-slate-800/80 opacity-60'
                                 }`}
                               >
                                 <div className="space-y-0.5">
@@ -1754,22 +1757,43 @@ export default function AdminDashboardPage() {
                                     <span className="font-bold text-xs text-white">{gp.name}</span>
                                     <span className="text-[10px] text-slate-400 font-mono">{gp.slug}</span>
                                   </div>
-                                  <span className={`text-[10px] font-extrabold ${isPageActive ? 'text-emerald-400' : 'text-slate-500'}`}>
-                                    {isPageActive ? '● সক্রিয় (Active)' : '○ নিষ্ক্রিয় (Disabled)'}
+                                  <span className={`text-[10px] font-extrabold flex items-center gap-1 ${
+                                    isExcludedGlobally 
+                                      ? 'text-amber-400' 
+                                      : (isPageActive ? 'text-emerald-400' : 'text-slate-500')
+                                  }`}>
+                                    {isExcludedGlobally ? (
+                                      <>
+                                        <Lock className="w-2.5 h-2.5" />
+                                        <span>🚫 এক্সক্লুড করা (Excluded)</span>
+                                      </>
+                                    ) : (
+                                      isPageActive ? '● সক্রিয় (Active)' : '○ নিষ্ক্রিয় (Disabled)'
+                                    )}
                                   </span>
                                 </div>
 
-                                <button
-                                  onClick={() => handleToggleTeacherStandardPage(selectedTeacher.id, gp.id)}
-                                  className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 ${
-                                    isPageActive 
-                                      ? 'bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30' 
-                                      : 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30'
-                                  }`}
-                                >
-                                  {isPageActive ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
-                                  <span>{isPageActive ? 'বন্ধ করুন' : 'চালু করুন'}</span>
-                                </button>
+                                {isExcludedGlobally ? (
+                                  <div
+                                    className="px-3 py-1.5 rounded-xl font-bold text-xs bg-amber-500/10 text-amber-400 border border-amber-500/25 cursor-not-allowed flex items-center gap-1.5 opacity-90 select-none shadow-sm"
+                                    title="গ্লোবাল পেজ ম্যানেজার থেকে এই শিক্ষককে বাদ (Exclude) রাখা হয়েছে। এটি চালু করতে গ্লোবাল পেজ সেটিংস থেকে আন-এক্সক্লুড করুন।"
+                                  >
+                                    <Lock className="w-3.5 h-3.5" />
+                                    <span>লকড / এক্সক্লুড</span>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => handleToggleTeacherStandardPage(selectedTeacher.id, gp.id)}
+                                    className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 ${
+                                      isPageActive 
+                                        ? 'bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30' 
+                                        : 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30'
+                                    }`}
+                                  >
+                                    {isPageActive ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
+                                    <span>{isPageActive ? 'বন্ধ করুন' : 'চালু করুন'}</span>
+                                  </button>
+                                )}
                               </div>
                             );
                           })}

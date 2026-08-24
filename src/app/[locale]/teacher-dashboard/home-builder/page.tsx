@@ -646,6 +646,10 @@ export default function TeacherHomePageBuilderPage() {
   const [contactCtaBtn1Text, setContactCtaBtn1Text] = useState('সকল কোর্সসমূহ দেখুন');
   const [contactCtaBtn2Text, setContactCtaBtn2Text] = useState('হেল্পলাইনে কল দিন');
 
+  // 13. Dynamic Custom Pages & Controls State
+  const [customNavLinks, setCustomNavLinks] = useState<any[]>([]);
+  const [customPagesConfig, setCustomPagesConfig] = useState<Record<string, any>>({});
+
   // Fetch initial data
   useEffect(() => {
     const fetchData = async () => {
@@ -677,9 +681,15 @@ export default function TeacherHomePageBuilderPage() {
           if (data.teachersRoster && Array.isArray(data.teachersRoster)) {
             setTeachersRoster(data.teachersRoster);
           }
+          if (data.customNavLinks && Array.isArray(data.customNavLinks)) {
+            setCustomNavLinks(data.customNavLinks);
+          }
 
           const config = data.homePageConfig;
           if (config) {
+            if (config.customPagesConfig) {
+              setCustomPagesConfig(config.customPagesConfig);
+            }
             if (config.heroSliders && config.heroSliders.length > 0) setHeroSliders(config.heroSliders);
             if (config.quickCards) setQuickCards(config.quickCards);
             if (config.coursesSubtitle) setCoursesSubtitle(config.coursesSubtitle);
@@ -806,6 +816,7 @@ export default function TeacherHomePageBuilderPage() {
     setSaving(true);
     try {
       const fullConfig = {
+        customPagesConfig,
         heroSliders,
         quickCards,
         coursesSubtitle,
@@ -1330,7 +1341,26 @@ export default function TeacherHomePageBuilderPage() {
         { id: 'contactFaq', label: '৫. সচরাচর জিজ্ঞাসা (FAQ Manager)', icon: HelpCircle },
         { id: 'contactCta', label: '৬. মেগা অ্যাকশন ব্যানার (CTA)', icon: Target },
       ]
-    }
+    },
+    // Dynamic Custom Pages Created for this Teacher
+    ...(customNavLinks && customNavLinks.length > 0 ? customNavLinks.map((customPage: any, idx: number) => {
+      const cleanSlug = (customPage.slug || `page_${idx}`).replace('/', '').toLowerCase();
+      const groupKey = `custom_${cleanSlug}`;
+      return {
+        id: groupKey,
+        groupName: `📑 ${customPage.name.toUpperCase()} (${(customPage.slug || '').toUpperCase()})`,
+        isCustomPage: true,
+        customPageData: customPage,
+        items: [
+          { 
+            id: `${groupKey}_controls`, 
+            label: `১. ${customPage.name} পেজ কন্ট্রোলস`, 
+            icon: Sliders,
+            customPage: customPage
+          }
+        ]
+      };
+    }) : [])
   ];
 
   const allTabs = tabGroups.flatMap(g => g.items);
@@ -4407,6 +4437,177 @@ export default function TeacherHomePageBuilderPage() {
               </div>
             </div>
           )}
+
+          {/* TAB: DYNAMIC CUSTOM PAGE CONTROLS */}
+          {activeTab.startsWith('custom_') && (() => {
+            const currentGroup = tabGroups.find(g => g.items.some(it => it.id === activeTab));
+            const customPage = (currentGroup as any)?.customPageData;
+            if (!customPage) return null;
+            const slugKey = (customPage.slug || '').replace('/', '').toLowerCase();
+            const pageConfig = customPagesConfig[slugKey] || {};
+
+            const updateCustomPageField = (field: string, value: any) => {
+              setCustomPagesConfig(prev => ({
+                ...prev,
+                [slugKey]: {
+                  ...(prev[slugKey] || {}),
+                  [field]: value
+                }
+              }));
+            };
+
+            const isNotice = slugKey === 'notice';
+
+            return (
+              <div className="space-y-8 animate-in fade-in duration-200">
+                {/* Header Row with Status Badge & Live Preview link */}
+                <div className="border-b border-foreground/10 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-black text-foreground flex items-center gap-2">
+                        <Sliders className="w-5 h-5 text-orange-500" />
+                        <span>{customPage.name} পেজ কন্ট্রোলস ও সেটিংস</span>
+                      </h3>
+                      <span className="text-xs font-mono bg-foreground/5 text-foreground/70 px-2 py-0.5 rounded border border-foreground/10">
+                        {customPage.slug}
+                      </span>
+                    </div>
+                    <p className="text-xs text-foreground/60 mt-1">
+                      {customPage.name} পেজের তথ্যাবলী ও সেকশন কাস্টমাইজেশন ম্যানেজ করুন।
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`px-3 py-1 rounded-xl text-xs font-black flex items-center gap-1.5 ${
+                      customPage.isPublished 
+                        ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30' 
+                        : 'bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-500/30'
+                    }`}>
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>{customPage.isPublished ? 'Live Published' : 'Draft Mode'}</span>
+                    </span>
+
+                    <a
+                      href={customPage.slug}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3.5 py-1.5 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/25 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>লাইভ দেখুন</span>
+                    </a>
+                  </div>
+                </div>
+
+                {/* Specific Notice Board Controls if slug is notice */}
+                {isNotice ? (
+                  <div className="space-y-6">
+                    {/* 1. Breaking Notice Ticker */}
+                    <div className="p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <Flame className="w-4 h-4 text-rose-500" />
+                        <h4 className="text-sm font-bold text-foreground">১. জরুরি স্ক্রোলিং নোটিশ বার (Breaking Urgent Notice Ticker)</h4>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-semibold text-foreground/70 block mb-1">জরুরি নোটিশের শিরোনাম</label>
+                          <input
+                            type="text"
+                            value={pageConfig.tickerHeadline || ''}
+                            onChange={(e) => updateCustomPageField('tickerHeadline', e.target.value)}
+                            placeholder="এইচএসসি ২০২৬ চূড়ান্ত মডেল টেস্ট ও স্পেশাল রিভিশন ক্লাসের সময়সূচি প্রকাশ"
+                            className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold text-foreground/70 block mb-1">স্মারক নম্বর (Reference No)</label>
+                          <input
+                            type="text"
+                            value={pageConfig.tickerRefNo || ''}
+                            onChange={(e) => updateCustomPageField('tickerRefNo', e.target.value)}
+                            placeholder="FB/NOT-2026/08-01"
+                            className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2. Header & Academic Session */}
+                    <div className="p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <GraduationCap className="w-4 h-4 text-orange-500" />
+                        <h4 className="text-sm font-bold text-foreground">২. শিক্ষাবর্ষ ও হেডার বিবরণ</h4>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-semibold text-foreground/70 block mb-1">শিক্ষাবর্ষ সেশন ব্যাজ</label>
+                          <input
+                            type="text"
+                            value={pageConfig.sessionYear || ''}
+                            onChange={(e) => updateCustomPageField('sessionYear', e.target.value)}
+                            placeholder="২০২৬ সেশন (Active)"
+                            className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold text-foreground/70 block mb-1">WhatsApp নোটিশ সাপোর্ট নম্বর</label>
+                          <input
+                            type="text"
+                            value={pageConfig.noticeWhatsapp || ''}
+                            onChange={(e) => updateCustomPageField('noticeWhatsapp', e.target.value)}
+                            placeholder="017XXXXXXXX"
+                            className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-xs text-foreground space-y-1">
+                      <p className="font-bold flex items-center gap-1.5 text-orange-500">
+                        <Sparkles className="w-4 h-4" />
+                        <span>স্মার্ট নোটিশ কন্ট্রোল একটিভ</span>
+                      </p>
+                      <p className="text-foreground/70">
+                        সুপার অ্যাডমিন থেকে রিকোয়ারমেন্ট অনুযায়ী নতুন নোটিশ যোগ, পিডিএফ আপলোড বা পরীক্ষার ফলাফল প্রকাশ করার আরও ফিচার যেকোনো সময় যুক্ত করা যাবে।
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  /* General Custom Page Controls */
+                  <div className="space-y-6">
+                    <div className="p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-orange-500" />
+                        <h4 className="text-sm font-bold text-foreground">১. মূল শিরোনাম ও বর্ণনা</h4>
+                      </div>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-xs font-semibold text-foreground/70 block mb-1">পেজ শিরোনাম (Heading)</label>
+                          <input
+                            type="text"
+                            value={pageConfig.heading || ''}
+                            onChange={(e) => updateCustomPageField('heading', e.target.value)}
+                            placeholder={`${customPage.name} - ${displayName || 'আমাদের একাডেমি'}`}
+                            className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold text-foreground/70 block mb-1">পেজ সাবটাইটেল / বিবরণ</label>
+                          <textarea
+                            rows={3}
+                            value={pageConfig.description || ''}
+                            onChange={(e) => updateCustomPageField('description', e.target.value)}
+                            placeholder="এই পেজের মূল বিষয়বস্তু ও বিবরণ এখানে লিখুন..."
+                            className="w-full px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
         </div>
 

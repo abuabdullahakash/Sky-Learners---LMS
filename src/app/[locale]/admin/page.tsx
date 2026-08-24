@@ -58,7 +58,9 @@ import {
   ArrowLeft,
   MapPin,
   Clock,
-  Compass
+  Compass,
+  Sliders,
+  Power
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -579,7 +581,15 @@ export default function AdminDashboardPage() {
 📝 রিকোয়ারমেন্ট: `;
 
     navigator.clipboard.writeText(promptText);
-    toast.success(`🤖 "${page.name}" পেজের AI Prompt কপি করা হয়েছে!`);
+    toast.success(`🤖 "${page.name}" ফ্রন্টএন্ড AI Prompt কপি করা হয়েছে!`);
+  };
+
+  const handleCopyBuilderAIPrompt = (teacher: UserItem, page: CustomNavItem) => {
+    const promptText = `🎯 Target: ${teacher.name || teacher.displayName || 'Teacher'} (ID: ${teacher.id}) | Page: ${page.name} (${page.slug}) | Target Accordion: ${page.name}
+🎛️ কন্ট্রোল রিকোয়ারমেন্ট: `;
+
+    navigator.clipboard.writeText(promptText);
+    toast.success(`🎛️ "${page.name}" বিল্ডার কন্ট্রোলস AI Prompt কপি করা হয়েছে!`);
   };
 
   const handleCopyPreviewLink = (teacherId: string, slug: string) => {
@@ -1883,67 +1893,99 @@ export default function AdminDashboardPage() {
                                   </div>
                                 </div>
 
-                                {/* Actions Toolbar */}
+                                {/* Actions Toolbar - Sleek Icon-Only with Rich Floating Tooltips */}
                                 <div className="flex flex-wrap items-center justify-between gap-2.5 pt-0.5">
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    {/* 1. Copy AI Prompt */}
-                                    <button
-                                      type="button"
-                                      onClick={() => handleCopyAIPrompt(selectedTeacher, page)}
-                                      className="px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/40 font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm"
-                                      title="এই পেজটি বানানোর জন্য AI Prompt কপি করুন"
-                                    >
-                                      <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                                      <span>🤖 Copy AI Prompt</span>
-                                    </button>
+                                  <div className="flex items-center gap-2">
+                                    {/* 1. Copy Frontend AI Prompt */}
+                                    <div className="relative group">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleCopyAIPrompt(selectedTeacher, page)}
+                                        className="p-2.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/35 text-purple-300 border border-purple-500/40 transition-all shadow-sm flex items-center justify-center"
+                                      >
+                                        <Sparkles className="w-4 h-4 text-purple-400" />
+                                      </button>
+                                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 rounded-lg bg-slate-950 text-purple-200 text-[11px] font-bold whitespace-nowrap shadow-2xl border border-purple-500/30 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-30">
+                                        🤖 কপি ফ্রন্টএন্ড AI প্রম্পট
+                                      </div>
+                                    </div>
 
-                                    {/* 2. Live Preview Button */}
-                                    <a
-                                      href={`${page.slug}?preview=true&teacherId=${selectedTeacher.id}`}
-                                      target="_blank"
-                                      rel="noreferrer"
-                                      className="px-3 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm"
-                                      title="নতুন ট্যাবে লাইভ প্রিভিউ দেখুন"
-                                    >
-                                      <Eye className="w-3.5 h-3.5 text-blue-400" />
-                                      <span>👁️ Live Preview</span>
-                                    </a>
+                                    {/* 2. Copy Builder Controls AI Prompt */}
+                                    <div className="relative group">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleCopyBuilderAIPrompt(selectedTeacher, page)}
+                                        className="p-2.5 rounded-xl bg-orange-600/20 hover:bg-orange-600/35 text-orange-300 border border-orange-500/40 transition-all shadow-sm flex items-center justify-center"
+                                      >
+                                        <Sliders className="w-4 h-4 text-orange-400" />
+                                      </button>
+                                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 rounded-lg bg-slate-950 text-orange-200 text-[11px] font-bold whitespace-nowrap shadow-2xl border border-orange-500/30 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-30">
+                                        🎛️ কপি বিল্ডার কন্ট্রোলস AI প্রম্পট
+                                      </div>
+                                    </div>
 
-                                    {/* 3. Copy Preview Link */}
-                                    <button
-                                      type="button"
-                                      onClick={() => handleCopyPreviewLink(selectedTeacher.id, page.slug)}
-                                      className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-xs flex items-center gap-1.5 transition-all"
-                                      title="টিচারকে দেখানোর জন্য প্রিভিউ লিংক কপি করুন"
-                                    >
-                                      <Copy className="w-3.5 h-3.5 text-slate-400" />
-                                      <span>🔗 Copy Preview Link</span>
-                                    </button>
+                                    {/* 3. Live Preview Button */}
+                                    <div className="relative group">
+                                      <a
+                                        href={`${page.slug}?preview=true&teacherId=${selectedTeacher.id}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="p-2.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/35 text-blue-300 border border-blue-500/40 transition-all shadow-sm flex items-center justify-center"
+                                      >
+                                        <Eye className="w-4 h-4 text-blue-400" />
+                                      </a>
+                                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 rounded-lg bg-slate-950 text-blue-200 text-[11px] font-bold whitespace-nowrap shadow-2xl border border-blue-500/30 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-30">
+                                        👁️ নতুন ট্যাবে লাইভ প্রিভিউ
+                                      </div>
+                                    </div>
+
+                                    {/* 4. Copy Preview Link */}
+                                    <div className="relative group">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleCopyPreviewLink(selectedTeacher.id, page.slug)}
+                                        className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all flex items-center justify-center"
+                                      >
+                                        <Copy className="w-4 h-4 text-slate-400" />
+                                      </button>
+                                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 rounded-lg bg-slate-950 text-slate-200 text-[11px] font-bold whitespace-nowrap shadow-2xl border border-slate-700 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-30">
+                                        🔗 প্রিভিউ লিংক কপি
+                                      </div>
+                                    </div>
                                   </div>
 
                                   <div className="flex items-center gap-2">
-                                    {/* 4. Active / Disabled Toggle */}
-                                    <button
-                                      type="button"
-                                      onClick={() => handleToggleTeacherCustomPageStatus(selectedTeacher.id, page.id)}
-                                      className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all border ${
-                                        page.enabled 
-                                          ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' 
-                                          : 'bg-slate-800 text-slate-400 border-slate-700'
-                                      }`}
-                                    >
-                                      {page.enabled ? 'মেনুতে সক্রিয়' : 'মেনু থেকে বন্ধ'}
-                                    </button>
+                                    {/* 5. Active / Disabled in Storefront Menu Toggle */}
+                                    <div className="relative group">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleToggleTeacherCustomPageStatus(selectedTeacher.id, page.id)}
+                                        className={`p-2.5 rounded-xl transition-all border flex items-center justify-center ${
+                                          page.enabled 
+                                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30' 
+                                            : 'bg-slate-800 text-slate-500 border-slate-700 hover:bg-slate-750 hover:text-slate-400'
+                                        }`}
+                                      >
+                                        <Globe className="w-4 h-4" />
+                                      </button>
+                                      <div className="absolute bottom-full right-0 mb-2 px-2.5 py-1 rounded-lg bg-slate-950 text-slate-200 text-[11px] font-bold whitespace-nowrap shadow-2xl border border-slate-700 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-30">
+                                        {page.enabled ? '🟢 মেনুতে সক্রিয় (ক্লিক করলে বন্ধ হবে)' : '⚪ মেনু থেকে বন্ধ (ক্লিক করলে চালু হবে)'}
+                                      </div>
+                                    </div>
 
-                                    {/* 5. Delete Page */}
-                                    <button
-                                      type="button"
-                                      onClick={() => handleDeleteTeacherCustomPage(selectedTeacher.id, page.id)}
-                                      className="p-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 transition-colors"
-                                      title="Delete Page"
-                                    >
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                    </button>
+                                    {/* 6. Delete Page */}
+                                    <div className="relative group">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteTeacherCustomPage(selectedTeacher.id, page.id)}
+                                        className="p-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 transition-colors flex items-center justify-center"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </button>
+                                      <div className="absolute bottom-full right-0 mb-2 px-2.5 py-1 rounded-lg bg-slate-950 text-rose-300 text-[11px] font-bold whitespace-nowrap shadow-2xl border border-rose-500/30 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-30">
+                                        🗑️ পেজটি মুছে ফেলুন
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
 

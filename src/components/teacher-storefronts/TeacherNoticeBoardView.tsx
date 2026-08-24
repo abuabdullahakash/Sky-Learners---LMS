@@ -224,7 +224,12 @@ export default function TeacherNoticeBoardView({
   ];
 
   const handleDownloadNoticePDF = (notice: NoticeItem) => {
-    toast.success(`"${notice.title}"-এর অফিসিয়াল পিডিএফ ডাউনলোড হচ্ছে...`, { icon: '📄' });
+    if (notice.attachmentUrl && notice.attachmentUrl.startsWith('http')) {
+      window.open(notice.attachmentUrl, '_blank', 'noopener,noreferrer');
+      toast.success(`"${notice.attachmentName || notice.title}" ওপেন / ডাউনলোড করা হচ্ছে...`, { icon: '📄' });
+      return;
+    }
+    toast.success(`"${notice.title}"-এর অফিসিয়াল কপি প্রস্তুত হচ্ছে...`, { icon: '📄' });
   };
 
   const handleShareNotice = (notice: NoticeItem) => {

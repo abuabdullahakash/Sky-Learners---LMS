@@ -78,6 +78,7 @@ import {
   X,
   Search,
   RotateCcw,
+  RefreshCw,
   Palette,
   Brush,
   Music,
@@ -195,6 +196,89 @@ export const DEFAULT_VALUE_CARDS: ValueCardItem[] = [
     subtitle: 'ভিন্ন ও আধুনিক দৃষ্টিভঙ্গি',
     desc: 'গতানুগতিক নিয়মের বাইরে গিয়ে বাস্তব উদাহরণ ও সহজ টেকনিকের সাহায্যে কঠিন বিষয়গুলোকে সহজবোধ্য করে তোলা।',
     colorTheme: 'purple'
+  }
+];
+
+export const DEFAULT_INSTITUTIONAL_NOTICES = [
+  {
+    id: 'not_01',
+    refNo: 'FB/NOT-2026/08-01',
+    title: 'এইচএসসি ২০২৬ চূড়ান্ত মডেল টেস্ট ও স্পেশাল রিভিশন ক্লাসের সময়সূচি প্রকাশ',
+    category: 'urgent',
+    categoryLabel: 'জরুরি নোটিশ',
+    date: '২৪ আগস্ট, ২০২৬',
+    isPinned: true,
+    isUrgent: true,
+    content: `এইচএসসি ২০২৬ শিক্ষাবর্ষের সকল শিক্ষার্থীদের অবগতির জন্য জানানো যাচ্ছে যে, আগামী ১ সেপ্টেম্বর ২০২৬ থেকে আমাদের একাডেমির চূড়ান্ত মডেল টেস্ট ও স্পেশাল রিভিশন ক্লাস শুরু হতে যাচ্ছে। 
+
+১. সকল শিক্ষার্থীকে নির্ধারিত সময়ে প্রবেশপত্র সংগ্রহ করার নির্দেশ দেওয়া হচ্ছে।
+২. মডেল টেস্টের পূর্ণাঙ্গ রুটিন ও পরীক্ষার নিয়মাবলী নিচের সংযুক্ত পিডিএফ ফাইলে দেওয়া হলো।
+৩. কোনো শিক্ষার্থী পরীক্ষায় অনুপস্থিত থাকলে তাকে পরবর্তীতে অতিরিক্ত ফি দিয়ে রি-টেস্টে বসতে হবে।`,
+    hasAttachment: true,
+    attachmentName: 'HSC-2026-Final-Model-Test-Routine.pdf',
+    attachmentSize: '১.৪ মেগাবাইট',
+    attachmentUrl: 'https://drive.google.com'
+  },
+  {
+    id: 'not_02',
+    refNo: 'FB/NOT-2026/08-02',
+    title: 'অনলাইন লাইভ ক্লাসের পরিবর্তিত সাপ্তাহিক রুটিন ও জুম লিংক সংক্রান্ত বিজ্ঞপ্তি',
+    category: 'routine',
+    categoryLabel: 'ক্লাস রুটিন',
+    date: '২২ আগস্ট, ২০২৬',
+    isPinned: true,
+    content: `শিক্ষার্থীদের সুবিধার্থে এবং লোডশেডিংয়ের সময় সমন্বয়ের জন্য আগামী শনিবার থেকে অনলাইন লাইভ ক্লাসের সময়ে সাময়িক পরিবর্তন আনা হয়েছে। 
+
+প্রতি শনি, সোম ও বুধবার রাত ৮:৩০ মিনিটে এবং রবি ও মঙ্গলবার সন্ধ্যা ৭:০০ টায় নির্ধারিত জুম লিংকের মাধ্যমে ক্লাস পরিচালিত হবে। ক্লাস শুরুর ১৫ মিনিট আগে গ্রুপে পাসকোড প্রদান করা হবে।`,
+    hasAttachment: true,
+    attachmentName: 'Updated-Live-Class-Schedule.pdf',
+    attachmentSize: '৮৫০ কিলোবাইট',
+    attachmentUrl: 'https://drive.google.com'
+  },
+  {
+    id: 'not_03',
+    refNo: 'FB/NOT-2026/08-03',
+    title: 'সাপ্তাহিক অধ্যায়ভিত্তিক মেধা যাচাই পরীক্ষা ও স্কলারশিপ পুরস্কার বিতরণ',
+    category: 'exam',
+    categoryLabel: 'পরীক্ষা ও ফলাফল',
+    date: '১৯ আগস্ট, ২০২৬',
+    content: `সকল ব্যাচের শিক্ষার্থীদের জানানো যাচ্ছে যে, আগামী শুক্রবার বিকাল ৩:০০ টায় অধ্যায়ভিত্তিক বিশেষ মেধা যাচাই পরীক্ষা অনুষ্ঠিত হবে। 
+
+উক্ত পরীক্ষায় শীর্ষস্থান অর্জনকারী শিক্ষার্থীদের পরবর্তী মাসের টিউশন ফিতে ৫০% পর্যন্ত স্কলারশিপ ওয়েভার এবং আকর্ষণীয় গিফট হ্যাম্পার প্রদান করা হবে। সময়মতো পরীক্ষায় উপস্থিত থাকার জন্য বলা হলো।`,
+    hasAttachment: true,
+    attachmentName: 'Weekly-Scholarship-Exam-Guidelines.pdf',
+    attachmentSize: '১.১ মেগাবাইট',
+    attachmentUrl: 'https://drive.google.com'
+  },
+  {
+    id: 'not_04',
+    refNo: 'FB/NOT-2026/08-04',
+    title: 'সেপ্টেম্বর ২০২৬ সেশনের নতুন ব্যাচে ভর্তি ফি মওকুফ ও রেজিস্ট্রেশন শুরু',
+    category: 'fees',
+    categoryLabel: 'ফি ও ভর্তি',
+    date: '১৫ আগস্ট, ২০২৬',
+    content: `নতুন সেশনের জন্য অগ্রিম রেজিস্ট্রেশন শুরু হয়েছে। ২৫ আগস্টের মধ্যে ভর্তি নিশ্চিত করলে ২০% বিশেষ ছাড় প্রযোজ্য হবে। 
+
+বিকাশ/নগদ পেমেন্টের মাধ্যমে সরাসরি ওয়েবসাইট থেকে রেজিস্ট্রেশন সম্পন্ন করা যাবে। যেকোনো সহায়তার জন্য সরাসরি অফিসিয়াল নম্বরে যোগাযোগ করতে অনুরোধ করা হচ্ছে।`,
+    hasAttachment: false,
+    attachmentName: '',
+    attachmentSize: '',
+    attachmentUrl: ''
+  },
+  {
+    id: 'not_05',
+    refNo: 'FB/NOT-2026/08-05',
+    title: 'পবিত্র জন্মাষ্টমী ও সাপ্তাহিক বন্ধ উপলক্ষে সকল ক্লাস বন্ধ সংক্রান্ত নোটিশ',
+    category: 'holiday',
+    categoryLabel: 'ছুটির বিজ্ঞপ্তি',
+    date: '১২ আগস্ট, ২০২৬',
+    content: `সকল শিক্ষার্থী ও অভিভাবকদের সদয় অবগতির জন্য জানানো যাচ্ছে যে, সরকারি ছুটি উপলক্ষে আগামী রবিবার একাডেমির সকল অনলাইন ও অফলাইন ক্লাস বন্ধ থাকবে। 
+
+পরবর্তী সোমবার থেকে যথারীতি রুটিন অনুযায়ী সকল ক্লাস পরিচালিত হবে। বন্ধের সময়ে পেন্ডিং বাড়ির কাজ ও রেকর্ডেড ক্লাস সম্পন্ন করতে পরামর্শ দেওয়া হলো।`,
+    hasAttachment: false,
+    attachmentName: '',
+    attachmentSize: '',
+    attachmentUrl: ''
   }
 ];
 
@@ -666,6 +750,7 @@ export default function TeacherHomePageBuilderPage() {
   const [newNoticeIsPinned, setNewNoticeIsPinned] = useState(false);
   const [newNoticeIsUrgent, setNewNoticeIsUrgent] = useState(false);
   const [uploadingNoticeHeroBg, setUploadingNoticeHeroBg] = useState(false);
+  const [editingNoticeId, setEditingNoticeId] = useState<string | null>(null);
 
   // Excluded & Disabled Pages State
   const [disabledStandardPages, setDisabledStandardPages] = useState<string[]>([]);
@@ -1036,98 +1121,6 @@ export default function TeacherHomePageBuilderPage() {
     }
   };
 
-  // Notice Hero Background upload handler
-  const handleUploadNoticeHeroBg = async (e: React.ChangeEvent<HTMLInputElement>, slugKey: string) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadingNoticeHeroBg(true);
-    try {
-      const url = await uploadImageToImgBB(file);
-      setCustomPagesConfig(prev => ({
-        ...prev,
-        [slugKey]: {
-          ...(prev[slugKey] || {}),
-          heroBgImage: url
-        }
-      }));
-      toast.success('হিরো ব্যাকগ্রাউন্ড ইমেজ সফলভাবে আপলোড হয়েছে!');
-    } catch (err) {
-      toast.error('ছবি আপলোড ব্যর্থ হয়েছে');
-    } finally {
-      setUploadingNoticeHeroBg(false);
-    }
-  };
-
-  // Add Notice Item Helper
-  const handleAddCustomNotice = (slugKey: string) => {
-    if (!newNoticeTitle.trim()) {
-      toast.error('দয়া করে নোটিশের শিরোনাম লিখুন');
-      return;
-    }
-    const categoryLabels: Record<string, string> = {
-      urgent: 'জরুরি বিজ্ঞপ্তি',
-      exam: 'পরীক্ষা ও ফলাফল',
-      routine: 'ক্লাস রুটিন',
-      fees: 'ফি ও ভর্তি',
-      holiday: 'ছুটির নোটিশ',
-      general: 'সাধারণ বিজ্ঞপ্তি'
-    };
-
-    const newNoticeItem = {
-      id: `custom_not_${Date.now()}`,
-      refNo: newNoticeRefNo.trim() || `FB/NOT-2026/${String(Math.floor(Math.random() * 90) + 10)}`,
-      title: newNoticeTitle.trim(),
-      category: newNoticeCategory,
-      categoryLabel: categoryLabels[newNoticeCategory] || 'সাধারণ বিজ্ঞপ্তি',
-      date: newNoticeDate.trim() || new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
-      content: newNoticeContent.trim() || newNoticeTitle.trim(),
-      hasAttachment: Boolean(newNoticeAttachmentName.trim() || newNoticeAttachmentUrl.trim()),
-      attachmentName: newNoticeAttachmentName.trim() || (newNoticeAttachmentUrl.trim() ? 'Notice-Attachment.pdf' : ''),
-      attachmentSize: newNoticeAttachmentSize.trim() || '১.২ মেগাবাইট',
-      attachmentUrl: newNoticeAttachmentUrl.trim(),
-      isPinned: newNoticeIsPinned,
-      isUrgent: newNoticeIsUrgent,
-      publishedBy: displayName || user?.displayName || 'Instructor'
-    };
-
-    const currentNotices = customPagesConfig[slugKey]?.notices || [];
-    const updatedNotices = [newNoticeItem, ...currentNotices];
-
-    setCustomPagesConfig(prev => ({
-      ...prev,
-      [slugKey]: {
-        ...(prev[slugKey] || {}),
-        notices: updatedNotices
-      }
-    }));
-
-    // Reset Form
-    setNewNoticeTitle('');
-    setNewNoticeRefNo('');
-    setNewNoticeContent('');
-    setNewNoticeAttachmentName('');
-    setNewNoticeAttachmentSize('');
-    setNewNoticeAttachmentUrl('');
-    setNewNoticeIsPinned(false);
-    setNewNoticeIsUrgent(false);
-
-    toast.success('নতুন নোটিশ সফলভাবে যুক্ত হয়েছে! স্থায়ী করতে "সেটিংস সংরক্ষণ করুন" চাপুন।');
-  };
-
-  // Delete Notice Item Helper
-  const handleDeleteCustomNotice = (slugKey: string, noticeId: string) => {
-    const currentNotices = customPagesConfig[slugKey]?.notices || [];
-    const updatedNotices = currentNotices.filter((n: any) => n.id !== noticeId);
-    setCustomPagesConfig(prev => ({
-      ...prev,
-      [slugKey]: {
-        ...(prev[slugKey] || {}),
-        notices: updatedNotices
-      }
-    }));
-    toast.success('নোটিশটি তালিকা থেকে মুছে ফেলা হয়েছে');
-  };
-
   // Faculty Photo upload handler
   const handleUploadFacultyPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1346,6 +1339,172 @@ export default function TeacherHomePageBuilderPage() {
       toast.error(locale === 'bn' ? 'ছবি আপলোড ব্যর্থ হয়েছে' : 'Failed to upload photo');
     } finally {
       setUploadingAboutFounderImg(false);
+    }
+  };
+
+  // Notice Management Handlers
+  const handleStartEditNotice = (notice: any) => {
+    setEditingNoticeId(notice.id);
+    setNewNoticeTitle(notice.title || '');
+    setNewNoticeRefNo(notice.refNo || '');
+    setNewNoticeCategory(notice.category || 'exam');
+    setNewNoticeDate(notice.date || '');
+    setNewNoticeContent(notice.content || '');
+    setNewNoticeAttachmentName(notice.attachmentName || '');
+    setNewNoticeAttachmentSize(notice.attachmentSize || '');
+    setNewNoticeAttachmentUrl(notice.attachmentUrl || '');
+    setNewNoticeIsPinned(Boolean(notice.isPinned));
+    setNewNoticeIsUrgent(Boolean(notice.isUrgent));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    toast.success('নোটিশ এডিট মোড সক্রিয় হয়েছে', { icon: '✏️' });
+  };
+
+  const handleCancelEditNotice = () => {
+    setEditingNoticeId(null);
+    setNewNoticeTitle('');
+    setNewNoticeRefNo('');
+    setNewNoticeCategory('exam');
+    setNewNoticeDate('');
+    setNewNoticeContent('');
+    setNewNoticeAttachmentName('');
+    setNewNoticeAttachmentSize('');
+    setNewNoticeAttachmentUrl('');
+    setNewNoticeIsPinned(false);
+    setNewNoticeIsUrgent(false);
+  };
+
+  const handleSaveOrAddNotice = (slugKey: string) => {
+    if (!newNoticeTitle.trim()) {
+      toast.error('অনুগ্রহ করে নোটিশের শিরোনাম লিখুন');
+      return;
+    }
+
+    const currentList = customPagesConfig[slugKey]?.notices !== undefined
+      ? (customPagesConfig[slugKey]?.notices || [])
+      : DEFAULT_INSTITUTIONAL_NOTICES;
+
+    const categoryLabels: Record<string, string> = {
+      urgent: 'জরুরি বিজ্ঞপ্তি',
+      exam: 'পরীক্ষা ও ফলাফল',
+      routine: 'ক্লাস রুটিন',
+      fees: 'ফি ও ভর্তি',
+      holiday: 'ছুটির নোটিশ',
+      general: 'সাধারণ বিজ্ঞপ্তি'
+    };
+
+    if (editingNoticeId) {
+      const updatedList = currentList.map((n: any) => {
+        if (n.id === editingNoticeId) {
+          return {
+            ...n,
+            title: newNoticeTitle.trim(),
+            refNo: newNoticeRefNo.trim() || n.refNo || `FB/NOT-2026/08-${Math.floor(Math.random() * 90 + 10)}`,
+            category: newNoticeCategory,
+            categoryLabel: categoryLabels[newNoticeCategory] || 'সাধারণ বিজ্ঞপ্তি',
+            date: newNoticeDate.trim() || n.date,
+            content: newNoticeContent.trim(),
+            hasAttachment: Boolean(newNoticeAttachmentUrl.trim() || newNoticeAttachmentName.trim()),
+            attachmentName: newNoticeAttachmentName.trim() || (newNoticeAttachmentUrl.trim() ? 'Notice-Document.pdf' : ''),
+            attachmentSize: newNoticeAttachmentSize.trim() || (newNoticeAttachmentUrl.trim() ? '১.২ মেগাবাইট' : ''),
+            attachmentUrl: newNoticeAttachmentUrl.trim(),
+            isPinned: newNoticeIsPinned,
+            isUrgent: newNoticeIsUrgent
+          };
+        }
+        return n;
+      });
+
+      setCustomPagesConfig(prev => ({
+        ...prev,
+        [slugKey]: {
+          ...(prev[slugKey] || {}),
+          notices: updatedList
+        }
+      }));
+
+      handleCancelEditNotice();
+      toast.success('নোটিশ সফলভাবে আপডেট হয়েছে!', { icon: '💾' });
+    } else {
+      const newNoticeObj = {
+        id: `notice_${Date.now()}`,
+        refNo: newNoticeRefNo.trim() || `FB/NOT-2026/08-${Math.floor(Math.random() * 90 + 10)}`,
+        title: newNoticeTitle.trim(),
+        category: newNoticeCategory,
+        categoryLabel: categoryLabels[newNoticeCategory] || 'সাধারণ বিজ্ঞপ্তি',
+        date: newNoticeDate.trim() || new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+        content: newNoticeContent.trim() || 'বিস্তারিত তথ্যের জন্য সংশ্লিষ্ট কর্তৃপক্ষের সাথে যোগাযোগ করুন।',
+        hasAttachment: Boolean(newNoticeAttachmentUrl.trim() || newNoticeAttachmentName.trim()),
+        attachmentName: newNoticeAttachmentName.trim() || (newNoticeAttachmentUrl.trim() ? 'Notice-Document.pdf' : ''),
+        attachmentSize: newNoticeAttachmentSize.trim() || (newNoticeAttachmentUrl.trim() ? '১.২ মেগাবাইট' : ''),
+        attachmentUrl: newNoticeAttachmentUrl.trim(),
+        isPinned: newNoticeIsPinned,
+        isUrgent: newNoticeIsUrgent
+      };
+
+      setCustomPagesConfig(prev => ({
+        ...prev,
+        [slugKey]: {
+          ...(prev[slugKey] || {}),
+          notices: [newNoticeObj, ...currentList]
+        }
+      }));
+
+      handleCancelEditNotice();
+      toast.success('নতুন নোটিশ সফলভাবে যোগ হয়েছে!', { icon: '🎉' });
+    }
+  };
+
+  const handleDeleteCustomNotice = (slugKey: string, noticeId: string) => {
+    const currentList = customPagesConfig[slugKey]?.notices !== undefined
+      ? (customPagesConfig[slugKey]?.notices || [])
+      : DEFAULT_INSTITUTIONAL_NOTICES;
+
+    const filtered = currentList.filter((n: any) => n.id !== noticeId);
+    setCustomPagesConfig(prev => ({
+      ...prev,
+      [slugKey]: {
+        ...(prev[slugKey] || {}),
+        notices: filtered
+      }
+    }));
+    if (editingNoticeId === noticeId) {
+      handleCancelEditNotice();
+    }
+    toast.success('নোটিশটি মুছে ফেলা হয়েছে');
+  };
+
+  const handleRestoreDefaultNotices = (slugKey: string) => {
+    if (confirm('আপনি কি সত্যিই মূল ৫টি ডিফল্ট প্রাতিষ্ঠানিক নোটিশ রিস্টোর করতে চান?')) {
+      setCustomPagesConfig(prev => ({
+        ...prev,
+        [slugKey]: {
+          ...(prev[slugKey] || {}),
+          notices: DEFAULT_INSTITUTIONAL_NOTICES
+        }
+      }));
+      handleCancelEditNotice();
+      toast.success('ডিফল্ট নোটিশ রিস্টোর করা হয়েছে!');
+    }
+  };
+
+  const handleUploadNoticeHeroBg = async (e: React.ChangeEvent<HTMLInputElement>, slugKey: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingNoticeHeroBg(true);
+    try {
+      const url = await uploadImageToImgBB(file);
+      setCustomPagesConfig(prev => ({
+        ...prev,
+        [slugKey]: {
+          ...(prev[slugKey] || {}),
+          heroBgImage: url
+        }
+      }));
+      toast.success('হিরো ব্যাকগ্রাউন্ড ইমেজ আপলোড হয়েছে!');
+    } catch (err) {
+      toast.error('ছবি আপলোড ব্যর্থ হয়েছে');
+    } finally {
+      setUploadingNoticeHeroBg(false);
     }
   };
 
@@ -4739,187 +4898,279 @@ export default function TeacherHomePageBuilderPage() {
                 {/* ------------------------------------------------------------- */}
                 {/* 1. NOTICE TAB 2: NOTICE UPLOAD & MANAGEMENT                   */}
                 {/* ------------------------------------------------------------- */}
-                {isNoticeManager ? (
-                  <div className="space-y-8">
-                    {/* Add New Notice Form */}
-                    <div className="p-6 rounded-3xl bg-foreground/[0.02] border border-foreground/10 space-y-5">
-                      <div className="flex items-center gap-2">
-                        <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 border border-orange-500/20">
-                          <Plus className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-bold text-foreground">১. নতুন অফিসিয়াল নোটিশ প্রকাশ করুন</h4>
-                          <p className="text-xs text-foreground/60">ফর্মটি পূরণ করে নিচে &quot;নোটিশ যুক্ত করুন&quot; বাটনে চাপুন।</p>
-                        </div>
-                      </div>
+                {isNoticeManager ? (() => {
+                  const displayNotices = (pageConfig.notices !== undefined) 
+                    ? (pageConfig.notices || []) 
+                    : DEFAULT_INSTITUTIONAL_NOTICES;
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="sm:col-span-2">
-                          <label className="text-xs font-semibold text-foreground/70 block mb-1">
-                            নোটিশের শিরোনাম <span className="text-rose-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={newNoticeTitle}
-                            onChange={(e) => setNewNoticeTitle(e.target.value)}
-                            placeholder="যেমন: এইচএসসি ২০২৬ চূড়ান্ত মডেল টেস্ট ও বিশেষ ক্লাসের সময়সূচি"
-                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="text-xs font-semibold text-foreground/70 block mb-1">স্মারক নম্বর (Reference No)</label>
-                          <input
-                            type="text"
-                            value={newNoticeRefNo}
-                            onChange={(e) => setNewNoticeRefNo(e.target.value)}
-                            placeholder="FB/NOT-2026/08-06"
-                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="text-xs font-semibold text-foreground/70 block mb-1">নোটিশের ক্যাটাগরি</label>
-                          <select
-                            value={newNoticeCategory}
-                            onChange={(e: any) => setNewNoticeCategory(e.target.value)}
-                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
-                          >
-                            <option value="urgent">🚨 জরুরি বিজ্ঞপ্তি</option>
-                            <option value="exam">📝 পরীক্ষা ও ফলাফল</option>
-                            <option value="routine">📅 ক্লাস রুটিন</option>
-                            <option value="fees">💳 ফি ও ভর্তি</option>
-                            <option value="holiday">🏖️ ছুটির নোটিশ</option>
-                            <option value="general">📄 সাধারণ বিজ্ঞপ্তি</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="text-xs font-semibold text-foreground/70 block mb-1">প্রকাশের তারিখ</label>
-                          <input
-                            type="text"
-                            value={newNoticeDate}
-                            onChange={(e) => setNewNoticeDate(e.target.value)}
-                            placeholder="২৪ আগস্ট, ২০২৬ (খালি রাখলে আজকের তারিখ বসবে)"
-                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="text-xs font-semibold text-foreground/70 block mb-1">সংযুক্ত PDF ফাইলের নাম (ঐচ্ছিক)</label>
-                          <input
-                            type="text"
-                            value={newNoticeAttachmentName}
-                            onChange={(e) => setNewNoticeAttachmentName(e.target.value)}
-                            placeholder="Model-Test-Routine-2026.pdf"
-                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
-                          />
-                        </div>
-
-                        <div className="sm:col-span-2">
-                          <label className="text-xs font-semibold text-foreground/70 block mb-1">নোটিশের পূর্ণ বিবরণ ও নির্দেশনা</label>
-                          <textarea
-                            rows={4}
-                            value={newNoticeContent}
-                            onChange={(e) => setNewNoticeContent(e.target.value)}
-                            placeholder="এখানে নোটিশের যাবতীয় বিস্তারিত নির্দেশনা ও তথ্য লিখুন..."
-                            className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
-                          />
-                        </div>
-
-                        <div className="sm:col-span-2 flex flex-wrap items-center gap-6 p-3 rounded-2xl bg-background border border-foreground/10">
-                          <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-foreground">
-                            <input
-                              type="checkbox"
-                              checked={newNoticeIsPinned}
-                              onChange={(e) => setNewNoticeIsPinned(e.target.checked)}
-                              className="w-4 h-4 rounded text-orange-500 focus:ring-orange-500"
-                            />
-                            <span>📌 গুরুত্বপূর্ণ নোটিশ হিসেবে শীর্ষে পিন করুন</span>
-                          </label>
-
-                          <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-foreground">
-                            <input
-                              type="checkbox"
-                              checked={newNoticeIsUrgent}
-                              onChange={(e) => setNewNoticeIsUrgent(e.target.checked)}
-                              className="w-4 h-4 rounded text-rose-500 focus:ring-rose-500"
-                            />
-                            <span>🚨 জরুরি নোটিশ হিসেবে মার্ক করুন</span>
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-end pt-2">
-                        <button
-                          type="button"
-                          onClick={() => handleAddCustomNotice(slugKey)}
-                          className="px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all"
-                        >
-                          <Plus className="w-4 h-4" />
-                          <span>নোটিশ যুক্ত করুন (Add Notice)</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Published Notices List */}
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-orange-500" />
-                          <span>আপনার প্রকাশিত কাস্টম নোটিশসমূহ ({noticeList.length})</span>
-                        </h4>
-                      </div>
-
-                      {noticeList.length === 0 ? (
-                        <div className="p-8 rounded-3xl bg-foreground/[0.02] border border-dashed border-foreground/15 text-center space-y-2">
-                          <p className="text-xs font-bold text-foreground">এখনো কোনো কাস্টম নোটিশ যোগ করা হয়নি।</p>
-                          <p className="text-[11px] text-foreground/60 max-w-md mx-auto">
-                            আপনি উপরের ফর্ম থেকে নতুন নোটিশ যোগ করলে তা সরাসরি নোটিশ বোর্ডে প্রদর্শিত হবে। কোনো নোটিশ যোগ না করা থাকলে সিস্টেম ডিফল্ট প্রাতিষ্ঠানিক নোটিশগুলো লাইভ থাকবে।
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-1 gap-3">
-                          {noticeList.map((not: any) => (
-                            <div
-                              key={not.id}
-                              className="p-4 rounded-2xl bg-card border border-foreground/10 flex items-start justify-between gap-4 shadow-sm"
-                            >
-                              <div className="space-y-1 min-w-0">
-                                <div className="flex flex-wrap items-center gap-2">
-                                  <span className="px-2 py-0.5 rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-300 text-[10px] font-black uppercase">
-                                    {not.categoryLabel || not.category}
-                                  </span>
-                                  <span className="text-[11px] font-mono text-foreground/60 bg-foreground/5 px-2 py-0.5 rounded">
-                                    {not.refNo}
-                                  </span>
-                                  {not.isPinned && (
-                                    <span className="text-[10px] text-amber-500 font-bold flex items-center gap-1">
-                                      <Pin className="w-3 h-3 fill-amber-500" />
-                                      <span>Pinned</span>
-                                    </span>
-                                  )}
-                                  <span className="text-[11px] text-foreground/50">{not.date}</span>
-                                </div>
-                                <h5 className="font-bold text-xs text-foreground truncate">{not.title}</h5>
-                                <p className="text-[11px] text-foreground/60 line-clamp-1">{not.content}</p>
-                              </div>
-
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteCustomNotice(slugKey, not.id)}
-                                className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition-colors shrink-0"
-                                title="নোটিশটি মুছে ফেলুন"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
+                  return (
+                    <div className="space-y-8">
+                      {/* Add / Edit Notice Form */}
+                      <div className="p-6 rounded-3xl bg-foreground/[0.02] border border-foreground/10 space-y-5 shadow-sm">
+                        <div className="flex items-center justify-between gap-4 border-b border-foreground/10 pb-4">
+                          <div className="flex items-center gap-2.5">
+                            <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 border border-orange-500/20">
+                              {editingNoticeId ? <Pencil className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                             </div>
-                          ))}
+                            <div>
+                              <h4 className="text-sm font-bold text-foreground">
+                                {editingNoticeId ? '১. নির্বাচিত নোটিশটি এডিট / সংশোধন করুন' : '১. নতুন অফিসিয়াল নোটিশ প্রকাশ করুন'}
+                              </h4>
+                              <p className="text-xs text-foreground/60">
+                                {editingNoticeId ? 'তথ্য সংশোধন করে নিচে "নোটিশ আপডেট করুন" বাটনে চাপুন।' : 'ফর্মটি পূরণ করে নিচে "নোটিশ যুক্ত করুন" বাটনে চাপুন।'}
+                              </p>
+                            </div>
+                          </div>
+
+                          {editingNoticeId && (
+                            <button
+                              type="button"
+                              onClick={handleCancelEditNotice}
+                              className="px-3.5 py-1.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-foreground/70 text-xs font-bold transition-all border border-foreground/10 flex items-center gap-1.5"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                              <span>এডিট বাতিল</span>
+                            </button>
+                          )}
                         </div>
-                      )}
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="sm:col-span-2">
+                            <label className="text-xs font-semibold text-foreground/70 block mb-1">
+                              নোটিশের শিরোনাম <span className="text-rose-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={newNoticeTitle}
+                              onChange={(e) => setNewNoticeTitle(e.target.value)}
+                              placeholder="যেমন: এইচএসসি ২০২৬ চূড়ান্ত মডেল টেস্ট ও বিশেষ ক্লাসের সময়সূচি"
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="text-xs font-semibold text-foreground/70 block mb-1">স্মারক নম্বর (Reference No)</label>
+                            <input
+                              type="text"
+                              value={newNoticeRefNo}
+                              onChange={(e) => setNewNoticeRefNo(e.target.value)}
+                              placeholder="FB/NOT-2026/08-06"
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="text-xs font-semibold text-foreground/70 block mb-1">নোটিশের ক্যাটাগরি</label>
+                            <select
+                              value={newNoticeCategory}
+                              onChange={(e: any) => setNewNoticeCategory(e.target.value)}
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                            >
+                              <option value="urgent">🚨 জরুরি বিজ্ঞপ্তি</option>
+                              <option value="exam">📝 পরীক্ষা ও ফলাফল</option>
+                              <option value="routine">📅 ক্লাস রুটিন</option>
+                              <option value="fees">💳 ফি ও ভর্তি</option>
+                              <option value="holiday">🏖️ ছুটির নোটিশ</option>
+                              <option value="general">📄 সাধারণ বিজ্ঞপ্তি</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="text-xs font-semibold text-foreground/70 block mb-1">প্রকাশের তারিখ</label>
+                            <input
+                              type="text"
+                              value={newNoticeDate}
+                              onChange={(e) => setNewNoticeDate(e.target.value)}
+                              placeholder="২৪ আগস্ট, ২০২৬ (খালি রাখলে আজকের তারিখ বসবে)"
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="text-xs font-semibold text-foreground/70 block mb-1">সংযুক্ত PDF ফাইলের নাম (ঐচ্ছিক)</label>
+                            <input
+                              type="text"
+                              value={newNoticeAttachmentName}
+                              onChange={(e) => setNewNoticeAttachmentName(e.target.value)}
+                              placeholder="Model-Test-Routine-2026.pdf"
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                            />
+                          </div>
+
+                          {/* PDF Download / Google Drive Link Input */}
+                          <div className="sm:col-span-2 space-y-1">
+                            <label className="text-xs font-semibold text-foreground/70 flex items-center justify-between">
+                              <span className="flex items-center gap-1.5">
+                                <ExternalLink className="w-3.5 h-3.5 text-orange-500" />
+                                <span>সংযুক্ত PDF / Google Drive ডাউনলোড লিংক (ঐচ্ছিক)</span>
+                              </span>
+                              <span className="text-[10px] text-foreground/50">Google Drive, Dropbox বা সরাসরি PDF লিংক</span>
+                            </label>
+                            <input
+                              type="url"
+                              value={newNoticeAttachmentUrl}
+                              onChange={(e) => setNewNoticeAttachmentUrl(e.target.value)}
+                              placeholder="https://drive.google.com/file/d/... অথবা সরাসরি ফাইলের লিংক"
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500 font-mono"
+                            />
+                            <p className="text-[11px] text-foreground/50">
+                              💡 Google Drive-এ আপলোড করা পিডিএফ ফাইলের &quot;Anyone with the link can view&quot; শেয়ার লিংকটি এখানে পেস্ট করলে শিক্ষার্থীরা সরাসরি ডাউনলোড করতে পারবে।
+                            </p>
+                          </div>
+
+                          <div className="sm:col-span-2">
+                            <label className="text-xs font-semibold text-foreground/70 block mb-1">নোটিশের পূর্ণ বিবরণ ও নির্দেশনা</label>
+                            <textarea
+                              rows={4}
+                              value={newNoticeContent}
+                              onChange={(e) => setNewNoticeContent(e.target.value)}
+                              placeholder="এখানে নোটিশের যাবতীয় বিস্তারিত নির্দেশনা ও তথ্য লিখুন..."
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs text-foreground focus:outline-none focus:border-orange-500"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-2 flex flex-wrap items-center gap-6 p-3.5 rounded-2xl bg-background border border-foreground/10">
+                            <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-foreground">
+                              <input
+                                type="checkbox"
+                                checked={newNoticeIsPinned}
+                                onChange={(e) => setNewNoticeIsPinned(e.target.checked)}
+                                className="w-4 h-4 rounded text-orange-500 focus:ring-orange-500"
+                              />
+                              <span>📌 গুরুত্বপূর্ণ নোটিশ হিসেবে শীর্ষে পিন করুন</span>
+                            </label>
+
+                            <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-foreground">
+                              <input
+                                type="checkbox"
+                                checked={newNoticeIsUrgent}
+                                onChange={(e) => setNewNoticeIsUrgent(e.target.checked)}
+                                className="w-4 h-4 rounded text-rose-500 focus:ring-rose-500"
+                              />
+                              <span>🚨 জরুরি নোটিশ হিসেবে মার্ক করুন</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-3 pt-2">
+                          {editingNoticeId && (
+                            <button
+                              type="button"
+                              onClick={handleCancelEditNotice}
+                              className="px-5 py-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-foreground font-bold text-xs transition-all border border-foreground/10"
+                            >
+                              বাতিল করুন
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => handleSaveOrAddNotice(slugKey)}
+                            className="px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all"
+                          >
+                            {editingNoticeId ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                            <span>{editingNoticeId ? 'নোটিশ আপডেট করুন (Save Changes)' : 'নোটিশ যুক্ত করুন (Add Notice)'}</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Published Notices List */}
+                      <div className="space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-foreground/10 pb-3">
+                          <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                            <FileText className="w-4 h-4 text-orange-500" />
+                            <span>আপনার প্রকাশিত নোটিশসমূহ ({displayNotices.length})</span>
+                          </h4>
+
+                          <button
+                            type="button"
+                            onClick={() => handleRestoreDefaultNotices(slugKey)}
+                            className="text-xs font-bold text-orange-500 hover:text-orange-600 hover:underline flex items-center gap-1.5 transition-all self-start sm:self-auto"
+                          >
+                            <RefreshCw className="w-3.5 h-3.5" />
+                            <span>ডিফল্ট ৫টি নোটিশ রিস্টোর করুন</span>
+                          </button>
+                        </div>
+
+                        {displayNotices.length === 0 ? (
+                          <div className="p-8 rounded-3xl bg-foreground/[0.02] border border-dashed border-foreground/15 text-center space-y-2">
+                            <p className="text-xs font-bold text-foreground">এখনো কোনো নোটিশ নেই।</p>
+                            <p className="text-[11px] text-foreground/60 max-w-md mx-auto">
+                              আপনি উপরের ফর্ম থেকে নতুন নোটিশ যোগ করতে পারেন অথবা উপরের &quot;ডিফল্ট ৫টি নোটিশ রিস্টোর করুন&quot; বাটনে চাপুন।
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 gap-3">
+                            {displayNotices.map((not: any) => (
+                              <div
+                                key={not.id}
+                                className={`p-4 sm:p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm ${
+                                  editingNoticeId === not.id 
+                                    ? 'bg-orange-500/10 border-orange-500 ring-2 ring-orange-500/30' 
+                                    : 'bg-card border-foreground/10 hover:border-foreground/20'
+                                }`}
+                              >
+                                <div className="space-y-1.5 min-w-0 flex-1">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <span className="px-2 py-0.5 rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-300 text-[10px] font-black uppercase">
+                                      {not.categoryLabel || not.category}
+                                    </span>
+                                    <span className="text-[11px] font-mono text-foreground/60 bg-foreground/5 px-2 py-0.5 rounded">
+                                      {not.refNo}
+                                    </span>
+                                    {not.isPinned && (
+                                      <span className="text-[10px] text-amber-500 font-bold flex items-center gap-1">
+                                        <Pin className="w-3 h-3 fill-amber-500" />
+                                        <span>Pinned</span>
+                                      </span>
+                                    )}
+                                    {not.isUrgent && (
+                                      <span className="text-[10px] text-rose-500 font-bold flex items-center gap-1">
+                                        <Flame className="w-3 h-3 text-rose-500" />
+                                        <span>Urgent</span>
+                                      </span>
+                                    )}
+                                    {not.attachmentUrl && (
+                                      <span className="text-[10px] text-emerald-500 font-bold flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded">
+                                        <ExternalLink className="w-2.5 h-2.5" />
+                                        <span>PDF Link</span>
+                                      </span>
+                                    )}
+                                    <span className="text-[11px] text-foreground/50">{not.date}</span>
+                                  </div>
+
+                                  <h5 className="font-bold text-xs sm:text-sm text-foreground truncate">{not.title}</h5>
+                                  <p className="text-[11px] text-foreground/60 line-clamp-2 leading-relaxed">{not.content}</p>
+                                </div>
+
+                                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleStartEditNotice(not)}
+                                    className="px-3 py-1.5 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/25 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                                    title="নোটিশটি এডিট করুন"
+                                  >
+                                    <Pencil className="w-3.5 h-3.5" />
+                                    <span>এডিট</span>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteCustomNotice(slugKey, not.id)}
+                                    className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition-colors"
+                                    title="নোটিশটি মুছে ফেলুন"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ) : isNotice ? (
+                  );
+                })() : isNotice ? (
                   /* ------------------------------------------------------------- */
                   /* 2. NOTICE TAB 1: HERO SECTION & GENERAL NOTICE SETTINGS       */
                   /* ------------------------------------------------------------- */

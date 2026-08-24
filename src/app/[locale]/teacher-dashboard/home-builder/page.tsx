@@ -756,6 +756,23 @@ export default function TeacherHomePageBuilderPage() {
   const [disabledStandardPages, setDisabledStandardPages] = useState<string[]>([]);
   const [globallyExcludedPages, setGloballyExcludedPages] = useState<string[]>([]);
 
+  // Track Unsaved Changes & Section Navigation Guard
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
+  const [pendingTabSwitch, setPendingTabSwitch] = useState<string | null>(null);
+  const [pendingGroupSwitch, setPendingGroupSwitch] = useState<string | null>(null);
+  const [showUnsavedModal, setShowUnsavedModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
   // Fetch initial data
   useEffect(() => {
     const fetchData = async () => {
@@ -1080,10 +1097,31 @@ export default function TeacherHomePageBuilderPage() {
         profilePhoto: profilePhoto || user.photoURL,
       }, { merge: true }).catch(() => {});
 
-      toast.success(locale === 'bn' ? 'হোম পেজের সেটিংস সফলভাবে সংরক্ষিত হয়েছে!' : 'Home page configuration saved successfully!');
+      setHasUnsavedChanges(false);
+
+      let pageName = 'হোম';
+      if (activeTab === 'branding') {
+        pageName = 'ব্র্যান্ডিং ও পরিচিতি';
+      } else if (activeTab.startsWith('about')) {
+        pageName = 'অ্যাবাউট';
+      } else if (activeTab.startsWith('contact')) {
+        pageName = 'যোগাযোগ';
+      } else if (activeTab.startsWith('custom_')) {
+        const matchingNav = customNavLinks.find(c => activeTab.startsWith(`custom_${(c.slug || '').replace('/', '').toLowerCase()}`));
+        pageName = matchingNav ? matchingNav.name : 'নোটিশ';
+      }
+
+      toast.success(
+        locale === 'bn' 
+          ? `${pageName} পেজের সেটিংস সফলভাবে সংরক্ষিত হয়েছে!` 
+          : `${pageName} page settings saved successfully!`,
+        { icon: '💾' }
+      );
+      return true;
     } catch (err) {
       console.error('Error saving home page config:', err);
       toast.error(locale === 'bn' ? 'সংরক্ষণ ব্যর্থ হয়েছে' : 'Failed to save configuration');
+      return false;
     } finally {
       setSaving(false);
     }
@@ -1688,6 +1726,61 @@ export default function TeacherHomePageBuilderPage() {
 
   const allTabs = tabGroups.flatMap(g => g.items);
 
+  const currentParentGroup = tabGroups.find(g => g.items.some(it => it.id === activeTab));
+  let currentActiveSectionName = 'হোম পেজ';
+  if (currentParentGroup) {
+    const cpData = (currentParentGroup as any).customPageData;
+    if ((currentParentGroup as any).isCustomPage) {
+      currentActiveSectionName = `${cpData?.name || 'নোটিশ'} পেজ`;
+    } else if (currentParentGroup.id === 'aboutUs') {
+      currentActiveSectionName = 'অ্যাবাউট পেজ';
+    } else if (currentParentGroup.id === 'contactUs') {
+      currentActiveSectionName = 'যোগাযোগ পেজ';
+    } else if (currentParentGroup.id === 'branding') {
+      currentActiveSectionName = 'ব্র্যান্ডিং ও পরিচিতি';
+    } else if (currentParentGroup.id === 'home') {
+      currentActiveSectionName = 'হোম পেজ';
+    }
+  }
+
+  const handleRequestTabSwitch = (targetTabId: string, targetGroupId?: string) => {
+    if (targetTabId === activeTab) return;
+    if (hasUnsavedChanges) {
+      setPendingTabSwitch(targetTabId);
+      if (targetGroupId) setPendingGroupSwitch(targetGroupId);
+      setShowUnsavedModal(true);
+    } else {
+      setActiveTab(targetTabId as any);
+      if (targetGroupId) setOpenGroup(targetGroupId);
+    }
+  };
+
+  const handleSaveAndSwitch = async () => {
+    const success = await handleSaveConfig();
+    if (success) {
+      if (pendingTabSwitch) setActiveTab(pendingTabSwitch as any);
+      if (pendingGroupSwitch) setOpenGroup(pendingGroupSwitch);
+      setPendingTabSwitch(null);
+      setPendingGroupSwitch(null);
+      setShowUnsavedModal(false);
+    }
+  };
+
+  const handleDiscardAndSwitch = () => {
+    setHasUnsavedChanges(false);
+    if (pendingTabSwitch) setActiveTab(pendingTabSwitch as any);
+    if (pendingGroupSwitch) setOpenGroup(pendingGroupSwitch);
+    setPendingTabSwitch(null);
+    setPendingGroupSwitch(null);
+    setShowUnsavedModal(false);
+  };
+
+  const handleCancelSwitch = () => {
+    setPendingTabSwitch(null);
+    setPendingGroupSwitch(null);
+    setShowUnsavedModal(false);
+  };
+
   // Accordion open group state (defaults to 'home')
   const [openGroup, setOpenGroup] = useState<string>('home');
 
@@ -1771,9 +1864,10 @@ export default function TeacherHomePageBuilderPage() {
                       if (isOpen) {
                         setOpenGroup('');
                       } else {
-                        setOpenGroup(group.id);
                         if (!hasActiveChild && group.items.length > 0) {
-                          setActiveTab(group.items[0].id as any);
+                          handleRequestTabSwitch(group.items[0].id, group.id);
+                        } else {
+                          setOpenGroup(group.id);
                         }
                       }
                     }}
@@ -1810,7 +1904,7 @@ export default function TeacherHomePageBuilderPage() {
                           <button
                             key={tab.id}
                             type="button"
-                            onClick={() => setActiveTab(tab.id as any)}
+                            onClick={() => handleRequestTabSwitch(tab.id, group.id)}
                             className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all text-left ${
                               isActive
                                 ? 'bg-orange-500 text-white shadow-md font-bold'
@@ -1882,7 +1976,7 @@ export default function TeacherHomePageBuilderPage() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => handleRequestTabSwitch(tab.id)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex-shrink-0 transition-all ${
                   isActive ? 'bg-orange-500 text-white' : 'bg-foreground/5 text-foreground/70'
                 }`}
@@ -5379,11 +5473,11 @@ export default function TeacherHomePageBuilderPage() {
           type="button"
           onClick={handleSaveConfig}
           disabled={saving}
-          aria-label="সেটিংস সংরক্ষণ করুন"
+          aria-label={`${currentActiveSectionName} সংরক্ষণ করুন`}
           className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-orange-600 via-orange-500 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white flex items-center justify-center shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/80 transition-all duration-300 hover:scale-110 active:scale-95 ring-4 ring-orange-500/25 border-2 border-white/30 disabled:opacity-50 cursor-pointer ${
             saving ? 'animate-pulse' : ''
           }`}
-          title="সেটিংস সংরক্ষণ করুন (Save All Settings)"
+          title={`${currentActiveSectionName} সংরক্ষণ করুন (Save)`}
         >
           {saving ? (
             <Loader2 className="w-6 h-6 sm:w-7 sm:h-7 animate-spin text-white" />
@@ -5395,9 +5489,58 @@ export default function TeacherHomePageBuilderPage() {
         {/* Floating Tooltip */}
         <div className="absolute bottom-full right-0 mb-3 px-3.5 py-1.5 rounded-xl bg-slate-950/95 text-white text-xs font-bold whitespace-nowrap shadow-2xl border border-white/10 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 flex items-center gap-1.5 z-50 backdrop-blur-md">
           <Save className="w-3.5 h-3.5 text-orange-400" />
-          <span>{saving ? 'সংরক্ষণ হচ্ছে...' : 'সেটিংস সংরক্ষণ করুন (Save All)'}</span>
+          <span>{saving ? 'সংরক্ষণ হচ্ছে...' : `${currentActiveSectionName} সংরক্ষণ করুন`}</span>
         </div>
       </div>
+
+      {/* Unsaved Changes Confirmation Modal */}
+      {showUnsavedModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-card border border-foreground/15 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-500 flex items-center justify-center shrink-0">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-foreground">অসংরক্ষিত পরিবর্তন রয়েছে!</h3>
+                <p className="text-xs text-foreground/60">Unsaved Changes Detected</p>
+              </div>
+            </div>
+
+            <p className="text-xs sm:text-sm text-foreground/80 leading-relaxed">
+              আপনি <strong className="text-orange-500">{currentActiveSectionName}</strong>-এ কিছু পরিবর্তন করেছেন যা এখনো সংরক্ষণ করা হয়নি। আপনি কি সেভ করে পরের সেকশনে যেতে চান?
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={handleSaveAndSwitch}
+                disabled={saving}
+                className="w-full sm:flex-1 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all"
+              >
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                <span>সেভ করে যান</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDiscardAndSwitch}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/20 font-bold text-xs transition-all"
+              >
+                সেভ ছাড়াই যান
+              </button>
+
+              <button
+                type="button"
+                onClick={handleCancelSwitch}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-foreground/70 font-bold text-xs transition-all border border-foreground/10"
+              >
+                বাতিল
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

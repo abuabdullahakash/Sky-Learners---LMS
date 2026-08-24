@@ -183,18 +183,16 @@ export default function DynamicTeacherCustomPage({ params }: CustomPageProps) {
 
         {/* Dynamic Route Content Router */}
         {slug === 'notice' ? (
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-            <TeacherNoticeBoardView
-              teacherName={teacherName}
-              teacherHeadline={teacherHeadline}
-              teacherAvatar={teacherAvatar}
-              teacherId={effectiveTeacherId}
-              teacherPhone={teacherProfile?.contactPhone}
-              teacherWhatsapp={teacherProfile?.contactWhatsapp}
-              firestoreNotices={teacherNotices}
-              pageConfig={teacherProfile?.homePageConfig?.customPagesConfig?.notice || teacherProfile?.customPagesConfig?.notice || {}}
-            />
-          </div>
+          <TeacherNoticeBoardView
+            teacherName={teacherName}
+            teacherHeadline={teacherHeadline}
+            teacherAvatar={teacherAvatar}
+            teacherId={effectiveTeacherId}
+            teacherPhone={teacherProfile?.contactPhone}
+            teacherWhatsapp={teacherProfile?.contactWhatsapp}
+            firestoreNotices={teacherNotices}
+            pageConfig={teacherProfile?.homePageConfig?.customPagesConfig?.notice || teacherProfile?.customPagesConfig?.notice || {}}
+          />
         ) : (
           <div>
             {/* Page Hero Section */}

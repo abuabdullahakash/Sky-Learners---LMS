@@ -26,7 +26,9 @@ import {
   Building2,
   Bookmark,
   Layers,
-  BookOpen
+  BookOpen,
+  ArrowRight,
+  Play
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -43,6 +45,7 @@ export interface NoticeItem {
   hasAttachment?: boolean;
   attachmentName?: string;
   attachmentSize?: string;
+  attachmentUrl?: string;
   publishedBy: string;
 }
 
@@ -70,11 +73,12 @@ export default function TeacherNoticeBoardView({
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedNotice, setSelectedNotice] = useState<NoticeItem | null>(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState<boolean>(false);
 
   // Dynamic values configured from Teacher Website Builder
   const heroHeading = pageConfig?.heroHeading || 'সকল ব্যাচের একাডেমিক নোটিশ ও অফিসিয়াল সার্কুলার';
-  const heroSubtitle = pageConfig?.heroSubtitle || `${teacherName}-এর সকল অনলাইন ও অফলাইন ব্যাচের ক্লাস রুটিন, পরীক্ষার সময়সূচি, ফলাফল, ফি এবং জরুরি আপডেটসমূহ এখান থেকে সরাসরি সংগ্রহ করুন।`;
-  const heroTopBadge = pageConfig?.heroTopBadge || `${teacherName}'s Official Notice Board`;
+  const heroSubtitle = pageConfig?.heroSubtitle || `${teacherName}, দেশজুড়ে সকল ব্যাচের ক্লাস রুটিন, পরীক্ষার সময়সূচি, ফলাফল, ফি এবং জরুরি আপডেটসমূহ নিয়মিত এখান থেকে প্রকাশ করা হয়।`;
+  const heroTopBadge = pageConfig?.heroTopBadge || `${teacherName}'s Official Notice Hub`;
   const heroBgImage = pageConfig?.heroBgImage || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1600&auto=format&fit=crop';
   const sessionYear = pageConfig?.sessionYear || '২০২৬ সেশন (Active)';
   const effectiveWhatsapp = pageConfig?.noticeWhatsapp || teacherWhatsapp;
@@ -182,7 +186,8 @@ export default function TeacherNoticeBoardView({
         content: fn.content || fn.description || '',
         hasAttachment: Boolean(fn.attachmentUrl || fn.pdfUrl),
         attachmentName: fn.attachmentName || 'Official-Notice-Document.pdf',
-        attachmentSize: fn.attachmentSize || '১.২ মেগাবাইট'
+        attachmentSize: fn.attachmentSize || '১.২ মেগাবাইট',
+        attachmentUrl: fn.attachmentUrl || fn.pdfUrl
       }));
       combined = [...combined, ...mappedFirestore];
     }
@@ -234,132 +239,185 @@ export default function TeacherNoticeBoardView({
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="w-full bg-background text-foreground selection:bg-orange-500 selection:text-white">
       
-      {/* 1. URGENT BREAKING NOTICE TICKER (জরুরি স্ক্রোলিং নোটিশ বার) */}
-      {(pageConfig?.tickerHeadline || pinnedNotice) && (
-        <div className="rounded-2xl bg-rose-500/10 dark:bg-rose-950/40 border border-rose-500/30 p-3 flex items-center justify-between gap-3 shadow-md overflow-hidden relative backdrop-blur-sm">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-rose-500/20 text-rose-600 dark:text-rose-300 border border-rose-500/40 text-[11px] font-black uppercase shrink-0">
-              <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-              <span>জরুরি বিজ্ঞপ্তি</span>
-            </div>
-            <p className="text-xs text-foreground font-semibold truncate hover:text-primary transition-colors cursor-pointer" onClick={() => pinnedNotice && setSelectedNotice(pinnedNotice)}>
-              {pageConfig?.tickerRefNo ? `${pageConfig.tickerRefNo}: ` : (pinnedNotice ? `${pinnedNotice.refNo}: ` : '')}
-              {pageConfig?.tickerHeadline || pinnedNotice?.title}
-            </p>
-          </div>
-          {pinnedNotice && (
-            <button
-              onClick={() => setSelectedNotice(pinnedNotice)}
-              className="text-[11px] font-extrabold text-primary hover:text-primary/80 px-3 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/20 shrink-0 transition-all flex items-center gap-1"
-            >
-              <span>বিস্তারিত</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          )}
+      {/* ========================================================================= */}
+      {/* 1. 100% FULL-WIDTH TOP HERO BANNER (Exact Style Match with /about Hero)    */}
+      {/* ========================================================================= */}
+      <section className="relative overflow-hidden min-h-[460px] sm:min-h-[520px] flex items-center justify-center border-b border-foreground/10 w-full">
+        
+        {/* Full Background Photo */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={heroBgImage} 
+            alt="Hero Background" 
+            className="w-full h-full object-cover object-center scale-105 filter brightness-90"
+          />
+          {/* Smooth Gradient Overlay matching Site Theme */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#09090b]/95 via-[#09090b]/80 to-[#09090b]/40 sm:from-[#09090b]/95 sm:via-[#1c120c]/85 sm:to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/40" />
         </div>
-      )}
 
-      {/* ========================================================================= */}
-      {/* 2. STUNNING HERO SECTION WITH IMAGE & OVERLAY GRADIENT                     */}
-      {/* ========================================================================= */}
-      <div className="relative rounded-3xl overflow-hidden border border-border shadow-2xl bg-slate-950 text-white">
-        
-        {/* Hero Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 hover:scale-105"
-          style={{
-            backgroundImage: `url('${heroBgImage}')`
-          }}
-        />
+        {/* Centered Content Container */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 sm:py-24 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            {/* Left Column: Slogan, Headline & Action Buttons */}
+            <div className="lg:col-span-7 space-y-5 text-center lg:text-left text-white">
+              
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/20 text-orange-400 text-xs font-black uppercase tracking-wider backdrop-blur-md">
+                <Sparkles className="w-3.5 h-3.5 text-orange-400" />
+                <span>{heroTopBadge}</span>
+              </div>
 
-        {/* Multi-layer Gradient Color Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-purple-950/90 to-slate-950/85 backdrop-blur-[2px]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-purple-950/30" />
-        
-        {/* Decorative Glowing Orbs */}
-        <div className="absolute -top-20 -right-20 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-orange-500/15 rounded-full blur-3xl pointer-events-none" />
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15] drop-shadow-md">
+                {heroHeading}
+              </h1>
 
-        {/* Hero Content Area */}
-        <div className="relative z-10 p-6 sm:p-10 lg:p-12 space-y-6">
-          
-          {/* Top Badges Row */}
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-xs font-black uppercase tracking-wider shadow-lg">
-              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-              <span>{heroTopBadge}</span>
+              <p className="text-white/90 text-sm sm:text-base lg:text-lg font-normal leading-relaxed max-w-xl mx-auto lg:mx-0 drop-shadow">
+                {heroSubtitle}
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
+                <a
+                  href="#notices-section"
+                  className="px-7 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-sm shadow-xl shadow-orange-500/30 transition-all hover:scale-105 flex items-center gap-2"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span>সকল নোটিশ দেখুন</span>
+                </a>
+
+                {pinnedNotice && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedNotice(pinnedNotice)}
+                    className="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm backdrop-blur-md transition-all flex items-center gap-2 hover:scale-105"
+                  >
+                    <span>সর্বশেষ সার্কুলার</span>
+                    <ArrowRight className="w-4 h-4 text-orange-400" />
+                  </button>
+                )}
+              </div>
+
+              {/* 4 Quick Stat Badges */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-4 max-w-xl mx-auto lg:mx-0">
+                <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
+                  <span className="text-[10px] text-white/60 block font-medium">মোট নোটিশ</span>
+                  <span className="text-xs font-black text-white font-mono">{allNotices.length}টি প্রকাশনা</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
+                  <span className="text-[10px] text-white/60 block font-medium">সর্বশেষ আপডেট</span>
+                  <span className="text-xs font-black text-emerald-400 font-mono">আজ প্রকাশিত</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
+                  <span className="text-[10px] text-white/60 block font-medium">ক্যাটাগরি</span>
+                  <span className="text-xs font-black text-amber-300 font-mono">৬টি ফিল্টার</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
+                  <span className="text-[10px] text-white/60 block font-medium">শিক্ষাবর্ষ</span>
+                  <span className="text-xs font-black text-orange-300 font-mono">{sessionYear}</span>
+                </div>
+              </div>
+
             </div>
 
-            <div className="flex items-center gap-2">
-              <div className="px-3.5 py-1.5 rounded-2xl bg-black/50 border border-purple-500/30 text-right backdrop-blur-md">
-                <span className="text-[10px] text-purple-200 block font-medium">শিক্ষাবর্ষ</span>
-                <span className="text-xs font-black text-amber-400 font-mono">{sessionYear}</span>
+            {/* Right Column: Featured Interactive Notice Card */}
+            <div className="lg:col-span-5 flex justify-center lg:justify-end">
+              <div 
+                onClick={() => pinnedNotice && setSelectedNotice(pinnedNotice)}
+                className="w-full max-w-sm sm:max-w-md aspect-[16/10] rounded-3xl overflow-hidden bg-white/10 backdrop-blur-md border-2 border-white/30 hover:border-orange-400 shadow-2xl relative group cursor-pointer transition-all duration-300 hover:scale-[1.03]"
+              >
+                <img 
+                  src={heroBgImage} 
+                  alt="Featured Notice" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-95"
+                />
+                
+                {/* Subtle Gradient Sheen */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-black/70 via-black/30 to-transparent" />
+
+                {/* Centered Play / Notice Icon */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/90 text-orange-600 flex items-center justify-center shadow-2xl group-hover:scale-110 group-hover:bg-white transition-all duration-300 ring-8 ring-white/30">
+                    <FileText className="w-7 h-7 sm:w-8 sm:h-8 text-orange-600" />
+                  </div>
+                </div>
+
+                {/* Corner caption badge */}
+                <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between pointer-events-none">
+                  <span className="text-[11px] font-black text-white bg-black/60 px-3 py-1 rounded-full backdrop-blur-md border border-white/10 truncate max-w-[80%]">
+                    {pinnedNotice?.title || 'আমি শিখবো, আমি জিতবো'}
+                  </span>
+                  <span className="text-[10px] font-mono font-bold text-amber-400 bg-black/70 px-2 py-0.5 rounded-md">
+                    {pinnedNotice?.refNo || 'NOTICE'}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Main Hero Headline & Subtitle */}
-          <div className="space-y-3 max-w-3xl">
-            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight sm:leading-snug drop-shadow-md">
-              {heroHeading}
-            </h1>
-            <p className="text-xs sm:text-sm md:text-base text-slate-200 leading-relaxed max-w-2xl font-medium">
-              {heroSubtitle}
-            </p>
           </div>
+        </div>
+      </section>
 
-          {/* 4 Quick Stat Badges */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-            <div className="p-3 rounded-2xl bg-slate-900/60 border border-purple-500/20 backdrop-blur-md space-y-0.5">
-              <span className="text-[10px] text-slate-400 block font-medium">মোট সক্রিয় নোটিশ</span>
-              <span className="text-sm font-black text-white font-mono">{allNotices.length}টি প্রকাশনা</span>
+      {/* ========================================================================= */}
+      {/* 2. MAIN NOTICES CONTENT AREA (Centered Container)                          */}
+      {/* ========================================================================= */}
+      <div id="notices-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+        
+        {/* Urgent Breaking Notice Ticker */}
+        {(pageConfig?.tickerHeadline || pinnedNotice) && (
+          <div className="rounded-2xl bg-rose-500/10 dark:bg-rose-950/40 border border-rose-500/30 p-3 flex items-center justify-between gap-3 shadow-md overflow-hidden relative backdrop-blur-sm">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-rose-500/20 text-rose-600 dark:text-rose-300 border border-rose-500/40 text-[11px] font-black uppercase shrink-0">
+                <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                <span>জরুরি বিজ্ঞপ্তি</span>
+              </div>
+              <p className="text-xs text-foreground font-semibold truncate hover:text-primary transition-colors cursor-pointer" onClick={() => pinnedNotice && setSelectedNotice(pinnedNotice)}>
+                {pageConfig?.tickerRefNo ? `${pageConfig.tickerRefNo}: ` : (pinnedNotice ? `${pinnedNotice.refNo}: ` : '')}
+                {pageConfig?.tickerHeadline || pinnedNotice?.title}
+              </p>
             </div>
-            <div className="p-3 rounded-2xl bg-slate-900/60 border border-purple-500/20 backdrop-blur-md space-y-0.5">
-              <span className="text-[10px] text-slate-400 block font-medium">সর্বশেষ আপডেট</span>
-              <span className="text-sm font-black text-emerald-400 font-mono">আজ প্রকাশিত</span>
-            </div>
-            <div className="p-3 rounded-2xl bg-slate-900/60 border border-purple-500/20 backdrop-blur-md space-y-0.5">
-              <span className="text-[10px] text-slate-400 block font-medium">ক্যাটারগরি ফিল্টার</span>
-              <span className="text-sm font-black text-purple-300 font-mono">৬টি বিষয়ভিত্তিক</span>
-            </div>
-            <div className="p-3 rounded-2xl bg-slate-900/60 border border-purple-500/20 backdrop-blur-md space-y-0.5">
-              <span className="text-[10px] text-slate-400 block font-medium">অনুমোদন স্ট্যাটাস</span>
-              <span className="text-sm font-black text-amber-300 font-mono">১০০% ভেরিফাইড</span>
-            </div>
+            {pinnedNotice && (
+              <button
+                onClick={() => setSelectedNotice(pinnedNotice)}
+                className="text-[11px] font-extrabold text-primary hover:text-primary/80 px-3 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/20 shrink-0 transition-all flex items-center gap-1"
+              >
+                <span>বিস্তারিত</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
+        )}
 
-          {/* Search Bar & Reset Toolbar */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 pt-3">
+        {/* Search Bar & Categories Toolbar */}
+        <div className="p-6 rounded-3xl bg-card border border-border space-y-5 shadow-sm">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
             <div className="relative flex-1 w-full">
-              <Search className="w-4 h-4 text-purple-300 absolute left-4 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="নোটিশের শিরোনাম, স্মারক নম্বর (Ref No) বা বিষয় দিয়ে খুঁজুন..."
+                placeholder="নোটিশের শিরোনাম, স্মারক নম্বর (Ref No) বা কিওয়ার্ড দিয়ে খুঁজুন..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-900/80 border border-purple-500/30 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/40 transition-all shadow-inner backdrop-blur-md"
+                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-inner"
               />
               {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   <X className="w-4 h-4" />
                 </button>
               )}
             </div>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <button
-                onClick={() => { setSearchQuery(''); setActiveCategory('all'); }}
-                className="px-5 py-3 rounded-2xl bg-purple-600/30 hover:bg-purple-600/50 text-white text-xs font-bold transition-all border border-purple-500/40 w-full sm:w-auto text-center backdrop-blur-md"
-              >
-                রিসেট
-              </button>
-            </div>
+            <button
+              onClick={() => { setSearchQuery(''); setActiveCategory('all'); }}
+              className="px-4 py-2.5 rounded-2xl bg-foreground/5 hover:bg-foreground/10 text-foreground text-xs font-bold transition-colors border border-border w-full sm:w-auto text-center"
+            >
+              রিসেট
+            </button>
           </div>
 
-          {/* Category Filter Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1 pt-1">
+          {/* Category Filter Pills */}
+          <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1">
             {categoryFilters.map((cat) => {
               const Icon = cat.icon;
               const isActive = activeCategory === cat.id;
@@ -369,14 +427,14 @@ export default function TeacherNoticeBoardView({
                   onClick={() => setActiveCategory(cat.id)}
                   className={`px-3.5 py-2 rounded-2xl text-xs font-extrabold whitespace-nowrap transition-all flex items-center gap-2 border select-none ${
                     isActive
-                      ? 'bg-purple-600 border-purple-400 text-white shadow-lg shadow-purple-600/40 scale-105'
-                      : 'bg-slate-900/70 border-purple-500/20 text-slate-200 hover:bg-slate-800/80 hover:text-white backdrop-blur-md'
+                      ? 'bg-primary border-primary text-white shadow-lg shadow-primary/30 scale-105'
+                      : 'bg-background border-border text-muted-foreground hover:bg-foreground/5 hover:text-foreground'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : (cat.color || 'text-purple-300')}`} />
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : (cat.color || 'text-primary')}`} />
                   <span>{cat.label}</span>
                   <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                    isActive ? 'bg-purple-800 text-white' : 'bg-slate-800 text-slate-300'
+                    isActive ? 'bg-primary-foreground/20 text-white' : 'bg-foreground/10 text-muted-foreground'
                   }`}>
                     {cat.count}
                   </span>
@@ -384,239 +442,238 @@ export default function TeacherNoticeBoardView({
               );
             })}
           </div>
-
         </div>
 
-      </div>
-
-      {/* 3. FEATURED PINNED CIRCULAR CARD */}
-      {pinnedNotice && activeCategory === 'all' && !searchQuery && (
-        <div className="p-6 sm:p-7 rounded-3xl bg-card border border-primary/40 shadow-xl space-y-4 relative overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border">
-            <div className="flex items-center gap-2.5">
-              <span className="px-3 py-1 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-300 border border-rose-500/30 text-xs font-black flex items-center gap-1.5 shadow-sm">
-                <Pin className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
-                <span>পিনযুক্ত গুরুত্বপূর্ণ বিজ্ঞপ্তি</span>
-              </span>
-              <span className="text-xs text-primary font-mono bg-primary/10 px-2.5 py-0.5 rounded-lg border border-primary/20">
-                {pinnedNotice.refNo}
+        {/* Featured Pinned Circular Card */}
+        {pinnedNotice && activeCategory === 'all' && !searchQuery && (
+          <div className="p-6 sm:p-7 rounded-3xl bg-card border border-primary/40 shadow-xl space-y-4 relative overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border">
+              <div className="flex items-center gap-2.5">
+                <span className="px-3 py-1 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-300 border border-rose-500/30 text-xs font-black flex items-center gap-1.5 shadow-sm">
+                  <Pin className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
+                  <span>পিনযুক্ত গুরুত্বপূর্ণ বিজ্ঞপ্তি</span>
+                </span>
+                <span className="text-xs text-primary font-mono bg-primary/10 px-2.5 py-0.5 rounded-lg border border-primary/20">
+                  {pinnedNotice.refNo}
+                </span>
+              </div>
+              <span className="text-xs text-muted-foreground flex items-center gap-1.5 font-mono">
+                <Calendar className="w-3.5 h-3.5 text-primary" />
+                <span>{pinnedNotice.date}</span>
               </span>
             </div>
-            <span className="text-xs text-muted-foreground flex items-center gap-1.5 font-mono">
-              <Calendar className="w-3.5 h-3.5 text-primary" />
-              <span>{pinnedNotice.date}</span>
+
+            <div className="space-y-2">
+              <h3 
+                onClick={() => setSelectedNotice(pinnedNotice)} 
+                className="text-lg sm:text-xl font-black text-foreground hover:text-primary transition-colors cursor-pointer leading-snug"
+              >
+                {pinnedNotice.title}
+              </h3>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                {pinnedNotice.content}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setSelectedNotice(pinnedNotice)}
+                  className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white font-extrabold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-primary/30"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>সম্পূর্ণ নোটিশ পড়ুন</span>
+                </button>
+
+                {pinnedNotice.hasAttachment && (
+                  <button
+                    onClick={() => handleDownloadNoticePDF(pinnedNotice)}
+                    className="px-4 py-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-foreground border border-border font-bold text-xs flex items-center gap-1.5 transition-all"
+                  >
+                    <Download className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>PDF ডাউনলোড ({pinnedNotice.attachmentSize || '১.২ MB'})</span>
+                  </button>
+                )}
+              </div>
+
+              <button
+                onClick={() => handleShareNotice(pinnedNotice)}
+                className="p-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-muted-foreground hover:text-foreground border border-border text-xs transition-colors"
+                title="শেয়ার করুন"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Notices Stream List */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-extrabold text-foreground flex items-center gap-2">
+              <FileText className="w-4 h-4 text-primary" />
+              <span>সকল সার্কুলার ও বিজ্ঞপ্তির তালিকা ({filteredNotices.length})</span>
+            </h3>
+            <span className="text-xs text-muted-foreground font-medium">
+              সর্বশেষ আপডেট: <strong className="text-foreground">আজ</strong>
             </span>
           </div>
 
-          <div className="space-y-2">
-            <h3 
-              onClick={() => setSelectedNotice(pinnedNotice)} 
-              className="text-lg sm:text-xl font-black text-foreground hover:text-primary transition-colors cursor-pointer leading-snug"
-            >
-              {pinnedNotice.title}
-            </h3>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3">
-              {pinnedNotice.content}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-            <div className="flex items-center gap-2">
+          {filteredNotices.length === 0 ? (
+            <div className="p-12 rounded-3xl bg-card border border-border text-center space-y-3">
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mx-auto">
+                <Search className="w-6 h-6" />
+              </div>
+              <h4 className="font-extrabold text-base text-foreground">কোনো নোটিশ পাওয়া যায়নি</h4>
+              <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                আপনার অনুসন্ধান অনুযায়ী এই ক্যাটাগরিতে কোনো বিজ্ঞপ্তি নেই। অন্য কোনো কিওয়ার্ড বা ক্যাটাগরি দিয়ে চেষ্টা করুন।
+              </p>
               <button
-                onClick={() => setSelectedNotice(pinnedNotice)}
-                className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white font-extrabold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-primary/30"
+                onClick={() => { setSearchQuery(''); setActiveCategory('all'); }}
+                className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-xs transition-all shadow-md"
               >
-                <Eye className="w-3.5 h-3.5" />
-                <span>সম্পূর্ণ নোটিশ পড়ুন</span>
+                সকল নোটিশ দেখুন
               </button>
-
-              {pinnedNotice.hasAttachment && (
-                <button
-                  onClick={() => handleDownloadNoticePDF(pinnedNotice)}
-                  className="px-4 py-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-foreground border border-border font-bold text-xs flex items-center gap-1.5 transition-all"
-                >
-                  <Download className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>PDF ডাউনলোড ({pinnedNotice.attachmentSize})</span>
-                </button>
-              )}
             </div>
-
-            <button
-              onClick={() => handleShareNotice(pinnedNotice)}
-              className="p-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-muted-foreground hover:text-foreground border border-border text-xs transition-colors"
-              title="শেয়ার করুন"
-            >
-              <Share2 className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 4. NOTICES STREAM & ARCHIVE CARDS */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-base font-extrabold text-foreground flex items-center gap-2">
-            <FileText className="w-4 h-4 text-primary" />
-            <span>সকল সার্কুলার ও বিজ্ঞপ্তির তালিকা ({filteredNotices.length})</span>
-          </h3>
-          <span className="text-xs text-muted-foreground font-medium">
-            সর্বশেষ আপডেট: <strong className="text-foreground">আজ</strong>
-          </span>
-        </div>
-
-        {filteredNotices.length === 0 ? (
-          <div className="p-12 rounded-3xl bg-card border border-border text-center space-y-3">
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mx-auto">
-              <Search className="w-6 h-6" />
-            </div>
-            <h4 className="font-extrabold text-base text-foreground">কোনো নোটিশ পাওয়া যায়নি</h4>
-            <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-              আপনার অনুসন্ধান অনুযায়ী এই ক্যাটাগরিতে কোনো বিজ্ঞপ্তি নেই। অন্য কোনো কিওয়ার্ড বা ক্যাটাগরি দিয়ে চেষ্টা করুন।
-            </p>
-            <button
-              onClick={() => { setSearchQuery(''); setActiveCategory('all'); }}
-              className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-xs transition-all shadow-md"
-            >
-              সকল নোটিশ দেখুন
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-3.5">
-            {filteredNotices.map((notice) => {
-              const isPinned = notice.isPinned || notice.isUrgent;
-              return (
-                <div
-                  key={notice.id}
-                  className={`p-5 sm:p-6 rounded-3xl border transition-all duration-200 hover:shadow-xl space-y-3 relative group ${
-                    isPinned
-                      ? 'bg-card border-primary/40 hover:border-primary/70 shadow-md'
-                      : 'bg-card border-border hover:border-primary/30'
-                  }`}
-                >
-                  {/* Notice Meta Row */}
-                  <div className="flex flex-wrap items-center justify-between gap-2.5 text-xs">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className={`px-2.5 py-0.5 rounded-lg text-[11px] font-black uppercase ${
-                        notice.category === 'urgent'
-                          ? 'bg-rose-500/15 text-rose-600 dark:text-rose-300 border border-rose-500/30'
-                          : (notice.category === 'exam'
-                              ? 'bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-500/30'
-                              : (notice.category === 'routine'
-                                  ? 'bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-500/30'
-                                  : 'bg-foreground/5 text-foreground border border-border'))
-                      }`}>
-                        {notice.categoryLabel}
-                      </span>
-                      <span className="text-[11px] text-muted-foreground font-mono bg-foreground/5 px-2 py-0.5 rounded border border-border">
-                        {notice.refNo}
-                      </span>
-                      {isPinned && (
-                        <span className="text-[10px] text-amber-500 font-bold flex items-center gap-1">
-                          <Pin className="w-3 h-3 fill-amber-500" />
-                          <span>Pinned</span>
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-1.5 text-muted-foreground font-mono text-[11px]">
-                      <Calendar className="w-3.5 h-3.5 text-primary" />
-                      <span>{notice.date}</span>
-                    </div>
-                  </div>
-
-                  {/* Title & Excerpt */}
-                  <div className="space-y-1.5">
-                    <h4 
-                      onClick={() => setSelectedNotice(notice)}
-                      className="font-extrabold text-base text-foreground hover:text-primary transition-colors cursor-pointer leading-snug"
-                    >
-                      {notice.title}
-                    </h4>
-                    <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                      {notice.content}
-                    </p>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-border">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setSelectedNotice(notice)}
-                        className="px-3.5 py-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 text-xs font-bold flex items-center gap-1.5 transition-all"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>বিস্তারিত দেখুন</span>
-                      </button>
-
-                      {notice.hasAttachment && (
-                        <button
-                          onClick={() => handleDownloadNoticePDF(notice)}
-                          className="px-3 py-1.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-foreground border border-border text-xs font-medium flex items-center gap-1.5 transition-all"
-                        >
-                          <Download className="w-3.5 h-3.5 text-emerald-500" />
-                          <span className="hidden sm:inline">PDF</span>
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => handleShareNotice(notice)}
-                        className="p-1.5 rounded-lg bg-foreground/5 hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors border border-border"
-                        title="লিংক শেয়ার করুন"
-                      >
-                        <Share2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* 5. NOTICE ALERTS & WHATSAPP SUBSCRIPTION BOX */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-emerald-500/10 via-card to-purple-500/10 border border-emerald-500/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
-        <div className="space-y-1.5 text-center md:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-300 text-xs font-black uppercase">
-            <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
-            <span>তাৎক্ষণিক নোটিশ আপডেট</span>
-          </div>
-          <h4 className="text-lg sm:text-xl font-black text-foreground">
-            ক্লাস ও পরীক্ষার নোটিশ সরাসরি WhatsApp-এ পেতে চান?
-          </h4>
-          <p className="text-xs text-muted-foreground max-w-xl">
-            {teacherName}-এর অফিশিয়াল নোটিশ গ্রুপে যুক্ত থাকলে প্রতিটি সার্কুলার ও ক্লাসের জুম লিংক স্বয়ংক্রিয়ভাবে পেয়ে যাবেন।
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3 shrink-0">
-          {teacherWhatsapp ? (
-            <a
-              href={`https://wa.me/${teacherWhatsapp.replace(/[^0-9]/g, '')}`}
-              target="_blank"
-              rel="noreferrer"
-              className="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs flex items-center gap-2 transition-all shadow-lg shadow-emerald-600/30 hover:scale-105"
-            >
-              <MessageCircle className="w-4 h-4" />
-              <span>WhatsApp নোটিশ গ্রুপে যুক্ত হোন</span>
-            </a>
           ) : (
-            <a
-              href="#contact"
-              className="px-6 py-3 rounded-2xl bg-primary hover:bg-primary/90 text-white font-extrabold text-xs flex items-center gap-2 transition-all shadow-lg shadow-primary/30 hover:scale-105"
-            >
-              <Bell className="w-4 h-4" />
-              <span>নোটিশ নোটিফিকেশন অন করুন</span>
-            </a>
+            <div className="grid grid-cols-1 gap-3.5">
+              {filteredNotices.map((notice) => {
+                const isPinned = notice.isPinned || notice.isUrgent;
+                return (
+                  <div
+                    key={notice.id}
+                    className={`p-5 sm:p-6 rounded-3xl border transition-all duration-200 hover:shadow-xl space-y-3 relative group ${
+                      isPinned
+                        ? 'bg-card border-primary/40 hover:border-primary/70 shadow-md'
+                        : 'bg-card border-border hover:border-primary/30'
+                    }`}
+                  >
+                    {/* Notice Meta Row */}
+                    <div className="flex flex-wrap items-center justify-between gap-2.5 text-xs">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={`px-2.5 py-0.5 rounded-lg text-[11px] font-black uppercase ${
+                          notice.category === 'urgent'
+                            ? 'bg-rose-500/15 text-rose-600 dark:text-rose-300 border border-rose-500/30'
+                            : (notice.category === 'exam'
+                                ? 'bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-500/30'
+                                : (notice.category === 'routine'
+                                    ? 'bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-500/30'
+                                    : 'bg-foreground/5 text-foreground border border-border'))
+                        }`}>
+                          {notice.categoryLabel}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground font-mono bg-foreground/5 px-2 py-0.5 rounded border border-border">
+                          {notice.refNo}
+                        </span>
+                        {isPinned && (
+                          <span className="text-[10px] text-amber-500 font-bold flex items-center gap-1">
+                            <Pin className="w-3 h-3 fill-amber-500" />
+                            <span>Pinned</span>
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-1.5 text-muted-foreground font-mono text-[11px]">
+                        <Calendar className="w-3.5 h-3.5 text-primary" />
+                        <span>{notice.date}</span>
+                      </div>
+                    </div>
+
+                    {/* Title & Excerpt */}
+                    <div className="space-y-1.5">
+                      <h4 
+                        onClick={() => setSelectedNotice(notice)}
+                        className="font-extrabold text-base text-foreground hover:text-primary transition-colors cursor-pointer leading-snug"
+                      >
+                        {notice.title}
+                      </h4>
+                      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                        {notice.content}
+                      </p>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-border">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setSelectedNotice(notice)}
+                          className="px-3.5 py-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>বিস্তারিত দেখুন</span>
+                        </button>
+
+                        {notice.hasAttachment && (
+                          <button
+                            onClick={() => handleDownloadNoticePDF(notice)}
+                            className="px-3 py-1.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-foreground border border-border text-xs font-medium flex items-center gap-1.5 transition-all"
+                          >
+                            <Download className="w-3.5 h-3.5 text-emerald-500" />
+                            <span className="hidden sm:inline">PDF</span>
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => handleShareNotice(notice)}
+                          className="p-1.5 rounded-lg bg-foreground/5 hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors border border-border"
+                          title="লিংক শেয়ার করুন"
+                        >
+                          <Share2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
+
+        {/* Notice Alerts & WhatsApp Subscription Box */}
+        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-emerald-500/10 via-card to-purple-500/10 border border-emerald-500/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+          <div className="space-y-1.5 text-center md:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-300 text-xs font-black uppercase">
+              <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
+              <span>তাৎক্ষণিক নোটিশ আপডেট</span>
+            </div>
+            <h4 className="text-lg sm:text-xl font-black text-foreground">
+              ক্লাস ও পরীক্ষার নোটিশ সরাসরি WhatsApp-এ পেতে চান?
+            </h4>
+            <p className="text-xs text-muted-foreground max-w-xl">
+              {teacherName}-এর অফিশিয়াল নোটিশ গ্রুপে যুক্ত থাকলে প্রতিটি সার্কুলার ও ক্লাসের জুম লিংক স্বয়ংক্রিয়ভাবে পেয়ে যাবেন।
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            {effectiveWhatsapp ? (
+              <a
+                href={`https://wa.me/${effectiveWhatsapp.replace(/[^0-9]/g, '')}`}
+                target="_blank"
+                rel="noreferrer"
+                className="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs flex items-center gap-2 transition-all shadow-lg shadow-emerald-600/30 hover:scale-105"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>WhatsApp নোটিশ গ্রুপে যুক্ত হোন</span>
+              </a>
+            ) : (
+              <a
+                href="#notices-section"
+                className="px-6 py-3 rounded-2xl bg-primary hover:bg-primary/90 text-white font-extrabold text-xs flex items-center gap-2 transition-all shadow-lg shadow-primary/30 hover:scale-105"
+              >
+                <Bell className="w-4 h-4" />
+                <span>নোটিশ নোটিফিকেশন অন করুন</span>
+              </a>
+            )}
+          </div>
+        </div>
+
       </div>
 
       {/* ========================================================================= */}
-      {/* 6. NOTICE DETAILS INTERACTIVE MODAL (নোটিশ বিস্তারিত পপআপ)                 */}
+      {/* 3. NOTICE DETAILS INTERACTIVE MODAL (নোটিশ বিস্তারিত পপআপ)                 */}
       {/* ========================================================================= */}
       {selectedNotice && (
         <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
@@ -663,8 +720,8 @@ export default function TeacherNoticeBoardView({
                     <FileText className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-bold text-xs text-foreground truncate">{selectedNotice.attachmentName}</p>
-                    <p className="text-[10px] text-muted-foreground">পিডিএফ ডকুমেন্ট • সাইজ: {selectedNotice.attachmentSize}</p>
+                    <p className="font-bold text-xs text-foreground truncate">{selectedNotice.attachmentName || 'Notice-Attachment.pdf'}</p>
+                    <p className="text-[10px] text-muted-foreground">পিডিএফ ডকুমেন্ট • সাইজ: {selectedNotice.attachmentSize || '১.২ মেগাবাইট'}</p>
                   </div>
                 </div>
 

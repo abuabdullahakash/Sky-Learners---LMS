@@ -168,6 +168,7 @@
   "Navigation": {
     "home": "Home",
     "courses": "Courses",
+    "contact": "Contact",
     "dashboard": "Dashboard",
     "login": "Login"
   },

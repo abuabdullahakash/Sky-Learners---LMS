@@ -512,6 +512,8 @@ export default function TeacherHomePageBuilderPage() {
   const [contactPhone, setContactPhone] = useState('01700000000');
   const [contactWhatsapp, setContactWhatsapp] = useState('01700000000');
   const [contactEmail, setContactEmail] = useState('support@academy.com');
+  const [contactAddress, setContactAddress] = useState('ফার্মগেট / মৌচাক শাখা, ঢাকা, বাংলাদেশ');
+  const [contactOfficeHours, setContactOfficeHours] = useState('প্রতিদিন সকাল ৯:০০ টা — রাত ১০:০০ টা');
   const [contactFacebookPage, setContactFacebookPage] = useState('https://facebook.com');
   const [contactFacebookGroup, setContactFacebookGroup] = useState('https://facebook.com/groups');
   const [contactYoutube, setContactYoutube] = useState('https://youtube.com');
@@ -656,6 +658,8 @@ export default function TeacherHomePageBuilderPage() {
             if (config.contactPhone) setContactPhone(config.contactPhone);
             if (config.contactWhatsapp) setContactWhatsapp(config.contactWhatsapp);
             if (config.contactEmail) setContactEmail(config.contactEmail);
+            if (config.contactAddress) setContactAddress(config.contactAddress);
+            if (config.contactOfficeHours) setContactOfficeHours(config.contactOfficeHours);
             if (config.contactFacebookPage) setContactFacebookPage(config.contactFacebookPage);
             if (config.contactFacebookGroup) setContactFacebookGroup(config.contactFacebookGroup);
             if (config.contactYoutube) setContactYoutube(config.contactYoutube);
@@ -761,6 +765,8 @@ export default function TeacherHomePageBuilderPage() {
         contactPhone,
         contactWhatsapp,
         contactEmail,
+        contactAddress,
+        contactOfficeHours,
         contactFacebookPage,
         contactFacebookGroup,
         contactYoutube,
@@ -2533,6 +2539,26 @@ export default function TeacherHomePageBuilderPage() {
                     value={contactYoutube}
                     onChange={(e) => setContactYoutube(e.target.value)}
                     placeholder="https://youtube.com/@yourchannel"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">অফলাইন ব্রাঞ্চ / ক্লাসরুমের ঠিকানা</label>
+                  <input
+                    type="text"
+                    value={contactAddress}
+                    onChange={(e) => setContactAddress(e.target.value)}
+                    placeholder="যেমন: ফার্মগেট / মৌচাক শাখা, ঢাকা"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">সাপোর্ট ও অফিস সময়সূচি</label>
+                  <input
+                    type="text"
+                    value={contactOfficeHours}
+                    onChange={(e) => setContactOfficeHours(e.target.value)}
+                    placeholder="যেমন: প্রতিদিন সকাল ৯:০০ টা — রাত ১০:০০ টা"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                 </div>

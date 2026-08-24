@@ -1068,6 +1068,7 @@ export default function TeacherHomePageBuilderPage() {
         contactYoutube,
         contactTelegram,
         homePageConfig: fullConfig,
+        customPagesConfig: customPagesConfig,
         aboutPageConfig: fullConfig.aboutPageConfig,
         contactPageConfig: fullConfig.contactPageConfig
       }, { merge: true });
@@ -1470,7 +1471,7 @@ export default function TeacherHomePageBuilderPage() {
     if (editingNoticeId === noticeId) {
       handleCancelEditNotice();
     }
-    toast.success('নোটিশটি মুছে ফেলা হয়েছে');
+    toast.success('নোটিশটি মুছে ফেলা হয়েছে! লাইভ করতে "সেটিংস সংরক্ষণ করুন" বাটনে চাপুন।');
   };
 
   const handleRestoreDefaultNotices = (slugKey: string) => {
@@ -1483,7 +1484,7 @@ export default function TeacherHomePageBuilderPage() {
         }
       }));
       handleCancelEditNotice();
-      toast.success('ডিফল্ট নোটিশ রিস্টোর করা হয়েছে!');
+      toast.success('ডিফল্ট নোটিশ রিস্টোর করা হয়েছে! লাইভ করতে "সেটিংস সংরক্ষণ করুন" বাটনে চাপুন।');
     }
   };
 

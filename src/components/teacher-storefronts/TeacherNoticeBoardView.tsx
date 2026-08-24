@@ -82,7 +82,8 @@ export default function TeacherNoticeBoardView({
   const heroBgImage = pageConfig?.heroBgImage || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1600&auto=format&fit=crop';
   const sessionYear = pageConfig?.sessionYear || '২০২৬ সেশন (Active)';
   const effectiveWhatsapp = pageConfig?.noticeWhatsapp || teacherWhatsapp;
-  const customUploadedNotices: NoticeItem[] = Array.isArray(pageConfig?.notices) ? pageConfig.notices : [];
+  const isCustomNoticesConfigured = Array.isArray(pageConfig?.notices);
+  const customUploadedNotices: NoticeItem[] = isCustomNoticesConfigured ? pageConfig.notices : [];
 
   // Realistic Bangladeshi Institutional Notices tailored for Teacher Academy
   const defaultInstitutionalNotices: NoticeItem[] = useMemo(() => [
@@ -166,12 +167,33 @@ export default function TeacherNoticeBoardView({
 
   // Combine Custom Uploaded Notices + Firestore Live Posts + Institutional Notices
   const allNotices: NoticeItem[] = useMemo(() => {
-    let combined: NoticeItem[] = [];
-
-    if (customUploadedNotices.length > 0) {
-      combined = [...customUploadedNotices];
+    // 1. If teacher has customized/configured their notices in Website Builder (even if empty []), honor their configured list!
+    if (isCustomNoticesConfigured) {
+      let combined: NoticeItem[] = [...customUploadedNotices];
+      if (firestoreNotices.length > 0) {
+        const mappedFirestore: NoticeItem[] = firestoreNotices.map((fn, idx) => ({
+          id: fn.id || `fs_${idx}`,
+          refNo: fn.refNo || `FB/NOT-2026/${String(idx + 10).padStart(2, '0')}`,
+          title: fn.title || 'অফিসিয়াল বিজ্ঞপ্তি',
+          category: (fn.category as any) || 'general',
+          categoryLabel: fn.category === 'exam' ? 'পরীক্ষা ও ফলাফল' : (fn.category === 'routine' ? 'ক্লাস রুটিন' : 'সাধারণ বিজ্ঞপ্তি'),
+          date: fn.createdAt?.toDate ? fn.createdAt.toDate().toLocaleDateString('bn-BD') : 'সম্প্রতি',
+          isPinned: Boolean(fn.isPinned),
+          isUrgent: Boolean(fn.isUrgent),
+          publishedBy: teacherName,
+          content: fn.content || fn.description || '',
+          hasAttachment: Boolean(fn.attachmentUrl || fn.pdfUrl),
+          attachmentName: fn.attachmentName || 'Official-Notice-Document.pdf',
+          attachmentSize: fn.attachmentSize || '১.২ মেগাবাইট',
+          attachmentUrl: fn.attachmentUrl || fn.pdfUrl
+        }));
+        combined = [...combined, ...mappedFirestore];
+      }
+      return combined;
     }
 
+    // 2. Default fallback ONLY when teacher has never configured notices in Website Builder
+    let combined: NoticeItem[] = [];
     if (firestoreNotices.length > 0) {
       const mappedFirestore: NoticeItem[] = firestoreNotices.map((fn, idx) => ({
         id: fn.id || `fs_${idx}`,
@@ -197,7 +219,7 @@ export default function TeacherNoticeBoardView({
     }
 
     return combined;
-  }, [customUploadedNotices, firestoreNotices, defaultInstitutionalNotices, teacherName]);
+  }, [isCustomNoticesConfigured, customUploadedNotices, firestoreNotices, defaultInstitutionalNotices, teacherName]);
 
   // Filter Notices by Category & Search
   const filteredNotices = useMemo(() => {
@@ -211,7 +233,10 @@ export default function TeacherNoticeBoardView({
     });
   }, [allNotices, activeCategory, searchQuery]);
 
-  const pinnedNotice = useMemo(() => allNotices.find(n => n.isPinned || n.isUrgent) || allNotices[0], [allNotices]);
+  const pinnedNotice = useMemo(() => {
+    if (allNotices.length === 0) return null;
+    return allNotices.find(n => n.isPinned || n.isUrgent) || allNotices[0] || null;
+  }, [allNotices]);
 
   // Categories with live badge counts
   const categoryFilters = [
@@ -312,11 +337,15 @@ export default function TeacherNoticeBoardView({
                 </div>
                 <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
                   <span className="text-[10px] text-white/60 block font-medium">সর্বশেষ আপডেট</span>
-                  <span className="text-xs font-black text-emerald-400 font-mono">আজ প্রকাশিত</span>
+                  <span className="text-xs font-black text-emerald-400 font-mono">
+                    {allNotices.length > 0 ? (allNotices[0]?.date || 'আজ প্রকাশিত') : 'প্রকাশিত নয়'}
+                  </span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
                   <span className="text-[10px] text-white/60 block font-medium">ক্যাটাগরি</span>
-                  <span className="text-xs font-black text-amber-300 font-mono">৬টি ফিল্টার</span>
+                  <span className="text-xs font-black text-amber-300 font-mono">
+                    {allNotices.length > 0 ? '৬টি ফিল্টার' : '০টি ফিল্টার'}
+                  </span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
                   <span className="text-[10px] text-white/60 block font-medium">শিক্ষাবর্ষ</span>
@@ -525,20 +554,26 @@ export default function TeacherNoticeBoardView({
           </div>
 
           {filteredNotices.length === 0 ? (
-            <div className="p-12 rounded-3xl bg-card border border-border text-center space-y-3">
+            <div className="p-12 rounded-3xl bg-card border border-border text-center space-y-3 shadow-sm">
               <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mx-auto">
-                <Search className="w-6 h-6" />
+                <Bell className="w-6 h-6" />
               </div>
-              <h4 className="font-extrabold text-base text-foreground">কোনো নোটিশ পাওয়া যায়নি</h4>
-              <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-                আপনার অনুসন্ধান অনুযায়ী এই ক্যাটাগরিতে কোনো বিজ্ঞপ্তি নেই। অন্য কোনো কিওয়ার্ড বা ক্যাটাগরি দিয়ে চেষ্টা করুন।
+              <h4 className="font-extrabold text-base text-foreground">
+                {allNotices.length === 0 ? 'বর্তমানে কোনো নোটিশ প্রকাশ করা হয়নি' : 'কোনো নোটিশ পাওয়া যায়নি'}
+              </h4>
+              <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                {allNotices.length === 0 
+                  ? 'শিক্ষক বা একাডেমি কর্তৃপক্ষ নতুন নোটিশ প্রকাশ করলে তা সরাসরি এই নোটিশ বোর্ডে দেখতে পাবেন।' 
+                  : 'আপনার অনুসন্ধান অনুযায়ী এই ক্যাটাগরিতে কোনো বিজ্ঞপ্তি নেই। অন্য কোনো কিওয়ার্ড বা ক্যাটাগরি দিয়ে চেষ্টা করুন।'}
               </p>
-              <button
-                onClick={() => { setSearchQuery(''); setActiveCategory('all'); }}
-                className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-xs transition-all shadow-md"
-              >
-                সকল নোটিশ দেখুন
-              </button>
+              {allNotices.length > 0 && (
+                <button
+                  onClick={() => { setSearchQuery(''); setActiveCategory('all'); }}
+                  className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-xs transition-all shadow-md"
+                >
+                  সকল নোটিশ দেখুন
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-3.5">

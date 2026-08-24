@@ -251,9 +251,11 @@ export default function Navbar() {
               <Link href={aboutLink} className={`font-medium transition-colors hover:text-primary ${isAboutActive ? 'text-primary' : 'text-foreground/80'}`}>
                 About
               </Link>
-              <Link href={contactLink} className={`font-medium transition-colors hover:text-primary ${isContactActive ? 'text-primary' : 'text-foreground/80'}`}>
-                {t('contact') || (pathname.includes('/bn') ? 'যোগাযোগ' : 'Contact')}
-              </Link>
+              {(effectiveTeacherId || isTeacher || isCustomTeacherMode) && !isForcedMarketplace && (
+                <Link href={contactLink} className={`font-medium transition-colors hover:text-primary ${isContactActive ? 'text-primary' : 'text-foreground/80'}`}>
+                  {t('contact') || (pathname.includes('/bn') ? 'যোগাযোগ' : 'Contact')}
+                </Link>
+              )}
               
               <div className="flex items-center gap-4 pl-4 border-l border-foreground/10">
                 <ThemeToggle />
@@ -702,21 +704,23 @@ export default function Navbar() {
                   </span>
                   <ChevronRight className={`w-4 h-4 transition-transform ${isAboutActive ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
                 </Link>
-                <Link
-                  href={contactLink}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
-                    isContactActive 
-                      ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 border-orange-400/40 ring-1 ring-orange-400/30' 
-                      : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
-                  }`}
-                >
-                  <span className="flex items-center gap-2.5">
-                    <span className={`w-2 h-2 rounded-full ${isContactActive ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
-                    <span>{pathname.includes('/bn') ? 'যোগাযোগ' : 'Contact'}</span>
-                  </span>
-                  <ChevronRight className={`w-4 h-4 transition-transform ${isContactActive ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
-                </Link>
+                {(effectiveTeacherId || isTeacher || isCustomTeacherMode) && !isForcedMarketplace && (
+                  <Link
+                    href={contactLink}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
+                      isContactActive 
+                        ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 border-orange-400/40 ring-1 ring-orange-400/30' 
+                        : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <span className={`w-2 h-2 rounded-full ${isContactActive ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
+                      <span>{pathname.includes('/bn') ? 'যোগাযোগ' : 'Contact'}</span>
+                    </span>
+                    <ChevronRight className={`w-4 h-4 transition-transform ${isContactActive ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
+                  </Link>
+                )}
 
                 {user && (
                   <Link

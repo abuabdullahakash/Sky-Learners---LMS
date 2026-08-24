@@ -66,6 +66,12 @@ service cloud.firestore {
       allow write: if isAuthenticated();
     }
 
+    // Teacher Inquiries & Direct Messages
+    match /teacher_inquiries/{inquiryId} {
+      allow create: if true;
+      allow read, update, delete: if isAuthenticated();
+    }
+
     // General fallback for all other collections
     match /{document=**} {
       allow read, write: if isAuthenticated();

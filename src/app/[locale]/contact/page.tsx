@@ -1,12 +1,12 @@
 // @ts-nocheck
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Link } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, collection, addDoc, serverTimestamp, query, limit, getDocs } from 'firebase/firestore';
 import { useLocale } from 'next-intl';
 import { 
   Phone, 
@@ -39,7 +39,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
-export default function ContactPage() {
+function ContactPageContent() {
   const locale = useLocale();
   const { user, userData, loading: authLoading } = useAuth();
   const searchParams = useSearchParams();
@@ -100,6 +100,23 @@ export default function ContactPage() {
               setTeacherProfile(userSnap.data());
             }
           }
+        } else {
+          // If in general context, fallback to primary available teacher profile
+          const tpSnap = await getDocs(query(collection(db, 'teacherProfiles'), limit(1)));
+          if (!tpSnap.empty) {
+            setTeacherProfile(tpSnap.docs[0].data());
+          } else {
+            // Default placeholder profile
+            setTeacherProfile({
+              displayName: 'SkyLearners Academy',
+              headline: 'দেশসেরা মেন্টরদের সাথে শতভাগ প্রস্তুতি',
+              contactPhone: '01700000000',
+              contactWhatsapp: '01700000000',
+              contactEmail: 'support@skylearners.com',
+              contactAddress: 'ফার্মগেট / মৌচাক শাখা, ঢাকা, বাংলাদেশ',
+              contactOfficeHours: 'প্রতিদিন সকাল ৯:০০ টা — রাত ১০:০০ টা'
+            });
+          }
         }
       } catch (err) {
         console.error("Error fetching contact page data:", err);
@@ -133,8 +150,8 @@ export default function ContactPage() {
     setIsSubmitting(true);
     try {
       const inquiryPayload = {
-        targetTeacherId: activeTeacherId || 'marketplace',
-        teacherName: teacherProfile?.displayName || teacherProfile?.academyName || 'SkyLearners Support',
+        targetTeacherId: activeTeacherId || 'general',
+        teacherName: teacherProfile?.displayName || teacherProfile?.academyName || 'Teacher Support',
         studentName: formData.name.trim(),
         studentPhone: formData.phone.trim(),
         studentEmail: formData.email.trim() || '',
@@ -167,7 +184,7 @@ export default function ContactPage() {
   const headline = teacherProfile?.headline || (locale === 'bn' ? 'দেশসেরা মেন্টরদের সাথে শতভাগ প্রস্তুতি' : 'Top-tier mentorship & learning');
   const phone = teacherProfile?.contactPhone || teacherProfile?.helpBarPhone || teacherProfile?.phone || '01700000000';
   const rawWhatsapp = teacherProfile?.contactWhatsapp || teacherProfile?.whatsappNumber || phone;
-  const whatsappClean = rawWhatsapp.replace(/[^0-9]/g, '');
+  const whatsappClean = (rawWhatsapp || '').replace(/[^0-9]/g, '');
   const whatsappNumber = whatsappClean.startsWith('880') ? whatsappClean : (whatsappClean.startsWith('0') ? `88${whatsappClean}` : `880${whatsappClean}`);
   const email = teacherProfile?.contactEmail || teacherProfile?.email || 'support@skylearners.com';
   const address = teacherProfile?.contactAddress || teacherProfile?.address || (locale === 'bn' ? 'ফার্মগেট / মৌচাক শাখা, ঢাকা, বাংলাদেশ' : 'Farmgate / Mouchak Branch, Dhaka, Bangladesh');
@@ -207,7 +224,7 @@ export default function ContactPage() {
     {
       q: locale === 'bn' ? 'যেকোনো জরুরি প্রয়োজনে তাৎক্ষণিক সমাধান কীভাবে পাব?' : 'How can I get instant support for technical issues?',
       a: locale === 'bn'
-        ? 'আমাদের সরাসরি হোয়াটসঅ্যাপ হেল্পলাইনে (+880...) মেসেজ দিন অথবা এই পেজের ফর্মটি পূরণ করে পাঠান। আমাদের ডেডিকেটেড সাপোর্ট টিম দ্রুততম সময়ে সমাধান করে দেবে।'
+        ? 'আমাদের সরাসরি হোয়াটসঅ্যাপ হেল্পলাইনে মেসেজ দিন অথবা এই পেজের ফর্মটি পূরণ করে পাঠান। আমাদের ডেডিকেটেড সাপোর্ট টিম দ্রুততম সময়ে সমাধান করে দেবে।'
         : 'Message our official WhatsApp hotline directly or submit the inquiry form above. Our support team will resolve it swiftly.'
     }
   ];
@@ -256,9 +273,7 @@ export default function ContactPage() {
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-600 dark:text-orange-400 text-xs sm:text-sm font-black tracking-wide uppercase shadow-xs">
               <Headphones className="w-4 h-4 text-orange-500 animate-pulse" />
               <span>
-                {activeTeacherId 
-                  ? (locale === 'bn' ? `${academyName} • স্টুডেন্ট সাপোর্ট সেন্টার` : `${academyName} • Student Support Center`)
-                  : (locale === 'bn' ? 'SkyLearners প্ল্যাটফর্ম হেল্পডেস্ক' : 'SkyLearners Platform Helpdesk')}
+                {locale === 'bn' ? `${academyName} • স্টুডেন্ট সাপোর্ট সেন্টার` : `${academyName} • Student Support Center`}
               </span>
             </div>
 
@@ -821,5 +836,20 @@ export default function ContactPage() {
       </AnimatePresence>
 
     </div>
+  );
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[85vh] flex flex-col items-center justify-center space-y-4">
+        <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm font-bold text-foreground/60 animate-pulse">
+          Loading contact details...
+        </p>
+      </div>
+    }>
+      <ContactPageContent />
+    </Suspense>
   );
 }

@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { Link } from '@/i18n/routing';
+import { useSearchParams } from 'next/navigation';
 import { 
   Globe, 
   Sparkles, 
@@ -14,7 +15,9 @@ import {
   MessageCircle, 
   BookOpen, 
   Bell,
-  Clock
+  Clock,
+  Eye,
+  CheckCircle2
 } from 'lucide-react';
 import Footer from '@/components/Footer';
 
@@ -26,6 +29,10 @@ export default function DynamicTeacherCustomPage({ params }: CustomPageProps) {
   const resolvedParams = use(params);
   const { slug } = resolvedParams;
   const { user, userData } = useAuth();
+  const searchParams = useSearchParams();
+
+  const isPreview = searchParams.get('preview') === 'true';
+  const queryTeacherId = searchParams.get('teacherId');
 
   const [loading, setLoading] = useState(true);
   const [pageTitle, setPageTitle] = useState<string>('');
@@ -44,9 +51,11 @@ export default function DynamicTeacherCustomPage({ params }: CustomPageProps) {
     if (guestTeacherId === 'global') guestTeacherId = null;
   }
 
-  const effectiveTeacherId = isTeacher 
-    ? user?.uid 
-    : (preferredTeacherId || guestTeacherId || 'teacher_abuabdullahakash');
+  const effectiveTeacherId = queryTeacherId 
+    ? queryTeacherId 
+    : (isTeacher 
+        ? user?.uid 
+        : (preferredTeacherId || guestTeacherId || 'teacher_abuabdullahakash'));
 
   useEffect(() => {
     const fetchPageAndTeacherData = async () => {
@@ -136,6 +145,19 @@ export default function DynamicTeacherCustomPage({ params }: CustomPageProps) {
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between selection:bg-purple-500 selection:text-white">
       <div>
         
+        {/* Preview Mode Alert Banner */}
+        {isPreview && (
+          <div className="bg-gradient-to-r from-amber-600/25 via-purple-600/20 to-amber-600/25 border-b border-amber-500/40 px-4 py-2.5 text-center text-xs text-amber-200 flex flex-wrap items-center justify-center gap-2 sticky top-0 z-40 backdrop-blur-md shadow-md">
+            <Eye className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
+            <span>
+              <strong>👀 টিচার প্রিভিউ মোড:</strong> এটি <strong>&quot;{teacherName}&quot;</strong>-এর কাস্টম পেজের প্রিভিউ। স্ট্যাটাস: 
+              <span className={`ml-1 font-extrabold px-2 py-0.5 rounded ${pageData?.isPublished ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/25 text-amber-300 border border-amber-500/30'}`}>
+                {pageData?.isPublished ? '✓ Live Published' : '⏳ Draft / Default Template'}
+              </span>
+            </span>
+          </div>
+        )}
+
         {/* Top Breadcrumb & Back Bar */}
         <div className="bg-slate-900/60 border-b border-slate-800/80 backdrop-blur-md">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between text-xs">

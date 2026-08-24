@@ -106,6 +106,7 @@ interface CustomNavItem {
   name: string;
   slug: string;
   enabled: boolean;
+  isPublished?: boolean;
   createdAt?: string;
 }
 
@@ -529,6 +530,7 @@ export default function AdminDashboardPage() {
       name: newTeacherPageName.trim(),
       slug: cleanSlug,
       enabled: true,
+      isPublished: false,
       createdAt: new Date().toISOString()
     };
 
@@ -538,7 +540,7 @@ export default function AdminDashboardPage() {
 
     try {
       await setDoc(doc(db, 'teacherProfiles', teacherId), { customNavLinks: updatedNavLinks }, { merge: true });
-      toast.success(`"${newTeacherPageName.trim()}" পেজটি শুধুমাত্র এই শিক্ষকের সাইটে যুক্ত হয়েছে!`);
+      toast.success(`"${newTeacherPageName.trim()}" পেজটি সফলভাবে যুক্ত হয়েছে!`);
       setNewTeacherPageName('');
       setNewTeacherPageSlug('');
     } catch (err) {
@@ -547,6 +549,55 @@ export default function AdminDashboardPage() {
     } finally {
       setPageSaving(false);
     }
+  };
+
+  const handleToggleCustomPagePublish = async (teacherId: string, pageId: string) => {
+    const currentProfile = teacherProfiles[teacherId] || { id: teacherId };
+    const existingCustomLinks: CustomNavItem[] = currentProfile.customNavLinks || [];
+    const updatedNavLinks = existingCustomLinks.map(p => {
+      if (p.id === pageId) {
+        return { ...p, isPublished: !p.isPublished };
+      }
+      return p;
+    });
+
+    const updatedProfile = { ...currentProfile, customNavLinks: updatedNavLinks };
+    setTeacherProfiles(prev => ({ ...prev, [teacherId]: updatedProfile }));
+
+    try {
+      await setDoc(doc(db, 'teacherProfiles', teacherId), { customNavLinks: updatedNavLinks }, { merge: true });
+      const target = updatedNavLinks.find(p => p.id === pageId);
+      toast.success(target?.isPublished ? '🎉 কাস্টম পেজ লাইভ পাবলিশ করা হয়েছে!' : 'ডিফল্ট টেমপ্লেট সক্রিয় করা হয়েছে');
+    } catch (err) {
+      console.error("Error updating publish status:", err);
+      toast.error('পাবলিশ স্ট্যাটাস পরিবর্তন ব্যর্থ হয়েছে');
+    }
+  };
+
+  const handleCopyAIPrompt = (teacher: UserItem, page: CustomNavItem) => {
+    const promptText = `[SkyLearners LMS - Teacher Custom Page Requirement]
+Teacher Name: ${teacher.name || teacher.displayName || 'Teacher'}
+Teacher Email: ${teacher.email || 'N/A'}
+Teacher UID: ${teacher.id}
+Page Name: ${page.name}
+Page Slug: ${page.slug}
+Storefront URL: /teachers/${teacher.id}
+Custom Page Clean URL: ${page.slug}
+
+TASK FOR AI:
+Please build the custom page design for Teacher "${teacher.name || teacher.displayName}" at route "${page.slug}".
+Ensure this custom view renders when visiting in Teacher Storefront Mode for Teacher ID "${teacher.id}".`;
+
+    navigator.clipboard.writeText(promptText);
+    toast.success(`🤖 "${page.name}" পেজের AI Prompt কপি করা হয়েছে!`);
+  };
+
+  const handleCopyPreviewLink = (teacherId: string, slug: string) => {
+    const formattedSlug = slug.startsWith('/') ? slug : `/${slug}`;
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const previewUrl = `${origin}${formattedSlug}?preview=true&teacherId=${teacherId}`;
+    navigator.clipboard.writeText(previewUrl);
+    toast.success('🔗 টিচার প্রিভিউ লিংক কপি করা হয়েছে!');
   };
 
   const handleDeleteTeacherCustomPage = async (teacherId: string, pageId: string) => {
@@ -1784,7 +1835,7 @@ export default function AdminDashboardPage() {
                         </form>
 
                         {/* List of Custom Pages */}
-                        <div className="space-y-2 pt-2">
+                        <div className="space-y-3 pt-2">
                           <h5 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                             বিদ্যমান কাস্টম পেজসমূহ ({customNavLinks.length})
                           </h5>
@@ -1797,40 +1848,115 @@ export default function AdminDashboardPage() {
                             customNavLinks.map(page => (
                               <div 
                                 key={page.id}
-                                className="p-3.5 rounded-2xl bg-slate-900/90 border border-purple-500/25 flex items-center justify-between gap-3 shadow-sm"
+                                className="p-4 rounded-3xl bg-slate-900/95 border border-purple-500/30 space-y-3.5 shadow-lg hover:border-purple-500/50 transition-all"
                               >
-                                <div className="space-y-0.5">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-extrabold text-xs text-white">{page.name}</span>
-                                    <span className="text-[11px] text-purple-300 font-mono bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
-                                      {page.slug}
-                                    </span>
+                                {/* Top Row: Page Info, Mode Badge & Publish Button */}
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
+                                  <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-black text-sm text-white">{page.name}</span>
+                                      <span className="text-xs text-purple-300 font-mono bg-purple-500/15 px-2.5 py-0.5 rounded-lg border border-purple-500/25">
+                                        {page.slug}
+                                      </span>
+                                    </div>
+                                    <p className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                                      <span>🔒 Only visible on {selectedTeacher.name || 'this teacher'}&apos;s storefront</span>
+                                    </p>
                                   </div>
-                                  <p className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
-                                    <span>🔒 Only visible on {selectedTeacher.name || 'this teacher'}&apos;s storefront</span>
-                                  </p>
+
+                                  {/* Mode Status & Toggle */}
+                                  <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                                    {page.isPublished ? (
+                                      <span className="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[11px] font-black flex items-center gap-1.5 shadow-sm">
+                                        <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                                        <span>লাইভ কাস্টম ডিজাইন</span>
+                                      </span>
+                                    ) : (
+                                      <span className="px-2.5 py-1 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-black flex items-center gap-1.5 shadow-sm">
+                                        <Clock className="w-3.5 h-3.5 text-amber-400" />
+                                        <span>ডিফল্ট টেমপ্লেট (Draft)</span>
+                                      </span>
+                                    )}
+
+                                    <button
+                                      type="button"
+                                      onClick={() => handleToggleCustomPagePublish(selectedTeacher.id, page.id)}
+                                      className={`px-3 py-1.5 rounded-xl font-black text-xs transition-all flex items-center gap-1.5 shadow-md ${
+                                        page.isPublished
+                                          ? 'bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700'
+                                          : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30'
+                                      }`}
+                                    >
+                                      <Sparkles className="w-3.5 h-3.5" />
+                                      <span>{page.isPublished ? 'ডিফল্ট টেমপ্লেটে নিন' : 'পাবলিশ করুন (Publish)'}</span>
+                                    </button>
+                                  </div>
                                 </div>
 
-                                <div className="flex items-center gap-2">
-                                  <button
-                                    onClick={() => handleToggleTeacherCustomPageStatus(selectedTeacher.id, page.id)}
-                                    className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all ${
-                                      page.enabled 
-                                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
-                                        : 'bg-slate-800 text-slate-400 border border-slate-700'
-                                    }`}
-                                  >
-                                    {page.enabled ? 'সক্রিয় (Active)' : 'বন্ধ (Disabled)'}
-                                  </button>
+                                {/* Actions Toolbar */}
+                                <div className="flex flex-wrap items-center justify-between gap-2.5 pt-0.5">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    {/* 1. Copy AI Prompt */}
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCopyAIPrompt(selectedTeacher, page)}
+                                      className="px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/40 font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm"
+                                      title="এই পেজটি বানানোর জন্য AI Prompt কপি করুন"
+                                    >
+                                      <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                                      <span>🤖 Copy AI Prompt</span>
+                                    </button>
 
-                                  <button
-                                    onClick={() => handleDeleteTeacherCustomPage(selectedTeacher.id, page.id)}
-                                    className="p-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 transition-colors"
-                                    title="Delete Page"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
+                                    {/* 2. Live Preview Button */}
+                                    <a
+                                      href={`${page.slug}?preview=true&teacherId=${selectedTeacher.id}`}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="px-3 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm"
+                                      title="নতুন ট্যাবে লাইভ প্রিভিউ দেখুন"
+                                    >
+                                      <Eye className="w-3.5 h-3.5 text-blue-400" />
+                                      <span>👁️ Live Preview</span>
+                                    </a>
+
+                                    {/* 3. Copy Preview Link */}
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCopyPreviewLink(selectedTeacher.id, page.slug)}
+                                      className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-xs flex items-center gap-1.5 transition-all"
+                                      title="টিচারকে দেখানোর জন্য প্রিভিউ লিংক কপি করুন"
+                                    >
+                                      <Copy className="w-3.5 h-3.5 text-slate-400" />
+                                      <span>🔗 Copy Preview Link</span>
+                                    </button>
+                                  </div>
+
+                                  <div className="flex items-center gap-2">
+                                    {/* 4. Active / Disabled Toggle */}
+                                    <button
+                                      type="button"
+                                      onClick={() => handleToggleTeacherCustomPageStatus(selectedTeacher.id, page.id)}
+                                      className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all border ${
+                                        page.enabled 
+                                          ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' 
+                                          : 'bg-slate-800 text-slate-400 border-slate-700'
+                                      }`}
+                                    >
+                                      {page.enabled ? 'মেনুতে সক্রিয়' : 'মেনু থেকে বন্ধ'}
+                                    </button>
+
+                                    {/* 5. Delete Page */}
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteTeacherCustomPage(selectedTeacher.id, page.id)}
+                                      className="p-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 transition-colors"
+                                      title="Delete Page"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
                                 </div>
+
                               </div>
                             ))
                           )}

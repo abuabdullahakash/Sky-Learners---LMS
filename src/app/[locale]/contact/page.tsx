@@ -67,13 +67,13 @@ function ContactPageContent() {
   const [teacherProfile, setTeacherProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // Form State
+  // Form State (Starts completely clean and empty)
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     email: '',
-    level: 'HSC 2026',
-    category: 'ভর্তি ও ব্যাচ সংক্রান্ত তথ্য',
+    level: '',
+    category: '',
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -128,18 +128,6 @@ function ContactPageContent() {
     fetchContactData();
   }, [activeTeacherId, authLoading]);
 
-  // Prefill user data if logged in
-  useEffect(() => {
-    if (user || userData) {
-      setFormData(prev => ({
-        ...prev,
-        name: prev.name || user?.displayName || userData?.name || '',
-        email: prev.email || user?.email || '',
-        phone: prev.phone || userData?.phone || ''
-      }));
-    }
-  }, [user, userData]);
-
   const handleSubmitInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.phone.trim() || !formData.message.trim()) {
@@ -166,10 +154,14 @@ function ContactPageContent() {
 
       await addDoc(collection(db, 'teacher_inquiries'), inquiryPayload);
       setIsSuccessModalOpen(true);
-      setFormData(prev => ({
-        ...prev,
+      setFormData({
+        name: '',
+        phone: '',
+        email: '',
+        level: '',
+        category: '',
         message: ''
-      }));
+      });
       toast.success(locale === 'bn' ? 'আপনার বার্তাটি সফলভাবে পাঠানো হয়েছে!' : 'Your inquiry has been submitted successfully!');
     } catch (error) {
       console.error("Error sending inquiry:", error);
@@ -468,7 +460,7 @@ function ContactPageContent() {
                     placeholder={locale === 'bn' ? 'যেমন: তানভীর আহমেদ' : 'e.g. Tanvir Ahmed'}
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-foreground/[0.03] dark:bg-white/[0.03] border border-foreground/10 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-sm font-medium text-foreground outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl bg-foreground/[0.03] dark:bg-slate-900/90 border border-foreground/15 dark:border-slate-700/80 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-sm font-medium text-foreground outline-none transition-all placeholder:text-foreground/40"
                   />
                 </div>
 
@@ -483,7 +475,7 @@ function ContactPageContent() {
                     placeholder={locale === 'bn' ? 'যেমন: 017xxxxxxxx' : 'e.g. 017xxxxxxxx'}
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-foreground/[0.03] dark:bg-white/[0.03] border border-foreground/10 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-sm font-medium text-foreground outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl bg-foreground/[0.03] dark:bg-slate-900/90 border border-foreground/15 dark:border-slate-700/80 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-sm font-medium text-foreground outline-none transition-all placeholder:text-foreground/40"
                   />
                 </div>
               </div>
@@ -495,21 +487,27 @@ function ContactPageContent() {
                     <GraduationCap className="w-3.5 h-3.5 text-orange-500" />
                     <span>{locale === 'bn' ? 'ক্লাস / ব্যাচ' : 'Class / Batch'}</span>
                   </label>
-                  <select
-                    value={formData.level}
-                    onChange={(e) => setFormData({ ...formData, level: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-foreground/[0.03] dark:bg-white/[0.03] border border-foreground/10 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-sm font-medium text-foreground outline-none transition-all"
-                  >
-                    <option value="HSC 2026">HSC 2026</option>
-                    <option value="HSC 2025">HSC 2025</option>
-                    <option value="Medical Admission">Medical Admission</option>
-                    <option value="Varsity 'Ka' Unit">Varsity 'Ka' Unit</option>
-                    <option value="Engineering Special">Engineering Special</option>
-                    <option value="Class 9-10 (SSC)">Class 9-10 (SSC)</option>
-                    <option value="Class 6-8">Class 6-8</option>
-                    <option value="Honours / University">Honours / University</option>
-                    <option value="অন্যান্য / Other">অন্যান্য / Other</option>
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={formData.level}
+                      onChange={(e) => setFormData({ ...formData, level: e.target.value })}
+                      className="w-full px-4 py-3 pr-10 rounded-xl bg-background dark:bg-slate-900/90 text-foreground border border-foreground/15 dark:border-slate-700/80 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-sm font-medium outline-none transition-all appearance-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-slate-900 dark:[&>option]:text-slate-100"
+                    >
+                      <option value="" className="bg-white text-slate-500 dark:bg-slate-900 dark:text-slate-400 py-2 font-medium">
+                        {locale === 'bn' ? '-- আপনার ক্লাস / ব্যাচ সিলেক্ট করুন --' : '-- Select Your Class / Batch --'}
+                      </option>
+                      <option value="HSC 2026" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 py-2 font-medium">HSC 2026</option>
+                      <option value="HSC 2025" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 py-2 font-medium">HSC 2025</option>
+                      <option value="Medical Admission" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 py-2 font-medium">Medical Admission</option>
+                      <option value="Varsity 'Ka' Unit" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 py-2 font-medium">Varsity &apos;Ka&apos; Unit</option>
+                      <option value="Engineering Special" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 py-2 font-medium">Engineering Special</option>
+                      <option value="Class 9-10 (SSC)" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 py-2 font-medium">Class 9-10 (SSC)</option>
+                      <option value="Class 6-8" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 py-2 font-medium">Class 6-8</option>
+                      <option value="Honours / University" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 py-2 font-medium">Honours / University</option>
+                      <option value="অন্যান্য / Other" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 py-2 font-medium">{locale === 'bn' ? 'অন্যান্য / Other' : 'Other'}</option>
+                    </select>
+                    <ChevronDown className="w-4 h-4 text-foreground/50 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
                 </div>
 
                 <div className="space-y-1.5">
@@ -517,17 +515,33 @@ function ContactPageContent() {
                     <HelpCircle className="w-3.5 h-3.5 text-orange-500" />
                     <span>{locale === 'bn' ? 'প্রশ্নের ধরন / বিষয়' : 'Query Topic'}</span>
                   </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-foreground/[0.03] dark:bg-white/[0.03] border border-foreground/10 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-sm font-medium text-foreground outline-none transition-all"
-                  >
-                    <option value="ভর্তি ও ব্যাচ সংক্রান্ত তথ্য">ভর্তি ও ব্যাচ সংক্রান্ত তথ্য (Admission Info)</option>
-                    <option value="কোর্স অ্যাক্সেস ও টেকনিক্যাল হেল্প">কোর্স অ্যাক্সেস ও টেকনিক্যাল হেল্প (Access Support)</option>
-                    <option value="পেমেন্ট ও ট্রানজ্যাকশন সাপোর্ট">পেমেন্ট ও ট্রানজ্যাকশন সাপোর্ট (Payment Help)</option>
-                    <option value="অফলাইন শিট ও ম্যাটেরিয়ালস">অফলাইন শিট ও ম্যাটেরিয়ালস (Lecture Sheets)</option>
-                    <option value="সাধারণ পরামর্শ ও কাউন্সেলিং">সাধারণ পরামর্শ ও কাউন্সেলিং (General Inquiry)</option>
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      className="w-full px-4 py-3 pr-10 rounded-xl bg-background dark:bg-slate-900/90 text-foreground border border-foreground/15 dark:border-slate-700/80 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-sm font-medium outline-none transition-all appearance-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-slate-900 dark:[&>option]:text-slate-100"
+                    >
+                      <option value="" className="bg-white text-slate-500 dark:bg-slate-900 dark:text-slate-400 py-2 font-medium">
+                        {locale === 'bn' ? '-- বিষয় / ক্যাটাগরি সিলেক্ট করুন --' : '-- Select Query Topic --'}
+                      </option>
+                      <option value="ভর্তি ও ব্যাচ সংক্রান্ত তথ্য" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 py-2 font-medium">
+                        {locale === 'bn' ? 'ভর্তি ও ব্যাচ সংক্রান্ত তথ্য' : 'Admission & Batch Info'}
+                      </option>
+                      <option value="কোর্স অ্যাক্সেস ও টেকনিক্যাল হেল্প" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 py-2 font-medium">
+                        {locale === 'bn' ? 'কোর্স অ্যাক্সেস ও টেকনিক্যাল হেল্প' : 'Course Access & Tech Help'}
+                      </option>
+                      <option value="পেমেন্ট ও ট্রানজ্যাকশন সাপোর্ট" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 py-2 font-medium">
+                        {locale === 'bn' ? 'পেমেন্ট ও ট্রানজ্যাকশন সাপোর্ট' : 'Payment & Transaction Help'}
+                      </option>
+                      <option value="অফলাইন শিট ও ম্যাটেরিয়ালস" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 py-2 font-medium">
+                        {locale === 'bn' ? 'অফলাইন শিট ও ম্যাটেরিয়ালস' : 'Lecture Sheets & Materials'}
+                      </option>
+                      <option value="সাধারণ পরামর্শ ও কাউন্সেলিং" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 py-2 font-medium">
+                        {locale === 'bn' ? 'সাধারণ পরামর্শ ও কাউন্সেলিং' : 'General Counseling & Inquiry'}
+                      </option>
+                    </select>
+                    <ChevronDown className="w-4 h-4 text-foreground/50 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
                 </div>
               </div>
 
@@ -543,7 +557,7 @@ function ContactPageContent() {
                   placeholder={locale === 'bn' ? 'এখানে আপনার প্রশ্ন বা বিষয়টি বিস্তারিতভাবে লিখুন...' : 'Write your questions or message in detail here...'}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-foreground/[0.03] dark:bg-white/[0.03] border border-foreground/10 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-sm font-medium text-foreground outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-foreground/[0.03] dark:bg-slate-900/90 border border-foreground/15 dark:border-slate-700/80 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-sm font-medium text-foreground outline-none transition-all resize-none placeholder:text-foreground/40"
                 />
               </div>
 

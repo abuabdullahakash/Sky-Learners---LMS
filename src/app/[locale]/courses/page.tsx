@@ -4,7 +4,21 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from '@/i18n/routing';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { BookOpen, Users, Star, Clock, Search, PlusCircle, Sparkles, Building2, GraduationCap } from 'lucide-react';
+import { useLocale } from 'next-intl';
+import { 
+  BookOpen, 
+  Users, 
+  Clock, 
+  Search, 
+  PlusCircle, 
+  Sparkles, 
+  Building2, 
+  X, 
+  Filter, 
+  GraduationCap,
+  Layers,
+  ArrowRight
+} from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
 import { generateCourseUrl } from '@/lib/slug';
@@ -13,9 +27,19 @@ import { Link } from '@/i18n/routing';
 export default function CoursesPage() {
   const { user, userData, loading: authLoading } = useAuth();
   const router = useRouter();
+  const locale = useLocale();
+  const isBn = locale === 'bn';
   const searchParams = useSearchParams();
   const queryTeacherId = searchParams.get('teacherId');
   const isForcedMarketplace = searchParams.get('view') === 'marketplace';
+
+  // URL Filters from Mega Menu & Search
+  const urlCategory = searchParams.get('category');
+  const urlClass = searchParams.get('class') || searchParams.get('eduClass');
+  const urlGroup = searchParams.get('group');
+  const urlDepartment = searchParams.get('department');
+  const urlYear = searchParams.get('year');
+  const urlTrack = searchParams.get('track');
 
   const [guestTeacherId, setGuestTeacherId] = useState<string | null>(null);
 
@@ -39,6 +63,15 @@ export default function CoursesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [loading, setLoading] = useState(true);
+
+  // Sync selectedCategory with urlCategory if present
+  useEffect(() => {
+    if (urlCategory) {
+      setSelectedCategory(urlCategory);
+    } else {
+      setSelectedCategory('all');
+    }
+  }, [urlCategory]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -115,7 +148,7 @@ export default function CoursesPage() {
     fetchCourses();
   }, [activeTeacherId, authLoading]);
 
-  // Filter & Smart-Rank courses by search query, category, and popularity
+  // Filter & Smart-Rank courses by search query, category, and URL parameters
   const filteredCourses = courses.filter((c) => {
     const q = searchQuery.toLowerCase().trim();
     const matchesSearch = q === '' || 
@@ -125,10 +158,51 @@ export default function CoursesPage() {
       c.coachingName?.toLowerCase().includes(q) ||
       (c.specificSubjects && c.specificSubjects.some((s: any) => (typeof s === 'string' ? s : s.name)?.toLowerCase().includes(q)));
 
-    const matchesCategory = selectedCategory === 'all' || 
-      (c.category && c.category.toLowerCase() === selectedCategory.toLowerCase());
+    // Category filter
+    let matchesCategory = true;
+    const catToMatch = urlCategory || (selectedCategory !== 'all' ? selectedCategory : null);
+    if (catToMatch) {
+      if (catToMatch === 'honours' || catToMatch === 'masters' || catToMatch === 'honours_masters') {
+        matchesCategory = c.category === 'honours' || c.category === 'masters';
+      } else {
+        matchesCategory = c.category && c.category.toLowerCase() === catToMatch.toLowerCase();
+      }
+    }
 
-    return matchesSearch && matchesCategory;
+    // Class filter (e.g. 1 to 12)
+    let matchesClass = true;
+    if (urlClass) {
+      matchesClass = String(c.eduClass) === String(urlClass) || String(c.class) === String(urlClass);
+    }
+
+    // Group / Department filter
+    let matchesGroup = true;
+    if (urlGroup) {
+      matchesGroup = Boolean(c.department && c.department.toLowerCase() === urlGroup.toLowerCase());
+    }
+
+    let matchesDepartment = true;
+    if (urlDepartment) {
+      matchesDepartment = Boolean(c.department && c.department.toLowerCase() === urlDepartment.toLowerCase());
+    }
+
+    // Year / Semester filter
+    let matchesYear = true;
+    if (urlYear) {
+      matchesYear = Boolean(c.year && c.year.toLowerCase() === urlYear.toLowerCase());
+    }
+
+    // Track filter for skills
+    let matchesTrack = true;
+    if (urlTrack) {
+      matchesTrack = (c.category === 'skills') && (
+        c.title?.toLowerCase().includes(urlTrack.toLowerCase()) ||
+        c.subtitle?.toLowerCase().includes(urlTrack.toLowerCase()) ||
+        c.track === urlTrack
+      );
+    }
+
+    return matchesSearch && matchesCategory && matchesClass && matchesGroup && matchesDepartment && matchesYear && matchesTrack;
   }).sort((a, b) => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
@@ -154,6 +228,55 @@ export default function CoursesPage() {
   });
   const availableCategories = Array.from(categoriesSet);
 
+  // Friendly Category Label Helper
+  const getCategoryLabel = (cat: string) => {
+    switch (cat.toLowerCase()) {
+      case 'primary': return isBn ? 'প্রাথমিক বিদ্যালয়' : 'Primary School';
+      case 'high_school': return isBn ? 'উচ্চ বিদ্যালয়' : 'High School';
+      case 'intermediate': return isBn ? 'উচ্চ মাধ্যমিক' : 'HSC';
+      case 'admission': return isBn ? 'বিশ্ববিদ্যালয় ভর্তি' : 'University Admission';
+      case 'honours': return isBn ? 'অনার্স' : 'Honours';
+      case 'masters': return isBn ? 'মাস্টার্স' : 'Masters';
+      case 'skills': return isBn ? 'দক্ষতা' : 'Skills';
+      default: return cat;
+    }
+  };
+
+  const getClassLabel = (cls: string) => {
+    const num = parseInt(cls, 10);
+    if (isNaN(num)) return cls;
+    if (isBn) {
+      const bnNums: Record<number, string> = {
+        1: '১ম শ্রেণি', 2: '২য় শ্রেণি', 3: '৩য় শ্রেণি', 4: '৪র্থ শ্রেণি', 5: '৫ম শ্রেণি',
+        6: '৬ষ্ঠ শ্রেণি', 7: '৭ম শ্রেণি', 8: '৮ম শ্রেণি', 9: '৯ম শ্রেণি', 10: '১০ম শ্রেণি (এসএসসি)',
+        11: 'একাদশ শ্রেণি', 12: 'দ্বাদশ শ্রেণি'
+      };
+      return bnNums[num] || `${cls} শ্রেণি`;
+    }
+    return `Class ${cls}`;
+  };
+
+  const getGroupLabel = (grp: string) => {
+    switch (grp.toLowerCase()) {
+      case 'science': return isBn ? 'বিজ্ঞান বিভাগ' : 'Science';
+      case 'arts': return isBn ? 'মানবিক বিভাগ' : 'Arts';
+      case 'commerce': return isBn ? 'ব্যবসায় শিক্ষা' : 'Commerce';
+      case 'engineering': return isBn ? 'ইঞ্জিনিয়ারিং ভর্তি' : 'Engineering';
+      case 'medical': return isBn ? 'মেডিকেল ভর্তি' : 'Medical';
+      case 'university': return isBn ? 'বিশ্ববিদ্যালয় ইউনিট' : 'Varsity Units';
+      case 'iba': return isBn ? 'আইবিএ / বিউপি' : 'IBA / BUP';
+      default: return grp;
+    }
+  };
+
+  const hasActiveFilters = Boolean(urlCategory || urlClass || urlGroup || urlDepartment || urlYear || urlTrack || (selectedCategory !== 'all' && !urlCategory));
+
+  const clearAllFilters = () => {
+    setSelectedCategory('all');
+    setSearchQuery('');
+    router.push('/courses');
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -163,20 +286,20 @@ export default function CoursesPage() {
   }
 
   const isFocusedAcademy = Boolean(activeTeacherId);
-  const academyName = teacherProfile?.displayName || (isTeacher ? user?.displayName : '') || 'আমাদের একাডেমি';
+  const academyName = teacherProfile?.displayName || (isTeacher ? user?.displayName : '') || (isBn ? 'আমাদের একাডেমি' : 'Our Academy');
 
   return (
     <div className="min-h-[calc(100vh-80px)] pt-28 pb-16 bg-background text-foreground selection:bg-primary selection:text-white">
       <div className="max-w-[1280px] mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px]">
         
         {/* Header Section */}
-        <div className="text-center max-w-3xl mx-auto mb-10 space-y-4">
+        <div className="text-center max-w-3xl mx-auto mb-8 space-y-4">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-500 text-xs sm:text-sm font-bold tracking-wide uppercase shadow-sm">
             <Sparkles className="w-4 h-4 text-orange-500" />
             <span>
               {isFocusedAcademy 
-                ? `${academyName} • কোর্স পোর্টাল` 
-                : 'এক্সপ্লোর করুন সকল কোর্স'}
+                ? (isBn ? `${academyName} • কোর্স পোর্টাল` : `${academyName} • Courses Portal`)
+                : (isBn ? 'এক্সপ্লোর করুন সকল কোর্স' : 'Explore All Courses')}
             </span>
           </div>
 
@@ -185,23 +308,30 @@ export default function CoursesPage() {
               <>
                 <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-primary bg-clip-text text-transparent">
                   {academyName}
-                </span>-এর সকল কোর্সসমূহ
+                </span>{isBn ? '-এর সকল কোর্সসমূহ' : ' Courses'}
               </>
             ) : (
               <>
-                আমাদের <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">সকল কোর্সসমূহ</span>
+                {isBn ? 'আমাদের ' : 'Browse Our '}
+                <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">
+                  {isBn ? 'সকল কোর্সসমূহ' : 'Featured Courses'}
+                </span>
               </>
             )}
           </h1>
 
           <p className="text-foreground/70 text-sm sm:text-base md:text-lg leading-relaxed">
             {isFocusedAcademy 
-              ? `${academyName}-এর সকল প্রিমিয়াম ব্যাচ, এক্সাম এবং স্পেশাল লাইভ ক্লাসসমূহ এক নজরে দেখুন।`
-              : 'আপনার পছন্দের কোর্সটি বেছে নিন এবং আজই শেখা শুরু করুন। সেরা শিক্ষকদের গাইডলাইনে প্রস্তুত হোন ভবিষ্যতের জন্য।'}
+              ? (isBn 
+                  ? `${academyName}-এর সকল প্রিমিয়াম ব্যাচ, এক্সাম এবং স্পেশাল লাইভ ক্লাসসমূহ এক নজরে দেখুন।` 
+                  : `Browse all premium batches, exams, and live classes by ${academyName}.`)
+              : (isBn 
+                  ? 'আপনার পছন্দের ক্লাস বা বিষয় নির্বাচন করুন এবং সেরা শিক্ষকদের গাইডলাইনে প্রস্তুত হোন ভবিষ্যতের জন্য।' 
+                  : 'Select your preferred education level and excel with top educators and coaching centers.')}
           </p>
 
           {/* Search Bar */}
-          <div className="pt-3 max-w-xl mx-auto">
+          <div className="pt-2 max-w-xl mx-auto">
             <div className="relative flex items-center shadow-lg rounded-2xl bg-background/90 border border-foreground/15 p-1.5 focus-within:border-primary/60 transition-all backdrop-blur-xl group">
               <div className="pl-4 pr-2 text-foreground/50 group-focus-within:text-primary transition-colors">
                 <Search className="w-5 h-5" />
@@ -210,7 +340,7 @@ export default function CoursesPage() {
                 type="text" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="কোর্সের নাম বা বিষয় দিয়ে খুঁজুন..."
+                placeholder={isBn ? "কোর্সের নাম বা বিষয় দিয়ে খুঁজুন..." : "Search by course title, teacher or subject..."}
                 className="w-full bg-transparent text-sm sm:text-base text-foreground placeholder:text-foreground/40 focus:outline-none py-2 pr-4"
               />
               {searchQuery && (
@@ -225,32 +355,101 @@ export default function CoursesPage() {
             </div>
           </div>
 
-          {/* Category Filter Tabs */}
-          {availableCategories.length > 0 && (
-            <div className="flex flex-wrap items-center justify-center gap-2 pt-4">
+          {/* Active Applied Filters Banner */}
+          {hasActiveFilters && (
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-2 animate-in fade-in duration-200">
+              <span className="text-xs font-bold text-foreground/50 flex items-center gap-1">
+                <Filter className="w-3.5 h-3.5 text-primary" />
+                {isBn ? 'সক্রিয় ফিল্টার:' : 'Active Filters:'}
+              </span>
+
+              {urlCategory && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold shadow-xs">
+                  <span>{getCategoryLabel(urlCategory)}</span>
+                  <Link href="/courses" className="hover:text-primary/70 transition-colors">
+                    <X className="w-3.5 h-3.5" />
+                  </Link>
+                </span>
+              )}
+
+              {urlClass && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-500 text-xs font-bold shadow-xs">
+                  <span>{getClassLabel(urlClass)}</span>
+                  <Link href={urlCategory ? `/courses?category=${urlCategory}` : '/courses'} className="hover:text-orange-600 transition-colors">
+                    <X className="w-3.5 h-3.5" />
+                  </Link>
+                </span>
+              )}
+
+              {urlGroup && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-500 text-xs font-bold shadow-xs">
+                  <span>{getGroupLabel(urlGroup)}</span>
+                  <Link href={urlCategory ? `/courses?category=${urlCategory}` : '/courses'} className="hover:text-purple-600 transition-colors">
+                    <X className="w-3.5 h-3.5" />
+                  </Link>
+                </span>
+              )}
+
+              {urlDepartment && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-xs font-bold shadow-xs">
+                  <span>{urlDepartment}</span>
+                  <Link href="/courses" className="hover:text-blue-600 transition-colors">
+                    <X className="w-3.5 h-3.5" />
+                  </Link>
+                </span>
+              )}
+
+              {urlYear && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-bold shadow-xs">
+                  <span>{urlYear}</span>
+                  <Link href={urlDepartment ? `/courses?department=${encodeURIComponent(urlDepartment)}` : '/courses'} className="hover:text-emerald-600 transition-colors">
+                    <X className="w-3.5 h-3.5" />
+                  </Link>
+                </span>
+              )}
+
               <button
                 type="button"
-                onClick={() => setSelectedCategory('all')}
+                onClick={clearAllFilters}
+                className="text-xs font-bold text-red-500 hover:text-red-600 underline px-2 py-1 transition-colors"
+              >
+                {isBn ? 'ফিল্টার রিসেট করুন' : 'Reset All'}
+              </button>
+            </div>
+          )}
+
+          {/* Category Filter Pills (When no deep URL filter is selected) */}
+          {availableCategories.length > 0 && !urlClass && !urlGroup && !urlYear && !urlDepartment && (
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedCategory('all');
+                  router.push('/courses');
+                }}
                 className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-                  selectedCategory === 'all'
+                  selectedCategory === 'all' && !urlCategory
                     ? 'bg-primary text-white shadow-md scale-105'
                     : 'bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground'
                 }`}
               >
-                সকল ({courses.length})
+                {isBn ? `সকল (${courses.length})` : `All (${courses.length})`}
               </button>
               {availableCategories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
-                  onClick={() => setSelectedCategory(cat)}
+                  onClick={() => {
+                    setSelectedCategory(cat);
+                    router.push(`/courses?category=${cat}`);
+                  }}
                   className={`px-4 py-2 rounded-full text-xs font-bold capitalize transition-all ${
-                    selectedCategory === cat
+                    (selectedCategory === cat || urlCategory === cat)
                       ? 'bg-orange-500 text-white shadow-md scale-105'
                       : 'bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground'
                   }`}
                 >
-                  {cat}
+                  {getCategoryLabel(cat)}
                 </button>
               ))}
             </div>
@@ -262,41 +461,59 @@ export default function CoursesPage() {
           <div className="text-center py-16 px-4 bg-foreground/[0.02] rounded-3xl border border-foreground/10 max-w-lg mx-auto shadow-sm space-y-4">
             <BookOpen className="w-16 h-16 text-foreground/30 mx-auto" />
             <h2 className="text-2xl font-bold text-foreground">
-              {searchQuery ? 'কোনো কোর্স খুঁজে পাওয়া যায়নি!' : (user && isTeacher ? 'আপনি এখনো কোনো কোর্স পাবলিশ করেননি!' : 'বর্তমানে কোনো কোর্স নেই')}
+              {searchQuery 
+                ? (isBn ? 'কোনো কোর্স খুঁজে পাওয়া যায়নি!' : 'No matching courses found!') 
+                : (user && isTeacher 
+                    ? (isBn ? 'আপনি এখনো কোনো কোর্স পাবলিশ করেননি!' : "You haven't published any courses yet!") 
+                    : (isBn ? 'বর্তমানে এই ক্যাটাগরিতে কোনো কোর্স নেই' : 'No courses available in this category currently'))}
             </h2>
             <p className="text-foreground/60 text-sm max-w-md mx-auto">
               {user && isTeacher 
-                ? 'শিক্ষার্থীদের জন্য আপনার কোর্স তৈরি করুন এবং পাবলিশ করে লাইভ নিয়ে আসুন।'
-                : 'অনুসন্ধানের সাথে মিল রেখে কোনো কোর্স পাওয়া যায়নি। অন্য কোনো বিষয় দিয়ে চেষ্টা করুন।'}
+                ? (isBn ? 'শিক্ষার্থীদের জন্য আপনার কোর্স তৈরি করুন এবং পাবলিশ করে লাইভ নিয়ে আসুন।' : 'Create and publish your curriculum from your dashboard.')
+                : (isBn ? 'অন্য কোনো ক্লাস বা বিষয় নির্বাচন করে চেষ্টা করুন অথবা সকল কোর্স ব্রাউজ করুন।' : 'Try clearing your filters or search for another subject.')}
             </p>
-            {user && isTeacher && (
-              <div className="pt-2">
+            <div className="pt-2 flex items-center justify-center gap-3">
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={clearAllFilters}
+                  className="px-5 py-2.5 rounded-xl bg-foreground/10 hover:bg-foreground/20 text-foreground font-bold text-xs transition-all"
+                >
+                  {isBn ? 'সকল ফিল্টার রিসেট করুন' : 'Clear All Filters'}
+                </button>
+              )}
+              {user && isTeacher && (
                 <Link
                   href="/teacher-dashboard/courses/create"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm shadow-lg shadow-orange-500/20 transition-all hover:scale-105"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-lg shadow-orange-500/20 transition-all hover:scale-105"
                 >
                   <PlusCircle className="w-4 h-4" />
-                  <span>+ নতুন কোর্স তৈরি করুন</span>
+                  <span>{isBn ? '+ নতুন কোর্স তৈরি করুন' : '+ Create Course'}</span>
                 </Link>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {filteredCourses.map((course) => {
               
               // Dynamic Badge Logic
-              let badgeText = course.category === 'intermediate' ? 'HSC' : course.category === 'primary' ? 'Primary' : course.category === 'high_school' ? 'SSC' : (course.category || 'Course');
-              if (course.eduClass) badgeText += ` ${course.eduClass}`;
-              if (course.department && course.category !== 'admission' && course.category !== 'honours' && course.category !== 'masters') badgeText += ` (${course.department})`;
+              let badgeText = course.category === 'intermediate' ? 'HSC' : course.category === 'primary' ? (isBn ? 'প্রাথমিক' : 'Primary') : course.category === 'high_school' ? (isBn ? 'উচ্চ বিদ্যালয়' : 'High School') : (course.category || 'Course');
+              if (course.eduClass) badgeText += ` - ${getClassLabel(String(course.eduClass))}`;
+              if (course.department && course.category !== 'admission' && course.category !== 'honours' && course.category !== 'masters') {
+                badgeText += ` (${getGroupLabel(course.department)})`;
+              }
+              if (course.year) {
+                badgeText += ` • ${course.year}`;
+              }
               
               if (course.isFullClassCourse !== false) {
-                badgeText += ' (Full Course)';
+                badgeText += isBn ? ' (সম্পূর্ণ কোর্স)' : ' (Full Course)';
               } else if (course.specificSubjects && course.specificSubjects.length > 0) {
                 if (course.specificSubjects.length === 1) {
                   badgeText += ` • ${course.specificSubjects[0]}`;
                 } else {
-                  badgeText += ` • ${course.specificSubjects.length} Subjects`;
+                  badgeText += ` • ${course.specificSubjects.length} ${isBn ? 'টি বিষয়' : 'Subjects'}`;
                 }
               }
 
@@ -334,7 +551,7 @@ export default function CoursesPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     {isFree && (
                       <div className="absolute top-3 right-3 bg-emerald-500 text-white font-extrabold text-xs px-3 py-1 rounded-full shadow-lg z-20 flex items-center gap-1">
-                        🎁 ফ্রি কোর্স
+                        🎁 {isBn ? 'ফ্রি কোর্স' : 'Free Course'}
                       </div>
                     )}
                   </div>
@@ -358,13 +575,13 @@ export default function CoursesPage() {
                       </div>
                       {isFree && (
                         <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full text-xs font-extrabold w-fit">
-                          🎁 ফ্রি
+                          🎁 {isBn ? 'ফ্রি' : 'Free'}
                         </div>
                       )}
                     </div>
 
                     <p className="text-foreground/60 mb-5 line-clamp-2 text-sm leading-relaxed">
-                      {course.subtitle || 'এই কোর্সে আপনি গুরুত্বপূর্ণ সব টপিক শিখতে পারবেন।'}
+                      {course.subtitle || (isBn ? 'এই কোর্সে আপনি গুরুত্বপূর্ণ সব টপিক শিখতে পারবেন।' : 'Master essential concepts with structured curriculum.')}
                     </p>
                     
                     {/* Stats Row */}
@@ -383,7 +600,7 @@ export default function CoursesPage() {
                         {course.totalExams || 0}
                       </span>
                       
-                      <span className="flex items-center gap-1.5 ml-auto" title="Duration"><Clock className="w-4 h-4 text-rose-500" /> {course.courseValidity || course.duration || 'Life-time'}</span>
+                      <span className="flex items-center gap-1.5 ml-auto" title="Duration"><Clock className="w-4 h-4 text-rose-500" /> {course.courseValidity || course.duration || (isBn ? 'লাইফ-টাইম' : 'Lifetime')}</span>
                     </div>
 
                     <div className="mt-auto pt-4 border-t border-foreground/10 flex items-center justify-between">
@@ -392,10 +609,10 @@ export default function CoursesPage() {
                           isDiscountValid ? (
                             <>
                               <span className="text-xs text-foreground/50 line-through font-medium">৳{course.price}</span>
-                              <span className="font-black text-2xl text-emerald-500">ফ্রি</span>
+                              <span className="font-black text-2xl text-emerald-500">{isBn ? 'ফ্রি' : 'Free'}</span>
                             </>
                           ) : (
-                            <span className="font-black text-2xl text-emerald-500">ফ্রি</span>
+                            <span className="font-black text-2xl text-emerald-500">{isBn ? 'ফ্রি' : 'Free'}</span>
                           )
                         ) : isDiscountValid ? (
                           <>
@@ -412,9 +629,10 @@ export default function CoursesPage() {
                       </div>
                       <Link 
                         href={generateCourseUrl(course)}
-                        className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white font-bold text-xs rounded-xl transition-all duration-300 shadow-md shadow-orange-500/20 active:scale-95"
+                        className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white font-bold text-xs rounded-xl transition-all duration-300 shadow-md shadow-orange-500/20 active:scale-95 flex items-center gap-1"
                       >
-                        বিস্তারিত দেখুন
+                        <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
                     </div>
                   </div>

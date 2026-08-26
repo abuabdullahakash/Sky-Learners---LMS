@@ -172,6 +172,17 @@
     "dashboard": "Dashboard",
     "login": "Login"
   },
+  "EducationLevels": {
+    "primary": "Primary School",
+    "high_school": "High School",
+    "intermediate": "HSC",
+    "admission": "University Admission",
+    "honours": "Honours / Undergrad",
+    "masters": "Masters / Postgrad",
+    "honours_masters": "Honours / Masters",
+    "skills": "Skills",
+    "browseAll": "Browse All Courses"
+  },
   "Dashboard": {
     "courseSidebar": {
       "back": "Back to My Courses",

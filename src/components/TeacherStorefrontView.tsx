@@ -74,6 +74,7 @@ interface TeacherStorefrontViewProps {
 
 export default function TeacherStorefrontView({ teacherId, isOwner = false }: TeacherStorefrontViewProps) {
   const locale = useLocale();
+  const isBn = locale === 'bn';
 
   const [isLoading, setIsLoading] = useState(true);
   const [profileData, setProfileData] = useState<any>(null);
@@ -1600,11 +1601,11 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               <h4 className="text-xl sm:text-2xl font-black text-foreground">
                 {helpBarTitle}{' '}
                 <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent font-black">
-                  আমরা পাশে আছি
+                  {isBn ? 'আমরা পাশে আছি' : "We're Here For You"}
                 </span>
               </h4>
               <p className="text-xs sm:text-sm text-foreground/60 mt-0.5 font-medium">
-                কোর্স সম্পর্কিত যেকোনো সমস্যা বা তথ্যের জন্য আমাদের সাথে যোগাযোগ করো
+                {isBn ? 'কোর্স সম্পর্কিত যেকোনো সমস্যা বা তথ্যের জন্য আমাদের সাথে যোগাযোগ করো' : 'Contact us for any course-related assistance or queries'}
               </p>
             </div>
           </div>
@@ -1619,8 +1620,8 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               >
                 <span className="font-black text-base">f</span>
                 <div className="text-left leading-tight">
-                  <div>Facebook মেসেজ</div>
-                  <div className="text-[10px] text-white/80 font-normal">(মেসেজের সময় ২৪/৭)</div>
+                  <div>Facebook {isBn ? 'মেসেজ' : 'Message'}</div>
+                  <div className="text-[10px] text-white/80 font-normal">({isBn ? 'মেসেজের সময় ২৪/৭' : '24/7 Available'})</div>
                 </div>
               </a>
             )}
@@ -1632,7 +1633,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               <Phone className="w-4 h-4 text-orange-500" />
               <div className="text-left leading-tight">
                 <div>{helpBarPhone}</div>
-                <div className="text-[10px] text-foreground/60 font-normal">(সকাল ১০টা - রাত ৮টা)</div>
+                <div className="text-[10px] text-foreground/60 font-normal">({isBn ? 'সকাল ১০টা - রাত ৮টা' : '10 AM - 8 PM'})</div>
               </div>
             </a>
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -26,6 +26,8 @@ const YoutubeIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function Footer() {
   const t = useTranslations('Footer');
+  const locale = useLocale();
+  const isBn = locale === 'bn';
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isForcedMarketplace = searchParams.get('view') === 'marketplace';
@@ -110,15 +112,15 @@ export default function Footer() {
   // =========================================================================
   if (isTeacherStorefrontMode && teacherData) {
     const displayName = teacherData.displayName || teacherData.academyName || 'Teacher Academy';
-    const headline = teacherData.headline || teacherData.bio || 'অনলাইন একাডেমিক ও ভর্তি পরীক্ষার জন্য একটি বিশেষায়িত লার্নিং প্ল্যাটফর্ম।';
+    const headline = teacherData.headline || teacherData.bio || (isBn ? 'অনলাইন একাডেমিক ও ভর্তি পরীক্ষার জন্য একটি বিশেষায়িত লার্নিং প্ল্যাটফর্ম।' : 'A specialized learning platform for academic excellence and exam preparation.');
     const customNavs = (teacherData.customNavLinks || []).filter((c: any) => c.enabled !== false);
     const photo = teacherData.profilePhoto || teacherData.photoUrl || teacherData.logoUrl;
 
     const contactPhone = teacherData.contactPhone || teacherData.phone || '01700000000';
     const contactWhatsapp = teacherData.contactWhatsapp || teacherData.whatsapp || contactPhone;
     const contactEmail = teacherData.contactEmail || teacherData.email || 'support@skylearners.com';
-    const contactAddress = teacherData.contactAddress || teacherData.address || 'অনলাইন একাডেমি, বাংলাদেশ';
-    const contactOfficeHours = teacherData.contactOfficeHours || 'প্রতিদিন সকাল ৯:০০ টা — রাত ১০:০০ টা';
+    const contactAddress = teacherData.contactAddress || teacherData.address || (isBn ? 'অনলাইন একাডেমি, বাংলাদেশ' : 'Online Academy, Bangladesh');
+    const contactOfficeHours = teacherData.contactOfficeHours || (isBn ? 'প্রতিদিন সকাল ৯:০০ টা — রাত ১০:০০ টা' : 'Everyday 9:00 AM — 10:00 PM');
 
     return (
       <footer className="relative overflow-hidden pt-16 sm:pt-20 pb-10 mt-20 border-t border-foreground/10 bg-gradient-to-b from-foreground/[0.02] via-background/95 to-background backdrop-blur-2xl">
@@ -156,7 +158,7 @@ export default function Footer() {
                         {displayName}
                       </h3>
                       <span className="text-[11px] font-bold text-orange-500">
-                        {teacherData.headerTagline || 'অফিশিয়াল একাডেমি'}
+                        {teacherData.headerTagline || (isBn ? 'অফিশিয়াল একাডেমি' : 'Official Academy')}
                       </span>
                     </div>
                   </div>
@@ -203,87 +205,90 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* 2. Teacher Quick Links */}
+            {/* 2. Teacher Quick Links (Localized) */}
             <div>
               <h4 className="font-extrabold text-sm sm:text-base text-foreground mb-5 flex items-center gap-2.5 tracking-tight">
                 <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-xs shadow-orange-500/40" />
-                <span>একাডেমি পেইজসমূহ</span>
+                <span>{isBn ? 'একাডেমি পেইজসমূহ' : 'Academy Pages'}</span>
               </h4>
               <ul className="space-y-2.5 text-xs sm:text-sm font-medium">
                 <li>
                   <Link href="/" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
-                    <span>হোম (Home)</span>
+                    <span>{isBn ? 'হোম' : 'Home'}</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/courses" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
-                    <span>কোর্সসমূহ (Courses)</span>
+                    <span>{isBn ? 'কোর্সসমূহ' : 'Courses'}</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/about" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
-                    <span>আমাদের সম্পর্কে (About)</span>
+                    <span>{isBn ? 'আমাদের সম্পর্কে' : 'About Us'}</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/contact" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
-                    <span>যোগাযোগ (Contact)</span>
+                    <span>{isBn ? 'যোগাযোগ' : 'Contact'}</span>
                   </Link>
                 </li>
-                {customNavs.map((c: any) => (
-                  <li key={c.id || c.slug}>
-                    <Link href={c.slug} className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
-                      <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
-                      <span>{c.name}</span>
-                    </Link>
-                  </li>
-                ))}
+                {customNavs.map((c: any) => {
+                  const navLabel = isBn ? (c.nameBn || c.name || c.title) : (c.nameEn || c.name || c.title);
+                  return (
+                    <li key={c.id || c.slug}>
+                      <Link href={c.slug} className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
+                        <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
+                        <span>{navLabel}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
 
-            {/* 3. Learning & Resources */}
+            {/* 3. Learning & Resources (Localized) */}
             <div>
               <h4 className="font-extrabold text-sm sm:text-base text-foreground mb-5 flex items-center gap-2.5 tracking-tight">
                 <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-400 shadow-xs shadow-amber-500/40" />
-                <span>কোর্স ক্যাটাগরি ও প্রস্তুতি</span>
+                <span>{isBn ? 'কোর্স ক্যাটাগরি ও প্রস্তুতি' : 'Course Tracks & Prep'}</span>
               </h4>
               <ul className="space-y-2.5 text-xs sm:text-sm font-medium">
                 <li>
                   <Link href="/courses?type=paid" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
-                    <span>অনলাইন রেকর্ডেড ক্লাস</span>
+                    <span>{isBn ? 'অনলাইন রেকর্ডেড ক্লাস' : 'Recorded Video Courses'}</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/courses?type=paid" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
-                    <span>লাইভ ইন্টারঅ্যাক্টিভ ব্যাচ</span>
+                    <span>{isBn ? 'লাইভ ইন্টারঅ্যাক্টিভ ব্যাচ' : 'Live Interactive Batches'}</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/courses?type=free" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
-                    <span>ফ্রি ক্লাস ও ডেমো লেকচার</span>
+                    <span>{isBn ? 'ফ্রি ক্লাস ও ডেমো লেকচার' : 'Free Demo Classes'}</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/courses" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
-                    <span>ডেইলি এক্সাম ও সলভ শিট</span>
+                    <span>{isBn ? 'ডেইলি এক্সাম ও সলভ শিট' : 'Daily Exams & Solves'}</span>
                   </Link>
                 </li>
               </ul>
             </div>
 
-            {/* 4. Direct Teacher Contact with Glass Icon Badges */}
+            {/* 4. Direct Teacher Contact with Glass Icon Badges (Localized) */}
             <div>
               <h4 className="font-extrabold text-sm sm:text-base text-foreground mb-5 flex items-center gap-2.5 tracking-tight">
                 <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 shadow-xs shadow-emerald-500/40" />
-                <span>সরাসরি যোগাযোগ</span>
+                <span>{isBn ? 'সরাসরি যোগাযোগ' : 'Direct Contact'}</span>
               </h4>
               <ul className="space-y-3.5 text-xs sm:text-sm">
                 <li className="flex items-start gap-3 text-foreground/75">
@@ -322,12 +327,16 @@ export default function Footer() {
           {/* Bottom Bar with Teacher Academy Copyright & Legal Links */}
           <div className="pt-8 border-t border-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-foreground/60">
             <p>
-              © {new Date().getFullYear()} <span className="text-foreground font-bold">{displayName}</span>. সর্বস্বত্ব সংরক্ষিত। Powered by <span className="font-bold text-orange-500">SkyLearners</span>.
+              © {new Date().getFullYear()} <span className="text-foreground font-bold">{displayName}</span>. {isBn ? 'সর্বস্বত্ব সংরক্ষিত।' : 'All rights reserved.'} Powered by <span className="font-bold text-orange-500">SkyLearners</span>.
             </p>
             <div className="flex items-center gap-5">
-              <Link href="/privacy" className="hover:text-orange-500 transition-colors">প্রাইভেসি পলিসি</Link>
+              <Link href="/privacy" className="hover:text-orange-500 transition-colors">
+                {isBn ? 'প্রাইভেসি পলিসি' : 'Privacy Policy'}
+              </Link>
               <span className="text-foreground/20">•</span>
-              <Link href="/terms" className="hover:text-orange-500 transition-colors">শর্তাবলী</Link>
+              <Link href="/terms" className="hover:text-orange-500 transition-colors">
+                {isBn ? 'শর্তাবলী' : 'Terms of Service'}
+              </Link>
             </div>
           </div>
         </div>

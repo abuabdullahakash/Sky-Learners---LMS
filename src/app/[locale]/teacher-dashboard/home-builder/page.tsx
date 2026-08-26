@@ -1675,62 +1675,63 @@ export default function TeacherHomePageBuilderPage() {
 
   const isAboutDisabled = disabledStandardPages.includes('about') || globallyExcludedPages.includes('about') || globallyExcludedPages.includes('/about');
   const isContactDisabled = disabledStandardPages.includes('contact') || globallyExcludedPages.includes('contact') || globallyExcludedPages.includes('/contact');
+  const isBn = locale === 'bn';
 
   const tabGroups = [
     {
       id: 'branding',
-      groupName: '🎨 ব্র্যান্ডিং ও পরিচিতি (BRANDING)',
+      groupName: isBn ? '🎨 ব্র্যান্ডিং ও পরিচিতি' : '🎨 Branding & Identity',
       items: [
-        { id: 'branding', label: 'ব্র্যান্ডিং ও একাউন্ট টাইপ', icon: Building2 },
+        { id: 'branding', label: isBn ? 'ব্র্যান্ডিং ও একাউন্ট টাইপ' : 'Branding & Account Mode', icon: Building2 },
       ]
     },
     {
       id: 'headerFooter',
-      groupName: '📐 হেডার ও ফুটার (HEADER & FOOTER)',
+      groupName: isBn ? '📐 হেডার ও ফুটার' : '📐 Header & Footer',
       items: [
-        { id: 'headerSettings', label: '১. হেডার লোগো ও ব্র্যান্ডিং', icon: LayoutDashboard },
-        { id: 'footerSettings', label: '২. ফুটার তথ্য ও সোশ্যাল লিঙ্ক', icon: Layers },
+        { id: 'headerSettings', label: isBn ? '১. হেডার লোগো ও ব্র্যান্ডিং' : '1. Header Logo & Branding', icon: LayoutDashboard },
+        { id: 'footerSettings', label: isBn ? '২. ফুটার তথ্য ও সোশ্যাল লিঙ্ক' : '2. Footer Information & Socials', icon: Layers },
       ]
     },
     {
       id: 'home',
-      groupName: '🏠 হোম পেজ (HOME PAGE)',
+      groupName: isBn ? '🏠 হোম পেজ' : '🏠 Home Page',
       items: [
-        { id: 'sliders', label: '১. ব্যানার স্লাইডার', icon: Sliders },
-        { id: 'quickCards', label: '২. পেইড ও ফ্রি কার্ডস', icon: Layers },
-        { id: 'categories', label: '৩. কোর্স ও ক্যাটাগরি', icon: Grid },
-        { id: 'features', label: '৪. প্রস্তুতিতে যা প্রয়োজন', icon: Award },
-        { id: 'admission', label: '৫. ভর্তি তথ্য ও নিয়ম', icon: Info },
-        { id: 'about', label: '৬. পরিচিতি ও বায়ো সেকশন', icon: Users },
-        ...(profileType === 'institution' ? [{ id: 'faculty', label: '৭. শিক্ষক মণ্ডলী প্যানেল', icon: Users }] : []),
-        { id: 'trustBanner', label: '৮. আস্থার ব্যানার', icon: Flame },
-        { id: 'gallery', label: '৯. স্মরণীয় মুহূর্ত ও ছবি', icon: ImageIcon },
-        { id: 'contact', label: '১০. যোগাযোগ ও সোশ্যাল লিঙ্ক', icon: Phone },
-        { id: 'helpBar', label: '১১. হেল্প ও সাপোর্ট বার', icon: HelpCircle },
+        { id: 'sliders', label: isBn ? '১. ব্যানার স্লাইডার' : '1. Hero Banner Sliders', icon: Sliders },
+        { id: 'quickCards', label: isBn ? '২. পেইড ও ফ্রি কার্ডস' : '2. Paid & Free Cards', icon: Layers },
+        { id: 'categories', label: isBn ? '৩. কোর্স ও ক্যাটাগরি' : '3. Course Categories', icon: Grid },
+        { id: 'features', label: isBn ? '৪. প্রস্তুতিতে যা প্রয়োজন' : '4. Essential Features', icon: Award },
+        { id: 'admission', label: isBn ? '৫. ভর্তি তথ্য ও নিয়ম' : '5. Admission Info & Steps', icon: Info },
+        { id: 'about', label: isBn ? '৬. পরিচিতি ও বায়ো সেকশন' : '6. Teacher Bio & Intro', icon: Users },
+        ...(profileType === 'institution' ? [{ id: 'faculty', label: isBn ? '৭. শিক্ষক মণ্ডলী প্যানেল' : '7. Faculty Roster', icon: Users }] : []),
+        { id: 'trustBanner', label: isBn ? '৮. আস্থার ব্যানার' : '8. Trust Banner', icon: Flame },
+        { id: 'gallery', label: isBn ? '৯. স্মরণীয় মুহূর্ত ও ছবি' : '9. Gallery & Moments', icon: ImageIcon },
+        { id: 'contact', label: isBn ? '১০. যোগাযোগ ও সোশ্যাল লিঙ্ক' : '10. Contact & Social Links', icon: Phone },
+        { id: 'helpBar', label: isBn ? '১১. হেল্প ও সাপোর্ট বার' : '11. Helpline & Support Bar', icon: HelpCircle },
       ]
     },
     ...(!isAboutDisabled ? [{
       id: 'aboutUs',
-      groupName: '📄 অ্যাবাউট পেজ (ABOUT US)',
+      groupName: isBn ? '📄 আমাদের সম্পর্কে' : '📄 About Us Page',
       items: [
-        { id: 'aboutHero', label: '১. হিরো ব্যানার ও স্লোগান', icon: Flame },
-        { id: 'aboutStory', label: '২. আমাদের গল্প ও পরিসংখ্যান', icon: BookOpen },
-        { id: 'aboutValues', label: '৩. আমাদের মূল ভিত্তি (Values)', icon: Award },
-        { id: 'aboutShowcase', label: '৪. ক্যাম্পাস ও টিম মোমেন্টস', icon: ImageIcon },
-        { id: 'aboutFounder', label: '৫. ফাউন্ডার ও মেন্টর প্রোফাইল', icon: User },
-        { id: 'aboutCta', label: '৬. মেগা অ্যাকশন ব্যানার (CTA)', icon: Target },
+        { id: 'aboutHero', label: isBn ? '১. হিরো ব্যানার ও স্লোগান' : '1. Hero Banner & Tagline', icon: Flame },
+        { id: 'aboutStory', label: isBn ? '২. আমাদের গল্প ও পরিসংখ্যান' : '2. Our Story & Stats', icon: BookOpen },
+        { id: 'aboutValues', label: isBn ? '৩. আমাদের মূল ভিত্তি (Values)' : '3. Core Values & Principles', icon: Award },
+        { id: 'aboutShowcase', label: isBn ? '৪. ক্যাম্পাস ও টিম মোমেন্টস' : '4. Campus & Team Moments', icon: ImageIcon },
+        { id: 'aboutFounder', label: isBn ? '৫. ফাউন্ডার ও মেন্টর প্রোফাইল' : '5. Founder & Mentor Profile', icon: User },
+        { id: 'aboutCta', label: isBn ? '৬. মেগা অ্যাকশন ব্যানার (CTA)' : '6. Action Banner (CTA)', icon: Target },
       ]
     }] : []),
     ...(!isContactDisabled ? [{
       id: 'contactUs',
-      groupName: '📞 যোগাযোগ পেজ (CONTACT US)',
+      groupName: isBn ? '📞 যোগাযোগ পেজ' : '📞 Contact Us Page',
       items: [
-        { id: 'contactHero', label: '১. হিরো ও লাইভ সাপোর্ট ব্যাজ', icon: Headphones },
-        { id: 'contactCards', label: '২. ৪টি কুইক অ্যাকশন কার্ডস', icon: Phone },
-        { id: 'contactSchedule', label: '৩. সাপোর্ট সময় ও ব্রাঞ্চ লোকেশন', icon: Clock },
-        { id: 'contactSocial', label: '৪. সোশ্যাল ও ভিআইপি কমিউনিটি', icon: Globe },
-        { id: 'contactFaq', label: '৫. সচরাচর জিজ্ঞাসা (FAQ Manager)', icon: HelpCircle },
-        { id: 'contactCta', label: '৬. মেগা অ্যাকশন ব্যানার (CTA)', icon: Target },
+        { id: 'contactHero', label: isBn ? '১. হিরো ও লাইভ সাপোর্ট' : '1. Hero & Live Support', icon: Headphones },
+        { id: 'contactCards', label: isBn ? '২. ৪টি কুইক অ্যাকশন কার্ডস' : '2. Quick Contact Cards', icon: Phone },
+        { id: 'contactSchedule', label: isBn ? '৩. সাপোর্ট সময় ও ব্রাঞ্চ লোকেশন' : '3. Support Hours & Location', icon: Clock },
+        { id: 'contactSocial', label: isBn ? '৪. সোশ্যাল ও ভিআইপি কমিউনিটি' : '4. Social & VIP Community', icon: Globe },
+        { id: 'contactFaq', label: isBn ? '৫. সচরাচর জিজ্ঞাসা (FAQ)' : '5. Frequently Asked Questions', icon: HelpCircle },
+        { id: 'contactCta', label: isBn ? '৬. মেগা অ্যাকশন ব্যানার (CTA)' : '6. Action Banner (CTA)', icon: Target },
       ]
     }] : []),
     // Dynamic Custom Pages Created for this Teacher
@@ -1743,13 +1744,13 @@ export default function TeacherHomePageBuilderPage() {
         ? [
             { 
               id: `${groupKey}_settings`, 
-              label: `১. ${customPage.name} পেজ ও হিরো সেটিংস`, 
+              label: isBn ? `১. ${customPage.name} পেজ ও হিরো সেটিংস` : `1. ${customPage.name} Page & Hero`, 
               icon: Sliders,
               customPage: customPage
             },
             { 
               id: `${groupKey}_manager`, 
-              label: `২. নোটিশ আপলোড ও ম্যানেজমেন্ট`, 
+              label: isBn ? `২. নোটিশ আপলোড ও ম্যানেজমেন্ট` : `2. Notice Upload & Management`, 
               icon: FilePlus,
               customPage: customPage
             }
@@ -1757,7 +1758,7 @@ export default function TeacherHomePageBuilderPage() {
         : [
             { 
               id: `${groupKey}_settings`, 
-              label: `১. ${customPage.name} পেজ কন্ট্রোলস`, 
+              label: isBn ? `১. ${customPage.name} পেজ কন্ট্রোলস` : `1. ${customPage.name} Page Controls`, 
               icon: Sliders,
               customPage: customPage
             }
@@ -1765,7 +1766,7 @@ export default function TeacherHomePageBuilderPage() {
 
       return {
         id: groupKey,
-        groupName: `📑 ${customPage.name.toUpperCase()} (${(customPage.slug || '').toUpperCase()})`,
+        groupName: `📢 ${customPage.name}`,
         isCustomPage: true,
         customPageData: customPage,
         items
@@ -1877,10 +1878,9 @@ export default function TeacherHomePageBuilderPage() {
       {/* ========================================================================= */}
       {/* DEDICATED WEBSITE BUILDER SIDEBAR (Replaces Main Sidebar on Desktop)      */}
       {/* ========================================================================= */}
-      {/* ========================================================================= */}
       {/* DEDICATED WEBSITE BUILDER SIDEBAR (Soft Liquid Glassmorphism)             */}
       {/* ========================================================================= */}
-      <aside className="hidden md:flex w-64 lg:w-[280px] flex-shrink-0 bg-background/80 backdrop-blur-xl border-r border-foreground/[0.08] fixed left-0 top-[80px] h-[calc(100vh-80px)] z-40 overflow-y-auto custom-scrollbar flex-col justify-between">
+      <aside className="hidden md:flex w-64 lg:w-[290px] xl:w-[305px] flex-shrink-0 bg-background/80 backdrop-blur-xl border-r border-foreground/[0.08] fixed left-0 top-[80px] h-[calc(100vh-80px)] z-40 overflow-y-auto custom-scrollbar flex-col justify-between">
         
         {/* Top Header & Back Button */}
         <div>
@@ -1890,18 +1890,18 @@ export default function TeacherHomePageBuilderPage() {
               className="inline-flex items-center gap-2 text-xs font-bold text-foreground/60 hover:text-orange-500 transition-colors group"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-              <span>Back to Dashboard</span>
+              <span>{isBn ? 'ড্যাশবোর্ডে ফিরে যান' : 'Back to Dashboard'}</span>
             </Link>
 
             <div>
-              <h3 className="font-black text-base text-foreground flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center">
-                  <Globe className="w-3.5 h-3.5" />
+              <h3 className="font-black text-base lg:text-lg text-foreground flex items-center gap-2">
+                <div className="w-7 h-7 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center shadow-xs">
+                  <Globe className="w-4 h-4" />
                 </div>
-                <span>ওয়েবসাইট বিল্ডার</span>
+                <span>{isBn ? 'ওয়েবসাইট বিল্ডার' : 'Website Builder'}</span>
               </h3>
-              <p className="text-[11px] text-foreground/50 mt-0.5">
-                আপনার একাডেমি সাইট কাস্টমাইজ করুন
+              <p className="text-xs text-foreground/50 mt-0.5">
+                {isBn ? 'আপনার একাডেমি সাইট কাস্টমাইজ করুন' : 'Customize your academy website'}
               </p>
             </div>
           </div>
@@ -1936,7 +1936,7 @@ export default function TeacherHomePageBuilderPage() {
                         }
                       }
                     }}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs transition-all duration-200 cursor-pointer ${
+                    className={`w-full flex items-center justify-between px-3.5 py-3 text-[13px] sm:text-sm transition-all duration-200 cursor-pointer text-left ${
                       isOpen
                         ? 'text-orange-500 font-extrabold border-b border-orange-500/15'
                         : hasActiveChild 
@@ -1944,10 +1944,10 @@ export default function TeacherHomePageBuilderPage() {
                           : 'text-foreground/80 hover:text-foreground font-semibold'
                     }`}
                   >
-                    <div className="flex items-center gap-2 truncate">
+                    <div className="flex items-center gap-2 leading-snug">
                       <span>{group.groupName}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors ${
                         isOpen 
                           ? 'bg-orange-500/20 text-orange-500' 
@@ -1956,7 +1956,7 @@ export default function TeacherHomePageBuilderPage() {
                         {group.items.length}
                       </span>
                       <ChevronDown 
-                        className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                        className={`w-4 h-4 transition-transform duration-300 ${
                           isOpen ? 'rotate-180 text-orange-500' : 'text-foreground/40'
                         }`} 
                       />
@@ -1974,21 +1974,21 @@ export default function TeacherHomePageBuilderPage() {
                             key={tab.id}
                             type="button"
                             onClick={() => handleRequestTabSwitch(tab.id, group.id)}
-                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-all text-left cursor-pointer ${
+                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[12.5px] sm:text-[13px] transition-all text-left cursor-pointer ${
                               isActive
                                 ? 'bg-gradient-to-r from-orange-500/15 via-orange-500/10 to-amber-500/10 border border-orange-500/30 text-orange-500 font-bold shadow-xs shadow-orange-500/10'
                                 : 'hover:bg-foreground/[0.04] text-foreground/70 hover:text-foreground font-medium'
                             }`}
                           >
-                            <div className="flex items-center gap-2 truncate">
+                            <div className="flex items-center gap-2.5">
                               {isActive ? (
-                                <span className="w-1.5 h-3.5 rounded-full bg-gradient-to-b from-orange-500 to-amber-500 shadow-sm shadow-orange-500/50 shrink-0" />
+                                <span className="w-1.5 h-4 rounded-full bg-gradient-to-b from-orange-500 to-amber-500 shadow-sm shadow-orange-500/50 shrink-0" />
                               ) : (
-                                <Icon className="w-3.5 h-3.5 flex-shrink-0 text-foreground/40" />
+                                <Icon className="w-4 h-4 flex-shrink-0 text-foreground/40" />
                               )}
-                              <span className="truncate">{tab.label}</span>
+                              <span>{tab.label}</span>
                             </div>
-                            <ChevronRight className={`w-3 h-3 flex-shrink-0 transition-transform ${isActive ? 'text-orange-500 translate-x-0.5' : 'text-foreground/30'}`} />
+                            <ChevronRight className={`w-3.5 h-3.5 flex-shrink-0 transition-transform ${isActive ? 'text-orange-500 translate-x-0.5' : 'text-foreground/30'}`} />
                           </button>
                         );
                       })}
@@ -2008,7 +2008,7 @@ export default function TeacherHomePageBuilderPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
                 <Sparkles className="w-3.5 h-3.5 text-orange-500" />
-                <span>সাইট রেডি প্রগ্রেস</span>
+                <span>{isBn ? 'সাইট রেডি প্রগ্রেস' : 'Site Setup Progress'}</span>
               </div>
               <span className={`text-xs font-black ${progressPercent === 100 ? 'text-emerald-500' : 'text-orange-500'}`}>
                 {progressPercent}%
@@ -2028,8 +2028,8 @@ export default function TeacherHomePageBuilderPage() {
             </div>
 
             <div className="flex items-center justify-between text-[10px] text-foreground/60 pt-0.5">
-              <span>{progressPercent === 100 ? '🎉 সম্পূর্ণ রেডি!' : `${checklist.length - completedCount}টি তথ্য বাকি`}</span>
-              <span className="font-bold">{completedCount}/{checklist.length} টি পূর্ণ</span>
+              <span>{progressPercent === 100 ? (isBn ? '🎉 সম্পূর্ণ রেডি!' : '🎉 All Ready!') : (isBn ? `${checklist.length - completedCount}টি তথ্য বাকি` : `${checklist.length - completedCount} items left`)}</span>
+              <span className="font-bold">{completedCount}/{checklist.length} {isBn ? 'টি পূর্ণ' : 'done'}</span>
             </div>
           </div>
         </div>
@@ -2039,7 +2039,7 @@ export default function TeacherHomePageBuilderPage() {
       {/* ========================================================================= */}
       {/* MAIN FULL-WIDTH CONTENT AREA (Shifted by sidebar width on Desktop)        */}
       {/* ========================================================================= */}
-      <div className="md:ml-64 lg:ml-[280px] p-2 sm:p-4 md:p-6 space-y-6">
+      <div className="md:ml-64 lg:ml-[290px] xl:ml-[305px] p-2 sm:p-4 md:p-6 space-y-6">
         
         {/* Mobile Horizontal Tabs Bar (Liquid Pills) */}
         <div className="md:hidden flex items-center gap-2 overflow-x-auto pb-2 border-b border-foreground/10">

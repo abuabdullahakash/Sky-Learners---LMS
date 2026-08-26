@@ -5,78 +5,88 @@ This version uses Next.js App Router with Internationalization (`[locale]` routi
 
 # 🏛️ SkyLearners Architecture & Development Guidelines
 
-This LMS platform is architected around a **Dual-Mode System** with **Clean SEO URLs**:
+This LMS platform is architected around a **3-Tier Category Framework** with **Dynamic Header/Footer Integration** and **Clean SEO URLs**:
 
 ---
 
-## 🌐 1. Platform Modes & Categorization
+## 🌐 1. The 3-Tier Category Framework
 
-### A. Marketplace Mode (গ্লোবাল মার্কেটপ্লেস)
+```mermaid
+graph TD
+    A[SkyLearners LMS Platform] --> B[১. Marketplace Category]
+    A --> C[২. Global Teacher Storefront]
+    C --> D[৩. Individual Teacher Storefront Sub-Category]
+    
+    B --> B1[Marketplace Header: Central Logo + MegaMenu + Search + Filter]
+    B --> B2[Marketplace Footer: Global Platform Info]
+    
+    C --> C1[Super Admin HUB: Global Teacher Pages & Rules]
+    C --> C2[সকল শিক্ষকের Global Header & Dynamic Logo Slot]
+    C --> C3[সকল শিক্ষকের Global Footer Template]
+    
+    D --> D1[Super Admin: সকল শিক্ষকের তালিকা -> Teacher Control Manager]
+    D --> D2[Teacher Website Builder: Custom Pages & Branding]
+    D --> D3[Exclusive Custom Pages & Footer Overrides for specific teacher]
+```
+
+### 📂 Tier 1: `Marketplace Category` (গ্লোবাল মার্কেটপ্লেস)
 * **Target Audience:** Organic Google/Social visitors, guests, and students who haven't selected a focused teacher academy.
 * **Scope:** Displays nationwide courses from all teachers, coaching institutions, platform notices, and global FAQs.
-* **Core Pages:**
-  - `Home` (`/`)
-  - `Courses Catalog` (`/courses`)
-  - `About Platform` (`/about`)
-  - *(Any future marketplace page added here only impacts Marketplace mode)*
+* **Header Components:**
+  - Central SkyLearners Logo
+  - `marketplaceNavLinks` (`Home` `/`, `Courses` `/courses` [with CourseMegaMenu], `About` `/about`)
+  - Global Search Bar & Filters
+* **Footer Components:**
+  - Central SkyLearners Footer (Platform info, global links, platform support)
+* **AI Rule:** When the user says *"Marketplace Header / Footer / NavLinks এ এই পেজ বা ডিজাইন পরিবর্তন করো"*, ONLY edit Marketplace components without touching any teacher storefront.
 
-### B. Teacher Storefront Mode (শিক্ষকের নিজস্ব কাস্টম একাডেমি)
-* **Target Audience:** The logged-in teacher, visitors arriving via a teacher's referral/share link, and enrolled students who set this teacher as their "Focused Academy" (`preferredTeacherId`).
-* **Scope:** Displays only that teacher's branded pages, bio, video intro, custom value cards, testimonials, and courses.
-* **Customization:** Fully customizable by the teacher via **Website Builder** (`/teacher-dashboard/home-builder`).
-* **Core Pages:**
-  - `Teacher Home` (Rendered via `<TeacherStorefrontView />` or `/teachers/[slug]`)
-  - `Teacher Courses` (`/courses` filtered by `teacherId`)
-  - `Teacher About` (`/about` with teacher's custom bio/values)
-  - *(Any future teacher page added here connects to Teacher Storefront & Website Builder)*
+---
+
+### 👨‍🏫 Tier 2: `Global Teacher Storefront` (সকল শিক্ষকের গ্লোবাল বেস একাডেমি)
+* **Target Audience:** Logged-in teachers, visitors arriving via a teacher's referral link, students with a preferred teacher, or visitors on `/teachers/[slug]`.
+* **Managed From:** Super Admin Dashboard -> **`Global Teacher Storefront Pages & Rules` HUB**.
+* **Header Components:**
+  - Dynamic Teacher Logo / Avatar + Academy Name
+  - `teacherStorefrontNavLinks` (`Home`, `Courses`, `About`, `যোগাযোগ (Contact)` + Super Admin added Global Pages)
+  - Exclusion Rules: Super Admin can exclude specific teachers from specific global pages (`excludedTeacherIds`).
+* **Footer Components:**
+  - Dynamic Teacher Footer (Teacher's contact info, WhatsApp, address, office hours, quick links, teacher copyright).
+* **AI Rule:** When the user says *"Global Teacher Header / Footer / Pages এ এই আপডেট করো"*, update the shared base template so that **ALL teachers** automatically get this update.
+
+---
+
+### 👑 Tier 3: `Individual Teacher Custom Storefront` (নির্দিষ্ট শিক্ষকের কাস্টম একাডেমি)
+* **Target Audience:** Specific visitors/students of a single teacher (e.g. Teacher Akash / `teacher-01`).
+* **Managed From:** Super Admin Dashboard -> **`সকল শিক্ষকের তালিকা` -> `Teacher Control Manager`** OR Teacher's own **Website Builder** (`/teacher-dashboard/home-builder`).
+* **Components:**
+  - Specific custom pages (e.g. `/notice`, `/special-batch-2026`, custom notes) registered under that teacher's `customNavLinks`.
+  - Specific branding, custom cover photos, custom video intro, and custom value cards.
+* **AI Rule:** When the user mentions a specific teacher name/ID (e.g. *"Teacher Akash এর জন্য এই স্পেশাল পেজ তৈরি করো"*), create/modify it strictly under that teacher's document or custom slug route so no other teacher gets affected.
 
 ---
 
 ## 🔗 2. Clean URL & SEO Standards (Strict)
 
 1. **Clean & Human-Readable Slugs:**
-   - Always use clean slugs for courses: `/courses/[courseSlug]` (never messy database IDs in user-facing URLs).
+   - Always use clean slugs for courses: `/courses/[courseSlug]`.
    - Always use clean slugs for teacher academies: `/teachers/[teacherSlug]`.
-2. **SEO & Canonical Tags:**
-   - Search engines crawl clean URLs (`/`, `/courses`, `/about`, `/teachers/[slug]`, `/courses/[slug]`).
-   - Referral parameters (like `?ref=...`) must maintain canonical tags pointing to the clean canonical URLs.
-3. **No Cluttered URLs:** Avoid unnecessary parameters or exposed Firebase document IDs in public navigation.
+2. **Slug to UID Resolution:**
+   - When a visitor visits `/teachers/[slug]`, the system uses `resolveTeacherBySlugOrId` to resolve the actual Firebase UID and stores it in `sessionStorage.setItem('referralTeacherId', uid)`.
+   - All subsequent page visits (`/courses`, `/about`, `/contact`, `/[slug]`) in that session stay within that teacher's storefront.
+3. **SEO & Canonical Tags:**
+   - Referral parameters maintain clean canonical URLs.
 
 ---
 
-## 🛠️ 3. Rules for Adding New Pages / Features
+## 🛠️ 3. Rules for AI Implementation & Maintenance
 
-Whenever developing or updating the website:
+1. **Always Check the Category First:**
+   - Request about Marketplace? -> Target Tier 1 (`marketplaceNavLinks`, Central Logo, Marketplace Footer).
+   - Request about All Teachers? -> Target Tier 2 (`teacherStorefrontNavLinks`, Global Pages HUB, Global Teacher Footer).
+   - Request about a Specific Teacher? -> Target Tier 3 (`Teacher Control Manager`, `customNavLinks`, Teacher Website Builder).
 
-### When User Requests a **Marketplace Page**:
-* Register the page under the **Marketplace Navigation**.
-* Ensure it only renders in Marketplace mode and does not alter or conflict with individual Teacher Storefronts.
-* Make the route clean, responsive, and SEO-friendly.
+2. **Zero Mega-Menu in Teacher Mode:**
+   - The `CourseMegaMenu` dropdown is exclusively for Marketplace mode. It must NEVER render in Teacher Storefront Mode.
 
-### When User Requests a **Teacher Site Page**:
-* Register the page under the **Teacher Storefront Navigation** (`teacherStorefrontNavLinks` in `Navbar.tsx`).
-* Integrate the page/section data with the **Teacher Website Builder** (`/teacher-dashboard/home-builder`) so the teacher can edit its content.
-* Ensure the page loads dynamically for visitors in Teacher Mode (`guestTeacherId` / `preferredTeacherId` / logged-in teacher).
-
----
-
-## 🗂️ 4. Header Menu Categorization & Dynamic Switching Architecture
-
-In `src/components/Navbar.tsx`, public navigation links are cleanly divided into two explicit categories:
-
-1. **`marketplaceNavLinks` (Marketplace Menu Category - 100% Clean URLs):**
-   - Contains: `Home` (`/`), `Courses` (`/courses`), `About` (`/about`) (and any new marketplace pages).
-   - URLs are 100% clean and pure without any query parameters.
-   - Only shown to:
-     - Organic / non-logged-in visitors (no referral link).
-     - Logged-in students in Global Marketplace Mode.
-
-2. **`teacherStorefrontNavLinks` (Teacher Storefront Menu Category):**
-   - Contains: `Home`, `Courses`, `About`, `যোগাযোগ (Contact)` (and any new teacher pages).
-   - Only shown when `isTeacherStorefrontMode` is `true`:
-     - Logged-in teacher (`isTeacher === true`).
-     - Visitor with referral link in session (`guestTeacherId` from `sessionStorage.getItem('referralTeacherId')`).
-     - Student who selected a specific teacher (`userData.preferredTeacherId`).
-     - On a `/teachers/[slug]` route.
-
-**AI Instruction:** When adding or modifying a public page, simply register its navigation object in either `marketplaceNavLinks` or `teacherStorefrontNavLinks` accordingly.
+3. **Persistent Dual-Mode Footer:**
+   - `Footer.tsx` automatically switches between Marketplace Footer and Teacher Branded Footer based on `isTeacherStorefrontMode`.

@@ -1,8 +1,14 @@
 "use client";
 
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { resolveTeacherBySlugOrId } from '@/lib/slug';
+import { Mail, MapPin, Phone, MessageCircle, Clock, Globe, Sparkles, BookOpen, User } from 'lucide-react';
 import Image from 'next/image';
 
 const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -21,13 +27,268 @@ const YoutubeIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export default function Footer() {
   const t = useTranslations('Footer');
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const isForcedMarketplace = searchParams.get('view') === 'marketplace';
+  const { user, userData } = useAuth();
 
-  const isDashboard = pathname.startsWith('/dashboard') || pathname.startsWith('/teacher-dashboard');
+  const isDashboard = pathname.startsWith('/dashboard') || pathname.startsWith('/teacher-dashboard') || pathname.startsWith('/admin');
+
+  // Teacher Storefront Mode Detection
+  const isAdmin = userData?.isAdmin || userData?.role === 'admin' || user?.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com' || Boolean(user?.email?.toLowerCase().includes('abuabdullahakash'));
+  const isTeacher = isAdmin || userData?.role === 'teacher';
+  const isStudent = !isAdmin && userData?.role === 'student';
+  const preferredTeacherId = userData?.preferredTeacherId && userData.preferredTeacherId !== 'global' ? userData.preferredTeacherId : null;
+
+  const [guestTeacherId, setGuestTeacherId] = useState<string | null>(null);
+  const [teacherData, setTeacherData] = useState<any | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('referralTeacherId') || localStorage.getItem('referralTeacherId');
+      if (stored && stored !== 'global') {
+        setGuestTeacherId(stored);
+      }
+    }
+  }, []);
+
+  let routeTeacherId: string | null = null;
+  if (pathname.includes('/teachers/')) {
+    const parts = pathname.split('/teachers/');
+    if (parts[1]) {
+      routeTeacherId = parts[1].split('/')[0].split('#')[0].split('?')[0];
+    }
+  }
+
+  const isTeacherStorefrontMode = !isForcedMarketplace && Boolean(
+    (user && isTeacher) ||
+    routeTeacherId || 
+    (guestTeacherId && guestTeacherId !== 'global') ||
+    (isStudent && preferredTeacherId && preferredTeacherId !== 'global')
+  );
+
+  const effectiveTeacherId = isForcedMarketplace
+    ? null
+    : (routeTeacherId || guestTeacherId || (isStudent && preferredTeacherId ? preferredTeacherId : (isTeacher ? user?.uid : null)));
+
+  useEffect(() => {
+    if (!effectiveTeacherId || !isTeacherStorefrontMode) {
+      setTeacherData(null);
+      return;
+    }
+
+    let isMounted = true;
+    const fetchTeacher = async () => {
+      try {
+        const resolved = await resolveTeacherBySlugOrId(db, effectiveTeacherId);
+        if (resolved && isMounted) {
+          setTeacherData(resolved);
+        } else {
+          const docRef = doc(db, 'teacherProfiles', effectiveTeacherId);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists() && isMounted) {
+            setTeacherData(docSnap.data());
+          }
+        }
+      } catch (err) {
+        console.error("Error loading teacher profile in footer:", err);
+      }
+    };
+
+    fetchTeacher();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [effectiveTeacherId, isTeacherStorefrontMode]);
 
   if (isDashboard) {
     return null;
   }
 
+  // =========================================================================
+  // CASE A: TEACHER STOREFRONT FOOTER (Category 2 & 3: Teacher Branded Footer)
+  // =========================================================================
+  if (isTeacherStorefrontMode && teacherData) {
+    const displayName = teacherData.displayName || teacherData.academyName || 'Teacher Academy';
+    const headline = teacherData.headline || teacherData.bio || 'অনলাইন একাডেমিক ও ভর্তি পরীক্ষার জন্য একটি বিশেষায়িত লার্নিং প্ল্যাটফর্ম।';
+    const customNavs = (teacherData.customNavLinks || []).filter((c: any) => c.enabled !== false);
+    const photo = teacherData.profilePhoto || teacherData.photoUrl || teacherData.logoUrl;
+
+    const contactPhone = teacherData.contactPhone || teacherData.phone || '01700000000';
+    const contactWhatsapp = teacherData.contactWhatsapp || teacherData.whatsapp || contactPhone;
+    const contactEmail = teacherData.contactEmail || teacherData.email || 'support@skylearners.com';
+    const contactAddress = teacherData.contactAddress || teacherData.address || 'ঢাকা, বাংলাদেশ';
+    const contactOfficeHours = teacherData.contactOfficeHours || 'প্রতিদিন সকাল ৯:০০ টা — রাত ১০:০০ টা';
+
+    return (
+      <footer className="bg-background/90 backdrop-blur-md border-t border-foreground/10 pt-16 pb-8 mt-20 relative overflow-hidden">
+        {/* Glowing Orbs matching teacher theme */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/10 blur-[140px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-amber-500/10 blur-[140px] rounded-full pointer-events-none" />
+
+        <div className="max-w-[1280px] mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px] relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-16 mb-12">
+            
+            {/* 1. Teacher Brand & Bio */}
+            <div className="space-y-4">
+              <Link href="/" className="flex items-center gap-3 group">
+                {photo ? (
+                  <div className="relative w-12 h-12 rounded-2xl overflow-hidden border-2 border-orange-500/30 shadow-md shadow-orange-500/20 shrink-0">
+                    <img src={photo} alt={displayName} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center shadow-lg shadow-orange-500/20 text-lg shrink-0">
+                    {displayName.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div>
+                  <h3 className="font-black text-lg leading-tight text-foreground group-hover:text-orange-500 transition-colors">
+                    {displayName}
+                  </h3>
+                  <span className="text-xs font-bold text-orange-500">
+                    অফিশিয়াল একাডেমি
+                  </span>
+                </div>
+              </Link>
+
+              <p className="text-foreground/70 text-sm leading-relaxed line-clamp-3">
+                {headline}
+              </p>
+
+              {/* Social Channels */}
+              <div className="flex items-center gap-3 pt-2">
+                {teacherData.socialFacebook && (
+                  <a href={teacherData.socialFacebook} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-xl bg-foreground/5 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                    <FacebookIcon className="w-4 h-4" />
+                  </a>
+                )}
+                {teacherData.socialYoutube && (
+                  <a href={teacherData.socialYoutube} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-xl bg-foreground/5 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                    <YoutubeIcon className="w-4 h-4" />
+                  </a>
+                )}
+                <a href={`https://wa.me/${contactWhatsapp.replace(/[^\d+]/g, '')}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                  <MessageCircle className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+
+            {/* 2. Teacher Quick Links */}
+            <div>
+              <h4 className="font-bold text-base text-foreground mb-5 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-orange-500" />
+                <span>একাডেমি পেইজসমূহ</span>
+              </h4>
+              <ul className="space-y-2.5 text-sm">
+                <li>
+                  <Link href="/" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-orange-500 transition-colors" />
+                    <span>হোম (Home)</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/courses" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-orange-500 transition-colors" />
+                    <span>কোর্সসমূহ (Courses)</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/about" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-orange-500 transition-colors" />
+                    <span>আমাদের সম্পর্কে (About)</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contact" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-orange-500 transition-colors" />
+                    <span>যোগাযোগ (Contact)</span>
+                  </Link>
+                </li>
+                {customNavs.map((c: any) => (
+                  <li key={c.id || c.slug}>
+                    <Link href={c.slug} className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
+                      <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-orange-500 transition-colors" />
+                      <span>{c.name}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* 3. Learning & Resources */}
+            <div>
+              <h4 className="font-bold text-base text-foreground mb-5 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-500" />
+                <span>কোর্স ক্যাটাগরি ও প্রস্তুতি</span>
+              </h4>
+              <ul className="space-y-2.5 text-sm">
+                <li>
+                  <Link href="/courses" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-amber-500 transition-colors" />
+                    <span>অনলাইন রেকর্ডেড ক্লাস</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/courses" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-amber-500 transition-colors" />
+                    <span>লাইভ ইন্টারঅ্যাক্টিভ ব্যাচ</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/courses" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-amber-500 transition-colors" />
+                    <span>ডেইলি এক্সাম ও সলভ শিট</span>
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* 4. Direct Teacher Contact */}
+            <div>
+              <h4 className="font-bold text-base text-foreground mb-5 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span>সরাসরি যোগাযোগ</span>
+              </h4>
+              <ul className="space-y-3 text-sm">
+                <li className="flex items-start gap-2.5 text-foreground/70">
+                  <MapPin className="w-4 h-4 text-orange-500 shrink-0 mt-1" />
+                  <span>{contactAddress}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-foreground/70">
+                  <Phone className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>{contactPhone}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-foreground/70">
+                  <Mail className="w-4 h-4 text-blue-500 shrink-0" />
+                  <span className="truncate">{contactEmail}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-foreground/70">
+                  <Clock className="w-4 h-4 text-amber-500 shrink-0" />
+                  <span className="text-xs">{contactOfficeHours}</span>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+
+          {/* Bottom Bar with Teacher Academy Copyright */}
+          <div className="pt-6 border-t border-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-foreground/50">
+            <p>
+              © {new Date().getFullYear()} {displayName}. সর্বস্বত্ব সংরক্ষিত। Powered by SkyLearners.
+            </p>
+            <div className="flex items-center gap-5">
+              <Link href="/privacy" className="hover:text-orange-500 transition-colors">প্রাইভেসি পলিসি</Link>
+              <Link href="/terms" className="hover:text-orange-500 transition-colors">শর্তাবলী</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
+  // =========================================================================
+  // CASE B: GLOBAL MARKETPLACE FOOTER (Category 1: Central Marketplace Footer)
+  // =========================================================================
   return (
     <footer className="bg-background/80 backdrop-blur-md border-t border-foreground/10 pt-16 pb-8 mt-20 relative overflow-hidden">
       {/* Decorative glows */}
@@ -41,10 +302,10 @@ export default function Footer() {
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2 mb-2">
               <div className="relative w-[180px] h-[50px] md:w-[240px] md:h-[60px] flex items-center justify-start">
-                <Image src="/Skylearnars Academy logo.png" alt="Sky Learners Logo" fill className="object-contain object-left" />
+                <Image src="/Skylearnars Academy logo.png" alt="Sky Learners Logo" fill className="object-contain object-left" priority />
               </div>
             </Link>
-            <p className="text-foreground/70 leading-relaxed">
+            <p className="text-foreground/70 leading-relaxed text-sm">
               {t('about')}
             </p>
             <div className="flex items-center gap-4 pt-4">
@@ -66,7 +327,7 @@ export default function Footer() {
           {/* Quick Links */}
           <div>
             <h3 className="font-bold text-lg mb-6">{t('quickLinks')}</h3>
-            <ul className="space-y-3">
+            <ul className="space-y-3 text-sm">
               <li>
                 <Link href="/" className="text-foreground/70 hover:text-primary transition-colors flex items-center gap-2 group">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors"></span>
@@ -91,7 +352,7 @@ export default function Footer() {
           {/* Legal */}
           <div>
             <h3 className="font-bold text-lg mb-6">{t('legal')}</h3>
-            <ul className="space-y-3">
+            <ul className="space-y-3 text-sm">
               <li>
                 <Link href="/privacy" className="text-foreground/70 hover:text-primary transition-colors flex items-center gap-2 group">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors"></span>
@@ -110,7 +371,7 @@ export default function Footer() {
           {/* Contact */}
           <div>
             <h3 className="font-bold text-lg mb-6">{t('contact')}</h3>
-            <ul className="space-y-4">
+            <ul className="space-y-4 text-sm">
               <li className="flex items-start gap-3 text-foreground/70">
                 <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <span>123 Learning Street, Education City, 10001</span>

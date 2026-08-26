@@ -132,6 +132,7 @@ export default function Navbar() {
   const [storefrontTeacherData, setStorefrontTeacherData] = useState<{
     disabledPages?: string[];
     customNavLinks?: Array<{ id: string; name: string; slug: string; enabled: boolean }>;
+    profilePhoto?: string;
   } | null>(null);
   const [platformGlobalPages, setPlatformGlobalPages] = useState<Array<{ id: string; name: string; slug: string; excludedTeacherIds?: string[] }>>([]);
 
@@ -217,13 +218,19 @@ export default function Navbar() {
             setPreferredTeacherName(data.displayName || data.academyName || 'Teacher Academy');
             setStorefrontTeacherData({
               disabledPages: data.disabledPages || [],
-              customNavLinks: data.customNavLinks || []
+              customNavLinks: data.customNavLinks || [],
+              profilePhoto: data.profilePhoto || data.photoUrl || data.logoUrl || ''
             });
           } else {
             getDoc(doc(db, 'users', resolvedUid)).then(uDoc => {
               if (uDoc.exists()) {
                 const uData = uDoc.data();
                 setPreferredTeacherName(uData.name || uData.displayName || 'Teacher Academy');
+                setStorefrontTeacherData({
+                  disabledPages: [],
+                  customNavLinks: [],
+                  profilePhoto: uData.profilePhoto || uData.photoURL || uData.photoUrl || ''
+                });
               }
             }).catch(() => {});
             setStorefrontTeacherData({ disabledPages: [], customNavLinks: [] });
@@ -377,11 +384,33 @@ export default function Navbar() {
           <div className="flex justify-between items-center h-20 gap-4 md:gap-6">
             {/* Left Side: Logo + Nav Links together */}
             <div className="flex items-center gap-6 lg:gap-8 z-10">
-              {/* Logo */}
-              <Link href={homeLink} className="flex items-center gap-2 shrink-0">
-                <div className="relative w-[140px] h-[38px] sm:w-[165px] sm:h-[44px] md:w-[185px] md:h-[48px] flex items-center justify-start">
-                  <Image src="/Skylearnars Academy logo.png" alt="Sky Learners Logo" fill className="object-contain object-left" priority />
-                </div>
+              {/* Logo (Dynamic: Teacher Academy Branding vs Marketplace SkyLearners Logo) */}
+              <Link href={homeLink} className="flex items-center gap-2 shrink-0 group">
+                {isTeacherStorefrontMode && preferredTeacherName ? (
+                  <div className="flex items-center gap-2.5">
+                    {storefrontTeacherData?.profilePhoto ? (
+                      <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-orange-500/30 bg-orange-500/10 shadow-sm shrink-0">
+                        <img src={storefrontTeacherData.profilePhoto} alt={preferredTeacherName} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center shadow-md shadow-orange-500/20 text-sm">
+                        {preferredTeacherName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="flex flex-col">
+                      <span className="font-extrabold text-sm sm:text-base leading-tight text-foreground group-hover:text-primary transition-colors truncate max-w-[140px] sm:max-w-[200px]">
+                        {preferredTeacherName}
+                      </span>
+                      <span className="text-[10px] font-semibold text-orange-500 leading-none">
+                        Teacher Academy
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative w-[140px] h-[38px] sm:w-[165px] sm:h-[44px] md:w-[185px] md:h-[48px] flex items-center justify-start">
+                    <Image src="/Skylearnars Academy logo.png" alt="Sky Learners Logo" fill className="object-contain object-left" priority />
+                  </div>
+                )}
               </Link>
 
               {/* Desktop Navigation Links directly beside Logo */}

@@ -455,8 +455,8 @@ function ImageSizeGuideBadge({ size, note }: { size: string; note?: string }) {
         <span>সাইজ গাইড</span>
       </button>
 
-      {/* Floating Hover/Click Tooltip Popover */}
-      <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block group-focus-within:block z-50 w-64 sm:w-72 p-3.5 rounded-2xl bg-zinc-950 text-white border border-white/20 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 pointer-events-none">
+      {/* Floating Hover/Click Tooltip Popover (Right aligned to prevent overflow) */}
+      <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block group-focus-within:block z-50 w-64 sm:w-72 p-3.5 rounded-2xl bg-zinc-950 text-white border border-white/20 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 pointer-events-none">
         <div className="flex items-center gap-1.5 text-xs font-black text-orange-400 border-b border-white/10 pb-1.5 mb-2">
           <Info className="w-3.5 h-3.5 shrink-0" />
           <span>প্রস্তাবিত রেজোলিউশন (Pixels)</span>
@@ -1877,22 +1877,27 @@ export default function TeacherHomePageBuilderPage() {
       {/* ========================================================================= */}
       {/* DEDICATED WEBSITE BUILDER SIDEBAR (Replaces Main Sidebar on Desktop)      */}
       {/* ========================================================================= */}
-      <aside className="hidden md:flex w-64 lg:w-[280px] flex-shrink-0 bg-background border-r border-foreground/10 fixed left-0 top-[80px] h-[calc(100vh-80px)] z-40 overflow-y-auto custom-scrollbar flex-col justify-between">
+      {/* ========================================================================= */}
+      {/* DEDICATED WEBSITE BUILDER SIDEBAR (Soft Liquid Glassmorphism)             */}
+      {/* ========================================================================= */}
+      <aside className="hidden md:flex w-64 lg:w-[280px] flex-shrink-0 bg-background/80 backdrop-blur-xl border-r border-foreground/[0.08] fixed left-0 top-[80px] h-[calc(100vh-80px)] z-40 overflow-y-auto custom-scrollbar flex-col justify-between">
         
         {/* Top Header & Back Button */}
         <div>
-          <div className="p-4 border-b border-foreground/10 space-y-3">
+          <div className="p-4 border-b border-foreground/[0.08] space-y-3 bg-gradient-to-b from-foreground/[0.02] to-transparent">
             <Link 
               href="/teacher-dashboard" 
-              className="inline-flex items-center gap-2 text-xs font-bold text-foreground/60 hover:text-orange-500 transition-colors"
+              className="inline-flex items-center gap-2 text-xs font-bold text-foreground/60 hover:text-orange-500 transition-colors group"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
               <span>Back to Dashboard</span>
             </Link>
 
             <div>
-              <h3 className="font-extrabold text-base text-foreground flex items-center gap-2">
-                <Globe className="w-4 h-4 text-orange-500" />
+              <h3 className="font-black text-base text-foreground flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center">
+                  <Globe className="w-3.5 h-3.5" />
+                </div>
                 <span>ওয়েবসাইট বিল্ডার</span>
               </h3>
               <p className="text-[11px] text-foreground/50 mt-0.5">
@@ -1901,13 +1906,22 @@ export default function TeacherHomePageBuilderPage() {
             </div>
           </div>
 
-          {/* Accordion Grouped Builder Section Items */}
+          {/* Accordion Grouped Builder Section Items (Soft Liquid Style) */}
           <div className="p-2.5 space-y-2">
             {tabGroups.map((group) => {
               const isOpen = openGroup === group.id;
               const hasActiveChild = group.items.some(it => it.id === activeTab);
               return (
-                <div key={group.id} className="rounded-2xl border border-foreground/10 bg-background/50 overflow-hidden shadow-sm transition-all duration-300">
+                <div 
+                  key={group.id} 
+                  className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
+                    isOpen
+                      ? 'border-orange-500/30 bg-gradient-to-b from-orange-500/[0.07] via-orange-500/[0.02] to-transparent shadow-lg shadow-orange-500/[0.03]'
+                      : hasActiveChild
+                        ? 'border-orange-500/20 bg-orange-500/[0.03] shadow-xs'
+                        : 'border-foreground/[0.07] bg-foreground/[0.015] hover:bg-foreground/[0.035] hover:border-foreground/15'
+                  }`}
+                >
                   {/* Accordion Header Button */}
                   <button
                     type="button"
@@ -1922,19 +1936,23 @@ export default function TeacherHomePageBuilderPage() {
                         }
                       }
                     }}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-black tracking-wide transition-all duration-200 ${
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs transition-all duration-200 cursor-pointer ${
                       isOpen
-                        ? 'bg-orange-500/10 text-orange-500 border-b border-orange-500/20'
+                        ? 'text-orange-500 font-extrabold border-b border-orange-500/15'
                         : hasActiveChild 
-                          ? 'bg-foreground/5 text-orange-500 font-bold'
-                          : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground'
+                          ? 'text-orange-500 font-bold'
+                          : 'text-foreground/80 hover:text-foreground font-semibold'
                     }`}
                   >
                     <div className="flex items-center gap-2 truncate">
                       <span>{group.groupName}</span>
                     </div>
                     <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-foreground/10 text-foreground/70">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors ${
+                        isOpen 
+                          ? 'bg-orange-500/20 text-orange-500' 
+                          : 'bg-foreground/[0.06] text-foreground/60'
+                      }`}>
                         {group.items.length}
                       </span>
                       <ChevronDown 
@@ -1945,9 +1963,9 @@ export default function TeacherHomePageBuilderPage() {
                     </div>
                   </button>
 
-                  {/* Accordion Body Items */}
+                  {/* Accordion Body Items (Liquid Pills) */}
                   {isOpen && (
-                    <div className="p-1.5 space-y-1 bg-foreground/[0.02] animate-in fade-in duration-200">
+                    <div className="p-1.5 space-y-1 bg-foreground/[0.01] animate-in fade-in duration-200">
                       {group.items.map((tab) => {
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.id;
@@ -1956,17 +1974,21 @@ export default function TeacherHomePageBuilderPage() {
                             key={tab.id}
                             type="button"
                             onClick={() => handleRequestTabSwitch(tab.id, group.id)}
-                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all text-left ${
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-all text-left cursor-pointer ${
                               isActive
-                                ? 'bg-orange-500 text-white shadow-md font-bold'
-                                : 'hover:bg-foreground/5 text-foreground/75 hover:text-foreground'
+                                ? 'bg-gradient-to-r from-orange-500/15 via-orange-500/10 to-amber-500/10 border border-orange-500/30 text-orange-500 font-bold shadow-xs shadow-orange-500/10'
+                                : 'hover:bg-foreground/[0.04] text-foreground/70 hover:text-foreground font-medium'
                             }`}
                           >
                             <div className="flex items-center gap-2 truncate">
-                              <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                              {isActive ? (
+                                <span className="w-1.5 h-3.5 rounded-full bg-gradient-to-b from-orange-500 to-amber-500 shadow-sm shadow-orange-500/50 shrink-0" />
+                              ) : (
+                                <Icon className="w-3.5 h-3.5 flex-shrink-0 text-foreground/40" />
+                              )}
                               <span className="truncate">{tab.label}</span>
                             </div>
-                            <ChevronRight className={`w-3 h-3 flex-shrink-0 ${isActive ? 'text-white' : 'text-foreground/30'}`} />
+                            <ChevronRight className={`w-3 h-3 flex-shrink-0 transition-transform ${isActive ? 'text-orange-500 translate-x-0.5' : 'text-foreground/30'}`} />
                           </button>
                         );
                       })}
@@ -1979,10 +2001,10 @@ export default function TeacherHomePageBuilderPage() {
         </div>
 
         {/* Bottom Sidebar Action Buttons with Progress Bar */}
-        <div className="p-3 border-t border-foreground/10 space-y-3">
+        <div className="p-3 border-t border-foreground/[0.08] space-y-3 bg-gradient-to-t from-foreground/[0.02] to-transparent">
           
           {/* Website Setup Completion Progress Bar */}
-          <div className="p-3 bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-foreground/[0.02] border border-orange-500/20 rounded-2xl space-y-2">
+          <div className="p-3 bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-foreground/[0.02] border border-orange-500/20 rounded-2xl space-y-2 backdrop-blur-md">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
                 <Sparkles className="w-3.5 h-3.5 text-orange-500" />
@@ -2019,7 +2041,7 @@ export default function TeacherHomePageBuilderPage() {
       {/* ========================================================================= */}
       <div className="md:ml-64 lg:ml-[280px] p-2 sm:p-4 md:p-6 space-y-6">
         
-        {/* Mobile Horizontal Tabs Bar */}
+        {/* Mobile Horizontal Tabs Bar (Liquid Pills) */}
         <div className="md:hidden flex items-center gap-2 overflow-x-auto pb-2 border-b border-foreground/10">
           {allTabs.map((tab) => {
             const Icon = tab.icon;
@@ -2029,7 +2051,9 @@ export default function TeacherHomePageBuilderPage() {
                 key={tab.id}
                 onClick={() => handleRequestTabSwitch(tab.id)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex-shrink-0 transition-all ${
-                  isActive ? 'bg-orange-500 text-white' : 'bg-foreground/5 text-foreground/70'
+                  isActive 
+                    ? 'bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-500 border border-orange-500/35 shadow-xs' 
+                    : 'bg-foreground/[0.03] text-foreground/70 border border-foreground/[0.06] hover:bg-foreground/[0.06]'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />

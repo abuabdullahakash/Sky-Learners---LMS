@@ -5,22 +5,34 @@ import { useLocale } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/routing";
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
+import { motion } from "framer-motion";
 
 /**
  * Modern BN | EN Sliding Pill Language Switcher
- * Exclusively designed for Teacher Storefront & Dashboard
+ * Powered by Framer Motion Spring Physics Shared Layout Animation
  */
 export function TeacherLanguageToggle() {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
 
+  const [optimisticLocale, setOptimisticLocale] = React.useState<"bn" | "en">(
+    (locale as "bn" | "en") || "en"
+  );
+
+  React.useEffect(() => {
+    if (locale === "bn" || locale === "en") {
+      setOptimisticLocale(locale);
+    }
+  }, [locale]);
+
   const handleSwitch = (newLocale: "bn" | "en") => {
-    if (locale === newLocale) return;
+    if (optimisticLocale === newLocale) return;
+    setOptimisticLocale(newLocale);
     router.replace(pathname, { locale: newLocale });
   };
 
-  const isBn = locale === "bn";
+  const isBn = optimisticLocale === "bn";
 
   return (
     <div 
@@ -28,35 +40,60 @@ export function TeacherLanguageToggle() {
       role="group"
       aria-label="Language Switcher"
     >
-      {/* Animated Sliding Background Indicator */}
-      <div
-        className={`absolute top-0.5 bottom-0.5 w-[30px] sm:w-[32px] rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-sm shadow-orange-500/30 transition-all duration-300 ease-out pointer-events-none ${
-          isBn ? "left-0.5" : "left-[calc(100%-32.5px)] sm:left-[calc(100%-34.5px)]"
-        }`}
-      />
-
       {/* BN Button */}
       <button
         type="button"
         onClick={() => handleSwitch("bn")}
-        className={`relative z-10 w-[30px] sm:w-[32px] h-6 sm:h-7 flex items-center justify-center text-[10px] sm:text-xs font-black transition-colors duration-200 ${
-          isBn ? "text-white drop-shadow-xs" : "text-foreground/70 hover:text-foreground"
-        }`}
+        className="relative z-10 px-2.5 sm:px-3 h-6 sm:h-7 flex items-center justify-center text-[10px] sm:text-xs font-black transition-colors duration-200 cursor-pointer"
         aria-pressed={isBn}
       >
-        বাং
+        {isBn && (
+          <motion.div
+            layoutId="activeTeacherLangPill"
+            className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-md shadow-orange-500/30"
+            transition={{
+              type: "spring",
+              stiffness: 380,
+              damping: 26,
+              mass: 0.6
+            }}
+          />
+        )}
+        <span
+          className={`relative z-10 transition-colors duration-200 ${
+            isBn ? "text-white drop-shadow-xs" : "text-foreground/70 hover:text-foreground"
+          }`}
+        >
+          বাং
+        </span>
       </button>
 
       {/* EN Button */}
       <button
         type="button"
         onClick={() => handleSwitch("en")}
-        className={`relative z-10 w-[30px] sm:w-[32px] h-6 sm:h-7 flex items-center justify-center text-[10px] sm:text-xs font-black transition-colors duration-200 ${
-          !isBn ? "text-white drop-shadow-xs" : "text-foreground/70 hover:text-foreground"
-        }`}
+        className="relative z-10 px-2.5 sm:px-3 h-6 sm:h-7 flex items-center justify-center text-[10px] sm:text-xs font-black transition-colors duration-200 cursor-pointer"
         aria-pressed={!isBn}
       >
-        EN
+        {!isBn && (
+          <motion.div
+            layoutId="activeTeacherLangPill"
+            className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-md shadow-orange-500/30"
+            transition={{
+              type: "spring",
+              stiffness: 380,
+              damping: 26,
+              mass: 0.6
+            }}
+          />
+        )}
+        <span
+          className={`relative z-10 transition-colors duration-200 ${
+            !isBn ? "text-white drop-shadow-xs" : "text-foreground/70 hover:text-foreground"
+          }`}
+        >
+          EN
+        </span>
       </button>
     </div>
   );
@@ -86,7 +123,7 @@ export function TeacherThemeToggle() {
     <button
       type="button"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="relative p-1.5 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-foreground/[0.06] hover:bg-orange-500/10 dark:bg-foreground/[0.08] dark:hover:bg-amber-500/10 border border-foreground/10 hover:border-orange-500/30 transition-all duration-300 flex items-center justify-center group overflow-hidden shadow-xs"
+      className="relative p-1.5 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-foreground/[0.06] hover:bg-orange-500/10 dark:bg-foreground/[0.08] dark:hover:bg-amber-500/10 border border-foreground/10 hover:border-orange-500/30 transition-all duration-300 flex items-center justify-center group overflow-hidden shadow-xs cursor-pointer"
       aria-label="Toggle Theme"
       title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
     >

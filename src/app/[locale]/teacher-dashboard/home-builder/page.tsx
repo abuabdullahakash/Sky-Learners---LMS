@@ -26,6 +26,7 @@ import {
   Copy,
   ExternalLink,
   Layers,
+  LayoutDashboard,
   Boxes,
   Sliders,
   BookOpen,
@@ -488,7 +489,7 @@ export default function TeacherHomePageBuilderPage() {
   const [saving, setSaving] = useState(false);
   const [courses, setCourses] = useState<{ id: string; title: string }[]>([]);
   const [activeTab, setActiveTab] = useState<
-    'branding' | 'faculty' | 'sliders' | 'quickCards' | 'categories' | 'features' | 'admission' | 'about' | 'contact' | 'trustBanner' | 'gallery' | 'helpBar' | 'aboutHero' | 'aboutStory' | 'aboutValues' | 'aboutShowcase' | 'aboutFounder' | 'aboutCta' | 'contactHero' | 'contactCards' | 'contactSchedule' | 'contactSocial' | 'contactFaq' | 'contactCta'
+    'branding' | 'headerSettings' | 'footerSettings' | 'faculty' | 'sliders' | 'quickCards' | 'categories' | 'features' | 'admission' | 'about' | 'contact' | 'trustBanner' | 'gallery' | 'helpBar' | 'aboutHero' | 'aboutStory' | 'aboutValues' | 'aboutShowcase' | 'aboutFounder' | 'aboutCta' | 'contactHero' | 'contactCards' | 'contactSchedule' | 'contactSocial' | 'contactFaq' | 'contactCta'
   >('branding');
 
   // 0. Branding & Identity State
@@ -500,6 +501,13 @@ export default function TeacherHomePageBuilderPage() {
   const [coverPhoto, setCoverPhoto] = useState('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop');
   const [uploadingProfilePhoto, setUploadingProfilePhoto] = useState(false);
   const [uploadingCoverPhoto, setUploadingCoverPhoto] = useState(false);
+
+  // 0.0 Header & Footer Dedicated States
+  const [headerLogo, setHeaderLogo] = useState('');
+  const [uploadingHeaderLogo, setUploadingHeaderLogo] = useState(false);
+  const [headerTagline, setHeaderTagline] = useState('Teacher Academy');
+  const [footerBio, setFooterBio] = useState('অনলাইন একাডেমিক ও ভর্তি পরীক্ষার জন্য একটি বিশেষায়িত লার্নিং প্ল্যাটফর্ম।');
+  const [footerCopyright, setFooterCopyright] = useState('');
 
   // 0.1 Faculty / Teachers Roster State (For Institutions)
   const [teachersRoster, setTeachersRoster] = useState<Array<{
@@ -852,6 +860,11 @@ export default function TeacherHomePageBuilderPage() {
             if (config.admissionTitle) setAdmissionTitle(config.admissionTitle);
             if (config.admissionSubtitle) setAdmissionSubtitle(config.admissionSubtitle);
             if (config.admissionNotice) setAdmissionNotice(config.admissionNotice);
+            if (data.headerLogo || data.logoUrl || config.headerLogo) setHeaderLogo(data.headerLogo || data.logoUrl || config.headerLogo);
+            if (data.headerTagline || config.headerTagline) setHeaderTagline(data.headerTagline || config.headerTagline);
+            if (data.footerBio || config.footerBio) setFooterBio(data.footerBio || config.footerBio);
+            if (data.footerCopyright || config.footerCopyright) setFooterCopyright(data.footerCopyright || config.footerCopyright);
+
             if (config.aboutTitle) setAboutTitle(config.aboutTitle);
             if (config.aboutHeadline) setAboutHeadline(config.aboutHeadline);
             if (config.founderTitle) setFounderTitle(config.founderTitle);
@@ -968,6 +981,10 @@ export default function TeacherHomePageBuilderPage() {
     try {
       const fullConfig = {
         customPagesConfig,
+        headerLogo,
+        headerTagline,
+        footerBio,
+        footerCopyright,
         heroSliders,
         quickCards,
         coursesSubtitle,
@@ -1073,6 +1090,11 @@ export default function TeacherHomePageBuilderPage() {
         bio: bio || '',
         profilePhoto,
         photoUrl: profilePhoto,
+        headerLogo: headerLogo || profilePhoto,
+        logoUrl: headerLogo || profilePhoto,
+        headerTagline: headerTagline || 'Teacher Academy',
+        footerBio: footerBio || headline || bio || '',
+        footerCopyright: footerCopyright || '',
         coverPhoto,
         teachersRoster,
         contactPhone,
@@ -1136,11 +1158,30 @@ export default function TeacherHomePageBuilderPage() {
       const url = await uploadImageToImgBB(file);
       setProfilePhoto(url);
       if (!aboutPhoto || aboutPhoto.includes('dicebear')) setAboutPhoto(url);
+      if (!headerLogo) setHeaderLogo(url);
+      setHasUnsavedChanges(true);
       toast.success(locale === 'bn' ? 'প্রোফাইল/লোগো ছবি আপলোড হয়েছে!' : 'Profile/Logo uploaded!');
     } catch (err) {
       toast.error(locale === 'bn' ? 'ছবি আপলোড ব্যর্থ হয়েছে' : 'Failed to upload photo');
     } finally {
       setUploadingProfilePhoto(false);
+    }
+  };
+
+  // Header Dedicated Logo upload handler
+  const handleUploadHeaderLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingHeaderLogo(true);
+    try {
+      const url = await uploadImageToImgBB(file);
+      setHeaderLogo(url);
+      setHasUnsavedChanges(true);
+      toast.success(locale === 'bn' ? 'হেডার লোগো সফলভাবে আপলোড হয়েছে!' : 'Header logo uploaded!');
+    } catch (err) {
+      toast.error(locale === 'bn' ? 'লোগো আপলোড ব্যর্থ হয়েছে' : 'Failed to upload header logo');
+    } finally {
+      setUploadingHeaderLogo(false);
     }
   };
 
@@ -1644,6 +1685,14 @@ export default function TeacherHomePageBuilderPage() {
       ]
     },
     {
+      id: 'headerFooter',
+      groupName: '📐 হেডার ও ফুটার (HEADER & FOOTER)',
+      items: [
+        { id: 'headerSettings', label: '১. হেডার লোগো ও ব্র্যান্ডিং', icon: LayoutDashboard },
+        { id: 'footerSettings', label: '২. ফুটার তথ্য ও সোশ্যাল লিঙ্ক', icon: Layers },
+      ]
+    },
+    {
       id: 'home',
       groupName: '🏠 হোম পেজ (HOME PAGE)',
       items: [
@@ -1738,6 +1787,8 @@ export default function TeacherHomePageBuilderPage() {
       currentActiveSectionName = 'যোগাযোগ পেজ';
     } else if (currentParentGroup.id === 'branding') {
       currentActiveSectionName = 'ব্র্যান্ডিং ও পরিচিতি';
+    } else if (currentParentGroup.id === 'headerFooter') {
+      currentActiveSectionName = 'হেডার ও ফুটার';
     } else if (currentParentGroup.id === 'home') {
       currentActiveSectionName = 'হোম পেজ';
     }
@@ -2276,6 +2327,467 @@ export default function TeacherHomePageBuilderPage() {
                   />
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* TAB: HEADER SETTINGS (হেডার লোগো ও ব্র্যান্ডিং) */}
+          {activeTab === 'headerSettings' && (
+            <div className="space-y-8">
+              <div className="border-b border-foreground/10 pb-4">
+                <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                  <LayoutDashboard className="w-5 h-5 text-orange-500" />
+                  <span>১. হেডার লোগো ও ব্র্যান্ডিং (Header & Branding)</span>
+                </h3>
+                <p className="text-xs text-foreground/60 mt-1">
+                  আপনার স্টোরফ্রন্ট ওয়েবসাইটের শীর্ষ হেডার বারের লোগো, নাম, ট্যাগলাইন এবং নেভিগেশন ডিসপ্লে কাস্টমাইজ করুন।
+                </p>
+              </div>
+
+              {/* Live Interactive Header Preview Banner */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-foreground/80 block uppercase tracking-wider flex items-center gap-2">
+                    <Eye className="w-4 h-4 text-orange-500" />
+                    <span>হেডার লাইভ প্রিভিউ (Live Header Preview)</span>
+                  </label>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold border border-emerald-500/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>রিয়েলটাইম প্রিভিউ</span>
+                  </span>
+                </div>
+
+                {/* Preview Box */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-zinc-950 border border-white/10 shadow-xl overflow-hidden relative">
+                  <div className="flex items-center justify-between gap-4">
+                    {/* Brand Logo & Name Slot */}
+                    <div className="flex items-center gap-3">
+                      {headerLogo || profilePhoto ? (
+                        <div className="w-10 h-10 rounded-xl overflow-hidden border border-orange-500/40 bg-orange-500/10 shadow-sm shrink-0 flex items-center justify-center">
+                          <img src={headerLogo || profilePhoto} alt={displayName || 'Logo'} className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center text-base shadow-md shadow-orange-500/20 shrink-0">
+                          {(displayName || 'A').charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <div className="font-extrabold text-sm sm:text-base text-white leading-tight">
+                          {displayName || 'আপনার একাডেমি নাম'}
+                        </div>
+                        <div className="text-[10px] font-semibold text-orange-400 leading-none mt-0.5">
+                          {headerTagline || 'Teacher Academy'}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Nav Links in Preview */}
+                    <div className="hidden md:flex items-center gap-5 text-xs font-semibold text-white/80">
+                      <span className="text-orange-400 border-b-2 border-orange-500 pb-0.5">হোম</span>
+                      <span className="hover:text-white transition-colors cursor-pointer">কোর্সসমূহ</span>
+                      <span className="hover:text-white transition-colors cursor-pointer">আমাদের সম্পর্কে</span>
+                      <span className="hover:text-white transition-colors cursor-pointer">যোগাযোগ</span>
+                      {customNavLinks && customNavLinks.filter((c: any) => c.enabled !== false).map((c: any) => (
+                        <span key={c.id || c.slug} className="text-white/60 hover:text-white transition-colors cursor-pointer">
+                          {c.name}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Right side demo action */}
+                    <div className="flex items-center gap-2">
+                      <div className="px-3 py-1.5 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/40 text-[11px] font-bold">
+                        অফিশিয়াল স্টোরফ্রন্ট
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Header Logo Upload & Configuration */}
+              <div className="space-y-4 pt-4 border-t border-foreground/10">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                      <ImageIcon className="w-4 h-4 text-orange-500" />
+                      <span>হেডার ডেডিকেটেড লোগো (Header Custom Logo)</span>
+                    </h4>
+                    <p className="text-xs text-foreground/60 mt-0.5">
+                      ওয়েবসাইটের হেডারের জন্য আলাদা লোগো বা ব্র্যান্ড ইমেজ আপলোড করুন। খালি রাখলে প্রোফাইল ছবি ব্যবহার হবে।
+                    </p>
+                  </div>
+                  <ImageSizeGuideBadge size="300 × 80 px (বা 500 × 500 px স্কয়ার)" note="ট্রান্সপারেন্ট PNG লোগো সবচেয়ে সুন্দর দেখাবে।" />
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10">
+                  {/* Logo Preview */}
+                  <div className="relative w-20 h-20 rounded-2xl overflow-hidden border-2 border-dashed border-foreground/20 bg-foreground/5 flex items-center justify-center shrink-0">
+                    {headerLogo ? (
+                      <img src={headerLogo} alt="Header Logo" className="w-full h-full object-contain p-1" />
+                    ) : (
+                      <div className="text-center p-2 text-foreground/40">
+                        <ImageIcon className="w-6 h-6 mx-auto mb-1 opacity-60" />
+                        <span className="text-[10px] font-semibold block">লোগো নেই</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex-1 space-y-2 w-full">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={headerLogo}
+                        onChange={(e) => { setHeaderLogo(e.target.value); setHasUnsavedChanges(true); }}
+                        placeholder="হেডার লোগোর সরাসরি URL পেস্ট করুন"
+                        className="flex-1 px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                      />
+                      <label className="px-4 py-2 rounded-xl bg-orange-500 text-white text-xs font-bold cursor-pointer hover:bg-orange-600 transition-colors flex items-center gap-1.5 shrink-0">
+                        {uploadingHeaderLogo ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                        <span>{uploadingHeaderLogo ? 'আপলোড হচ্ছে...' : 'লোগো আপলোড'}</span>
+                        <input type="file" accept="image/*" onChange={handleUploadHeaderLogo} className="hidden" />
+                      </label>
+                      {headerLogo && (
+                        <button
+                          type="button"
+                          onClick={() => { setHeaderLogo(''); setHasUnsavedChanges(true); }}
+                          className="px-3 py-2 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-colors text-xs font-bold shrink-0"
+                          title="লোগো মুছে ফেলুন"
+                        >
+                          মুছুন
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-foreground/50">
+                      💡 টিপস: আপনি এখানে কোনো লোগো আপলোড না করলে স্বয়ংক্রিয়ভাবে আপনার প্রোফাইল ছবি ও নাম ব্যবহার করা হবে।
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Header Text & Tagline Configuration */}
+              <div className="space-y-4 pt-4 border-t border-foreground/10">
+                <h4 className="text-sm font-bold text-foreground">হেডার টেক্সট ও ট্যাগলাইন</h4>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                      হেডারে প্রদর্শিত নাম (Brand / Teacher Name) *
+                    </label>
+                    <input
+                      type="text"
+                      value={displayName}
+                      onChange={(e) => { setDisplayName(e.target.value); setHasUnsavedChanges(true); }}
+                      placeholder="যেমন: Abu Abdullah Akash"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-semibold"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                      হেডার সাব-ট্যাগলাইন (Header Tagline Badge)
+                    </label>
+                    <input
+                      type="text"
+                      value={headerTagline}
+                      onChange={(e) => { setHeaderTagline(e.target.value); setHasUnsavedChanges(true); }}
+                      placeholder="যেমন: Teacher Academy বা অনলাইন লার্নিং প্ল্যাটফর্ম"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-semibold"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Navigation Links Status Summary */}
+              <div className="p-4 rounded-2xl bg-orange-500/[0.04] border border-orange-500/20 space-y-2">
+                <h5 className="text-xs font-bold text-orange-500 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>হেডার নেভিগেশন মেনু লিঙ্কসমূহ (Active Header Menu)</span>
+                </h5>
+                <p className="text-[11px] text-foreground/70 leading-relaxed">
+                  আপনার হেডারে ডিফল্টভাবে <strong>হোম (Home)</strong>, <strong>কোর্সসমূহ (Courses)</strong>, <strong>আমাদের সম্পর্কে (About)</strong> ও <strong>যোগাযোগ (Contact)</strong> মেনু থাকবে। এছাড়া সুপার অ্যাডমিন বা আপনার তৈরি করা কাস্টম পেজগুলো (যেমন: নোটিশ পেজ) স্বয়ংক্রিয়ভাবে হেডারের সাথে যুক্ত থাকবে।
+                </p>
+              </div>
+
+            </div>
+          )}
+
+          {/* TAB: FOOTER SETTINGS (ফুটার তথ্য ও সোশ্যাল লিঙ্ক) */}
+          {activeTab === 'footerSettings' && (
+            <div className="space-y-8">
+              <div className="border-b border-foreground/10 pb-4">
+                <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                  <Layers className="w-5 h-5 text-orange-500" />
+                  <span>২. ফুটার তথ্য ও সোশ্যাল লিঙ্ক (Footer Information & Socials)</span>
+                </h3>
+                <p className="text-xs text-foreground/60 mt-1">
+                  আপনার স্টোরফ্রন্ট ওয়েবসাইটের নিচের ফুটার অংশের ব্র্যান্ডিং, সরাসরি যোগাযোগের ঠিকানা, হেল্পলাইন ও সোশ্যাল মিডিয়া লিঙ্ক কনফিগার করুন।
+                </p>
+              </div>
+
+              {/* Live Interactive Footer Preview Box */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-foreground/80 block uppercase tracking-wider flex items-center gap-2">
+                    <Eye className="w-4 h-4 text-orange-500" />
+                    <span>ফুটার লাইভ প্রিভিউ (Live Footer Preview)</span>
+                  </label>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold border border-emerald-500/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>রিয়েলটাইম প্রিভিউ</span>
+                  </span>
+                </div>
+
+                <div className="p-6 rounded-3xl bg-zinc-950 border border-white/10 shadow-2xl text-white overflow-hidden space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-xs border-b border-white/10 pb-6">
+                    {/* Col 1 */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2.5">
+                        {headerLogo || profilePhoto ? (
+                          <div className="w-8 h-8 rounded-lg overflow-hidden border border-orange-500/40 bg-orange-500/10 shrink-0">
+                            <img src={headerLogo || profilePhoto} alt="Logo" className="w-full h-full object-cover" />
+                          </div>
+                        ) : (
+                          <div className="w-8 h-8 rounded-lg bg-orange-500 text-white font-bold flex items-center justify-center shrink-0 text-xs">
+                            {(displayName || 'A').charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div>
+                          <div className="font-bold text-white leading-tight">{displayName || 'একাডেমি নাম'}</div>
+                          <div className="text-[10px] text-orange-400">অফিশিয়াল একাডেমি</div>
+                        </div>
+                      </div>
+                      <p className="text-white/60 text-[11px] leading-relaxed line-clamp-3">
+                        {footerBio || 'অনলাইন একাডেমিক ও ভর্তি পরীক্ষার জন্য একটি বিশেষায়িত লার্নিং প্ল্যাটফর্ম।'}
+                      </p>
+                    </div>
+
+                    {/* Col 2 */}
+                    <div className="space-y-2">
+                      <div className="font-bold text-orange-400 text-xs mb-2">একাডেমি পেইজসমূহ</div>
+                      <div className="text-white/60 space-y-1 text-[11px]">
+                        <div>• হোম (Home)</div>
+                        <div>• কোর্সসমূহ (Courses)</div>
+                        <div>• আমাদের সম্পর্কে (About)</div>
+                        <div>• যোগাযোগ (Contact)</div>
+                      </div>
+                    </div>
+
+                    {/* Col 3 */}
+                    <div className="space-y-2">
+                      <div className="font-bold text-amber-400 text-xs mb-2">কোর্স ও প্রস্তুতি</div>
+                      <div className="text-white/60 space-y-1 text-[11px]">
+                        <div>• অনলাইন রেকর্ডেড ক্লাস</div>
+                        <div>• লাইভ ইন্টারঅ্যাক্টিভ ব্যাচ</div>
+                        <div>• ডেইলি এক্সাম ও সলভ শিট</div>
+                      </div>
+                    </div>
+
+                    {/* Col 4 */}
+                    <div className="space-y-2">
+                      <div className="font-bold text-emerald-400 text-xs mb-2">সরাসরি যোগাযোগ</div>
+                      <div className="text-white/70 space-y-1 text-[11px]">
+                        <div className="flex items-center gap-1.5">
+                          <MapPin className="w-3 h-3 text-orange-400 shrink-0" />
+                          <span className="truncate">{contactAddress || 'ঢাকা, বাংলাদেশ'}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Phone className="w-3 h-3 text-emerald-400 shrink-0" />
+                          <span>{contactPhone || '01700000000'}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Mail className="w-3 h-3 text-blue-400 shrink-0" />
+                          <span className="truncate">{contactEmail || 'support@skylearners.com'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bottom preview bar */}
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-white/50 pt-2">
+                    <p>
+                      {footerCopyright || `© ${new Date().getFullYear()} ${displayName || 'Teacher Academy'}. সর্বস্বত্ব সংরক্ষিত। Powered by SkyLearners.`}
+                    </p>
+                    <div className="flex items-center gap-4">
+                      <span>প্রাইভেসি পলিসি</span>
+                      <span>শর্তাবলী</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 1. Footer Brand Bio */}
+              <div className="space-y-4 pt-4 border-t border-foreground/10">
+                <h4 className="text-sm font-bold text-foreground">ফুটার সংক্ষিপ্ত পরিচিতি বা স্লোগান</h4>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                    ফুটার পরিচিতি টেক্সট (Footer Bio / Vision Statement)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={footerBio}
+                    onChange={(e) => { setFooterBio(e.target.value); setHasUnsavedChanges(true); }}
+                    placeholder="অনলাইন একাডেমিক ও ভর্তি পরীক্ষার জন্য একটি বিশেষায়িত লার্নিং প্ল্যাটফর্ম..."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 leading-relaxed"
+                  />
+                </div>
+              </div>
+
+              {/* 2. Direct Contact Information */}
+              <div className="space-y-4 pt-4 border-t border-foreground/10">
+                <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-orange-500" />
+                  <span>সরাসরি যোগাযোগের ঠিকানা ও হেল্পলাইন</span>
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                      ক্যাম্পাস / ব্রাঞ্চ ঠিকানা (Campus Address)
+                    </label>
+                    <input
+                      type="text"
+                      value={contactAddress}
+                      onChange={(e) => { setContactAddress(e.target.value); setHasUnsavedChanges(true); }}
+                      placeholder="যেমন: বাড়ি ১২, রোড ৪, ধানমন্ডি, ঢাকা"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                      সরাসরি হেল্পলাইন ফোন (Helpline Phone)
+                    </label>
+                    <input
+                      type="text"
+                      value={contactPhone}
+                      onChange={(e) => { setContactPhone(e.target.value); setHasUnsavedChanges(true); }}
+                      placeholder="যেমন: 01712-345678"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                      সরাসরি হোয়াটসঅ্যাপ নম্বর (WhatsApp Number)
+                    </label>
+                    <input
+                      type="text"
+                      value={contactWhatsapp}
+                      onChange={(e) => { setContactWhatsapp(e.target.value); setHasUnsavedChanges(true); }}
+                      placeholder="যেমন: 01712-345678"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                      অফিশিয়াল সাপোর্ট ইমেইল (Official Email)
+                    </label>
+                    <input
+                      type="email"
+                      value={contactEmail}
+                      onChange={(e) => { setContactEmail(e.target.value); setHasUnsavedChanges(true); }}
+                      placeholder="যেমন: support@myacademy.com"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                      সাপোর্ট ও অফিস সময় (Office & Support Hours)
+                    </label>
+                    <input
+                      type="text"
+                      value={contactOfficeHours}
+                      onChange={(e) => { setContactOfficeHours(e.target.value); setHasUnsavedChanges(true); }}
+                      placeholder="যেমন: প্রতিদিন সকাল ৯:০০ টা — রাত ১০:০০ টা"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Social Media Channels */}
+              <div className="space-y-4 pt-4 border-t border-foreground/10">
+                <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-orange-500" />
+                  <span>সোশ্যাল মিডিয়া ও কমিউনিটি লিঙ্ক</span>
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                      ফেসবুক পেইজ লিংক (Facebook Page URL)
+                    </label>
+                    <input
+                      type="text"
+                      value={contactFacebookPage}
+                      onChange={(e) => { setContactFacebookPage(e.target.value); setHasUnsavedChanges(true); }}
+                      placeholder="https://facebook.com/..."
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                      ফেসবুক গ্রুপ লিংক (Facebook Group / Community)
+                    </label>
+                    <input
+                      type="text"
+                      value={contactFacebookGroup}
+                      onChange={(e) => { setContactFacebookGroup(e.target.value); setHasUnsavedChanges(true); }}
+                      placeholder="https://facebook.com/groups/..."
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                      ইউটিউব চ্যানেল লিংক (YouTube Channel URL)
+                    </label>
+                    <input
+                      type="text"
+                      value={contactYoutube}
+                      onChange={(e) => { setContactYoutube(e.target.value); setHasUnsavedChanges(true); }}
+                      placeholder="https://youtube.com/@..."
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                      টেলিগ্রাম চ্যানেল / গ্রুপ (Telegram Community)
+                    </label>
+                    <input
+                      type="text"
+                      value={contactTelegram}
+                      onChange={(e) => { setContactTelegram(e.target.value); setHasUnsavedChanges(true); }}
+                      placeholder="https://t.me/..."
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. Footer Custom Copyright */}
+              <div className="space-y-4 pt-4 border-t border-foreground/10">
+                <h4 className="text-sm font-bold text-foreground">ফুটার কপিরাইট বার্তা</h4>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground/70 block mb-1">
+                    কাস্টম কপিরাইট টেক্সট (Custom Copyright Text)
+                  </label>
+                  <input
+                    type="text"
+                    value={footerCopyright}
+                    onChange={(e) => { setFooterCopyright(e.target.value); setHasUnsavedChanges(true); }}
+                    placeholder={`যেমন: © ${new Date().getFullYear()} ${displayName || 'Teacher Academy'}. সর্বস্বত্ব সংরক্ষিত। Powered by SkyLearners.`}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
+                  />
+                  <p className="text-[11px] text-foreground/50 mt-1">
+                    খালি রাখলে স্বয়ংক্রিয়ভাবে ডিফল্ট কপিরাইট ও আপনার নাম যুক্ত থাকবে।
+                  </p>
+                </div>
+              </div>
+
             </div>
           )}
 

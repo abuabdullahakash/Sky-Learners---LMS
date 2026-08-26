@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from '@/i18n/routing';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { 
@@ -226,6 +226,33 @@ export default function CoursesPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedClassFilter, setSelectedClassFilter] = useState<string | null>(urlClass || null);
   const [loading, setLoading] = useState(true);
+
+  // Category Carousel Horizontal Scroll State
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkCategoryScroll = () => {
+    if (categoryScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = categoryScrollRef.current;
+      setCanScrollLeft(scrollLeft > 5);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
+    }
+  };
+
+  useEffect(() => {
+    checkCategoryScroll();
+    window.addEventListener('resize', checkCategoryScroll);
+    return () => window.removeEventListener('resize', checkCategoryScroll);
+  }, []);
+
+  const handleCategoryScroll = (direction: 'left' | 'right') => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = direction === 'left' ? -200 : 200;
+      categoryScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      setTimeout(checkCategoryScroll, 300);
+    }
+  };
 
   // Sync selectedCategory with urlCategory if present
   useEffect(() => {
@@ -640,37 +667,45 @@ export default function CoursesPage() {
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-4">
             
-            {/* 1. Floating Glass Back Button */}
-            <div>
-              <Link
-                href="/"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/80 hover:bg-orange-500/15 dark:bg-foreground/[0.06] dark:hover:bg-orange-500/20 text-foreground/80 hover:text-orange-500 border border-foreground/10 hover:border-orange-500/30 text-xs sm:text-sm font-bold transition-all duration-300 shadow-sm hover:shadow-md hover:shadow-orange-500/10 group backdrop-blur-xl"
-              >
-                <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                <span>{isBn ? 'পূর্ববর্তী পেজে ফিরুন' : 'Back to Academy'}</span>
-              </Link>
-            </div>
+            {/* 1. Floating Glass Back Button (Shows only when navigated from quick cards or external links) */}
+            {Boolean(urlType || searchParams.get('from') || searchParams.get('category')) && (
+              <div>
+                <button
+                  onClick={() => {
+                    if (typeof window !== 'undefined' && window.history.length > 1) {
+                      router.back();
+                    } else {
+                      router.push('/');
+                    }
+                  }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/80 hover:bg-orange-500/15 dark:bg-foreground/[0.06] dark:hover:bg-orange-500/20 text-foreground/80 hover:text-orange-500 border border-foreground/10 hover:border-orange-500/30 text-xs sm:text-sm font-bold transition-all duration-300 shadow-sm hover:shadow-md hover:shadow-orange-500/10 group backdrop-blur-xl cursor-pointer"
+                >
+                  <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+                  <span>{isBn ? 'পূর্ববর্তী পেজে ফিরুন' : 'Back to Previous Page'}</span>
+                </button>
+              </div>
+            )}
 
-            {/* 2. Floating Liquid Glass Capsule Box */}
-            <div className="relative rounded-[2.5rem] p-6 sm:p-8 lg:p-10 bg-gradient-to-br from-foreground/[0.03] via-card/70 to-foreground/[0.01] dark:from-foreground/[0.06] dark:via-card/60 dark:to-foreground/[0.02] border border-foreground/10 shadow-xl shadow-orange-500/[0.03] backdrop-blur-2xl overflow-hidden">
+            {/* 2. Floating Liquid Glass Capsule Box (Ultra-Responsive on Mobile & Tablet) */}
+            <div className="relative rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-7 lg:p-9 bg-gradient-to-br from-foreground/[0.03] via-card/70 to-foreground/[0.01] dark:from-foreground/[0.06] dark:via-card/60 dark:to-foreground/[0.02] border border-foreground/10 shadow-xl shadow-orange-500/[0.03] backdrop-blur-2xl overflow-hidden">
               
               {/* Subtle Glass Highlight Lines */}
               <div className="absolute top-0 left-0 w-full h-[1.5px] bg-gradient-to-r from-transparent via-orange-500/50 to-transparent" />
               <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
 
-              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 relative z-10">
+              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 sm:gap-8 relative z-10">
                 
                 {/* Left: Avatar & Text */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6 flex-1">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 flex-1 w-full">
                   
                   {/* Teacher Avatar with Glowing Ring */}
                   <div className="relative shrink-0">
-                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-3xl p-1 bg-gradient-to-tr from-orange-500 via-amber-500 to-orange-400 shadow-lg shadow-orange-500/25">
-                      <div className="w-full h-full rounded-[22px] overflow-hidden bg-background">
+                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-2xl sm:rounded-3xl p-1 bg-gradient-to-tr from-orange-500 via-amber-500 to-orange-400 shadow-lg shadow-orange-500/25">
+                      <div className="w-full h-full rounded-[14px] sm:rounded-[22px] overflow-hidden bg-background">
                         {teacherPhoto ? (
                           <img src={teacherPhoto} alt={teacherName} className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-2xl sm:text-3xl font-black text-orange-500 bg-orange-500/10">
+                          <div className="w-full h-full flex items-center justify-center text-xl sm:text-3xl font-black text-orange-500 bg-orange-500/10">
                             {teacherName.charAt(0)}
                           </div>
                         )}
@@ -678,27 +713,27 @@ export default function CoursesPage() {
                     </div>
                     
                     {/* Verified Badge */}
-                    <div className="absolute -bottom-1.5 -right-1.5 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[10px] font-black flex items-center gap-1 shadow-md border-2 border-background">
-                      <CheckCircle2 className="w-3 h-3" />
+                    <div className="absolute -bottom-1 -right-1 sm:-bottom-1.5 sm:-right-1.5 px-1.5 sm:px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[9px] sm:text-[10px] font-black flex items-center gap-1 shadow-md border-2 border-background">
+                      <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                       <span>{isBn ? 'ভেরিফাইড' : 'Verified'}</span>
                     </div>
                   </div>
 
                   {/* Title & Description */}
-                  <div className="space-y-2 flex-1">
+                  <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/15 text-orange-600 dark:text-orange-400 text-xs font-black uppercase tracking-wider border border-orange-500/30 shadow-xs">
-                        <Sparkles className="w-3.5 h-3.5 text-orange-500 animate-pulse" />
+                      <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-orange-500/15 text-orange-600 dark:text-orange-400 text-[10px] sm:text-xs font-black uppercase tracking-wider border border-orange-500/30 shadow-xs">
+                        <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-orange-500 animate-pulse" />
                         <span>{teacherProfile?.coachingName || (isBn ? 'অফিশিয়াল একাডেমি' : 'Official Academy')}</span>
                       </span>
                       {teacherProfile?.designation && (
-                        <span className="text-xs font-bold text-foreground/60">
+                        <span className="text-[11px] sm:text-xs font-bold text-foreground/60">
                           • {teacherProfile.designation}
                         </span>
                       )}
                     </div>
 
-                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground tracking-tight leading-tight">
+                    <h1 className="text-xl sm:text-2xl lg:text-4xl font-black text-foreground tracking-tight leading-snug">
                       {selectedTypeFilter === 'paid' ? (
                         isBn ? (
                           <>
@@ -739,34 +774,34 @@ export default function CoursesPage() {
 
                 </div>
 
-                {/* Right: Sleek Glass Stat Badges */}
-                <div className="flex sm:flex-row lg:flex-col gap-3 shrink-0 w-full sm:w-auto justify-start lg:justify-center border-t lg:border-t-0 lg:border-l border-foreground/10 pt-4 lg:pt-0 lg:pl-8">
+                {/* Right: Sleek Glass Stat Badges (Ultra-Responsive: 2-col on mobile, col on desktop) */}
+                <div className="grid grid-cols-2 lg:flex lg:flex-col gap-2.5 sm:gap-3 shrink-0 w-full lg:w-auto border-t lg:border-t-0 lg:border-l border-foreground/10 pt-4 lg:pt-0 lg:pl-8">
                   
                   {/* Stat 1: Total Available Courses */}
-                  <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-foreground/[0.03] dark:bg-foreground/[0.06] border border-foreground/10 shadow-xs flex-1 sm:flex-initial">
-                    <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center font-bold shrink-0">
+                  <div className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 sm:px-4 rounded-2xl bg-foreground/[0.03] dark:bg-foreground/[0.06] border border-foreground/10 shadow-xs">
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center font-bold shrink-0">
                       <BookOpen className="w-4 h-4" />
                     </div>
-                    <div>
-                      <span className="text-[10px] text-foreground/50 font-bold block uppercase tracking-wider">
+                    <div className="min-w-0">
+                      <span className="text-[9px] sm:text-[10px] text-foreground/50 font-bold block uppercase tracking-wider truncate">
                         {isBn ? 'উপলব্ধ কোর্স' : 'Available'}
                       </span>
-                      <span className="text-base sm:text-lg font-black text-foreground">
+                      <span className="text-xs sm:text-base lg:text-lg font-black text-foreground truncate block">
                         {toBnNum(teacherFilteredCourses.length)} {isBn ? 'টি কোর্স' : 'Courses'}
                       </span>
                     </div>
                   </div>
 
                   {/* Stat 2: Active Preparation Track */}
-                  <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-foreground/[0.03] dark:bg-foreground/[0.06] border border-foreground/10 shadow-xs flex-1 sm:flex-initial">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold shrink-0">
+                  <div className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 sm:px-4 rounded-2xl bg-foreground/[0.03] dark:bg-foreground/[0.06] border border-foreground/10 shadow-xs">
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold shrink-0">
                       <Award className="w-4 h-4" />
                     </div>
-                    <div>
-                      <span className="text-[10px] text-foreground/50 font-bold block uppercase tracking-wider">
+                    <div className="min-w-0">
+                      <span className="text-[9px] sm:text-[10px] text-foreground/50 font-bold block uppercase tracking-wider truncate">
                         {isBn ? 'প্রস্তুতি সুবিধা' : 'Preparation'}
                       </span>
-                      <span className="text-xs sm:text-sm font-bold text-foreground">
+                      <span className="text-[11px] sm:text-xs lg:text-sm font-bold text-foreground truncate block">
                         {isBn ? 'লাইভ ও রেকর্ডেড' : 'Live & Recorded'}
                       </span>
                     </div>
@@ -839,31 +874,66 @@ export default function CoursesPage() {
 
           </div>
 
-          {/* Academic Categories Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none mb-8">
-            {[
-              { id: 'all', label: isBn ? 'সকল ক্যাটাগরি' : 'All Categories' },
-              { id: 'intermediate', label: isBn ? 'এইচএসসি (HSC)' : 'HSC' },
-              { id: 'high_school', label: isBn ? 'এসএসসি (SSC)' : 'SSC' },
-              { id: 'primary', label: isBn ? 'প্রাথমিক' : 'Primary' },
-              { id: 'admission', label: isBn ? 'ভর্তি পরীক্ষা (Admission)' : 'Admission' },
-              { id: 'skills', label: isBn ? 'দক্ষতা ও ক্যারিয়ার (Skills)' : 'Skills' },
-            ].map((cat) => {
-              const isSelected = selectedCategory === cat.id;
-              return (
+          {/* Academic Categories Filter Pills Carousel with Dynamic Left/Right Nav Arrows */}
+          <div className="relative group/cat mb-8">
+            
+            {/* Left Scroll Arrow Button */}
+            {canScrollLeft && (
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 z-20 flex items-center pr-2 bg-gradient-to-r from-background via-background/95 to-transparent pl-0.5">
                 <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border cursor-pointer ${
-                    isSelected
-                      ? 'bg-orange-500/15 text-orange-500 border-orange-500/40 shadow-xs'
-                      : 'bg-foreground/[0.03] hover:bg-foreground/[0.08] text-foreground/70 border-foreground/10'
-                  }`}
+                  onClick={() => handleCategoryScroll('left')}
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-background/90 hover:bg-orange-500 text-foreground/70 hover:text-white border border-foreground/15 shadow-md flex items-center justify-center transition-all cursor-pointer"
+                  aria-label="Scroll Left"
                 >
-                  {cat.label}
+                  <ChevronLeft className="w-4 h-4" />
                 </button>
-              );
-            })}
+              </div>
+            )}
+
+            {/* Scrollable Container */}
+            <div
+              ref={categoryScrollRef}
+              onScroll={checkCategoryScroll}
+              className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 scrollbar-none scroll-smooth px-1"
+            >
+              {[
+                { id: 'all', label: isBn ? 'সকল ক্যাটাগরি' : 'All Categories' },
+                { id: 'intermediate', label: isBn ? 'এইচএসসি (HSC)' : 'HSC' },
+                { id: 'high_school', label: isBn ? 'এসএসসি (SSC)' : 'SSC' },
+                { id: 'primary', label: isBn ? 'প্রাথমিক' : 'Primary' },
+                { id: 'admission', label: isBn ? 'ভর্তি পরীক্ষা (Admission)' : 'Admission' },
+                { id: 'skills', label: isBn ? 'দক্ষতা ও ক্যারিয়ার (Skills)' : 'Skills' },
+              ].map((cat) => {
+                const isSelected = selectedCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border cursor-pointer shrink-0 active:scale-95 ${
+                      isSelected
+                        ? 'bg-orange-500/15 text-orange-500 border-orange-500/40 shadow-xs'
+                        : 'bg-foreground/[0.03] hover:bg-foreground/[0.08] text-foreground/70 border-foreground/10'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Right Scroll Arrow Button */}
+            {canScrollRight && (
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 z-20 flex items-center pl-2 bg-gradient-to-l from-background via-background/95 to-transparent pr-0.5">
+                <button
+                  onClick={() => handleCategoryScroll('right')}
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-background/90 hover:bg-orange-500 text-foreground/70 hover:text-white border border-foreground/15 shadow-md flex items-center justify-center transition-all cursor-pointer"
+                  aria-label="Scroll Right"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
           </div>
 
           {/* ========================================================================= */}

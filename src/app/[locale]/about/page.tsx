@@ -255,10 +255,17 @@ export default function AboutPage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const stored = sessionStorage.getItem('referralTeacherId') || localStorage.getItem('referralTeacherId');
-      if (stored && stored !== 'global') {
-        setGuestTeacherId(stored);
-      }
+      const checkStorage = () => {
+        const stored = sessionStorage.getItem('referralTeacherId') || localStorage.getItem('referralTeacherId');
+        if (stored && stored !== 'global') {
+          setGuestTeacherId(stored);
+        } else {
+          setGuestTeacherId(null);
+        }
+      };
+      checkStorage();
+      window.addEventListener('storage', checkStorage);
+      return () => window.removeEventListener('storage', checkStorage);
     }
   }, []);
 

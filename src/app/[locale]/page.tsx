@@ -114,11 +114,18 @@ export default function HomePage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const stored = sessionStorage.getItem('referralTeacherId') || localStorage.getItem('referralTeacherId');
-      if (stored && stored !== 'global') {
-        setGuestTeacherId(stored);
-      }
-      setHasCheckedStorage(true);
+      const checkStorage = () => {
+        const stored = sessionStorage.getItem('referralTeacherId') || localStorage.getItem('referralTeacherId');
+        if (stored && stored !== 'global') {
+          setGuestTeacherId(stored);
+        } else {
+          setGuestTeacherId(null);
+        }
+        setHasCheckedStorage(true);
+      };
+      checkStorage();
+      window.addEventListener('storage', checkStorage);
+      return () => window.removeEventListener('storage', checkStorage);
     }
   }, []);
 

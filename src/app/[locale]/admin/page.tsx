@@ -64,6 +64,7 @@ import {
   Lock
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import MarketplaceAdminManager from '@/components/MarketplaceAdminManager';
 
 interface UserItem {
   id: string;
@@ -153,7 +154,8 @@ export default function AdminDashboardPage() {
     { id: 'contact', name: 'Contact', nameBn: 'যোগাযোগ', slug: '/contact', isDefault: true },
   ];
 
-  // Active Tab
+  // Active Tab & Mode
+  const [adminMode, setAdminMode] = useState<'database' | 'marketplace'>('database');
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'teachers' | 'courses'>('overview');
 
   // Loading & Data states
@@ -654,15 +656,47 @@ export default function AdminDashboardPage() {
             {t('subtitle')}
           </p>
         </div>
-        <button
-          onClick={fetchAllData}
-          disabled={refreshing}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-bold transition-all disabled:opacity-50"
-        >
-          <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-          {refreshing ? 'Refreshing...' : 'Refresh Database'}
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center p-1 rounded-xl bg-slate-950/80 border border-slate-800">
+            <button
+              type="button"
+              onClick={() => setAdminMode('database')}
+              className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                adminMode === 'database' 
+                  ? 'bg-purple-600 text-white shadow-md' 
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" /> Database Control
+            </button>
+            <button
+              type="button"
+              onClick={() => setAdminMode('marketplace')}
+              className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                adminMode === 'marketplace' 
+                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md' 
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" /> Marketplace Manager
+            </button>
+          </div>
+
+          <button
+            onClick={fetchAllData}
+            disabled={refreshing}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-bold transition-all disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+            {refreshing ? 'Refreshing...' : 'Refresh'}
+          </button>
+        </div>
       </div>
+
+      {adminMode === 'marketplace' ? (
+        <MarketplaceAdminManager courses={courses} onRefresh={fetchAllData} />
+      ) : (
+        <>
 
       {/* Primary Analytics Counters */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -2378,6 +2412,9 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         </div>
+      )}
+
+        </>
       )}
 
     </div>

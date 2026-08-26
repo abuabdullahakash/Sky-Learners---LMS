@@ -64,7 +64,8 @@ export default function Navbar() {
   // Path & Context detection
   const isStudentDashboard = pathname.startsWith('/dashboard');
   const isTeacherDashboard = pathname.startsWith('/teacher-dashboard');
-  const isDashboard = isStudentDashboard || isTeacherDashboard;
+  const isAdminDashboard = pathname.startsWith('/admin');
+  const isDashboard = isStudentDashboard || isTeacherDashboard || isAdminDashboard;
 
   const parts = pathname.split('/');
   const coursesIndex = parts.indexOf('courses');
@@ -371,13 +372,15 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Center-Right Search Bar (10 Minute School Style) */}
-            <div className="hidden md:flex flex-1 max-w-[260px] lg:max-w-[320px] mx-auto items-center">
-              <HeaderSearchBar 
-                isTeacherStorefrontMode={isTeacherStorefrontMode} 
-                activeTeacherId={effectiveTeacherId} 
-              />
-            </div>
+            {/* Center-Right Search Bar (10 Minute School Style) - Only visible on public site pages, hidden on dashboard */}
+            {!isDashboard && (
+              <div className="hidden md:flex flex-1 max-w-[260px] lg:max-w-[320px] mx-auto items-center">
+                <HeaderSearchBar 
+                  isTeacherStorefrontMode={isTeacherStorefrontMode} 
+                  activeTeacherId={effectiveTeacherId} 
+                />
+              </div>
+            )}
 
             {/* Desktop Controls (Right) */}
             <div className="flex items-center gap-3 lg:gap-4 pl-2 shrink-0">

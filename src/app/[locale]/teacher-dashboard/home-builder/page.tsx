@@ -2383,25 +2383,33 @@ export default function TeacherHomePageBuilderPage() {
                 {/* Preview Box */}
                 <div className="p-4 sm:p-5 rounded-2xl bg-zinc-950 border border-white/10 shadow-xl overflow-hidden relative">
                   <div className="flex items-center justify-between gap-4">
-                    {/* Brand Logo & Name Slot */}
+                    {/* Brand Logo Slot: Pure Image if headerLogo exists, else Avatar + Name + Tagline */}
                     <div className="flex items-center gap-3">
-                      {headerLogo || profilePhoto ? (
-                        <div className="w-10 h-10 rounded-xl overflow-hidden border border-orange-500/40 bg-orange-500/10 shadow-sm shrink-0 flex items-center justify-center">
-                          <img src={headerLogo || profilePhoto} alt={displayName || 'Logo'} className="w-full h-full object-cover" />
+                      {headerLogo ? (
+                        <div className="h-10 sm:h-11 w-auto max-w-[200px] flex items-center justify-start py-0.5">
+                          <img src={headerLogo} alt={displayName || 'Logo'} className="h-full w-auto max-h-11 max-w-[200px] object-contain object-left" />
                         </div>
                       ) : (
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center text-base shadow-md shadow-orange-500/20 shrink-0">
-                          {(displayName || 'A').charAt(0).toUpperCase()}
+                        <div className="flex items-center gap-2.5">
+                          {profilePhoto ? (
+                            <div className="w-10 h-10 rounded-xl overflow-hidden border border-orange-500/40 bg-orange-500/10 shadow-sm shrink-0 flex items-center justify-center">
+                              <img src={profilePhoto} alt={displayName || 'Avatar'} className="w-full h-full object-cover" />
+                            </div>
+                          ) : (
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center text-base shadow-md shadow-orange-500/20 shrink-0">
+                              {(displayName || 'A').charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-extrabold text-sm sm:text-base text-white leading-tight">
+                              {displayName || 'আপনার একাডেমি নাম'}
+                            </div>
+                            <div className="text-[10px] font-semibold text-orange-400 leading-none mt-0.5">
+                              {headerTagline || 'Teacher Academy'}
+                            </div>
+                          </div>
                         </div>
                       )}
-                      <div>
-                        <div className="font-extrabold text-sm sm:text-base text-white leading-tight">
-                          {displayName || 'আপনার একাডেমি নাম'}
-                        </div>
-                        <div className="text-[10px] font-semibold text-orange-400 leading-none mt-0.5">
-                          {headerTagline || 'Teacher Academy'}
-                        </div>
-                      </div>
                     </div>
 
                     {/* Nav Links in Preview */}
@@ -2564,21 +2572,27 @@ export default function TeacherHomePageBuilderPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-xs border-b border-white/10 pb-6">
                     {/* Col 1 */}
                     <div className="space-y-3">
-                      <div className="flex items-center gap-2.5">
-                        {headerLogo || profilePhoto ? (
-                          <div className="w-8 h-8 rounded-lg overflow-hidden border border-orange-500/40 bg-orange-500/10 shrink-0">
-                            <img src={headerLogo || profilePhoto} alt="Logo" className="w-full h-full object-cover" />
-                          </div>
-                        ) : (
-                          <div className="w-8 h-8 rounded-lg bg-orange-500 text-white font-bold flex items-center justify-center shrink-0 text-xs">
-                            {(displayName || 'A').charAt(0).toUpperCase()}
-                          </div>
-                        )}
-                        <div>
-                          <div className="font-bold text-white leading-tight">{displayName || 'একাডেমি নাম'}</div>
-                          <div className="text-[10px] text-orange-400">অফিশিয়াল একাডেমি</div>
+                      {headerLogo ? (
+                        <div className="h-9 w-auto max-w-[170px] flex items-center justify-start py-0.5">
+                          <img src={headerLogo} alt="Logo" className="h-full w-auto max-h-9 max-w-[170px] object-contain object-left" />
                         </div>
-                      </div>
+                      ) : (
+                        <div className="flex items-center gap-2.5">
+                          {profilePhoto ? (
+                            <div className="w-8 h-8 rounded-lg overflow-hidden border border-orange-500/40 bg-orange-500/10 shrink-0">
+                              <img src={profilePhoto} alt="Logo" className="w-full h-full object-cover" />
+                            </div>
+                          ) : (
+                            <div className="w-8 h-8 rounded-lg bg-orange-500 text-white font-bold flex items-center justify-center shrink-0 text-xs">
+                              {(displayName || 'A').charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-bold text-white leading-tight">{displayName || 'একাডেমি নাম'}</div>
+                            <div className="text-[10px] text-orange-400">{headerTagline || 'অফিশিয়াল একাডেমি'}</div>
+                          </div>
+                        </div>
+                      )}
                       <p className="text-white/60 text-[11px] leading-relaxed line-clamp-3">
                         {footerBio || 'অনলাইন একাডেমিক ও ভর্তি পরীক্ষার জন্য একটি বিশেষায়িত লার্নিং প্ল্যাটফর্ম।'}
                       </p>

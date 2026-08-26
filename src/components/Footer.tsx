@@ -132,23 +132,35 @@ export default function Footer() {
             {/* 1. Teacher Brand & Bio */}
             <div className="space-y-4">
               <Link href="/" className="flex items-center gap-3 group">
-                {photo ? (
-                  <div className="relative w-12 h-12 rounded-2xl overflow-hidden border-2 border-orange-500/30 shadow-md shadow-orange-500/20 shrink-0">
-                    <img src={photo} alt={displayName} className="w-full h-full object-cover" />
+                {teacherData.headerLogo || teacherData.logoUrl ? (
+                  <div className="h-11 sm:h-12 w-auto max-w-[200px] flex items-center justify-start py-0.5">
+                    <img 
+                      src={teacherData.headerLogo || teacherData.logoUrl} 
+                      alt={displayName} 
+                      className="h-full w-auto max-h-12 max-w-[200px] object-contain object-left" 
+                    />
                   </div>
                 ) : (
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center shadow-lg shadow-orange-500/20 text-lg shrink-0">
-                    {displayName.charAt(0).toUpperCase()}
+                  <div className="flex items-center gap-3">
+                    {photo ? (
+                      <div className="relative w-12 h-12 rounded-2xl overflow-hidden border-2 border-orange-500/30 shadow-md shadow-orange-500/20 shrink-0">
+                        <img src={photo} alt={displayName} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center shadow-lg shadow-orange-500/20 text-lg shrink-0">
+                        {displayName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="font-black text-lg leading-tight text-foreground group-hover:text-orange-500 transition-colors">
+                        {displayName}
+                      </h3>
+                      <span className="text-xs font-bold text-orange-500">
+                        {teacherData.headerTagline || 'অফিশিয়াল একাডেমি'}
+                      </span>
+                    </div>
                   </div>
                 )}
-                <div>
-                  <h3 className="font-black text-lg leading-tight text-foreground group-hover:text-orange-500 transition-colors">
-                    {displayName}
-                  </h3>
-                  <span className="text-xs font-bold text-orange-500">
-                    অফিশিয়াল একাডেমি
-                  </span>
-                </div>
               </Link>
 
               <p className="text-foreground/70 text-sm leading-relaxed line-clamp-3">

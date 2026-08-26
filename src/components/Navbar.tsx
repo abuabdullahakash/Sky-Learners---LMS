@@ -133,6 +133,9 @@ export default function Navbar() {
     disabledPages?: string[];
     customNavLinks?: Array<{ id: string; name: string; slug: string; enabled: boolean }>;
     profilePhoto?: string;
+    headerLogo?: string;
+    logoUrl?: string;
+    headerTagline?: string;
   } | null>(null);
   const [platformGlobalPages, setPlatformGlobalPages] = useState<Array<{ id: string; name: string; slug: string; excludedTeacherIds?: string[] }>>([]);
 
@@ -219,7 +222,10 @@ export default function Navbar() {
             setStorefrontTeacherData({
               disabledPages: data.disabledPages || [],
               customNavLinks: data.customNavLinks || [],
-              profilePhoto: data.profilePhoto || data.photoUrl || data.logoUrl || ''
+              profilePhoto: data.profilePhoto || data.photoUrl || '',
+              headerLogo: data.headerLogo || data.logoUrl || '',
+              logoUrl: data.logoUrl || data.headerLogo || '',
+              headerTagline: data.headerTagline || 'Teacher Academy'
             });
           } else {
             getDoc(doc(db, 'users', resolvedUid)).then(uDoc => {
@@ -229,7 +235,10 @@ export default function Navbar() {
                 setStorefrontTeacherData({
                   disabledPages: [],
                   customNavLinks: [],
-                  profilePhoto: uData.profilePhoto || uData.photoURL || uData.photoUrl || ''
+                  profilePhoto: uData.profilePhoto || uData.photoURL || uData.photoUrl || '',
+                  headerLogo: uData.headerLogo || uData.logoUrl || '',
+                  logoUrl: uData.logoUrl || uData.headerLogo || '',
+                  headerTagline: uData.headerTagline || 'Teacher Academy'
                 });
               }
             }).catch(() => {});
@@ -386,7 +395,17 @@ export default function Navbar() {
             <div className="flex items-center gap-6 lg:gap-8 z-10">
               {/* Logo (Dynamic: Teacher Academy Branding vs Marketplace SkyLearners Logo) */}
               <Link href={homeLink} className="flex items-center gap-2 shrink-0 group">
-                {isTeacherStorefrontMode && preferredTeacherName ? (
+                {isTeacherStorefrontMode && (storefrontTeacherData?.headerLogo || storefrontTeacherData?.logoUrl) ? (
+                  /* Pure Brand Logo Image - No redundant text beside it */
+                  <div className="relative h-10 sm:h-11 md:h-12 w-auto max-w-[180px] sm:max-w-[240px] flex items-center justify-start py-0.5">
+                    <img 
+                      src={storefrontTeacherData.headerLogo || storefrontTeacherData.logoUrl} 
+                      alt={preferredTeacherName || 'Teacher Logo'} 
+                      className="h-full w-auto max-h-12 max-w-[180px] sm:max-w-[240px] object-contain object-left" 
+                    />
+                  </div>
+                ) : isTeacherStorefrontMode && preferredTeacherName ? (
+                  /* Fallback to Avatar + Name + Tagline only when NO image logo is uploaded */
                   <div className="flex items-center gap-2.5">
                     {storefrontTeacherData?.profilePhoto ? (
                       <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-orange-500/30 bg-orange-500/10 shadow-sm shrink-0">
@@ -402,7 +421,7 @@ export default function Navbar() {
                         {preferredTeacherName}
                       </span>
                       <span className="text-[10px] font-semibold text-orange-500 leading-none">
-                        Teacher Academy
+                        {storefrontTeacherData?.headerTagline || 'Teacher Academy'}
                       </span>
                     </div>
                   </div>

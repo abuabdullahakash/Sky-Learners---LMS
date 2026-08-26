@@ -564,7 +564,7 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
           <div className="bg-background/95 backdrop-blur-2xl border border-foreground/15 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.45)] overflow-hidden flex flex-row divide-x divide-foreground/10 items-stretch">
             
             {/* PANEL 1: Left Category List (Level 1) */}
-            <div className="w-[260px] p-2 space-y-1 bg-foreground/[0.015] self-start">
+            <div className="w-[260px] p-2 space-y-1 bg-foreground/[0.015] self-stretch flex flex-col">
               {categories.map((cat) => {
                 const Icon = cat.icon;
                 const isActive = activeLevel === cat.id;
@@ -637,8 +637,8 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
 
             {/* PANEL 2: Middle Sub-Items (Level 2) */}
             {currentCategory.hasSubMenu && (
-              <div className="w-[260px] p-2 space-y-1 bg-background/50 self-start flex flex-col justify-between">
-                <div className="space-y-1">
+              <div className="w-[260px] p-2 bg-background/50 self-stretch flex flex-col justify-between">
+                <div className="space-y-1 flex-1">
                   
                   {/* 1. Primary Level 2 */}
                   {activeLevel === 'primary' && (
@@ -769,11 +769,11 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
                   )}
                 </div>
 
-                {/* Bottom View Category Page Link (As shown in screenshot 3) */}
-                <div className="pt-2 mt-2 border-t border-foreground/10">
+                {/* Bottom View Category Page Link (Pinned to the very bottom) */}
+                <div className="pt-2 mt-auto border-t border-foreground/10">
                   <Link
                     href={currentCategory.href}
-                    className="flex items-center justify-between px-3 py-2 rounded-lg bg-foreground/5 hover:bg-primary/10 text-xs font-medium text-primary transition-all group"
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-foreground/5 hover:bg-primary/10 text-xs font-medium text-primary transition-all group"
                   >
                     <span>{isBn ? `সকল ${currentCategory.labelBn} কোর্স দেখুন` : `View all ${currentCategory.labelEn} courses`}</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -785,8 +785,8 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
             {/* PANEL 3: Level 3 Flyout */}
             {/* Case A: HSC Groups (Science, Arts, Commerce) */}
             {activeLevel === 'intermediate' && (
-              <div className="w-[240px] p-2 space-y-1 bg-foreground/[0.01] self-start animate-in fade-in duration-100 flex flex-col justify-between">
-                <div className="space-y-1">
+              <div className="w-[240px] p-2 bg-foreground/[0.01] self-stretch animate-in fade-in duration-100 flex flex-col justify-between">
+                <div className="space-y-1 flex-1">
                   {hscGroups.map((grp) => {
                     const gCount = groupCounts[`intermediate_${activeHscClass}_${grp.id}`] || 0;
                     return (
@@ -805,11 +805,11 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
                   })}
                 </div>
 
-                {/* Bottom Class Link */}
-                <div className="pt-2 mt-2 border-t border-foreground/10">
+                {/* Bottom Class Link (Pinned to the very bottom) */}
+                <div className="pt-2 mt-auto border-t border-foreground/10">
                   <Link
                     href={`/courses?category=intermediate&class=${activeHscClass}`}
-                    className="flex items-center justify-between px-3 py-2 rounded-lg bg-foreground/5 hover:bg-orange-500/10 text-xs font-medium text-orange-500 transition-all group"
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-foreground/5 hover:bg-orange-500/10 text-xs font-medium text-orange-500 transition-all group"
                   >
                     <span>{isBn ? `এই শ্রেণির সকল কোর্স দেখুন` : `View all Class ${activeHscClass} courses`}</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -820,8 +820,8 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
 
             {/* Case B: Honours & Masters Dynamic Years */}
             {activeLevel === 'honours_masters' && activeDepartment && activeDeptYears.length > 0 && (
-              <div className="w-[220px] p-2 space-y-1 bg-foreground/[0.01] self-start animate-in fade-in duration-100 flex flex-col justify-between">
-                <div className="space-y-1">
+              <div className="w-[220px] p-2 bg-foreground/[0.01] self-stretch animate-in fade-in duration-100 flex flex-col justify-between">
+                <div className="space-y-1 flex-1">
                   {activeDeptYears.map((yr) => {
                     const yrCount = deptYearCounts[`${activeDepartment}_${yr}`] || 0;
                     return (
@@ -840,11 +840,11 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
                   })}
                 </div>
 
-                {/* Bottom Subject Link */}
-                <div className="pt-2 mt-2 border-t border-foreground/10">
+                {/* Bottom Subject Link (Pinned to the very bottom) */}
+                <div className="pt-2 mt-auto border-t border-foreground/10">
                   <Link
                     href={`/courses?department=${encodeURIComponent(activeDepartment)}`}
-                    className="flex items-center justify-between px-3 py-2 rounded-lg bg-foreground/5 hover:bg-primary/10 text-xs font-medium text-primary transition-all group"
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-foreground/5 hover:bg-primary/10 text-xs font-medium text-primary transition-all group"
                   >
                     <span>{isBn ? `${activeDepartment}-এর সকল কোর্স` : `All ${activeDepartment} courses`}</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />

@@ -43,6 +43,7 @@ import RoleSelectionModal from './RoleSelectionModal';
 import CourseMegaMenu from './CourseMegaMenu';
 import HeaderSearchBar from './HeaderSearchBar';
 import { resolveTeacherBySlugOrId } from '@/lib/slug';
+import { TeacherThemeToggle, TeacherLanguageToggle } from './TeacherNavControls';
 
 export default function Navbar() {
   const t = useTranslations('Navigation');
@@ -433,21 +434,43 @@ export default function Navbar() {
               </Link>
 
               {/* Desktop Navigation Links directly beside Logo */}
-              <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-                {activePublicNavLinks.map((item) => {
-                  if (!isTeacherStorefrontMode && item.href === '/courses') {
-                    return <CourseMegaMenu key="desktop-courses-mega-menu" />;
-                  }
-                  return (
-                    <Link 
-                      key={item.href + item.name} 
-                      href={item.href} 
-                      className={`font-medium text-sm lg:text-base transition-colors hover:text-primary ${item.isActive ? 'text-primary font-semibold' : 'text-foreground/80'}`}
-                    >
-                      {item.name}
-                    </Link>
-                  );
-                })}
+              <div className="hidden md:flex items-center">
+                {isTeacherStorefrontMode ? (
+                  /* Modern Floating Pill Navigation for Teacher Storefront */
+                  <div className="flex items-center gap-1.5 p-1 rounded-full bg-foreground/[0.04] dark:bg-foreground/[0.06] border border-foreground/10 backdrop-blur-md shadow-xs">
+                    {activePublicNavLinks.map((item) => (
+                      <Link 
+                        key={item.href + item.name} 
+                        href={item.href} 
+                        className={`px-3.5 py-1.5 rounded-full text-xs lg:text-sm font-semibold transition-all duration-200 ${
+                          item.isActive 
+                            ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-sm shadow-orange-500/30' 
+                            : 'text-foreground/75 hover:text-orange-500 hover:bg-orange-500/10'
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  /* Original Marketplace Desktop Navigation Links (100% UNTOUCHED) */
+                  <div className="flex items-center space-x-6 lg:space-x-8">
+                    {activePublicNavLinks.map((item) => {
+                      if (item.href === '/courses') {
+                        return <CourseMegaMenu key="desktop-courses-mega-menu" />;
+                      }
+                      return (
+                        <Link 
+                          key={item.href + item.name} 
+                          href={item.href} 
+                          className={`font-medium text-sm lg:text-base transition-colors hover:text-primary ${item.isActive ? 'text-primary font-semibold' : 'text-foreground/80'}`}
+                        >
+                          {item.name}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -462,9 +485,18 @@ export default function Navbar() {
             )}
 
             {/* Desktop Controls (Right) */}
-            <div className="flex items-center gap-3 lg:gap-4 pl-2 shrink-0">
-              <ThemeToggle />
-              <LanguageToggle />
+            <div className="flex items-center gap-2.5 lg:gap-3.5 pl-2 shrink-0">
+              {isTeacherStorefrontMode || isTeacherDashboard ? (
+                <>
+                  <TeacherThemeToggle />
+                  <TeacherLanguageToggle />
+                </>
+              ) : (
+                <>
+                  <ThemeToggle />
+                  <LanguageToggle />
+                </>
+              )}
                 
                 {loading ? (
                   <div className="w-[120px] h-[40px] bg-foreground/10 animate-pulse rounded-full"></div>
@@ -711,16 +743,25 @@ export default function Navbar() {
               </div>
 
             {/* Mobile Controls (Toggles + Hamburger Trigger) */}
-            <div className="flex md:hidden items-center gap-2">
-              <ThemeToggle />
-              <LanguageToggle />
+            <div className="flex md:hidden items-center gap-1.5 sm:gap-2">
+              {isTeacherStorefrontMode || isTeacherDashboard ? (
+                <>
+                  <TeacherThemeToggle />
+                  <TeacherLanguageToggle />
+                </>
+              ) : (
+                <>
+                  <ThemeToggle />
+                  <LanguageToggle />
+                </>
+              )}
               
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-foreground transition-all ml-1"
+                className="p-2 sm:p-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-foreground transition-all ml-0.5"
                 aria-label="Toggle mobile menu"
               >
-                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {isMobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
               </button>
             </div>
           </div>
@@ -753,8 +794,17 @@ export default function Navbar() {
           {/* Drawer Top Header Bar */}
           <div className="flex items-center justify-between p-4 border-b border-foreground/10 bg-foreground/[0.03]">
             <div className="flex items-center gap-2">
-              <ThemeToggle />
-              <LanguageToggle />
+              {isTeacherStorefrontMode || isTeacherDashboard ? (
+                <>
+                  <TeacherThemeToggle />
+                  <TeacherLanguageToggle />
+                </>
+              ) : (
+                <>
+                  <ThemeToggle />
+                  <LanguageToggle />
+                </>
+              )}
             </div>
             <button
               onClick={() => {
@@ -860,6 +910,33 @@ export default function Navbar() {
             ) : (
               /* CASE 3: Public Site Pages (Marketplace vs Teacher Storefront Menu) */
               <div className="space-y-3">
+                {/* Teacher Storefront Mini Brand Profile Card (Only in Teacher Mode) */}
+                {isTeacherStorefrontMode && (
+                  <div className="p-3.5 rounded-2xl bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-transparent border border-orange-500/20 shadow-xs mb-2 flex items-center gap-3">
+                    {storefrontTeacherData?.headerLogo || storefrontTeacherData?.logoUrl ? (
+                      <div className="h-10 w-auto max-w-[110px] flex items-center shrink-0">
+                        <img 
+                          src={storefrontTeacherData.headerLogo || storefrontTeacherData.logoUrl} 
+                          alt={preferredTeacherName || 'Academy Logo'} 
+                          className="h-full w-auto max-h-10 object-contain object-left" 
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center text-sm shadow-sm shadow-orange-500/20 shrink-0">
+                        {(preferredTeacherName || 'T').charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="font-extrabold text-sm text-foreground truncate">
+                        {preferredTeacherName || 'Teacher Academy'}
+                      </p>
+                      <p className="text-[10px] font-semibold text-orange-500 truncate">
+                        {storefrontTeacherData?.headerTagline || 'অফিশিয়াল একাডেমি'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Mobile Search Bar */}
                 <div className="px-1 pt-1 pb-1">
                   <HeaderSearchBar 
@@ -891,7 +968,9 @@ export default function Navbar() {
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
                         item.isActive 
-                          ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 border-orange-400/40 ring-1 ring-orange-400/30' 
+                          ? isTeacherStorefrontMode
+                            ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 border-orange-400/40 ring-1 ring-orange-400/30'
+                            : 'bg-primary text-primary-foreground shadow-md shadow-primary/30 border-primary/40'
                           : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
                       }`}
                     >

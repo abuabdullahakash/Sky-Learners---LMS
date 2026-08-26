@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from '@/i18n/routing';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { 
@@ -185,7 +185,6 @@ export default function CoursesPage() {
   const isBn = locale === 'bn';
   const searchParams = useSearchParams();
   const queryTeacherId = searchParams.get('teacherId');
-  const isForcedMarketplace = searchParams.get('view') === 'marketplace';
 
   // URL Filters from Mega Menu & Search
   const urlCategory = searchParams.get('category');
@@ -195,22 +194,8 @@ export default function CoursesPage() {
   const urlYear = searchParams.get('year');
   const urlSearch = searchParams.get('search');
 
-  const [guestTeacherId, setGuestTeacherId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const stored = sessionStorage.getItem('referralTeacherId') || localStorage.getItem('referralTeacherId');
-      if (stored && stored !== 'global') {
-        setGuestTeacherId(stored);
-      }
-    }
-  }, []);
-  
-  const isAdmin = userData?.isAdmin || userData?.role === 'admin' || user?.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com' || Boolean(user?.email?.toLowerCase().includes('abuabdullahakash'));
-  const isTeacher = isAdmin || userData?.role === 'teacher';
-
-  const preferredTeacherId = userData?.preferredTeacherId && userData.preferredTeacherId !== 'global' ? userData.preferredTeacherId : null;
-  const activeTeacherId = isForcedMarketplace ? null : (isTeacher ? user?.uid : (preferredTeacherId || queryTeacherId || (!user ? guestTeacherId : null)));
+  // ONLY set activeTeacherId if queryTeacherId is explicitly in URL
+  const activeTeacherId = queryTeacherId || null;
 
   const [courses, setCourses] = useState<any[]>([]);
   const [teacherProfile, setTeacherProfile] = useState<any>(null);
@@ -221,7 +206,7 @@ export default function CoursesPage() {
 
   // Sync selectedCategory with urlCategory if present
   useEffect(() => {
-    if (urlCategory) {
+    if (urlCategory && urlCategory !== 'all') {
       setSelectedCategory(urlCategory);
     } else {
       setSelectedCategory('all');
@@ -233,6 +218,8 @@ export default function CoursesPage() {
     }
     if (urlSearch) {
       setSearchQuery(urlSearch);
+    } else {
+      setSearchQuery('');
     }
   }, [urlCategory, urlClass, urlSearch]);
 
@@ -245,7 +232,7 @@ export default function CoursesPage() {
         const coursesRef = collection(db, 'courses');
         let q;
 
-        // If teacher is logged in OR student is in focused teacher mode, fetch ONLY that teacher's courses
+        // If explicitly in teacher mode via ?teacherId=...
         if (activeTeacherId) {
           q = query(
             coursesRef, 
@@ -317,7 +304,7 @@ export default function CoursesPage() {
     return String(val).replace(/[0-9]/g, (d) => bnDigits[Number(d)]);
   };
 
-  // Helper for Category Metadata
+  // Helper for Category Metadata with Custom Distinct Colors
   const getCategoryMeta = (catId: string) => {
     switch (catId) {
       case 'primary':
@@ -330,7 +317,9 @@ export default function CoursesPage() {
           descBn: 'ছোটদের পড়ালেখা হোক আনন্দের ও সহজ। ১ম থেকে ৫ম শ্রেণির সকল বিষয়ের সহজ পাঠ ও ভিত্তি গঠন।',
           descEn: 'Foundational learning made enjoyable and simple for Class 1 to 5 students.',
           icon: School,
-          colorBadge: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20',
+          sectionBg: 'bg-[#FFF9F2] dark:bg-[#251A10] border-amber-200/90 dark:border-amber-900/60',
+          colorBadge: 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 border-amber-300 dark:border-amber-800',
+          btnBg: 'bg-amber-600 hover:bg-amber-700 text-white',
           classes: [
             { num: '1', bn: '১ম শ্রেণি', en: 'Class 1' },
             { num: '2', bn: '২য় শ্রেণি', en: 'Class 2' },
@@ -349,7 +338,9 @@ export default function CoursesPage() {
           descBn: 'জেএসসি ও এসএসসি পরীক্ষার সেরা প্রস্তুতি এবং গণিত-বিজ্ঞানের বেসিক মজবুত করার পূর্ণাঙ্গ কোর্স।',
           descEn: 'Comprehensive preparation for high school and SSC board exam excellence.',
           icon: GraduationCap,
-          colorBadge: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+          sectionBg: 'bg-[#F4F9FF] dark:bg-[#0F1E33] border-blue-200/90 dark:border-blue-900/60',
+          colorBadge: 'bg-blue-100 text-blue-900 dark:bg-blue-950 dark:text-blue-300 border-blue-300 dark:border-blue-800',
+          btnBg: 'bg-blue-600 hover:bg-blue-700 text-white',
           classes: [
             { num: '6', bn: '৬ষ্ঠ শ্রেণি', en: 'Class 6' },
             { num: '7', bn: '৭ম শ্রেণি', en: 'Class 7' },
@@ -368,7 +359,9 @@ export default function CoursesPage() {
           descBn: 'বিজ্ঞান, মানবিক ও ব্যবসায় শিক্ষা বিভাগের জন্য অভিজ্ঞ শিক্ষকদের সাথে পূর্ণাঙ্গ এইচএসসি প্রস্তুতি।',
           descEn: 'Complete HSC preparation across Science, Arts, and Commerce streams.',
           icon: Award,
-          colorBadge: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+          sectionBg: 'bg-[#F2FAF5] dark:bg-[#0D241A] border-emerald-200/90 dark:border-emerald-900/60',
+          colorBadge: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800',
+          btnBg: 'bg-emerald-600 hover:bg-emerald-700 text-white',
           classes: [
             { num: '11', bn: 'একাদশ শ্রেণি', en: 'Class 11' },
             { num: '12', bn: 'দ্বাদশ শ্রেণি', en: 'Class 12' },
@@ -384,7 +377,9 @@ export default function CoursesPage() {
           descBn: 'বুয়েট, মেডিকেল, ঢাকা বিশ্ববিদ্যালয় সহ শীর্ষ বিশ্ববিদ্যালয়ের ভর্তি পরীক্ষার সফল প্রস্তুতি।',
           descEn: 'Targeted preparation for Medical, BUET, and University admission tests.',
           icon: Building2,
-          colorBadge: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+          sectionBg: 'bg-[#F9F5FF] dark:bg-[#201435] border-purple-200/90 dark:border-purple-900/60',
+          colorBadge: 'bg-purple-100 text-purple-900 dark:bg-purple-950 dark:text-purple-300 border-purple-300 dark:border-purple-800',
+          btnBg: 'bg-purple-600 hover:bg-purple-700 text-white',
           classes: [
             { num: 'engineering', bn: 'ইঞ্জিনিয়ারিং', en: 'Engineering' },
             { num: 'medical', bn: 'মেডিকেল', en: 'Medical' },
@@ -404,7 +399,9 @@ export default function CoursesPage() {
           descBn: 'জাতীয় ও পাবলিক বিশ্ববিদ্যালয়ের বিভিন্ন বিষয়ের একাডেমিক সিলেবাস ও পরীক্ষার দিকনির্দেশনা।',
           descEn: 'University degree level academic curriculum and semester guidelines.',
           icon: Library,
-          colorBadge: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
+          sectionBg: 'bg-[#FFF5F7] dark:bg-[#271018] border-rose-200/90 dark:border-rose-900/60',
+          colorBadge: 'bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-300 border-rose-300 dark:border-rose-800',
+          btnBg: 'bg-rose-600 hover:bg-rose-700 text-white',
           classes: []
         };
       case 'skills':
@@ -418,7 +415,9 @@ export default function CoursesPage() {
           descBn: 'প্রোগ্রামিং, ডিজাইন, ডিজিটাল মার্কেটিং এবং আধুনিক ফ্রিল্যান্সিং ক্যারিয়ার গড়ে তোলার কোর্স।',
           descEn: 'Practical career skills in programming, digital design, and freelancing.',
           icon: Sparkles,
-          colorBadge: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+          sectionBg: 'bg-[#F0FDFA] dark:bg-[#0E2421] border-teal-200/90 dark:border-teal-900/60',
+          colorBadge: 'bg-teal-100 text-teal-900 dark:bg-teal-950 dark:text-teal-300 border-teal-300 dark:border-teal-800',
+          btnBg: 'bg-teal-600 hover:bg-teal-700 text-white',
           classes: []
         };
     }
@@ -475,8 +474,7 @@ export default function CoursesPage() {
     return matchesSearch && matchesCategory && matchesClass && matchesGroup && matchesDepartment && matchesYear;
   });
 
-  const isMarketplaceMode = !activeTeacherId;
-  const isCategoryViewActive = Boolean((urlCategory && urlCategory !== 'all') || (selectedCategory !== 'all') || searchQuery.trim().length > 0 || urlClass);
+  const isCategoryViewActive = Boolean((urlCategory && urlCategory !== 'all') || searchQuery.trim().length > 0 || urlClass);
 
   const activeCategoryMeta = getCategoryMeta(urlCategory || selectedCategory || 'primary');
 
@@ -518,9 +516,9 @@ export default function CoursesPage() {
       <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
         
         {/* ========================================================================= */}
-        {/* CASE 1: GLOBAL MARKETPLACE MAIN COURSES HUB (NO CATEGORY SELECTED)       */}
+        {/* CASE 1: GLOBAL MARKETPLACE MAIN COURSES HUB (WHEN NO CATEGORY IS ACTIVE)  */}
         {/* ========================================================================= */}
-        {isMarketplaceMode && !isCategoryViewActive && (
+        {!isCategoryViewActive && (
           <div className="space-y-12">
             
             {/* Top Clean Header */}
@@ -547,7 +545,7 @@ export default function CoursesPage() {
               </div>
             </div>
 
-            {/* 🌟 Big Category Showcase Cards (Flat, No Shadows, Minimal Radius) */}
+            {/* 🌟 Big Category Showcase Cards (Each with unique pastel tint background) */}
             <div className="space-y-10">
               {mainCategoriesList.map((catId) => {
                 const meta = getCategoryMeta(catId);
@@ -564,13 +562,13 @@ export default function CoursesPage() {
                 return (
                   <section 
                     key={catId}
-                    className="rounded-xl border border-foreground/10 bg-foreground/[0.015] p-5 sm:p-7 space-y-6"
+                    className={`rounded-xl border ${meta.sectionBg} p-5 sm:p-7 space-y-6 transition-all`}
                   >
                     {/* 1. Category Section Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-md bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20">
-                          <Icon className="w-5 h-5" />
+                        <div className="w-10 h-10 rounded-md bg-background text-foreground flex items-center justify-center shrink-0 border border-foreground/15">
+                          <Icon className="w-5 h-5 text-foreground" />
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
@@ -591,7 +589,7 @@ export default function CoursesPage() {
                       <button
                         type="button"
                         onClick={() => handleSelectCategory(catId)}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-foreground/5 hover:bg-primary hover:text-white border border-foreground/10 text-xs font-bold text-foreground transition-all self-start sm:self-auto shrink-0 group"
+                        className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md ${meta.btnBg} text-xs font-bold transition-all self-start sm:self-auto shrink-0 group`}
                       >
                         <span>{isBn ? `সকল ${meta.nameBn} কোর্স দেখুন` : `View All Courses`}</span>
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -746,7 +744,7 @@ export default function CoursesPage() {
         {/* ========================================================================= */}
         {/* CASE 2: DEDICATED CATEGORY SUBVIEW (WITH CLEAN FLAT BACK BUTTON & FILTERS) */}
         {/* ========================================================================= */}
-        {(!isMarketplaceMode || isCategoryViewActive) && (
+        {isCategoryViewActive && (
           <div className="space-y-6">
             
             {/* Top Back Navigation Bar */}
@@ -765,8 +763,8 @@ export default function CoursesPage() {
               </span>
             </div>
 
-            {/* Category Banner Card */}
-            <div className="p-6 rounded-xl border border-foreground/10 bg-foreground/[0.015] flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            {/* Category Banner Card with specific section tint */}
+            <div className={`p-6 rounded-xl border ${activeCategoryMeta.sectionBg} flex flex-col sm:flex-row sm:items-center justify-between gap-6`}>
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${activeCategoryMeta.colorBadge}`}>

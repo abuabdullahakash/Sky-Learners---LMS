@@ -6,7 +6,31 @@ import { db, auth } from '@/lib/firebase';
 import { updateProfile } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { uploadImageToImgBB } from '@/lib/imgbb';
-import { User, Camera, Link as LinkIcon, Save, CheckCircle2, Globe, GraduationCap, BookOpen, Presentation, Eye, Upload, Loader2, Image as ImageIcon, Plus, X, Trash2, Sparkles, ShieldCheck, Building2 } from 'lucide-react';
+import { User, Camera, Link as LinkIcon, Save, CheckCircle2, Globe, GraduationCap, BookOpen, Presentation, Eye, Upload, Loader2, Image as ImageIcon, Plus, X, Trash2, Sparkles, ShieldCheck, Building2, Info } from 'lucide-react';
+
+function InfoTooltip({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div 
+      className="relative inline-flex items-center ml-2 align-middle z-20 group"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button 
+        type="button" 
+        onClick={() => setOpen(!open)}
+        className="w-4 h-4 rounded-full bg-foreground/10 hover:bg-orange-500/20 text-foreground/50 hover:text-orange-500 flex items-center justify-center transition-all cursor-pointer"
+      >
+        <Info className="w-2.5 h-2.5" />
+      </button>
+      {open && (
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 sm:w-64 p-2.5 rounded-xl bg-slate-950/95 backdrop-blur-xl border border-white/15 text-white text-[11px] font-normal leading-relaxed shadow-2xl z-50 pointer-events-none animate-in fade-in zoom-in-95 duration-150">
+          {text}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function ProfileBuilderPage() {
   const { user, refreshUserData } = useAuth();
@@ -302,11 +326,10 @@ export default function ProfileBuilderPage() {
         <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-5 sm:p-7 shadow-sm space-y-5">
           <div className="border-b border-foreground/10 pb-3.5">
             <h2 className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground">
-              <User className="w-5 h-5 text-orange-500 shrink-0" /> 1. Account Profile Type
+              <User className="w-5 h-5 text-orange-500 shrink-0" />
+              <span>1. Account Profile Type</span>
+              <InfoTooltip text="Select how your account is structured and presented to students across the portal." />
             </h2>
-            <p className="text-xs sm:text-sm text-foreground/70 font-medium mt-1">
-              Select how your account is structured and presented to students across the portal.
-            </p>
           </div>
 
           {/* Interactive Profile Type Choice Cards */}
@@ -373,11 +396,10 @@ export default function ProfileBuilderPage() {
         <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-5 sm:p-7 shadow-sm space-y-6">
           <div className="border-b border-foreground/10 pb-3.5">
             <h2 className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground">
-              <ImageIcon className="w-5 h-5 text-orange-500 shrink-0" /> 2. Profile Branding & Media
+              <ImageIcon className="w-5 h-5 text-orange-500 shrink-0" />
+              <span>2. Profile Branding & Media</span>
+              <InfoTooltip text="Upload high-quality cover banners and your main instructor portrait or institution logo." />
             </h2>
-            <p className="text-xs sm:text-sm text-foreground/70 font-medium mt-1">
-              Upload high-quality cover banners and your main instructor portrait or institution logo.
-            </p>
           </div>
 
           {/* Cover Photo Upload */}
@@ -457,11 +479,10 @@ export default function ProfileBuilderPage() {
         <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-5 sm:p-7 shadow-sm space-y-6">
           <div className="border-b border-foreground/10 pb-3.5">
             <h2 className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground">
-              <BookOpen className="w-5 h-5 text-orange-500 shrink-0" /> 3. Basic Information
+              <BookOpen className="w-5 h-5 text-orange-500 shrink-0" />
+              <span>3. Basic Information</span>
+              <InfoTooltip text="Enter your full display name, professional headline, and academic background details." />
             </h2>
-            <p className="text-xs sm:text-sm text-foreground/70 font-medium mt-1">
-              Enter your full display name, professional headline, and academic background details.
-            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
@@ -506,11 +527,10 @@ export default function ProfileBuilderPage() {
         <div className="bg-background dark:bg-foreground/5 border border-foreground/10 rounded-2xl p-5 sm:p-7 shadow-sm space-y-7">
           <div className="border-b border-foreground/10 pb-3.5">
             <h2 className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground">
-              <GraduationCap className="w-5 h-5 text-orange-500 shrink-0" /> 4. Academic Profile & Classes
+              <GraduationCap className="w-5 h-5 text-orange-500 shrink-0" />
+              <span>4. Academic Profile & Classes</span>
+              <InfoTooltip text="Specify your target education levels, subject expertise, and teaching experience or team roster." />
             </h2>
-            <p className="text-xs sm:text-sm text-foreground/70 font-medium mt-1">
-              Specify your target education levels, subject expertise, and teaching experience or team roster.
-            </p>
           </div>
           
           {/* Education Levels - Orange Badges when Selected */}
@@ -715,11 +735,10 @@ export default function ProfileBuilderPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-foreground/10 pb-3.5">
             <div>
               <h2 className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground">
-                <LinkIcon className="w-5 h-5 text-orange-500 shrink-0" /> 5. Social Links & Website
+                <LinkIcon className="w-5 h-5 text-orange-500 shrink-0" />
+                <span>5. Social Links & Website</span>
+                <InfoTooltip text="Connect your website, social media handles, and custom external links." />
               </h2>
-              <p className="text-xs sm:text-sm text-foreground/70 font-medium mt-1">
-                Connect your website, social media handles, and custom external links.
-              </p>
             </div>
             <button 
               type="button" 

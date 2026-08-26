@@ -3928,13 +3928,11 @@ export default function TeacherHomePageBuilderPage() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
                 <div>
-                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
-                    <Flame className="w-5 h-5 text-orange-500" />
-                    <span>১. হিরো ব্যানার ও স্লোগান (Hero Banner & Intro)</span>
+                  <h3 className="text-lg font-black text-foreground flex items-center">
+                    <Flame className="w-5 h-5 text-orange-500 mr-2" />
+                    <span>{isBn ? '১. হিরো ব্যানার ও স্লোগান' : '1. Hero Banner & Intro'}</span>
+                    <InfoTooltip text={isBn ? 'অ্যাবাউট পেজের শীর্ষ ব্যানার, মূল স্লোগান, পরিচিতি ভিডিও ও বাটন কাস্টমাইজ করুন।' : 'Customize about page top hero banner, slogan, video, and action buttons.'} />
                   </h3>
-                  <p className="text-xs text-foreground/60 mt-1">
-                    অ্যাবাউট পেজের শীর্ষ ব্যানার, মূল স্লোগান, পরিচিতি ভিডিও ও বাটন কাস্টমাইজ করুন।
-                  </p>
                 </div>
                 <Link
                   href="/about"
@@ -4070,13 +4068,11 @@ export default function TeacherHomePageBuilderPage() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
                 <div>
-                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-orange-500" />
-                    <span>২. আমাদের গল্প ও পরিসংখ্যান (Our Story & Live Stats)</span>
+                  <h3 className="text-lg font-black text-foreground flex items-center">
+                    <BookOpen className="w-5 h-5 text-orange-500 mr-2" />
+                    <span>{isBn ? '২. আমাদের গল্প ও পরিসংখ্যান' : '2. Our Story & Live Stats'}</span>
+                    <InfoTooltip text={isBn ? 'আপনার একাডেমির প্রতিষ্ঠাকালীন গল্প, অনুপ্রেরণামূলক বার্তা ও ৪টি প্রধান পরিসংখ্যান সেট করুন।' : 'Configure your academy story, inspirational message, and 4 live stats.'} />
                   </h3>
-                  <p className="text-xs text-foreground/60 mt-1">
-                    আপনার একাডেমির প্রতিষ্ঠাকালীন গল্প, অনুপ্রেরণামূলক বার্তা ও ৪টি প্রধান পরিসংখ্যান সেট করুন।
-                  </p>
                 </div>
                 <Link
                   href="/about#story"
@@ -4223,13 +4219,11 @@ export default function TeacherHomePageBuilderPage() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
                 <div>
-                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
-                    <Award className="w-5 h-5 text-orange-500" />
-                    <span>৩. আমাদের মূল ভিত্তি (Core Values Section)</span>
+                  <h3 className="text-lg font-black text-foreground flex items-center">
+                    <Award className="w-5 h-5 text-orange-500 mr-2" />
+                    <span>{isBn ? '৩. আমাদের মূল ভিত্তি' : '3. Core Values Section'}</span>
+                    <InfoTooltip text={isBn ? 'অ্যাবাউট পেজের ভ্যালু কার্ডগুলোর আইকন, শিরোনাম, সাবটাইটেল ও বিবরণ কাস্টমাইজ করুন।' : 'Customize value cards icons, titles, subtitles, and descriptions.'} />
                   </h3>
-                  <p className="text-xs text-foreground/60 mt-1">
-                    অ্যাবাউট পেজের ভ্যালু কার্ডগুলোর আইকন, শিরোনাম, সাবটাইটেল ও বিবরণ কাস্টমাইজ করুন।
-                  </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto shrink-0">
                   <button
@@ -4704,13 +4698,11 @@ export default function TeacherHomePageBuilderPage() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
                 <div>
-                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
-                    <ImageIcon className="w-5 h-5 text-orange-500" />
-                    <span>৪. ক্যাম্পাস ও টিম মোমেন্টস (Moments Showcase Slider)</span>
+                  <h3 className="text-lg font-black text-foreground flex items-center">
+                    <ImageIcon className="w-5 h-5 text-orange-500 mr-2" />
+                    <span>{isBn ? '৪. ক্যাম্পাস ও টিম মোমেন্টস' : '4. Moments Showcase Slider'}</span>
+                    <InfoTooltip text={isBn ? 'অ্যাবাউট পেজের ইন্টারেক্টিভ ২-রো গ্যালারি স্লাইডারের শিরোনাম ও পরিচিতি টেক্সট পরিবর্তন করুন।' : 'Change showcase slider headline and subtitle.'} />
                   </h3>
-                  <p className="text-xs text-foreground/60 mt-1">
-                    অ্যাবাউট পেজের ইন্টারেক্টিভ ২-রো গ্যালারি স্লাইডারের শিরোনাম ও পরিচিতি টেক্সট পরিবর্তন করুন।
-                  </p>
                 </div>
                 <Link
                   href="/about"
@@ -4753,13 +4745,11 @@ export default function TeacherHomePageBuilderPage() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
                 <div>
-                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
-                    <User className="w-5 h-5 text-orange-500" />
-                    <span>৫. ফাউন্ডার ও চিফ মেন্টর প্রোফাইল (Founder Spotlight)</span>
+                  <h3 className="text-lg font-black text-foreground flex items-center">
+                    <User className="w-5 h-5 text-orange-500 mr-2" />
+                    <span>{isBn ? '৫. ফাউন্ডার ও চিফ মেন্টর প্রোফাইল' : '5. Founder Spotlight'}</span>
+                    <InfoTooltip text={isBn ? 'অ্যাবাউট পেজের লাক্সারি কার্ডে ফাউন্ডার/চিফ মেন্টরের বার্তা ও পোর্ট্রেট সেট করুন।' : 'Configure founder message, photo, and title on about page.'} />
                   </h3>
-                  <p className="text-xs text-foreground/60 mt-1">
-                    অ্যাবাউট পেজের লাক্সারি গ্লাস মরফিক কার্ডে ফাউন্ডার/চিফ মেন্টরের বার্তা ও পোর্ট্রেট সেট করুন।
-                  </p>
                 </div>
                 <Link
                   href="/about"
@@ -4825,13 +4815,11 @@ export default function TeacherHomePageBuilderPage() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
                 <div>
-                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
-                    <Target className="w-5 h-5 text-orange-500" />
-                    <span>৬. মেগা অ্যাকশন ব্যানার (Mega CTA Banner)</span>
+                  <h3 className="text-lg font-black text-foreground flex items-center">
+                    <Target className="w-5 h-5 text-orange-500 mr-2" />
+                    <span>{isBn ? '৬. মেগা অ্যাকশন ব্যানার' : '6. Mega CTA Banner'}</span>
+                    <InfoTooltip text={isBn ? 'অ্যাবাউট পেজের নিচের মেগা প্রস্তুতি ব্যানার, বাটন, হেল্পলাইন ও ৪টি সুবিধা চেকলিস্ট কাস্টমাইজ করুন।' : 'Customize bottom mega CTA banner, action buttons, helpline, and feature badges.'} />
                   </h3>
-                  <p className="text-xs text-foreground/60 mt-1">
-                    অ্যাবাউট পেজের নিচের মেগা প্রস্তুতি ব্যানার, বাটন, হেল্পলাইন ও ৪টি সুবিধা চেকলিস্ট ব্যাজ কাস্টমাইজ করুন।
-                  </p>
                 </div>
                 <Link
                   href="/about"
@@ -4976,13 +4964,11 @@ export default function TeacherHomePageBuilderPage() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
                 <div>
-                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
-                    <Headphones className="w-5 h-5 text-orange-500" />
-                    <span>১. হিরো ও লাইভ সাপোর্ট ব্যাজ (Hero & Live Badges)</span>
+                  <h3 className="text-lg font-black text-foreground flex items-center">
+                    <Headphones className="w-5 h-5 text-orange-500 mr-2" />
+                    <span>{isBn ? '১. হিরো ও লাইভ সাপোর্ট ব্যাজ' : '1. Hero & Live Badges'}</span>
+                    <InfoTooltip text={isBn ? 'যোগাযোগ পেজের শীর্ষ হিরো সেকশনের হেডিং, সাবটাইটেল এবং লাইভ স্ট্যাটাস ব্যাজগুলো কাস্টমাইজ করুন।' : 'Customize contact page hero heading, subtitle, and live support badges.'} />
                   </h3>
-                  <p className="text-xs text-foreground/60 mt-1">
-                    যোগাযোগ পেজের শীর্ষ হিরো সেকশনের হেডিং, সাবটাইটেল এবং লাইভ স্ট্যাটাস ব্যাজগুলো কাস্টমাইজ করুন।
-                  </p>
                 </div>
                 <Link
                   href="/contact"
@@ -5074,13 +5060,11 @@ export default function TeacherHomePageBuilderPage() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
                 <div>
-                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
-                    <Phone className="w-5 h-5 text-orange-500" />
-                    <span>২. ৪টি কুইক অ্যাকশন কার্ডস (Quick Action Cards)</span>
+                  <h3 className="text-lg font-black text-foreground flex items-center">
+                    <Phone className="w-5 h-5 text-orange-500 mr-2" />
+                    <span>{isBn ? '২. ৪টি কুইক অ্যাকশন কার্ডস' : '2. Quick Action Cards'}</span>
+                    <InfoTooltip text={isBn ? 'শিক্ষার্থীদের দ্রুত যোগাযোগের জন্য ফোন, হোয়াটসঅ্যাপ, ইমেইল ও ব্রাঞ্চ কার্ডের তথ্য কনফিগার করুন।' : 'Configure phone, WhatsApp, email, and campus branch action cards.'} />
                   </h3>
-                  <p className="text-xs text-foreground/60 mt-1">
-                    শিক্ষার্থীদের দ্রুত যোগাযোগের জন্য ফোন, হোয়াটসঅ্যাপ, ইমেইল ও ব্রাঞ্চ কার্ডের তথ্য কনফিগার করুন।
-                  </p>
                 </div>
                 <Link
                   href="/contact"
@@ -5166,13 +5150,11 @@ export default function TeacherHomePageBuilderPage() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
                 <div>
-                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-orange-500" />
-                    <span>৩. সাপোর্ট সময়সূচি ও ব্রাঞ্চ লোকেশন (Schedule & Branch)</span>
+                  <h3 className="text-lg font-black text-foreground flex items-center">
+                    <Clock className="w-5 h-5 text-orange-500 mr-2" />
+                    <span>{isBn ? '৩. সাপোর্ট সময়সূচি ও ব্রাঞ্চ লোকেশন' : '3. Schedule & Branch Location'}</span>
+                    <InfoTooltip text={isBn ? 'অফিস সময়সূচি, রেসপন্স টাইম এবং Google Maps লোকেশন লিঙ্ক কনফিগার করুন।' : 'Configure support hours, response time commitment, and Google Maps direction link.'} />
                   </h3>
-                  <p className="text-xs text-foreground/60 mt-1">
-                    অফিস সময়সূচি, রেসপন্স টাইম এবং Google Maps লোকেশন লিঙ্ক কনফিগার করুন।
-                  </p>
                 </div>
                 <Link
                   href="/contact"
@@ -5239,13 +5221,11 @@ export default function TeacherHomePageBuilderPage() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
                 <div>
-                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
-                    <Globe className="w-5 h-5 text-orange-500" />
-                    <span>৪. সোশ্যাল ও ভিআইপি কমিউনিটি (Community & Social Hub)</span>
+                  <h3 className="text-lg font-black text-foreground flex items-center">
+                    <Globe className="w-5 h-5 text-orange-500 mr-2" />
+                    <span>{isBn ? '৪. সোশ্যাল ও ভিআইপি কমিউনিটি' : '4. Community & Social Hub'}</span>
+                    <InfoTooltip text={isBn ? 'ফেসবুক ভিআইপি গ্রুপ, টেলিগ্রাম চ্যানেল, ইউটিউব লেকচার এবং অফিশিয়াল পেজের লিংক সেট করুন।' : 'Configure Facebook VIP group, Telegram channel, YouTube, and Facebook page links.'} />
                   </h3>
-                  <p className="text-xs text-foreground/60 mt-1">
-                    ফেসবুক ভিআইপি গ্রুপ, টেলিগ্রাম চ্যানেল, ইউটিউব লেকচার এবং অফিশিয়াল পেজের লিংক সেট করুন।
-                  </p>
                 </div>
                 <Link
                   href="/contact"
@@ -5311,13 +5291,11 @@ export default function TeacherHomePageBuilderPage() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
                 <div>
-                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
-                    <HelpCircle className="w-5 h-5 text-orange-500" />
-                    <span>৫. সচরাচর জিজ্ঞাসা (FAQ Manager)</span>
+                  <h3 className="text-lg font-black text-foreground flex items-center">
+                    <HelpCircle className="w-5 h-5 text-orange-500 mr-2" />
+                    <span>{isBn ? '৫. সচরাচর জিজ্ঞাসা' : '5. FAQ Manager'}</span>
+                    <InfoTooltip text={isBn ? 'কন্টাক্ট পেজের জন্য প্রয়োজনীয় সাধারণ প্রশ্নোত্তর যুক্ত করুন এবং কাস্টমাইজ করুন।' : 'Add and manage frequently asked questions (FAQs) for contact page.'} />
                   </h3>
-                  <p className="text-xs text-foreground/60 mt-1">
-                    কন্টাক্ট পেজের জন্য প্রয়োজনীয় সাধারণ প্রশ্নোত্তর যুক্ত করুন এবং কাস্টমাইজ করুন।
-                  </p>
                 </div>
                 <div className="flex items-center gap-2 self-start sm:self-auto">
                   <button
@@ -5403,13 +5381,11 @@ export default function TeacherHomePageBuilderPage() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
                 <div>
-                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
-                    <Target className="w-5 h-5 text-orange-500" />
-                    <span>৬. মেগা অ্যাকশন ব্যানার (Mega CTA Banner)</span>
+                  <h3 className="text-lg font-black text-foreground flex items-center">
+                    <Target className="w-5 h-5 text-orange-500 mr-2" />
+                    <span>{isBn ? '৬. মেগা অ্যাকশন ব্যানার' : '6. Mega CTA Banner'}</span>
+                    <InfoTooltip text={isBn ? 'কন্টাক্ট পেজের নিচের কল-টু-অ্যাকশন ব্যানার, শিরোনাম ও বাটনসমূহ কাস্টমাইজ করুন।' : 'Customize bottom mega CTA banner, headline, and action buttons.'} />
                   </h3>
-                  <p className="text-xs text-foreground/60 mt-1">
-                    কন্টাক্ট পেজের নিচের কল-টু-অ্যাকশন ব্যানার, শিরোনাম ও বাটনসমূহ কাস্টমাইজ করুন।
-                  </p>
                 </div>
                 <Link
                   href="/contact"
@@ -5510,28 +5486,26 @@ export default function TeacherHomePageBuilderPage() {
                 {/* Clean Header Info */}
                 <div className="border-b border-foreground/10 pb-4">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-black text-foreground flex items-center gap-2">
+                    <h3 className="text-lg font-black text-foreground flex items-center">
                       {isNoticeManager ? (
                         <>
-                          <FilePlus className="w-5 h-5 text-orange-500" />
-                          <span>নোটিশ আপলোড ও ম্যানেজমেন্ট প্যানেল</span>
+                          <FilePlus className="w-5 h-5 text-orange-500 mr-2" />
+                          <span>{isBn ? 'নোটিশ আপলোড ও ম্যানেজমেন্ট প্যানেল' : 'Notice Upload & Management'}</span>
                         </>
                       ) : (
                         <>
-                          <Sliders className="w-5 h-5 text-orange-500" />
-                          <span>{customPage.name} পেজ ও হিরো সেটিংস</span>
+                          <Sliders className="w-5 h-5 text-orange-500 mr-2" />
+                          <span>{customPage.name} {isBn ? 'পেজ ও হিরো সেটিংস' : 'Page & Hero Settings'}</span>
                         </>
                       )}
+                      <InfoTooltip text={isNoticeManager 
+                        ? (isBn ? 'শিক্ষার্থীদের জন্য নতুন নোটিশ, পরীক্ষার সময়সূচি বা ছুটির সার্কুলার প্রকাশ ও নিয়ন্ত্রণ করুন।' : 'Publish and manage notices, exam schedules, and circulars.')
+                        : (isBn ? `${customPage.name} পেজের হিরো ব্যানার, শিরোনাম ও টেক্সট কাস্টমাইজেশন ম্যানেজ করুন।` : `Customize hero banner, headline, and content for ${customPage.name}.`)} />
                     </h3>
                     <span className="text-xs font-mono bg-foreground/5 text-foreground/70 px-2.5 py-0.5 rounded-lg border border-foreground/10">
                       {customPage.slug}
                     </span>
                   </div>
-                  <p className="text-xs text-foreground/60 mt-1">
-                    {isNoticeManager 
-                      ? 'শিক্ষার্থীদের জন্য নতুন নোটিশ, পরীক্ষার সময়সূচি বা ছুটির সার্কুলার প্রকাশ ও নিয়ন্ত্রণ করুন।' 
-                      : `${customPage.name} পেজের হিরো ব্যানার, শিরোনাম ও টেক্সট কাস্টমাইজেশন ম্যানেজ করুন।`}
-                  </p>
                 </div>
 
                 {/* ------------------------------------------------------------- */}

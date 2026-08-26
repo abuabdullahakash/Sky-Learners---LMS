@@ -3,12 +3,36 @@
 import { useState, useRef, useEffect } from 'react';
 import { 
   ShieldCheck, CreditCard, Bell, Save, AlertCircle, CheckCircle2, ChevronRight, ChevronLeft, Loader2,
-  Sparkles, Eye, EyeOff, Lock
+  Sparkles, Eye, EyeOff, Lock, Info
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { db, auth } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+
+function InfoTooltip({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div 
+      className="relative inline-flex items-center ml-2 align-middle z-20 group"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button 
+        type="button" 
+        onClick={() => setOpen(!open)}
+        className="w-4 h-4 rounded-full bg-foreground/10 hover:bg-orange-500/20 text-foreground/50 hover:text-orange-500 flex items-center justify-center transition-all cursor-pointer"
+      >
+        <Info className="w-2.5 h-2.5" />
+      </button>
+      {open && (
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 sm:w-64 p-2.5 rounded-xl bg-slate-950/95 backdrop-blur-xl border border-white/15 text-white text-[11px] font-normal leading-relaxed shadow-2xl z-50 pointer-events-none animate-in fade-in zoom-in-95 duration-150">
+          {text}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function TeacherSettingsPage() {
   const { user } = useAuth();
@@ -294,10 +318,10 @@ export default function TeacherSettingsPage() {
             {activeTab === 'payment' && (
               <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
                 <div className="border-b border-foreground/10 pb-4 mb-6">
-                  <h2 className="text-xl font-bold">Manual Payment Receiving Numbers</h2>
-                  <p className="text-sm text-foreground/60 mt-1">
-                    These numbers will be displayed to students on the checkout page so they can send you money.
-                  </p>
+                  <h2 className="text-xl font-bold flex items-center">
+                    <span>Manual Payment Receiving Numbers</span>
+                    <InfoTooltip text="These numbers will be displayed to students on the checkout page so they can send you money." />
+                  </h2>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -355,10 +379,10 @@ export default function TeacherSettingsPage() {
             {activeTab === 'security' && (
               <div className="space-y-6 sm:space-y-8 animate-in fade-in zoom-in-95 duration-300">
                 <div className="border-b border-foreground/10 pb-3.5">
-                  <h2 className="text-xl font-extrabold">Security & Password</h2>
-                  <p className="text-xs sm:text-sm text-foreground/60 mt-1">
-                    Keep your account secure by updating passwords regularly.
-                  </p>
+                  <h2 className="text-xl font-extrabold flex items-center">
+                    <span>Security & Password</span>
+                    <InfoTooltip text="Keep your account secure by updating passwords regularly." />
+                  </h2>
                 </div>
                 
                 {/* Change Password Section (100% Real Firebase Password Update) */}
@@ -366,11 +390,9 @@ export default function TeacherSettingsPage() {
                   <div className="border-b border-foreground/10 pb-3">
                     <h3 className="font-extrabold text-base sm:text-lg flex items-center gap-2 text-foreground">
                       <ShieldCheck className="w-5 h-5 text-orange-500 shrink-0" />
-                      Change Password
+                      <span>Change Password</span>
+                      <InfoTooltip text="Update your password to keep your account protected across all devices." />
                     </h3>
-                    <p className="text-xs sm:text-sm text-foreground/60 mt-1">
-                      Update your password to keep your account protected across all devices.
-                    </p>
                   </div>
 
                   <div className="space-y-4 max-w-2xl">
@@ -463,10 +485,10 @@ export default function TeacherSettingsPage() {
             {activeTab === 'notifications' && (
               <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
                 <div className="border-b border-foreground/10 pb-4 mb-6">
-                  <h2 className="text-xl font-bold">Notification Preferences</h2>
-                  <p className="text-sm text-foreground/60 mt-1">
-                    Choose what updates you want to receive.
-                  </p>
+                  <h2 className="text-xl font-bold flex items-center">
+                    <span>Notification Preferences</span>
+                    <InfoTooltip text="Choose what updates and alerts you want to receive." />
+                  </h2>
                 </div>
                 
                 <div className="space-y-4">

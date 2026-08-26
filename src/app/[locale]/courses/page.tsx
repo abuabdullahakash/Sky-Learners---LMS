@@ -991,7 +991,9 @@ export default function CoursesPage() {
                           <Link
                             key={idx}
                             href={`/teachers/${m.slug}`}
-                            className="min-w-[230px] sm:min-w-[260px] p-2.5 rounded-lg border border-foreground/10 bg-background hover:border-primary/40 hover:bg-primary/[0.02] flex items-center gap-3 transition-all shrink-0 group"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="min-w-[230px] sm:min-w-[260px] p-2.5 rounded-lg border border-foreground/10 bg-background hover:border-primary/40 hover:bg-primary/[0.02] flex items-center gap-3 transition-all shrink-0 group cursor-pointer"
                           >
                             <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-foreground/10">
                               <img src={m.photo} alt={m.name} className="w-full h-full object-cover" />

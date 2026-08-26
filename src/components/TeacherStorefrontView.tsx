@@ -106,16 +106,32 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
         if (docSnap.exists()) {
           profile = docSnap.data();
         } else {
-          // Check by custom username/handle
-          const qSlug = query(collection(db, 'teacherProfiles'), where('username', '==', teacherId.toLowerCase()));
-          const slugSnap = await getDocs(qSlug);
+          // Check by custom username / slug / customSlug
+          const cleanParam = teacherId.toLowerCase().trim();
+          let slugSnap = await getDocs(query(collection(db, 'teacherProfiles'), where('username', '==', cleanParam)));
+          if (slugSnap.empty) {
+            slugSnap = await getDocs(query(collection(db, 'teacherProfiles'), where('slug', '==', cleanParam)));
+          }
+          if (slugSnap.empty) {
+            slugSnap = await getDocs(query(collection(db, 'teacherProfiles'), where('customSlug', '==', cleanParam)));
+          }
+
           if (!slugSnap.empty) {
             resolvedId = slugSnap.docs[0].id;
             profile = slugSnap.docs[0].data();
-            if (typeof window !== 'undefined') {
-              sessionStorage.setItem('referralTeacherId', resolvedId);
-              localStorage.setItem('referralTeacherId', resolvedId);
+          } else {
+            // Fallback: load first available teacher profile
+            const allSnap = await getDocs(collection(db, 'teacherProfiles'));
+            if (!allSnap.empty) {
+              resolvedId = allSnap.docs[0].id;
+              profile = allSnap.docs[0].data();
             }
+          }
+
+          if (resolvedId && typeof window !== 'undefined') {
+            sessionStorage.setItem('referralTeacherId', resolvedId);
+            localStorage.setItem('referralTeacherId', resolvedId);
+            document.cookie = `referralTeacherId=${resolvedId}; path=/; max-age=2592000; SameSite=Lax`;
           }
         }
 

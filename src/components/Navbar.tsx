@@ -137,7 +137,7 @@ export default function Navbar() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const checkStorage = () => {
-        const stored = sessionStorage.getItem('referralTeacherId') || localStorage.getItem('referralTeacherId');
+        const stored = sessionStorage.getItem('referralTeacherId');
         if (stored && stored !== 'global') {
           setGuestTeacherId(stored);
         } else {
@@ -181,11 +181,7 @@ export default function Navbar() {
   // Active teacher for dynamic link routing
   const effectiveTeacherId = isForcedMarketplace
     ? null
-    : (isTeacher 
-        ? user?.uid 
-        : (isCustomTeacherMode && preferredTeacherId 
-            ? preferredTeacherId 
-            : (routeTeacherId || guestTeacherId || null)));
+    : (routeTeacherId || guestTeacherId || (isCustomTeacherMode && preferredTeacherId ? preferredTeacherId : (isTeacher ? user?.uid : null)));
 
   // Real-Time Listener for Active Teacher Storefront Config
   useEffect(() => {
@@ -227,12 +223,11 @@ export default function Navbar() {
   const isContactActive = pathname === '/contact' || pathname.startsWith('/contact');
 
   // Determine Active Platform Mode:
-  // True if: Logged-in teacher, student with preferred teacher, referral visitor, or on a /teachers/[slug] route
+  // True if: on a /teachers/[slug] route, or visitor with referral link in this specific tab (guestTeacherId)
   const isTeacherStorefrontMode = !isForcedMarketplace && Boolean(
-    isTeacher || 
-    (isStudent && preferredTeacherId && preferredTeacherId !== 'global') || 
     routeTeacherId || 
-    guestTeacherId
+    (guestTeacherId && guestTeacherId !== 'global') ||
+    (isStudent && preferredTeacherId && preferredTeacherId !== 'global')
   );
 
   // 1. Marketplace Navigation Menu Category (১০০% ক্লিন ও পিওর SEO URL)
@@ -899,6 +894,10 @@ export default function Navbar() {
                               <Link 
                                 href="/?view=marketplace" 
                                 onClick={() => {
+                                  if (typeof window !== 'undefined') {
+                                    sessionStorage.removeItem('referralTeacherId');
+                                    window.dispatchEvent(new Event('storage'));
+                                  }
                                   setIsMobileMenuOpen(false);
                                   setShowProfileMenu(false);
                                 }}
@@ -915,6 +914,10 @@ export default function Navbar() {
                               <Link 
                                 href="/" 
                                 onClick={() => {
+                                  if (typeof window !== 'undefined' && user?.uid) {
+                                    sessionStorage.setItem('referralTeacherId', user.uid);
+                                    window.dispatchEvent(new Event('storage'));
+                                  }
                                   setIsMobileMenuOpen(false);
                                   setShowProfileMenu(false);
                                 }}

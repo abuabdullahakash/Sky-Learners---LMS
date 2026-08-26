@@ -88,7 +88,8 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
   useEffect(() => {
     if (typeof window !== 'undefined' && teacherId) {
       sessionStorage.setItem('referralTeacherId', teacherId);
-      localStorage.setItem('referralTeacherId', teacherId);
+      localStorage.removeItem('referralTeacherId');
+      document.cookie = 'referralTeacherId=; path=/; max-age=0; SameSite=Lax';
     }
 
     const fetchAcademyStorefront = async () => {
@@ -130,8 +131,6 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
           if (resolvedId && typeof window !== 'undefined') {
             sessionStorage.setItem('referralTeacherId', resolvedId);
-            localStorage.setItem('referralTeacherId', resolvedId);
-            document.cookie = `referralTeacherId=${resolvedId}; path=/; max-age=2592000; SameSite=Lax`;
           }
         }
 

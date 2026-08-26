@@ -12,8 +12,8 @@ export default function TeacherDedicatedStorefrontPage({ params }: { params: Pro
   useEffect(() => {
     if (typeof window !== 'undefined' && teacherId) {
       sessionStorage.setItem('referralTeacherId', teacherId);
-      localStorage.setItem('referralTeacherId', teacherId);
-      document.cookie = `referralTeacherId=${teacherId}; path=/; max-age=2592000; SameSite=Lax`;
+      localStorage.removeItem('referralTeacherId');
+      document.cookie = 'referralTeacherId=; path=/; max-age=0; SameSite=Lax';
       window.dispatchEvent(new Event('storage'));
     }
   }, [teacherId]);

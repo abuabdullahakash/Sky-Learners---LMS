@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Link } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, addDoc, serverTimestamp, query, limit, getDocs } from 'firebase/firestore';
+import { resolveTeacherBySlugOrId } from '@/lib/slug';
 import { useLocale } from 'next-intl';
 import { 
   Phone, 
@@ -89,15 +90,25 @@ function ContactPageContent() {
       setLoading(true);
       try {
         if (activeTeacherId) {
-          const docRef = doc(db, 'teacherProfiles', activeTeacherId);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            setTeacherProfile(docSnap.data());
+          let resolvedUid = activeTeacherId;
+          const teacherInfo = await resolveTeacherBySlugOrId(db, activeTeacherId);
+          if (teacherInfo) {
+            resolvedUid = teacherInfo.uid || activeTeacherId;
+            setTeacherProfile(teacherInfo);
+            if (typeof window !== 'undefined' && guestTeacherId === activeTeacherId) {
+              sessionStorage.setItem('referralTeacherId', resolvedUid);
+            }
           } else {
-            const userRef = doc(db, 'users', activeTeacherId);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-              setTeacherProfile(userSnap.data());
+            const docRef = doc(db, 'teacherProfiles', activeTeacherId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              setTeacherProfile(docSnap.data());
+            } else {
+              const userRef = doc(db, 'users', activeTeacherId);
+              const userSnap = await getDoc(userRef);
+              if (userSnap.exists()) {
+                setTeacherProfile(userSnap.data());
+              }
             }
           }
         } else {

@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Link } from '@/i18n/routing';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { resolveTeacherBySlugOrId } from '@/lib/slug';
 import { 
   Building2, 
   Users, 
@@ -302,15 +303,25 @@ export default function AboutPage() {
       setLoading(true);
       try {
         if (activeTeacherId) {
-          // Fetch teacher's profile and custom config
-          const docRef = doc(db, 'teacherProfiles', activeTeacherId);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            setTeacherProfile(docSnap.data());
+          let resolvedUid = activeTeacherId;
+          const teacherInfo = await resolveTeacherBySlugOrId(db, activeTeacherId);
+          if (teacherInfo) {
+            resolvedUid = teacherInfo.uid || activeTeacherId;
+            setTeacherProfile(teacherInfo);
+            if (typeof window !== 'undefined' && guestTeacherId === activeTeacherId) {
+              sessionStorage.setItem('referralTeacherId', resolvedUid);
+            }
+          } else {
+            // Fetch teacher's profile and custom config
+            const docRef = doc(db, 'teacherProfiles', activeTeacherId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              setTeacherProfile(docSnap.data());
+            }
           }
 
           // Count teacher's published courses
-          const coursesQ = query(collection(db, 'courses'), where('teacherId', '==', activeTeacherId), where('isPublished', '==', true));
+          const coursesQ = query(collection(db, 'courses'), where('teacherId', '==', resolvedUid), where('isPublished', '==', true));
           const coursesSnap = await getDocs(coursesQ);
           setCoursesCount(coursesSnap.size);
         }

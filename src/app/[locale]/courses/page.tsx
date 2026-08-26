@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
-import { generateCourseUrl } from '@/lib/slug';
+import { generateCourseUrl, resolveTeacherBySlugOrId } from '@/lib/slug';
 import { Link } from '@/i18n/routing';
 
 // Top Mentors Data for Global Marketplace
@@ -251,20 +251,30 @@ export default function CoursesPage() {
 
         // If in teacher storefront mode, fetch ONLY that teacher's courses
         if (activeTeacherId) {
+          let resolvedUid = activeTeacherId;
+          const teacherInfo = await resolveTeacherBySlugOrId(db, activeTeacherId);
+          if (teacherInfo) {
+            resolvedUid = teacherInfo.uid || activeTeacherId;
+            setTeacherProfile(teacherInfo);
+            if (typeof window !== 'undefined' && guestTeacherId === activeTeacherId) {
+              sessionStorage.setItem('referralTeacherId', resolvedUid);
+            }
+          } else {
+            try {
+              const tDoc = await getDoc(doc(db, 'teacherProfiles', activeTeacherId));
+              if (tDoc.exists()) {
+                setTeacherProfile(tDoc.data());
+              }
+            } catch (e) {
+              console.error("Error fetching teacher profile:", e);
+            }
+          }
+
           q = query(
             coursesRef, 
-            where('teacherId', '==', activeTeacherId), 
+            where('teacherId', '==', resolvedUid), 
             where('isPublished', '==', true)
           );
-
-          try {
-            const tDoc = await getDoc(doc(db, 'teacherProfiles', activeTeacherId));
-            if (tDoc.exists()) {
-              setTeacherProfile(tDoc.data());
-            }
-          } catch (e) {
-            console.error("Error fetching teacher profile:", e);
-          }
         } else {
           // For marketplace mode, fetch all published courses
           q = query(coursesRef, where('isPublished', '==', true));

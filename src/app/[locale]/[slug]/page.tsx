@@ -4,6 +4,7 @@ import { use, useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
+import { resolveTeacherBySlugOrId } from '@/lib/slug';
 import { Link } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { 
@@ -65,28 +66,41 @@ export default function DynamicTeacherCustomPage({ params }: CustomPageProps) {
 
         // 1. Fetch Teacher Profile
         if (effectiveTeacherId) {
-          const tDoc = await getDoc(doc(db, 'teacherProfiles', effectiveTeacherId));
-          if (tDoc.exists()) {
-            const tData = tDoc.data();
-            setTeacherProfile(tData);
-
-            // Find matching custom page
-            const customNavs = tData.customNavLinks || [];
+          let resolvedUid = effectiveTeacherId;
+          const teacherInfo = await resolveTeacherBySlugOrId(db, effectiveTeacherId);
+          if (teacherInfo) {
+            resolvedUid = teacherInfo.uid || effectiveTeacherId;
+            setTeacherProfile(teacherInfo);
+            const customNavs = teacherInfo.customNavLinks || [];
             const matched = customNavs.find((c: any) => c.slug === formattedSlug || c.slug === slug);
             if (matched) {
               setPageTitle(matched.name);
               setPageData(matched);
             }
           } else {
-            const uDoc = await getDoc(doc(db, 'users', effectiveTeacherId));
-            if (uDoc.exists()) {
-              const uData = uDoc.data();
-              setTeacherProfile({
-                displayName: uData.name || uData.displayName || 'Instructor',
-                headline: uData.subject || 'Academic Instructor',
-                profilePhoto: uData.profilePhoto || uData.photoURL || uData.photoUrl,
-                bio: uData.bio || ''
-              });
+            const tDoc = await getDoc(doc(db, 'teacherProfiles', effectiveTeacherId));
+            if (tDoc.exists()) {
+              const tData = tDoc.data();
+              setTeacherProfile(tData);
+
+              // Find matching custom page
+              const customNavs = tData.customNavLinks || [];
+              const matched = customNavs.find((c: any) => c.slug === formattedSlug || c.slug === slug);
+              if (matched) {
+                setPageTitle(matched.name);
+                setPageData(matched);
+              }
+            } else {
+              const uDoc = await getDoc(doc(db, 'users', effectiveTeacherId));
+              if (uDoc.exists()) {
+                const uData = uDoc.data();
+                setTeacherProfile({
+                  displayName: uData.name || uData.displayName || 'Instructor',
+                  headline: uData.subject || 'Academic Instructor',
+                  profilePhoto: uData.profilePhoto || uData.photoURL || uData.photoUrl,
+                  bio: uData.bio || ''
+                });
+              }
             }
           }
         }

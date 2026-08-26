@@ -42,6 +42,7 @@ import {
 import RoleSelectionModal from './RoleSelectionModal';
 import CourseMegaMenu from './CourseMegaMenu';
 import HeaderSearchBar from './HeaderSearchBar';
+import { resolveTeacherBySlugOrId } from '@/lib/slug';
 
 export default function Navbar() {
   const t = useTranslations('Navigation');
@@ -191,29 +192,56 @@ export default function Navbar() {
       return;
     }
 
-    const unsubProfile = onSnapshot(doc(db, 'teacherProfiles', effectiveTeacherId), (tDoc) => {
-      if (tDoc.exists()) {
-        const data = tDoc.data();
-        setPreferredTeacherName(data.displayName || data.academyName || 'Teacher Academy');
-        setStorefrontTeacherData({
-          disabledPages: data.disabledPages || [],
-          customNavLinks: data.customNavLinks || []
-        });
-      } else {
-        getDoc(doc(db, 'users', effectiveTeacherId)).then(uDoc => {
-          if (uDoc.exists()) {
-            const uData = uDoc.data();
-            setPreferredTeacherName(uData.name || uData.displayName || 'Teacher Academy');
-          }
-        }).catch(() => {});
-        setStorefrontTeacherData({ disabledPages: [], customNavLinks: [] });
-      }
-    }, (err) => {
-      console.error("Error listening to teacher storefront in navbar:", err);
-    });
+    let unsub: (() => void) | null = null;
 
-    return () => unsubProfile();
-  }, [effectiveTeacherId]);
+    const setupTeacherListener = async () => {
+      try {
+        let resolvedUid = effectiveTeacherId;
+        const docRef = doc(db, 'teacherProfiles', effectiveTeacherId);
+        const docSnap = await getDoc(docRef);
+
+        if (!docSnap.exists()) {
+          const resolved = await resolveTeacherBySlugOrId(db, effectiveTeacherId);
+          if (resolved?.uid) {
+            resolvedUid = resolved.uid;
+            if (typeof window !== 'undefined' && guestTeacherId === effectiveTeacherId) {
+              sessionStorage.setItem('referralTeacherId', resolvedUid);
+              setGuestTeacherId(resolvedUid);
+            }
+          }
+        }
+
+        unsub = onSnapshot(doc(db, 'teacherProfiles', resolvedUid), (tDoc) => {
+          if (tDoc.exists()) {
+            const data = tDoc.data();
+            setPreferredTeacherName(data.displayName || data.academyName || 'Teacher Academy');
+            setStorefrontTeacherData({
+              disabledPages: data.disabledPages || [],
+              customNavLinks: data.customNavLinks || []
+            });
+          } else {
+            getDoc(doc(db, 'users', resolvedUid)).then(uDoc => {
+              if (uDoc.exists()) {
+                const uData = uDoc.data();
+                setPreferredTeacherName(uData.name || uData.displayName || 'Teacher Academy');
+              }
+            }).catch(() => {});
+            setStorefrontTeacherData({ disabledPages: [], customNavLinks: [] });
+          }
+        }, (err) => {
+          console.error("Error listening to teacher storefront in navbar:", err);
+        });
+      } catch (err) {
+        console.error("Error setting up teacher listener:", err);
+      }
+    };
+
+    setupTeacherListener();
+
+    return () => {
+      if (unsub) unsub();
+    };
+  }, [effectiveTeacherId, guestTeacherId]);
 
   // 100% Clean URLs for seamless user experience:
   const homeLink = '/';
@@ -223,8 +251,9 @@ export default function Navbar() {
   const isContactActive = pathname === '/contact' || pathname.startsWith('/contact');
 
   // Determine Active Platform Mode:
-  // True if: on a /teachers/[slug] route, or visitor with referral link in this specific tab (guestTeacherId)
+  // True if: Logged-in teacher (isTeacher), on a /teachers/[slug] route, or visitor with referral link in this specific tab (guestTeacherId), or student with focused academy
   const isTeacherStorefrontMode = !isForcedMarketplace && Boolean(
+    (user && isTeacher) ||
     routeTeacherId || 
     (guestTeacherId && guestTeacherId !== 'global') ||
     (isStudent && preferredTeacherId && preferredTeacherId !== 'global')

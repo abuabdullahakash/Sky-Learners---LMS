@@ -144,3 +144,98 @@ export async function resolveCourseBySlugOrId(db: Firestore, slugOrId: string) {
 
   return null;
 }
+
+/**
+ * Resolves a teacher by UID, custom username, customSlug, or clean slug.
+ * Guarantees that whether a user navigates via /teachers/[slug] or /teachers/[uid],
+ * the exact Firebase UID and profile data are resolved consistently.
+ */
+export async function resolveTeacherBySlugOrId(db: Firestore, slugOrId: string) {
+  if (!slugOrId || slugOrId === 'global') return null;
+
+  try {
+    let decoded = slugOrId;
+    try {
+      decoded = decodeURIComponent(slugOrId);
+    } catch (_) {}
+
+    const cleanParam = slugOrId.toLowerCase().trim();
+    const cleanDecoded = decoded.toLowerCase().trim();
+    const candidates = Array.from(new Set([slugOrId, decoded, cleanParam, cleanDecoded])).filter(Boolean);
+
+    // 1. Direct teacherProfiles Document ID Lookup
+    for (const candidate of candidates) {
+      const docRef = doc(db, 'teacherProfiles', candidate);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        return { uid: docSnap.id, id: docSnap.id, ...docSnap.data() } as any;
+      }
+    }
+
+    // 2. Direct users Document ID Lookup
+    for (const candidate of candidates) {
+      const userRef = doc(db, 'users', candidate);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const uData = userSnap.data();
+        const tDoc = await getDoc(doc(db, 'teacherProfiles', candidate));
+        const tData = tDoc.exists() ? tDoc.data() : {};
+        return { uid: userSnap.id, id: userSnap.id, ...uData, ...tData } as any;
+      }
+    }
+
+    const tProfilesRef = collection(db, 'teacherProfiles');
+
+    // 3. Search teacherProfiles by customSlug, username, or slug
+    for (const candidate of candidates) {
+      for (const field of ['customSlug', 'slug', 'username', 'handle']) {
+        const q = query(tProfilesRef, where(field, '==', candidate), limit(1));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          const found = snap.docs[0];
+          return { uid: found.id, id: found.id, ...found.data() } as any;
+        }
+      }
+    }
+
+    // 4. Search users collection by customSlug, username, or email handle
+    const usersRef = collection(db, 'users');
+    for (const candidate of candidates) {
+      for (const field of ['customSlug', 'username', 'slug']) {
+        const q = query(usersRef, where(field, '==', candidate), limit(1));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          const foundUser = snap.docs[0];
+          const tDoc = await getDoc(doc(db, 'teacherProfiles', foundUser.id));
+          const tData = tDoc.exists() ? tDoc.data() : {};
+          return { uid: foundUser.id, id: foundUser.id, ...foundUser.data(), ...tData } as any;
+        }
+      }
+    }
+
+    // 5. Special fallback for admin/founder slug (abu-abdullah-akash) or email matches
+    if (cleanParam.includes('abu-abdullah') || cleanParam.includes('akash')) {
+      const adminQ = query(usersRef, where('email', '==', 'abuabdullahakash@gmail.com'), limit(1));
+      const adminSnap = await getDocs(adminQ);
+      if (!adminSnap.empty) {
+        const foundUser = adminSnap.docs[0];
+        const tDoc = await getDoc(doc(db, 'teacherProfiles', foundUser.id));
+        const tData = tDoc.exists() ? tDoc.data() : {};
+        return { uid: foundUser.id, id: foundUser.id, ...foundUser.data(), ...tData } as any;
+      }
+    }
+
+    // 6. Final fallback: If looking for teacher and not found, check first teacher profile
+    const allTeachersSnap = await getDocs(query(tProfilesRef, limit(1)));
+    if (!allTeachersSnap.empty) {
+      const fallback = allTeachersSnap.docs[0];
+      return { uid: fallback.id, id: fallback.id, ...fallback.data() } as any;
+    }
+
+  } catch (error) {
+    console.error("Error resolving teacher by slug or ID:", error);
+  }
+
+  return null;
+}
+

@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import { generateCourseUrl } from '@/lib/slug';
+import { generateCourseUrl, resolveTeacherBySlugOrId } from '@/lib/slug';
 import { Link } from '@/i18n/routing';
 import { useLocale } from 'next-intl';
 import { 
@@ -102,36 +102,20 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
         let resolvedId = teacherId;
         let profile = null;
 
-        const docRef = doc(db, 'teacherProfiles', teacherId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          profile = docSnap.data();
+        const resolvedTeacher = await resolveTeacherBySlugOrId(db, teacherId);
+        if (resolvedTeacher) {
+          resolvedId = resolvedTeacher.uid || resolvedTeacher.id || teacherId;
+          profile = resolvedTeacher;
         } else {
-          // Check by custom username / slug / customSlug
-          const cleanParam = teacherId.toLowerCase().trim();
-          let slugSnap = await getDocs(query(collection(db, 'teacherProfiles'), where('username', '==', cleanParam)));
-          if (slugSnap.empty) {
-            slugSnap = await getDocs(query(collection(db, 'teacherProfiles'), where('slug', '==', cleanParam)));
+          const docRef = doc(db, 'teacherProfiles', teacherId);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            profile = docSnap.data();
           }
-          if (slugSnap.empty) {
-            slugSnap = await getDocs(query(collection(db, 'teacherProfiles'), where('customSlug', '==', cleanParam)));
-          }
+        }
 
-          if (!slugSnap.empty) {
-            resolvedId = slugSnap.docs[0].id;
-            profile = slugSnap.docs[0].data();
-          } else {
-            // Fallback: load first available teacher profile
-            const allSnap = await getDocs(collection(db, 'teacherProfiles'));
-            if (!allSnap.empty) {
-              resolvedId = allSnap.docs[0].id;
-              profile = allSnap.docs[0].data();
-            }
-          }
-
-          if (resolvedId && typeof window !== 'undefined') {
-            sessionStorage.setItem('referralTeacherId', resolvedId);
-          }
+        if (resolvedId && typeof window !== 'undefined') {
+          sessionStorage.setItem('referralTeacherId', resolvedId);
         }
 
         if (profile) {

@@ -44,6 +44,7 @@ import CourseMegaMenu from './CourseMegaMenu';
 import HeaderSearchBar from './HeaderSearchBar';
 import { resolveTeacherBySlugOrId } from '@/lib/slug';
 import { TeacherThemeToggle, TeacherLanguageToggle } from './TeacherNavControls';
+import TeacherStorefrontNav from './TeacherStorefrontNav';
 
 export default function Navbar() {
   const t = useTranslations('Navigation');
@@ -436,22 +437,8 @@ export default function Navbar() {
               {/* Desktop Navigation Links directly beside Logo */}
               <div className="hidden md:flex items-center">
                 {isTeacherStorefrontMode ? (
-                  /* Modern Floating Pill Navigation for Teacher Storefront */
-                  <div className="flex items-center gap-1.5 p-1 rounded-full bg-foreground/[0.04] dark:bg-foreground/[0.06] border border-foreground/10 backdrop-blur-md shadow-xs">
-                    {activePublicNavLinks.map((item) => (
-                      <Link 
-                        key={item.href + item.name} 
-                        href={item.href} 
-                        className={`px-3.5 py-1.5 rounded-full text-xs lg:text-sm font-semibold transition-all duration-200 ${
-                          item.isActive 
-                            ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-sm shadow-orange-500/30' 
-                            : 'text-foreground/75 hover:text-orange-500 hover:bg-orange-500/10'
-                        }`}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
+                  /* Modern Buttery-Smooth Sliding Pill Navigation for Teacher Storefront */
+                  <TeacherStorefrontNav navLinks={activePublicNavLinks} />
                 ) : (
                   /* Original Marketplace Desktop Navigation Links (100% UNTOUCHED) */
                   <div className="flex items-center space-x-6 lg:space-x-8">

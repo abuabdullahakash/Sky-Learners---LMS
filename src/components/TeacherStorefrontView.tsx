@@ -430,8 +430,8 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
             
             {/* Paid Courses Card */}
-            <a
-              href="#courses"
+            <Link
+              href="/courses?type=paid"
               className="group relative min-h-[190px] sm:min-h-[210px] p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-orange-500/[0.12] via-background to-orange-500/[0.04] border-2 border-orange-500/30 hover:border-orange-500/80 transition-all duration-500 shadow-sm hover:shadow-md hover:-translate-y-1 flex items-center justify-between overflow-hidden"
             >
               <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-orange-500/15 rounded-full blur-3xl pointer-events-none group-hover:scale-150 transition-transform duration-700" />
@@ -454,11 +454,11 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               <div className="relative z-10 w-16 h-16 rounded-3xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-md group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 flex-shrink-0">
                 <ArrowRight className="w-7 h-7" />
               </div>
-            </a>
+            </Link>
 
             {/* Free Courses Card */}
-            <a
-              href={quickCards.freeLink || '#courses'}
+            <Link
+              href="/courses?type=free"
               className="group relative min-h-[190px] sm:min-h-[210px] p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-blue-500/[0.12] via-background to-blue-500/[0.04] border-2 border-blue-500/30 hover:border-blue-500/80 transition-all duration-500 shadow-sm hover:shadow-md hover:-translate-y-1 flex items-center justify-between overflow-hidden"
             >
               <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-500/15 rounded-full blur-3xl pointer-events-none group-hover:scale-150 transition-transform duration-700" />
@@ -481,7 +481,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               <div className="relative z-10 w-16 h-16 rounded-3xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-md group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 flex-shrink-0">
                 <ArrowRight className="w-7 h-7" />
               </div>
-            </a>
+            </Link>
 
           </div>
         </div>

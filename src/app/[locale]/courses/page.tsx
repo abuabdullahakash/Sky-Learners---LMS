@@ -29,7 +29,7 @@ import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firesto
 import { generateCourseUrl } from '@/lib/slug';
 import { Link } from '@/i18n/routing';
 
-// Top Mentors Data by Category (Flat & Minimal)
+// Top Mentors Data for Global Marketplace
 const categoryMentors: Record<string, Array<{ name: string; institute: string; exp: string; photo: string; slug: string }>> = {
   primary: [
     {
@@ -185,6 +185,26 @@ export default function CoursesPage() {
   const isBn = locale === 'bn';
   const searchParams = useSearchParams();
   const queryTeacherId = searchParams.get('teacherId');
+  const isForcedMarketplace = searchParams.get('view') === 'marketplace';
+
+  const [guestTeacherId, setGuestTeacherId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('referralTeacherId') || localStorage.getItem('referralTeacherId');
+      if (stored && stored !== 'global') {
+        setGuestTeacherId(stored);
+      }
+    }
+  }, []);
+  
+  const isAdmin = userData?.isAdmin || userData?.role === 'admin' || user?.email?.toLowerCase().trim() === 'abuabdullahakash@gmail.com' || Boolean(user?.email?.toLowerCase().includes('abuabdullahakash'));
+  const isTeacher = isAdmin || userData?.role === 'teacher';
+
+  const preferredTeacherId = userData?.preferredTeacherId && userData.preferredTeacherId !== 'global' ? userData.preferredTeacherId : null;
+  
+  // Strict Isolation: Teacher Storefront Mode vs Marketplace Mode
+  const activeTeacherId = isForcedMarketplace ? null : (isTeacher ? user?.uid : (preferredTeacherId || queryTeacherId || (!user ? guestTeacherId : null)));
 
   // URL Filters from Mega Menu & Search
   const urlCategory = searchParams.get('category');
@@ -193,9 +213,6 @@ export default function CoursesPage() {
   const urlDepartment = searchParams.get('department');
   const urlYear = searchParams.get('year');
   const urlSearch = searchParams.get('search');
-
-  // ONLY set activeTeacherId if queryTeacherId is explicitly in URL
-  const activeTeacherId = queryTeacherId || null;
 
   const [courses, setCourses] = useState<any[]>([]);
   const [teacherProfile, setTeacherProfile] = useState<any>(null);
@@ -232,7 +249,7 @@ export default function CoursesPage() {
         const coursesRef = collection(db, 'courses');
         let q;
 
-        // If explicitly in teacher mode via ?teacherId=...
+        // If in teacher storefront mode, fetch ONLY that teacher's courses
         if (activeTeacherId) {
           q = query(
             coursesRef, 
@@ -304,7 +321,40 @@ export default function CoursesPage() {
     return String(val).replace(/[0-9]/g, (d) => bnDigits[Number(d)]);
   };
 
-  // Helper for Category Metadata with Custom Distinct Colors
+  const getClassLabel = (cls: string) => {
+    const map: Record<string, string> = {
+      '1': isBn ? '১ম শ্রেণি' : 'Class 1',
+      '2': isBn ? '২য় শ্রেণি' : 'Class 2',
+      '3': isBn ? '৩য় শ্রেণি' : 'Class 3',
+      '4': isBn ? '৪র্থ শ্রেণি' : 'Class 4',
+      '5': isBn ? '৫ম শ্রেণি' : 'Class 5',
+      '6': isBn ? '৬ষ্ঠ শ্রেণি' : 'Class 6',
+      '7': isBn ? '৭ম শ্রেণি' : 'Class 7',
+      '8': isBn ? '৮ম শ্রেণি' : 'Class 8',
+      '9': isBn ? '৯ম শ্রেণি' : 'Class 9',
+      '10': isBn ? '১০ম শ্রেণি' : 'Class 10',
+      '11': isBn ? '১১শ শ্রেণি' : 'Class 11',
+      '12': isBn ? '১২শ শ্রেণি' : 'Class 12',
+    };
+    return map[cls] || (isBn ? `ক্লাস ${cls}` : `Class ${cls}`);
+  };
+
+  const getGroupLabel = (grp: string) => {
+    const map: Record<string, string> = {
+      'science': isBn ? 'বিজ্ঞান' : 'Science',
+      'arts': isBn ? 'মানবিক' : 'Humanities',
+      'commerce': isBn ? 'ব্যবসায় শিক্ষা' : 'Business Studies',
+      'medical': isBn ? 'মেডিকেল' : 'Medical',
+      'engineering': isBn ? 'ইঞ্জিনিয়ারিং' : 'Engineering',
+      'varsity_a': isBn ? 'ভার্সিটি A ইউনিট' : 'Varsity A Unit',
+      'varsity_b': isBn ? 'ভার্সিটি B ইউনিট' : 'Varsity B Unit',
+      'varsity_c': isBn ? 'ভার্সিটি C ইউনিট' : 'Varsity C Unit',
+      'iba': isBn ? 'IBA / BUP' : 'IBA / BUP',
+    };
+    return map[grp] || grp;
+  };
+
+  // Helper for Category Metadata in Marketplace Mode
   const getCategoryMeta = (catId: string) => {
     switch (catId) {
       case 'primary':
@@ -425,7 +475,7 @@ export default function CoursesPage() {
 
   const mainCategoriesList = ['primary', 'high_school', 'intermediate', 'admission', 'honours_masters', 'skills'];
 
-  // Filter courses for active subview
+  // Filter courses
   const filteredCourses = courses.filter((c) => {
     const q = searchQuery.toLowerCase().trim();
     const matchesSearch = q === '' || 
@@ -474,7 +524,8 @@ export default function CoursesPage() {
     return matchesSearch && matchesCategory && matchesClass && matchesGroup && matchesDepartment && matchesYear;
   });
 
-  const isCategoryViewActive = Boolean((urlCategory && urlCategory !== 'all') || searchQuery.trim().length > 0 || urlClass);
+  const isTeacherStorefrontMode = Boolean(activeTeacherId);
+  const isMarketplaceCategorySubView = Boolean((urlCategory && urlCategory !== 'all') || searchQuery.trim().length > 0 || urlClass);
 
   const activeCategoryMeta = getCategoryMeta(urlCategory || selectedCategory || 'primary');
 
@@ -511,14 +562,242 @@ export default function CoursesPage() {
     );
   }
 
+  // =========================================================================
+  // SECTION A: TEACHER STOREFRONT COURSE CATALOG (100% PRESERVED & UNCHANGED)
+  // =========================================================================
+  if (isTeacherStorefrontMode) {
+    return (
+      <div className="min-h-[calc(100vh-80px)] pt-24 pb-20 bg-background text-foreground">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Teacher Profile Hero Header */}
+          {teacherProfile && (
+            <div className="bg-background rounded-3xl p-8 mb-10 border border-foreground/10 flex flex-col md:flex-row items-center gap-6 shadow-sm">
+              <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-orange-500 shrink-0 bg-foreground/5">
+                {teacherProfile.photoURL ? (
+                  <img src={teacherProfile.photoURL} alt={teacherProfile.displayName} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-orange-500">
+                    {teacherProfile.displayName?.charAt(0) || 'T'}
+                  </div>
+                )}
+              </div>
+              <div className="text-center md:text-left flex-1">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 text-xs font-bold mb-2">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>{teacherProfile.coachingName || 'Teacher Academy'}</span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">{teacherProfile.displayName || 'Teacher'} এর সকল কোর্স</h1>
+                <p className="text-foreground/60 text-sm mt-1 max-w-2xl">{teacherProfile.bio || 'এখানে শিক্ষকের সকল প্রিমিয়াম ও ফ্রি কোর্সসমূহ পাওয়া যাবে।'}</p>
+              </div>
+              <div className="bg-foreground/5 px-6 py-4 rounded-2xl border border-foreground/10 text-center shrink-0">
+                <span className="text-xs text-foreground/50 font-bold block uppercase">মোট কোর্স</span>
+                <span className="text-2xl font-black text-orange-500">{courses.length}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Teacher Search & Categories */}
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-8">
+            <div className="relative w-full md:w-96">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/40 w-4 h-4" />
+              <input
+                type="text"
+                placeholder={isBn ? 'কোর্স খুঁজুন...' : 'Search courses...'}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-background border border-foreground/10 rounded-2xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:border-orange-500 transition-colors"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
+              {[
+                { id: 'all', label: isBn ? 'সকল কোর্স' : 'All Courses' },
+                { id: 'intermediate', label: isBn ? 'এইচএসসি' : 'HSC' },
+                { id: 'high_school', label: isBn ? 'এসএসসি' : 'SSC' },
+                { id: 'primary', label: isBn ? 'প্রাথমিক' : 'Primary' },
+                { id: 'admission', label: isBn ? 'ভর্তি' : 'Admission' },
+                { id: 'skills', label: isBn ? 'স্কিলস' : 'Skills' },
+              ].map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
+                    selectedCategory === cat.id
+                      ? 'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-500/20'
+                      : 'bg-background hover:bg-foreground/5 text-foreground/70 border-foreground/10'
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Teacher Courses Grid */}
+          {filteredCourses.length === 0 ? (
+            <div className="text-center py-20 bg-foreground/5 rounded-3xl border border-foreground/10">
+              <BookOpen className="w-12 h-12 text-foreground/30 mx-auto mb-4" />
+              <h3 className="text-lg font-bold text-foreground mb-1">কোনো কোর্স পাওয়া যায়নি</h3>
+              <p className="text-foreground/60 text-sm">ভিন্ন কীওয়ার্ড দিয়ে সার্চ করুন অথবা অন্য ক্যাটাগরি নির্বাচন করুন।</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {filteredCourses.map((course) => {
+                let badgeText = course.category === 'intermediate' ? 'HSC' : course.category === 'primary' ? (isBn ? 'প্রাথমিক' : 'Primary') : course.category === 'high_school' ? (isBn ? 'উচ্চ বিদ্যালয়' : 'High School') : (course.category || 'Course');
+                if (course.eduClass) badgeText += ` - ${getClassLabel(String(course.eduClass))}`;
+                if (course.department && course.category !== 'admission' && course.category !== 'honours' && course.category !== 'masters') {
+                  badgeText += ` (${getGroupLabel(course.department)})`;
+                }
+                if (course.year) {
+                  badgeText += ` • ${course.year}`;
+                }
+                
+                if (course.isFullClassCourse !== false) {
+                  badgeText += isBn ? ' (সম্পূর্ণ কোর্স)' : ' (Full Course)';
+                } else if (course.specificSubjects && course.specificSubjects.length > 0) {
+                  if (course.specificSubjects.length === 1) {
+                    badgeText += ` • ${course.specificSubjects[0]}`;
+                  } else {
+                    badgeText += ` • ${course.specificSubjects.length} ${isBn ? 'টি বিষয়' : 'Subjects'}`;
+                  }
+                }
+
+                const hasDiscountPrice = course.discountPrice !== undefined && course.discountPrice !== null && course.discountPrice !== '' && Number(course.discountPrice) < Number(course.price || 0);
+                let isDiscountValid = false;
+                let expiryDate = null;
+                if (hasDiscountPrice && course.discountValidUntil) {
+                  expiryDate = course.discountValidUntil?.toDate ? course.discountValidUntil.toDate() : new Date(course.discountValidUntil);
+                  if (expiryDate && expiryDate > new Date()) {
+                    isDiscountValid = true;
+                  }
+                }
+
+                const activePrice = isDiscountValid ? Number(course.discountPrice) : Number(course.price || 0);
+                const isFree = activePrice === 0;
+
+                return (
+                  <div key={course.id} className="bg-background rounded-3xl border border-foreground/10 hover:border-orange-500/50 active:border-orange-500 transition-all duration-300 shadow-md hover:shadow-2xl hover:shadow-orange-500/10 overflow-hidden group flex flex-col relative">
+                    
+                    {isDiscountValid && (
+                      <div className="absolute top-0 left-0 w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white text-[10px] font-bold py-1 px-4 text-center z-20 uppercase tracking-widest shadow-md">
+                        Discount Valid Till: {expiryDate?.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </div>
+                    )}
+
+                    <div className={`h-48 w-full bg-foreground/5 relative overflow-hidden ${isDiscountValid ? 'mt-6' : ''}`}>
+                      {course.thumbnailUrl ? (
+                        <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-foreground/30 bg-gradient-to-br from-foreground/5 to-foreground/10">
+                          <BookOpen size={48} />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      {isFree && (
+                        <div className="absolute top-3 right-3 bg-emerald-500 text-white font-extrabold text-xs px-3 py-1 rounded-full shadow-lg z-20 flex items-center gap-1">
+                          🎁 {isBn ? 'ফ্রি কোর্স' : 'Free Course'}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="p-6 flex-1 flex flex-col relative z-10 bg-background">
+                      <div className="text-orange-500 text-[12px] font-extrabold uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        {course.courseType === 'coaching' || course.coachingName ? (
+                          <><Building2 className="w-3.5 h-3.5" /> <span>{course.coachingName || 'Coaching Center'}</span></>
+                        ) : (
+                          <><Users className="w-3.5 h-3.5" /> <span>{course.instructorName || 'Instructor'}</span></>
+                        )}
+                      </div>
+
+                      <h3 className="text-xl font-bold mb-2 line-clamp-2 leading-tight group-hover:text-primary transition-colors">{course.title}</h3>
+                      
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <div className="bg-foreground/5 border border-foreground/10 px-3 py-1 rounded-full text-xs font-extrabold text-foreground/80 w-fit">
+                          {badgeText}
+                        </div>
+                        {isFree && (
+                          <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full text-xs font-extrabold w-fit">
+                            🎁 {isBn ? 'ফ্রি' : 'Free'}
+                          </div>
+                        )}
+                      </div>
+
+                      <p className="text-foreground/60 mb-5 line-clamp-2 text-sm leading-relaxed">
+                        {course.subtitle || (isBn ? 'এই কোর্সে আপনি গুরুত্বপূর্ণ সব টপিক শিখতে পারবেন।' : 'Master essential concepts with structured curriculum.')}
+                      </p>
+                      
+                      <div className="flex items-center gap-4 text-xs font-bold text-foreground/70 mb-6 w-full">
+                        {(course.enrolledStudents && course.enrolledStudents >= 20) ? (
+                          <span className="flex items-center gap-1.5" title="Enrolled Students"><Users className="w-4 h-4 text-orange-500" /> {course.enrolledStudents}</span>
+                        ) : null}
+                        
+                        <span className="flex items-center gap-1.5" title="Total Videos">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+                          {course.totalVideoLessons || 0}
+                        </span>
+                        
+                        <span className="flex items-center gap-1.5" title="Total Exams">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                          {course.totalExams || 0}
+                        </span>
+                        
+                        <span className="flex items-center gap-1.5 ml-auto" title="Duration"><Clock className="w-4 h-4 text-rose-500" /> {course.courseValidity || course.duration || (isBn ? 'লাইফ-টাইম' : 'Lifetime')}</span>
+                      </div>
+
+                      <div className="mt-auto pt-4 border-t border-foreground/10 flex items-center justify-between">
+                        <div className="flex flex-col">
+                          {isFree ? (
+                            isDiscountValid ? (
+                              <>
+                                <span className="text-xs text-foreground/50 line-through font-medium">৳{course.price}</span>
+                                <span className="font-black text-2xl text-emerald-500">{isBn ? 'ফ্রি' : 'Free'}</span>
+                              </>
+                            ) : (
+                              <span className="font-black text-2xl text-emerald-500">{isBn ? 'ফ্রি' : 'Free'}</span>
+                            )
+                          ) : isDiscountValid ? (
+                            <>
+                              <span className="text-xs text-foreground/50 line-through font-medium">৳{course.price}</span>
+                              <span className="font-black text-2xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-rose-500">
+                                ৳{course.discountPrice}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="font-black text-2xl text-foreground">
+                              ৳{course.price}
+                            </span>
+                          )}
+                        </div>
+                        <Link 
+                          href={generateCourseUrl(course)}
+                          className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white font-bold text-xs rounded-xl transition-all duration-300 shadow-md shadow-orange-500/20 active:scale-95 flex items-center gap-1"
+                        >
+                          <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // SECTION B: GLOBAL MARKETPLACE MODE (MAIN COURSES HUB & CATEGORY SUBVIEWS)
+  // =========================================================================
   return (
     <div className="min-h-[calc(100vh-80px)] pt-24 pb-20 bg-background text-foreground">
       <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8">
         
-        {/* ========================================================================= */}
-        {/* CASE 1: GLOBAL MARKETPLACE MAIN COURSES HUB (WHEN NO CATEGORY IS ACTIVE)  */}
-        {/* ========================================================================= */}
-        {!isCategoryViewActive && (
+        {/* CASE 1: GLOBAL MARKETPLACE MAIN COURSES HUB (NO CATEGORY SELECTED) */}
+        {!isMarketplaceCategorySubView && (
           <div className="space-y-12">
             
             {/* Top Clean Header */}
@@ -741,10 +1020,8 @@ export default function CoursesPage() {
           </div>
         )}
 
-        {/* ========================================================================= */}
         {/* CASE 2: DEDICATED CATEGORY SUBVIEW (WITH CLEAN FLAT BACK BUTTON & FILTERS) */}
-        {/* ========================================================================= */}
-        {isCategoryViewActive && (
+        {isMarketplaceCategorySubView && (
           <div className="space-y-6">
             
             {/* Top Back Navigation Bar */}

@@ -106,7 +106,7 @@ export default function Footer() {
   }
 
   // =========================================================================
-  // CASE A: TEACHER STOREFRONT FOOTER (Category 2 & 3: Teacher Branded Footer)
+  // CASE A: TEACHER STOREFRONT FOOTER (Category 2 & 3: Teacher Branded Liquid Footer)
   // =========================================================================
   if (isTeacherStorefrontMode && teacherData) {
     const displayName = teacherData.displayName || teacherData.academyName || 'Teacher Academy';
@@ -117,69 +117,87 @@ export default function Footer() {
     const contactPhone = teacherData.contactPhone || teacherData.phone || '01700000000';
     const contactWhatsapp = teacherData.contactWhatsapp || teacherData.whatsapp || contactPhone;
     const contactEmail = teacherData.contactEmail || teacherData.email || 'support@skylearners.com';
-    const contactAddress = teacherData.contactAddress || teacherData.address || 'ঢাকা, বাংলাদেশ';
+    const contactAddress = teacherData.contactAddress || teacherData.address || 'অনলাইন একাডেমি, বাংলাদেশ';
     const contactOfficeHours = teacherData.contactOfficeHours || 'প্রতিদিন সকাল ৯:০০ টা — রাত ১০:০০ টা';
 
     return (
-      <footer className="bg-background/90 backdrop-blur-md border-t border-foreground/10 pt-16 pb-8 mt-20 relative overflow-hidden">
-        {/* Glowing Orbs matching teacher theme */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/10 blur-[140px] rounded-full pointer-events-none" />
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-amber-500/10 blur-[140px] rounded-full pointer-events-none" />
+      <footer className="relative overflow-hidden pt-16 sm:pt-20 pb-10 mt-20 border-t border-foreground/10 bg-gradient-to-b from-foreground/[0.02] via-background/95 to-background backdrop-blur-2xl">
+        {/* Soft Liquid Ambient Glowing Orbs */}
+        <div className="absolute -top-24 left-1/4 w-[500px] h-[300px] bg-orange-500/10 blur-[140px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/2 right-1/4 w-[450px] h-[300px] bg-amber-500/[0.08] blur-[140px] rounded-full pointer-events-none" />
 
-        <div className="max-w-[1280px] mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px] relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-16 mb-12">
+        <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 mb-12">
             
-            {/* 1. Teacher Brand & Bio */}
+            {/* 1. Teacher Brand & Bio Card */}
             <div className="space-y-4">
-              <Link href="/" className="flex items-center gap-3 group">
+              <Link href="/" className="flex items-center gap-3.5 group">
                 {teacherData.headerLogo || teacherData.logoUrl ? (
-                  <div className="h-11 sm:h-12 w-auto max-w-[200px] flex items-center justify-start py-0.5">
+                  <div className="h-11 sm:h-12 w-auto max-w-[210px] flex items-center justify-start py-0.5">
                     <img 
                       src={teacherData.headerLogo || teacherData.logoUrl} 
                       alt={displayName} 
-                      className="h-full w-auto max-h-12 max-w-[200px] object-contain object-left" 
+                      className="h-full w-auto max-h-12 max-w-[210px] object-contain object-left" 
                     />
                   </div>
                 ) : (
                   <div className="flex items-center gap-3">
                     {photo ? (
-                      <div className="relative w-12 h-12 rounded-2xl overflow-hidden border-2 border-orange-500/30 shadow-md shadow-orange-500/20 shrink-0">
+                      <div className="relative w-13 h-13 rounded-2xl overflow-hidden border-2 border-orange-500/40 shadow-md shadow-orange-500/20 shrink-0 bg-orange-500/10">
                         <img src={photo} alt={displayName} className="w-full h-full object-cover" />
                       </div>
                     ) : (
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center shadow-lg shadow-orange-500/20 text-lg shrink-0">
+                      <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center shadow-lg shadow-orange-500/25 text-lg shrink-0">
                         {displayName.charAt(0).toUpperCase()}
                       </div>
                     )}
-                    <div>
+                    <div className="flex flex-col">
                       <h3 className="font-black text-lg leading-tight text-foreground group-hover:text-orange-500 transition-colors">
                         {displayName}
                       </h3>
-                      <span className="text-xs font-bold text-orange-500">
-                        {teacherData.headerTagline || 'অফিশিয়াল একাডেমি'}
+                      <span className="text-[11px] font-bold text-orange-500">
+                        {teacherData.headerTagline || 'অফিশিয়াল একাডেমি'}
                       </span>
                     </div>
                   </div>
                 )}
               </Link>
 
-              <p className="text-foreground/70 text-sm leading-relaxed line-clamp-3">
+              <p className="text-foreground/75 text-xs sm:text-sm leading-relaxed line-clamp-3 font-medium">
                 {headline}
               </p>
 
-              {/* Social Channels */}
-              <div className="flex items-center gap-3 pt-2">
+              {/* Social Channels - Modern Liquid Glass Capsules */}
+              <div className="flex items-center gap-2.5 pt-2">
                 {teacherData.socialFacebook && (
-                  <a href={teacherData.socialFacebook} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-xl bg-foreground/5 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                  <a 
+                    href={teacherData.socialFacebook} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-10 h-10 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white border border-blue-500/20 flex items-center justify-center transition-all duration-300 shadow-xs hover:shadow-md hover:shadow-blue-500/25 hover:-translate-y-0.5"
+                    title="Facebook Page / Group"
+                  >
                     <FacebookIcon className="w-4 h-4" />
                   </a>
                 )}
                 {teacherData.socialYoutube && (
-                  <a href={teacherData.socialYoutube} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-xl bg-foreground/5 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                  <a 
+                    href={teacherData.socialYoutube} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-10 h-10 rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white border border-red-500/20 flex items-center justify-center transition-all duration-300 shadow-xs hover:shadow-md hover:shadow-red-500/25 hover:-translate-y-0.5"
+                    title="YouTube Channel"
+                  >
                     <YoutubeIcon className="w-4 h-4" />
                   </a>
                 )}
-                <a href={`https://wa.me/${contactWhatsapp.replace(/[^\d+]/g, '')}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                <a 
+                  href={`https://wa.me/${contactWhatsapp.replace(/[^\d+]/g, '')}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/20 flex items-center justify-center transition-all duration-300 shadow-xs hover:shadow-md hover:shadow-emerald-500/25 hover:-translate-y-0.5"
+                  title="Direct WhatsApp Message"
+                >
                   <MessageCircle className="w-4 h-4" />
                 </a>
               </div>
@@ -187,39 +205,39 @@ export default function Footer() {
 
             {/* 2. Teacher Quick Links */}
             <div>
-              <h4 className="font-bold text-base text-foreground mb-5 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-orange-500" />
+              <h4 className="font-extrabold text-sm sm:text-base text-foreground mb-5 flex items-center gap-2.5 tracking-tight">
+                <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-xs shadow-orange-500/40" />
                 <span>একাডেমি পেইজসমূহ</span>
               </h4>
-              <ul className="space-y-2.5 text-sm">
+              <ul className="space-y-2.5 text-xs sm:text-sm font-medium">
                 <li>
                   <Link href="/" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-orange-500 transition-colors" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
                     <span>হোম (Home)</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/courses" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-orange-500 transition-colors" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
                     <span>কোর্সসমূহ (Courses)</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/about" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-orange-500 transition-colors" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
                     <span>আমাদের সম্পর্কে (About)</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/contact" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-orange-500 transition-colors" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
                     <span>যোগাযোগ (Contact)</span>
                   </Link>
                 </li>
                 {customNavs.map((c: any) => (
                   <li key={c.id || c.slug}>
                     <Link href={c.slug} className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
-                      <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-orange-500 transition-colors" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
                       <span>{c.name}</span>
                     </Link>
                   </li>
@@ -229,67 +247,86 @@ export default function Footer() {
 
             {/* 3. Learning & Resources */}
             <div>
-              <h4 className="font-bold text-base text-foreground mb-5 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-500" />
+              <h4 className="font-extrabold text-sm sm:text-base text-foreground mb-5 flex items-center gap-2.5 tracking-tight">
+                <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-400 shadow-xs shadow-amber-500/40" />
                 <span>কোর্স ক্যাটাগরি ও প্রস্তুতি</span>
               </h4>
-              <ul className="space-y-2.5 text-sm">
+              <ul className="space-y-2.5 text-xs sm:text-sm font-medium">
                 <li>
-                  <Link href="/courses" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-amber-500 transition-colors" />
+                  <Link href="/courses?type=paid" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
                     <span>অনলাইন রেকর্ডেড ক্লাস</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/courses" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-amber-500 transition-colors" />
+                  <Link href="/courses?type=paid" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
                     <span>লাইভ ইন্টারঅ্যাক্টিভ ব্যাচ</span>
                   </Link>
                 </li>
                 <li>
+                  <Link href="/courses?type=free" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
+                    <span>ফ্রি ক্লাস ও ডেমো লেকচার</span>
+                  </Link>
+                </li>
+                <li>
                   <Link href="/courses" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 group-hover:bg-amber-500 transition-colors" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
                     <span>ডেইলি এক্সাম ও সলভ শিট</span>
                   </Link>
                 </li>
               </ul>
             </div>
 
-            {/* 4. Direct Teacher Contact */}
+            {/* 4. Direct Teacher Contact with Glass Icon Badges */}
             <div>
-              <h4 className="font-bold text-base text-foreground mb-5 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <h4 className="font-extrabold text-sm sm:text-base text-foreground mb-5 flex items-center gap-2.5 tracking-tight">
+                <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 shadow-xs shadow-emerald-500/40" />
                 <span>সরাসরি যোগাযোগ</span>
               </h4>
-              <ul className="space-y-3 text-sm">
-                <li className="flex items-start gap-2.5 text-foreground/70">
-                  <MapPin className="w-4 h-4 text-orange-500 shrink-0 mt-1" />
-                  <span>{contactAddress}</span>
+              <ul className="space-y-3.5 text-xs sm:text-sm">
+                <li className="flex items-start gap-3 text-foreground/75">
+                  <div className="w-8 h-8 rounded-xl bg-orange-500/10 text-orange-500 border border-orange-500/20 flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                    <MapPin className="w-4 h-4" />
+                  </div>
+                  <span className="leading-snug">{contactAddress}</span>
                 </li>
-                <li className="flex items-center gap-2.5 text-foreground/70">
-                  <Phone className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span>{contactPhone}</span>
+                <li className="flex items-center gap-3 text-foreground/75">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-xs">
+                    <Phone className="w-4 h-4" />
+                  </div>
+                  <a href={`tel:${contactPhone}`} className="hover:text-emerald-500 transition-colors font-semibold">
+                    {contactPhone}
+                  </a>
                 </li>
-                <li className="flex items-center gap-2.5 text-foreground/70">
-                  <Mail className="w-4 h-4 text-blue-500 shrink-0" />
-                  <span className="truncate">{contactEmail}</span>
+                <li className="flex items-center gap-3 text-foreground/75">
+                  <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-xs">
+                    <Mail className="w-4 h-4" />
+                  </div>
+                  <a href={`mailto:${contactEmail}`} className="hover:text-blue-500 transition-colors truncate font-semibold">
+                    {contactEmail}
+                  </a>
                 </li>
-                <li className="flex items-center gap-2.5 text-foreground/70">
-                  <Clock className="w-4 h-4 text-amber-500 shrink-0" />
-                  <span className="text-xs">{contactOfficeHours}</span>
+                <li className="flex items-center gap-3 text-foreground/75">
+                  <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-xs">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <span className="text-[11px] font-medium leading-tight">{contactOfficeHours}</span>
                 </li>
               </ul>
             </div>
 
           </div>
 
-          {/* Bottom Bar with Teacher Academy Copyright */}
-          <div className="pt-6 border-t border-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-foreground/50">
+          {/* Bottom Bar with Teacher Academy Copyright & Legal Links */}
+          <div className="pt-8 border-t border-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-foreground/60">
             <p>
-              © {new Date().getFullYear()} {displayName}. সর্বস্বত্ব সংরক্ষিত। Powered by SkyLearners.
+              © {new Date().getFullYear()} <span className="text-foreground font-bold">{displayName}</span>. সর্বস্বত্ব সংরক্ষিত। Powered by <span className="font-bold text-orange-500">SkyLearners</span>.
             </p>
             <div className="flex items-center gap-5">
               <Link href="/privacy" className="hover:text-orange-500 transition-colors">প্রাইভেসি পলিসি</Link>
+              <span className="text-foreground/20">•</span>
               <Link href="/terms" className="hover:text-orange-500 transition-colors">শর্তাবলী</Link>
             </div>
           </div>

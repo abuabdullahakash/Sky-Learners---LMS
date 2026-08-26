@@ -41,6 +41,7 @@ import {
 } from 'lucide-react';
 import RoleSelectionModal from './RoleSelectionModal';
 import CourseMegaMenu from './CourseMegaMenu';
+import HeaderSearchBar from './HeaderSearchBar';
 
 export default function Navbar() {
   const t = useTranslations('Navigation');
@@ -341,34 +342,47 @@ export default function Navbar() {
     <>
       <nav className="fixed w-full top-0 z-50 bg-background/85 backdrop-blur-md border-b border-foreground/10">
         <div className={`${isDashboard ? 'w-full' : 'max-w-[1280px]'} mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px]`}>
-          <div className="flex justify-between items-center h-20">
-            {/* Logo */}
-            <Link href={homeLink} className="flex items-center gap-2 z-10">
-              <div className="relative w-[150px] h-[40px] sm:w-[180px] sm:h-[48px] md:w-[220px] md:h-[56px] flex items-center justify-start">
-                <Image src="/Skylearnars Academy logo.png" alt="Sky Learners Logo" fill className="object-contain object-left" priority />
-              </div>
-            </Link>
+          <div className="flex justify-between items-center h-20 gap-4 md:gap-6">
+            {/* Left Side: Logo + Nav Links together */}
+            <div className="flex items-center gap-6 lg:gap-8 z-10">
+              {/* Logo */}
+              <Link href={homeLink} className="flex items-center gap-2 shrink-0">
+                <div className="relative w-[140px] h-[38px] sm:w-[165px] sm:h-[44px] md:w-[185px] md:h-[48px] flex items-center justify-start">
+                  <Image src="/Skylearnars Academy logo.png" alt="Sky Learners Logo" fill className="object-contain object-left" priority />
+                </div>
+              </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              {activePublicNavLinks.map((item) => {
-                if (!isTeacherStorefrontMode && item.href === '/courses') {
-                  return <CourseMegaMenu key="desktop-courses-mega-menu" />;
-                }
-                return (
-                  <Link 
-                    key={item.href + item.name} 
-                    href={item.href} 
-                    className={`font-medium transition-colors hover:text-primary ${item.isActive ? 'text-primary' : 'text-foreground/80'}`}
-                  >
-                    {item.name}
-                  </Link>
-                );
-              })}
-              
-              <div className="flex items-center gap-4 pl-4 border-l border-foreground/10">
-                <ThemeToggle />
-                <LanguageToggle />
+              {/* Desktop Navigation Links directly beside Logo */}
+              <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
+                {activePublicNavLinks.map((item) => {
+                  if (!isTeacherStorefrontMode && item.href === '/courses') {
+                    return <CourseMegaMenu key="desktop-courses-mega-menu" />;
+                  }
+                  return (
+                    <Link 
+                      key={item.href + item.name} 
+                      href={item.href} 
+                      className={`font-medium text-sm lg:text-base transition-colors hover:text-primary ${item.isActive ? 'text-primary font-semibold' : 'text-foreground/80'}`}
+                    >
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Center-Right Search Bar (10 Minute School Style) */}
+            <div className="hidden md:flex flex-1 max-w-[260px] lg:max-w-[320px] mx-auto items-center">
+              <HeaderSearchBar 
+                isTeacherStorefrontMode={isTeacherStorefrontMode} 
+                activeTeacherId={effectiveTeacherId} 
+              />
+            </div>
+
+            {/* Desktop Controls (Right) */}
+            <div className="flex items-center gap-3 lg:gap-4 pl-2 shrink-0">
+              <ThemeToggle />
+              <LanguageToggle />
                 
                 {loading ? (
                   <div className="w-[120px] h-[40px] bg-foreground/10 animate-pulse rounded-full"></div>
@@ -613,7 +627,6 @@ export default function Navbar() {
                   </Link>
                 )}
               </div>
-            </div>
 
             {/* Mobile Controls (Toggles + Hamburger Trigger) */}
             <div className="flex md:hidden items-center gap-2">
@@ -764,8 +777,16 @@ export default function Navbar() {
               </div>
             ) : (
               /* CASE 3: Public Site Pages (Marketplace vs Teacher Storefront Menu) */
-              <div className="space-y-2">
-                <div className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/40 px-3 mb-2 flex items-center justify-between">
+              <div className="space-y-3">
+                {/* Mobile Search Bar */}
+                <div className="px-1 pt-1 pb-1">
+                  <HeaderSearchBar 
+                    isTeacherStorefrontMode={isTeacherStorefrontMode} 
+                    activeTeacherId={effectiveTeacherId} 
+                  />
+                </div>
+
+                <div className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/40 px-3 mb-1 flex items-center justify-between">
                   <span>Navigation</span>
                   <span className="text-[9px] px-2 py-0.5 rounded-full bg-foreground/5 text-foreground/60 font-mono">
                     {isTeacherStorefrontMode ? 'Teacher Academy' : 'Marketplace'}

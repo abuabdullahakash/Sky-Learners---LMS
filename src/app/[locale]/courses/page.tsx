@@ -631,73 +631,149 @@ export default function CoursesPage() {
       <div className="min-h-[calc(100vh-80px)] pt-20 pb-20 bg-background text-foreground">
         
         {/* ========================================================================= */}
-        {/* COMPACT LIQUID GLASSMORPHIC HERO SECTION (Low Height & Ambient Glowing)     */}
+        {/* ULTRA-PREMIUM FLOATING LIQUID GLASSMORPHIC HERO SECTION                     */}
         {/* ========================================================================= */}
-        <section className="relative overflow-hidden pt-8 pb-10 sm:pb-12 bg-gradient-to-b from-orange-500/[0.08] via-background to-background border-b border-foreground/10">
+        <section className="relative overflow-hidden pt-6 pb-8 sm:pb-10 bg-gradient-to-b from-orange-500/[0.07] via-background/95 to-background border-b border-foreground/10">
           {/* Ambient Glows */}
-          <div className="absolute top-0 left-1/4 w-96 h-64 bg-orange-500/15 blur-[120px] rounded-full pointer-events-none" />
-          <div className="absolute top-10 right-1/4 w-80 h-64 bg-amber-500/10 blur-[100px] rounded-full pointer-events-none" />
+          <div className="absolute top-0 left-1/4 w-[500px] h-[260px] bg-orange-500/15 blur-[130px] rounded-full pointer-events-none" />
+          <div className="absolute top-10 right-1/4 w-[450px] h-[260px] bg-amber-500/10 blur-[130px] rounded-full pointer-events-none" />
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-4">
             
-            {/* 1. Back to Academy Button */}
-            <div className="mb-5">
+            {/* 1. Floating Glass Back Button */}
+            <div>
               <Link
                 href="/"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-foreground/[0.04] hover:bg-orange-500/10 dark:bg-foreground/[0.07] dark:hover:bg-orange-500/20 text-foreground/80 hover:text-orange-500 border border-foreground/10 hover:border-orange-500/30 text-xs sm:text-sm font-bold transition-all duration-200 shadow-xs group backdrop-blur-md"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/80 hover:bg-orange-500/15 dark:bg-foreground/[0.06] dark:hover:bg-orange-500/20 text-foreground/80 hover:text-orange-500 border border-foreground/10 hover:border-orange-500/30 text-xs sm:text-sm font-bold transition-all duration-300 shadow-sm hover:shadow-md hover:shadow-orange-500/10 group backdrop-blur-xl"
               >
                 <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
                 <span>{isBn ? 'পূর্ববর্তী পেজে ফিরুন' : 'Back to Academy'}</span>
               </Link>
             </div>
 
-            {/* 2. Hero Info Banner */}
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            {/* 2. Floating Liquid Glass Capsule Box */}
+            <div className="relative rounded-[2.5rem] p-6 sm:p-8 lg:p-10 bg-gradient-to-br from-foreground/[0.03] via-card/70 to-foreground/[0.01] dark:from-foreground/[0.06] dark:via-card/60 dark:to-foreground/[0.02] border border-foreground/10 shadow-xl shadow-orange-500/[0.03] backdrop-blur-2xl overflow-hidden">
               
-              <div className="flex items-center gap-4 sm:gap-5">
-                {/* Teacher Avatar */}
-                <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-orange-500/40 bg-orange-500/10 shadow-md shadow-orange-500/20 shrink-0">
-                  {teacherPhoto ? (
-                    <img src={teacherPhoto} alt={teacherName} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-xl sm:text-2xl font-black text-orange-500">
-                      {teacherName.charAt(0)}
-                    </div>
-                  )}
-                </div>
+              {/* Subtle Glass Highlight Lines */}
+              <div className="absolute top-0 left-0 w-full h-[1.5px] bg-gradient-to-r from-transparent via-orange-500/50 to-transparent" />
+              <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
 
-                <div className="space-y-1">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-orange-500/15 text-orange-600 dark:text-orange-400 text-[11px] font-black uppercase tracking-wider border border-orange-500/30">
-                    <Sparkles className="w-3 h-3 text-orange-500" />
-                    <span>{teacherProfile?.coachingName || 'অফিশিয়াল একাডেমি'}</span>
+              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 relative z-10">
+                
+                {/* Left: Avatar & Text */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6 flex-1">
+                  
+                  {/* Teacher Avatar with Glowing Ring */}
+                  <div className="relative shrink-0">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-3xl p-1 bg-gradient-to-tr from-orange-500 via-amber-500 to-orange-400 shadow-lg shadow-orange-500/25">
+                      <div className="w-full h-full rounded-[22px] overflow-hidden bg-background">
+                        {teacherPhoto ? (
+                          <img src={teacherPhoto} alt={teacherName} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-2xl sm:text-3xl font-black text-orange-500 bg-orange-500/10">
+                            {teacherName.charAt(0)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Verified Badge */}
+                    <div className="absolute -bottom-1.5 -right-1.5 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[10px] font-black flex items-center gap-1 shadow-md border-2 border-background">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>{isBn ? 'ভেরিফাইড' : 'Verified'}</span>
+                    </div>
                   </div>
 
-                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground tracking-tight">
-                    {selectedTypeFilter === 'paid' ? (
-                      isBn ? 'প্রিমিয়াম ব্যাচ ও পেইড কোর্সসমূহ' : 'Premium Paid Batches & Courses'
-                    ) : selectedTypeFilter === 'free' ? (
-                      isBn ? 'ফ্রি কোর্স ও ডেমো লেকচারসমূহ' : 'Free Courses & Demo Lectures'
-                    ) : (
-                      isBn ? `${teacherName} এর সকল কোর্সসমূহ` : `All Courses by ${teacherName}`
-                    )}
-                  </h1>
+                  {/* Title & Description */}
+                  <div className="space-y-2 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/15 text-orange-600 dark:text-orange-400 text-xs font-black uppercase tracking-wider border border-orange-500/30 shadow-xs">
+                        <Sparkles className="w-3.5 h-3.5 text-orange-500 animate-pulse" />
+                        <span>{teacherProfile?.coachingName || (isBn ? 'অফিশিয়াল একাডেমি' : 'Official Academy')}</span>
+                      </span>
+                      {teacherProfile?.designation && (
+                        <span className="text-xs font-bold text-foreground/60">
+                          • {teacherProfile.designation}
+                        </span>
+                      )}
+                    </div>
 
-                  <p className="text-foreground/70 text-xs sm:text-sm max-w-2xl font-medium leading-relaxed">
-                    {teacherProfile?.bio || teacherProfile?.headline || (isBn ? 'ভর্তি চলছে এমন সকল লাইভ ব্যাচ, রেকর্ডেড ক্লাস ও পরীক্ষার পূর্ণাঙ্গ প্রস্তুতি।' : 'Explore full structured curriculum and active batches.')}
-                  </p>
-                </div>
-              </div>
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground tracking-tight leading-tight">
+                      {selectedTypeFilter === 'paid' ? (
+                        isBn ? (
+                          <>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">প্রিমিয়াম ব্যাচ</span> ও পেইড কোর্সসমূহ
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">Premium Batches</span> & Paid Courses
+                          </>
+                        )
+                      ) : selectedTypeFilter === 'free' ? (
+                        isBn ? (
+                          <>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">ফ্রি কোর্স</span> ও ডেমো লেকচারসমূহ
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">Free Courses</span> & Demo Lectures
+                          </>
+                        )
+                      ) : (
+                        isBn ? (
+                          <>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">{teacherName}</span> এর সকল কোর্সসমূহ
+                          </>
+                        ) : (
+                          <>
+                            All Courses by <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">{teacherName}</span>
+                          </>
+                        )
+                      )}
+                    </h1>
 
-              {/* Stat Card */}
-              <div className="flex items-center gap-3 shrink-0 self-stretch md:self-auto justify-end">
-                <div className="px-5 py-3 rounded-2xl bg-foreground/[0.04] dark:bg-foreground/[0.07] border border-foreground/10 text-center shadow-xs">
-                  <span className="text-[10px] text-foreground/50 font-bold block uppercase tracking-wider">
-                    {isBn ? 'উপলব্ধ কোর্স' : 'Available'}
-                  </span>
-                  <span className="text-xl sm:text-2xl font-black text-orange-500">
-                    {toBnNum(teacherFilteredCourses.length)}
-                  </span>
+                    <p className="text-foreground/75 text-xs sm:text-sm max-w-2xl font-medium leading-relaxed">
+                      {teacherProfile?.bio || teacherProfile?.headline || (isBn ? 'ভর্তি চলছে এমন সকল লাইভ ব্যাচ, রেকর্ডেড ক্লাস ও পরীক্ষার পূর্ণাঙ্গ প্রস্তুতি।' : 'Explore structured curriculum, recorded video lessons, and active batches.')}
+                    </p>
+                  </div>
+
                 </div>
+
+                {/* Right: Sleek Glass Stat Badges */}
+                <div className="flex sm:flex-row lg:flex-col gap-3 shrink-0 w-full sm:w-auto justify-start lg:justify-center border-t lg:border-t-0 lg:border-l border-foreground/10 pt-4 lg:pt-0 lg:pl-8">
+                  
+                  {/* Stat 1: Total Available Courses */}
+                  <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-foreground/[0.03] dark:bg-foreground/[0.06] border border-foreground/10 shadow-xs flex-1 sm:flex-initial">
+                    <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center font-bold shrink-0">
+                      <BookOpen className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-foreground/50 font-bold block uppercase tracking-wider">
+                        {isBn ? 'উপলব্ধ কোর্স' : 'Available'}
+                      </span>
+                      <span className="text-base sm:text-lg font-black text-foreground">
+                        {toBnNum(teacherFilteredCourses.length)} {isBn ? 'টি কোর্স' : 'Courses'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Stat 2: Active Preparation Track */}
+                  <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-foreground/[0.03] dark:bg-foreground/[0.06] border border-foreground/10 shadow-xs flex-1 sm:flex-initial">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold shrink-0">
+                      <Award className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-foreground/50 font-bold block uppercase tracking-wider">
+                        {isBn ? 'প্রস্তুতি সুবিধা' : 'Preparation'}
+                      </span>
+                      <span className="text-xs sm:text-sm font-bold text-foreground">
+                        {isBn ? 'লাইভ ও রেকর্ডেড' : 'Live & Recorded'}
+                      </span>
+                    </div>
+                  </div>
+
+                </div>
+
               </div>
 
             </div>

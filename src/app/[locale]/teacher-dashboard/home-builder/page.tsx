@@ -481,6 +481,20 @@ function ImageSizeGuideBadge({ size, note }: { size: string; note?: string }) {
   );
 }
 
+function InfoTooltip({ text }: { text?: string }) {
+  if (!text) return null;
+  return (
+    <span className="relative inline-flex items-center group/tooltip ml-2 cursor-help align-middle">
+      <span className="w-4 h-4 rounded-full bg-foreground/[0.08] group-hover/tooltip:bg-orange-500/20 flex items-center justify-center transition-colors">
+        <Info className="w-2.5 h-2.5 text-foreground/50 group-hover/tooltip:text-orange-500 transition-colors shrink-0" />
+      </span>
+      <span className="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 bottom-full mb-2 hidden group-hover/tooltip:block z-50 w-64 sm:w-72 p-2.5 rounded-xl bg-zinc-950 text-white text-[11px] font-normal leading-relaxed border border-white/15 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 pointer-events-none text-left normal-case tracking-normal">
+        {text}
+      </span>
+    </span>
+  );
+}
+
 export default function TeacherHomePageBuilderPage() {
   const { user } = useAuth();
   const locale = useLocale();
@@ -1938,10 +1952,10 @@ export default function TeacherHomePageBuilderPage() {
                     }}
                     className={`w-full flex items-center justify-between px-3.5 py-3 text-[13px] sm:text-sm transition-all duration-200 cursor-pointer text-left ${
                       isOpen
-                        ? 'text-orange-500 font-extrabold border-b border-orange-500/15'
+                        ? 'text-foreground font-extrabold bg-foreground/[0.04] border-b border-foreground/[0.08]'
                         : hasActiveChild 
-                          ? 'text-orange-500 font-bold'
-                          : 'text-foreground/80 hover:text-foreground font-semibold'
+                          ? 'text-foreground font-bold bg-foreground/[0.02]'
+                          : 'text-foreground/70 hover:text-foreground font-semibold'
                     }`}
                   >
                     <div className="flex items-center gap-2 leading-snug">
@@ -1950,14 +1964,14 @@ export default function TeacherHomePageBuilderPage() {
                     <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors ${
                         isOpen 
-                          ? 'bg-orange-500/20 text-orange-500' 
+                          ? 'bg-foreground/10 text-foreground/80' 
                           : 'bg-foreground/[0.06] text-foreground/60'
                       }`}>
                         {group.items.length}
                       </span>
                       <ChevronDown 
                         className={`w-4 h-4 transition-transform duration-300 ${
-                          isOpen ? 'rotate-180 text-orange-500' : 'text-foreground/40'
+                          isOpen ? 'rotate-180 text-foreground/70' : 'text-foreground/40'
                         }`} 
                       />
                     </div>
@@ -1976,19 +1990,19 @@ export default function TeacherHomePageBuilderPage() {
                             onClick={() => handleRequestTabSwitch(tab.id, group.id)}
                             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[12.5px] sm:text-[13px] transition-all text-left cursor-pointer ${
                               isActive
-                                ? 'bg-gradient-to-r from-orange-500/15 via-orange-500/10 to-amber-500/10 border border-orange-500/30 text-orange-500 font-bold shadow-xs shadow-orange-500/10'
+                                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold shadow-md shadow-orange-500/25 border border-orange-400/30 group'
                                 : 'hover:bg-foreground/[0.04] text-foreground/70 hover:text-foreground font-medium'
                             }`}
                           >
                             <div className="flex items-center gap-2.5">
                               {isActive ? (
-                                <span className="w-1.5 h-4 rounded-full bg-gradient-to-b from-orange-500 to-amber-500 shadow-sm shadow-orange-500/50 shrink-0" />
+                                <span className="w-1.5 h-4 rounded-full bg-white shadow-xs shrink-0" />
                               ) : (
                                 <Icon className="w-4 h-4 flex-shrink-0 text-foreground/40" />
                               )}
                               <span>{tab.label}</span>
                             </div>
-                            <ChevronRight className={`w-3.5 h-3.5 flex-shrink-0 transition-transform ${isActive ? 'text-orange-500 translate-x-0.5' : 'text-foreground/30'}`} />
+                            <ChevronRight className={`w-3.5 h-3.5 flex-shrink-0 transition-transform ${isActive ? 'text-white translate-x-0.5' : 'text-foreground/30'}`} />
                           </button>
                         );
                       })}
@@ -2070,12 +2084,10 @@ export default function TeacherHomePageBuilderPage() {
               <Globe className="w-3.5 h-3.5" />
               <span>Storefront Website Builder</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
-              {allTabs.find(t => t.id === activeTab)?.label}
+            <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight flex items-center">
+              <span>{allTabs.find(t => t.id === activeTab)?.label}</span>
+              <InfoTooltip text={isBn ? 'আপনার ওয়েবসাইটের এই সেকশনটির তথ্য ও ডিজাইন কাস্টমাইজ করুন।' : 'Customize information and design of this website section.'} />
             </h1>
-            <p className="text-xs sm:text-sm text-foreground/60 mt-1">
-              আপনার ওয়েবসাইটের এই সেকশনটির তথ্য ও ডিজাইন কাস্টমাইজ করুন।
-            </p>
           </div>
 
           <div className="flex items-center gap-2.5">
@@ -2165,19 +2177,18 @@ export default function TeacherHomePageBuilderPage() {
           {activeTab === 'branding' && (
             <div className="space-y-8">
               <div className="border-b border-foreground/10 pb-4">
-                <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-orange-500" />
-                  <span>১. ব্র্যান্ডিং ও পরিচিতি (Branding & Identity)</span>
+                <h3 className="text-lg font-bold text-foreground flex items-center">
+                  <Building2 className="w-5 h-5 text-orange-500 mr-2" />
+                  <span>{isBn ? '১. ব্র্যান্ডিং ও পরিচিতি' : '1. Branding & Identity'}</span>
+                  <InfoTooltip text={isBn ? 'আপনার প্ল্যাটফর্ম বা অ্যাকাডেমির ধরন, ব্র্যান্ড লোগো, কভার ব্যানার এবং মূল পরিচয় নির্ধারণ করুন।' : 'Set your platform/academy mode, brand logo, cover banner, and identity.'} />
                 </h3>
-                <p className="text-xs text-foreground/60 mt-1">
-                  আপনার প্ল্যাটফর্ম বা অ্যাকাডেমির ধরন, ব্র্যান্ড লোগো, কভার ব্যানার এবং মূল পরিচয় নির্ধারণ করুন।
-                </p>
               </div>
 
               {/* Account Type Selector Cards */}
               <div className="space-y-3">
-                <label className="text-xs font-bold text-foreground/80 block uppercase tracking-wider">
-                  প্ল্যাটফর্মের ধরন (Account Mode)
+                <label className="text-xs font-bold text-foreground/80 block uppercase tracking-wider flex items-center">
+                  <span>{isBn ? 'প্ল্যাটফর্মের ধরন' : 'Account Mode'}</span>
+                  <InfoTooltip text={isBn ? 'একক শিক্ষক হিসেবে নাকি কোচিং/একাডেমি হিসেবে সাইট চালাবেন তা বেছে নিন।' : 'Select individual mentor or coaching academy mode.'} />
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Option 1: Individual Teacher */}
@@ -2194,11 +2205,11 @@ export default function TeacherHomePageBuilderPage() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-bold text-sm text-foreground">একক শিক্ষক (Individual Mentor)</h4>
+                        <h4 className="font-bold text-sm text-foreground">{isBn ? 'একক শিক্ষক' : 'Individual Mentor'}</h4>
                         {profileType === 'individual' && <CheckCircle2 className="w-4 h-4 text-orange-500" />}
                       </div>
                       <p className="text-xs text-foreground/60 mt-1 leading-relaxed">
-                        ব্যক্তিগত শিক্ষক প্রোফাইল। হোম পেজে আপনার একক পরিচয়, শিক্ষাগত যোগ্যতা ও বায়ো প্রদর্শিত হবে।
+                        {isBn ? 'ব্যক্তিগত শিক্ষক প্রোফাইল। হোম পেজে আপনার একক পরিচয় ও বায়ো থাকবে।' : 'Personal mentor profile with individual bio.'}
                       </p>
                     </div>
                   </div>
@@ -2217,11 +2228,11 @@ export default function TeacherHomePageBuilderPage() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-bold text-sm text-foreground">প্রতিষ্ঠান / একাডেমি (Institution / Academy)</h4>
+                        <h4 className="font-bold text-sm text-foreground">{isBn ? 'প্রতিষ্ঠান / একাডেমি' : 'Institution / Academy'}</h4>
                         {profileType === 'institution' && <CheckCircle2 className="w-4 h-4 text-orange-500" />}
                       </div>
                       <p className="text-xs text-foreground/60 mt-1 leading-relaxed">
-                        একাধিক শিক্ষক ও কোচিং সেন্টার। হোম পেজে “শিক্ষক মণ্ডলী” সেকশন এবং কোর্সে শিক্ষক অ্যাসাইন করার সুবিধা পাবেন।
+                        {isBn ? 'একাধিক শিক্ষক ও কোচিং সেন্টার। শিক্ষক মণ্ডলী প্যানেল সুবিধা পাবেন।' : 'Coaching center with multiple instructors.'}
                       </p>
                     </div>
                   </div>
@@ -2230,13 +2241,16 @@ export default function TeacherHomePageBuilderPage() {
 
               {/* Media / Photos Section (Cover Banner & Profile Photo / Logo) */}
               <div className="space-y-6 pt-4 border-t border-foreground/10">
-                <h4 className="text-sm font-bold text-foreground">ব্র্যান্ড মিডিয়া ও ব্যানার</h4>
+                <h4 className="text-sm font-bold text-foreground flex items-center">
+                  <span>{isBn ? 'ব্র্যান্ড মিডিয়া ও ব্যানার' : 'Brand Media & Banner'}</span>
+                  <InfoTooltip text={isBn ? 'কভার ব্যানার ও প্রোফাইল ছবি / ব্র্যান্ড লোগো।' : 'Cover banner and teacher portrait or academy logo.'} />
+                </h4>
 
                 {/* Cover Banner */}
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between">
                     <label className="text-xs font-bold text-foreground/70 block">
-                      কভার ব্যানার ফটো (Cover Banner)
+                      {isBn ? 'কভার ব্যানার ফটো (Cover Banner)' : 'Cover Banner Photo'}
                     </label>
                     <ImageSizeGuideBadge size="1200 × 400 px" note="কম্পিউটার ও মোবাইলের হেডারে কোনো অংশ কাটা ছাড়া নিখুঁত ফিট হবে।" />
                   </div>
@@ -2245,7 +2259,7 @@ export default function TeacherHomePageBuilderPage() {
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                       <label className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold cursor-pointer transition-all flex items-center gap-2 shadow-lg">
                         {uploadingCoverPhoto ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
-                        <span>{uploadingCoverPhoto ? 'আপলোড হচ্ছে...' : 'কভার পরিবর্তন করুন'}</span>
+                        <span>{uploadingCoverPhoto ? (isBn ? 'আপলোড হচ্ছে...' : 'Uploading...') : (isBn ? 'কভার পরিবর্তন করুন' : 'Change Cover')}</span>
                         <input type="file" accept="image/*" onChange={handleUploadCoverPhoto} className="hidden" />
                       </label>
                     </div>
@@ -2255,11 +2269,11 @@ export default function TeacherHomePageBuilderPage() {
                       type="text"
                       value={coverPhoto}
                       onChange={(e) => setCoverPhoto(e.target.value)}
-                      placeholder="কভার ফটো URL"
+                      placeholder={isBn ? 'কভার ফটো URL' : 'Cover Photo URL'}
                       className="flex-1 px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                     />
                     <label className="px-3.5 py-2 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/20 text-xs font-bold cursor-pointer transition-colors shrink-0">
-                      <span>ফাইল সিলেক্ট</span>
+                      <span>{isBn ? 'ফাইল সিলেক্ট' : 'Select File'}</span>
                       <input type="file" accept="image/*" onChange={handleUploadCoverPhoto} className="hidden" />
                     </label>
                   </div>
@@ -2271,34 +2285,29 @@ export default function TeacherHomePageBuilderPage() {
                     <img src={profilePhoto} alt="Profile / Logo" className="w-full h-full object-cover" />
                     <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer">
                       <Camera className="w-5 h-5 mb-1" />
-                      <span className="text-[10px] font-bold">পরিবর্তন</span>
+                      <span className="text-[10px] font-bold">{isBn ? 'পরিবর্তন' : 'Change'}</span>
                       <input type="file" accept="image/*" onChange={handleUploadProfilePhoto} className="hidden" />
                     </label>
                   </div>
 
                   <div className="flex-1 space-y-2">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h5 className="text-xs font-bold text-foreground">
-                          {profileType === 'institution' ? 'প্রতিষ্ঠানের লোগো (Brand Logo)' : 'প্রোফাইল ছবি (Teacher Portrait)'}
-                        </h5>
-                        <ImageSizeGuideBadge size="500 × 500 px" note="স্কয়ার বা রাউন্ড ফ্রেমে ক্রিস্প ও স্পষ্টভাবে প্রদর্শিত হবে।" />
-                      </div>
-                      <p className="text-[11px] text-foreground/60 mt-0.5">
-                        PNG বা JPG ফরম্যাটে ১:১ স্কয়ার ছবি ব্যবহার করুন।
-                      </p>
+                    <div className="flex items-center justify-between">
+                      <h5 className="text-xs font-bold text-foreground">
+                        {profileType === 'institution' ? (isBn ? 'প্রতিষ্ঠানের লোগো (Brand Logo)' : 'Institution Brand Logo') : (isBn ? 'প্রোফাইল ছবি (Teacher Portrait)' : 'Teacher Portrait Photo')}
+                      </h5>
+                      <ImageSizeGuideBadge size="500 × 500 px" note="স্কয়ার বা রাউন্ড ফ্রেমে ক্রিস্প ও স্পষ্টভাবে প্রদর্শিত হবে।" />
                     </div>
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
                         value={profilePhoto}
                         onChange={(e) => setProfilePhoto(e.target.value)}
-                        placeholder="ছবির সরাসরি লিঙ্ক বা URL"
+                        placeholder={isBn ? 'ছবির সরাসরি লিঙ্ক বা URL' : 'Direct image link or URL'}
                         className="flex-1 px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                       />
                       <label className="px-4 py-2 rounded-xl bg-orange-500 text-white text-xs font-bold cursor-pointer hover:bg-orange-600 transition-colors flex items-center gap-1.5 shrink-0">
                         {uploadingProfilePhoto ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-                        <span>{uploadingProfilePhoto ? 'আপলোড হচ্ছে...' : 'ছবি আপলোড'}</span>
+                        <span>{uploadingProfilePhoto ? (isBn ? 'আপলোড হচ্ছে...' : 'Uploading...') : (isBn ? 'ছবি আপলোড' : 'Upload Photo')}</span>
                         <input type="file" accept="image/*" onChange={handleUploadProfilePhoto} className="hidden" />
                       </label>
                     </div>
@@ -2308,7 +2317,10 @@ export default function TeacherHomePageBuilderPage() {
 
               {/* Basic Information */}
               <div className="space-y-4 pt-4 border-t border-foreground/10">
-                <h4 className="text-sm font-bold text-foreground">প্রাথমিক তথ্য</h4>
+                <h4 className="text-sm font-bold text-foreground flex items-center">
+                  <span>{isBn ? 'প্রাথমিক তথ্য' : 'Basic Information'}</span>
+                  <InfoTooltip text={isBn ? 'নাম, পদবি বা স্লোগান এবং সংক্ষিপ্ত বায়ো ওভারভিউ।' : 'Name, designation/tagline, and short bio overview.'} />
+                </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -2358,13 +2370,11 @@ export default function TeacherHomePageBuilderPage() {
           {activeTab === 'headerSettings' && (
             <div className="space-y-8">
               <div className="border-b border-foreground/10 pb-4">
-                <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
-                  <LayoutDashboard className="w-5 h-5 text-orange-500" />
-                  <span>১. হেডার লোগো ও ব্র্যান্ডিং (Header & Branding)</span>
+                <h3 className="text-lg font-bold text-foreground flex items-center">
+                  <LayoutDashboard className="w-5 h-5 text-orange-500 mr-2" />
+                  <span>{isBn ? '১. হেডার লোগো ও ব্র্যান্ডিং' : '1. Header Logo & Branding'}</span>
+                  <InfoTooltip text={isBn ? 'আপনার স্টোরফ্রন্ট ওয়েবসাইটের শীর্ষ হেডার বারের লোগো, নাম, ট্যাগলাইন এবং নেভিগেশন ডিসপ্লে কাস্টমাইজ করুন।' : 'Customize your storefront website header logo, name, tagline, and navigation display.'} />
                 </h3>
-                <p className="text-xs text-foreground/60 mt-1">
-                  আপনার স্টোরফ্রন্ট ওয়েবসাইটের শীর্ষ হেডার বারের লোগো, নাম, ট্যাগলাইন এবং নেভিগেশন ডিসপ্লে কাস্টমাইজ করুন।
-                </p>
               </div>
 
               {/* Live Interactive Header Preview Banner */}
@@ -2372,11 +2382,11 @@ export default function TeacherHomePageBuilderPage() {
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-foreground/80 block uppercase tracking-wider flex items-center gap-2">
                     <Eye className="w-4 h-4 text-orange-500" />
-                    <span>হেডার লাইভ প্রিভিউ (Live Header Preview)</span>
+                    <span>{isBn ? 'হেডার লাইভ প্রিভিউ' : 'Live Header Preview'}</span>
                   </label>
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold border border-emerald-500/30">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>রিয়েলটাইম প্রিভিউ</span>
+                    <span>{isBn ? 'রিয়েলটাইম প্রিভিউ' : 'Real-time Preview'}</span>
                   </span>
                 </div>
 
@@ -2414,10 +2424,10 @@ export default function TeacherHomePageBuilderPage() {
 
                     {/* Nav Links in Preview */}
                     <div className="hidden md:flex items-center gap-5 text-xs font-semibold text-white/80">
-                      <span className="text-orange-400 border-b-2 border-orange-500 pb-0.5">হোম</span>
-                      <span className="hover:text-white transition-colors cursor-pointer">কোর্সসমূহ</span>
-                      <span className="hover:text-white transition-colors cursor-pointer">আমাদের সম্পর্কে</span>
-                      <span className="hover:text-white transition-colors cursor-pointer">যোগাযোগ</span>
+                      <span className="text-orange-400 border-b-2 border-orange-500 pb-0.5">{isBn ? 'হোম' : 'Home'}</span>
+                      <span className="hover:text-white transition-colors cursor-pointer">{isBn ? 'কোর্সসমূহ' : 'Courses'}</span>
+                      <span className="hover:text-white transition-colors cursor-pointer">{isBn ? 'আমাদের সম্পর্কে' : 'About'}</span>
+                      <span className="hover:text-white transition-colors cursor-pointer">{isBn ? 'যোগাযোগ' : 'Contact'}</span>
                       {customNavLinks && customNavLinks.filter((c: any) => c.enabled !== false).map((c: any) => (
                         <span key={c.id || c.slug} className="text-white/60 hover:text-white transition-colors cursor-pointer">
                           {c.name}
@@ -2428,7 +2438,7 @@ export default function TeacherHomePageBuilderPage() {
                     {/* Right side demo action */}
                     <div className="flex items-center gap-2">
                       <div className="px-3 py-1.5 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/40 text-[11px] font-bold">
-                        অফিশিয়াল স্টোরফ্রন্ট
+                        {isBn ? 'অফিশিয়াল স্টোরফ্রন্ট' : 'Official Storefront'}
                       </div>
                     </div>
                   </div>
@@ -2438,15 +2448,11 @@ export default function TeacherHomePageBuilderPage() {
               {/* Header Logo Upload & Configuration */}
               <div className="space-y-4 pt-4 border-t border-foreground/10">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
-                      <ImageIcon className="w-4 h-4 text-orange-500" />
-                      <span>হেডার ডেডিকেটেড লোগো (Header Custom Logo)</span>
-                    </h4>
-                    <p className="text-xs text-foreground/60 mt-0.5">
-                      ওয়েবসাইটের হেডারের জন্য আলাদা লোগো বা ব্র্যান্ড ইমেজ আপলোড করুন। খালি রাখলে প্রোফাইল ছবি ব্যবহার হবে।
-                    </p>
-                  </div>
+                  <h4 className="text-sm font-bold text-foreground flex items-center">
+                    <ImageIcon className="w-4 h-4 text-orange-500 mr-2" />
+                    <span>{isBn ? 'হেডার ডেডিকেটেড লোগো' : 'Header Custom Logo'}</span>
+                    <InfoTooltip text={isBn ? 'ওয়েবসাইটের হেডারের জন্য আলাদা লোগো বা ব্র্যান্ড ইমেজ আপলোড করুন। খালি রাখলে প্রোফাইল ছবি ব্যবহার হবে।' : 'Upload dedicated header logo image. If left empty, profile picture is used.'} />
+                  </h4>
                   <ImageSizeGuideBadge size="300 × 80 px (বা 500 × 500 px স্কয়ার)" note="ট্রান্সপারেন্ট PNG লোগো সবচেয়ে সুন্দর দেখাবে।" />
                 </div>
 
@@ -2458,7 +2464,7 @@ export default function TeacherHomePageBuilderPage() {
                     ) : (
                       <div className="text-center p-2 text-foreground/40">
                         <ImageIcon className="w-6 h-6 mx-auto mb-1 opacity-60" />
-                        <span className="text-[10px] font-semibold block">লোগো নেই</span>
+                        <span className="text-[10px] font-semibold block">{isBn ? 'লোগো নেই' : 'No Logo'}</span>
                       </div>
                     )}
                   </div>
@@ -2469,12 +2475,12 @@ export default function TeacherHomePageBuilderPage() {
                         type="text"
                         value={headerLogo}
                         onChange={(e) => { setHeaderLogo(e.target.value); setHasUnsavedChanges(true); }}
-                        placeholder="হেডার লোগোর সরাসরি URL পেস্ট করুন"
+                        placeholder={isBn ? 'হেডার লোগোর সরাসরি URL পেস্ট করুন' : 'Paste direct logo URL'}
                         className="flex-1 px-3.5 py-2 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                       />
                       <label className="px-4 py-2 rounded-xl bg-orange-500 text-white text-xs font-bold cursor-pointer hover:bg-orange-600 transition-colors flex items-center gap-1.5 shrink-0">
                         {uploadingHeaderLogo ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-                        <span>{uploadingHeaderLogo ? 'আপলোড হচ্ছে...' : 'লোগো আপলোড'}</span>
+                        <span>{uploadingHeaderLogo ? (isBn ? 'আপলোড হচ্ছে...' : 'Uploading...') : (isBn ? 'লোগো আপলোড' : 'Upload Logo')}</span>
                         <input type="file" accept="image/*" onChange={handleUploadHeaderLogo} className="hidden" />
                       </label>
                       {headerLogo && (
@@ -2482,14 +2488,14 @@ export default function TeacherHomePageBuilderPage() {
                           type="button"
                           onClick={() => { setHeaderLogo(''); setHasUnsavedChanges(true); }}
                           className="px-3 py-2 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-colors text-xs font-bold shrink-0"
-                          title="লোগো মুছে ফেলুন"
+                          title={isBn ? 'লোগো মুছে ফেলুন' : 'Remove Logo'}
                         >
-                          মুছুন
+                          {isBn ? 'মুছুন' : 'Remove'}
                         </button>
                       )}
                     </div>
                     <p className="text-[11px] text-foreground/50">
-                      💡 টিপস: আপনি এখানে কোনো লোগো আপলোড না করলে স্বয়ংক্রিয়ভাবে আপনার প্রোফাইল ছবি ও নাম ব্যবহার করা হবে।
+                      💡 {isBn ? 'টিপস: আপনি এখানে কোনো লোগো আপলোড না করলে স্বয়ংক্রিয়ভাবে আপনার প্রোফাইল ছবি ও নাম ব্যবহার করা হবে।' : 'Tip: If no logo is uploaded, your profile photo & name will be used.'}
                     </p>
                   </div>
                 </div>
@@ -2497,12 +2503,15 @@ export default function TeacherHomePageBuilderPage() {
 
               {/* Header Text & Tagline Configuration */}
               <div className="space-y-4 pt-4 border-t border-foreground/10">
-                <h4 className="text-sm font-bold text-foreground">হেডার টেক্সট ও ট্যাগলাইন</h4>
+                <h4 className="text-sm font-bold text-foreground flex items-center">
+                  <span>{isBn ? 'হেডার টেক্সট ও ট্যাগলাইন' : 'Header Text & Tagline'}</span>
+                  <InfoTooltip text={isBn ? 'হেডারে আপনার একাডেমি বা ব্র্যান্ডের মূল নাম ও সাব-ট্যাগলাইন ব্যাজ।' : 'Your academy/brand display name and sub-tagline badge in the header.'} />
+                </h4>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-[11px] font-bold text-foreground/70 block mb-1">
-                      হেডারে প্রদর্শিত নাম (Brand / Teacher Name) *
+                      {isBn ? 'হেডারে প্রদর্শিত নাম (Brand / Teacher Name) *' : 'Display Brand / Teacher Name *'}
                     </label>
                     <input
                       type="text"
@@ -2515,13 +2524,13 @@ export default function TeacherHomePageBuilderPage() {
 
                   <div>
                     <label className="text-[11px] font-bold text-foreground/70 block mb-1">
-                      হেডার সাব-ট্যাগলাইন (Header Tagline Badge)
+                      {isBn ? 'হেডার সাব-ট্যাগলাইন (Header Tagline Badge)' : 'Header Sub-Tagline Badge'}
                     </label>
                     <input
                       type="text"
                       value={headerTagline}
                       onChange={(e) => { setHeaderTagline(e.target.value); setHasUnsavedChanges(true); }}
-                      placeholder="যেমন: Teacher Academy বা অনলাইন লার্নিং প্ল্যাটফর্ম"
+                      placeholder={isBn ? 'যেমন: Teacher Academy বা অনলাইন লার্নিং প্ল্যাটফর্ম' : 'e.g. Teacher Academy'}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 font-semibold"
                     />
                   </div>
@@ -2529,14 +2538,12 @@ export default function TeacherHomePageBuilderPage() {
               </div>
 
               {/* Navigation Links Status Summary */}
-              <div className="p-4 rounded-2xl bg-orange-500/[0.04] border border-orange-500/20 space-y-2">
-                <h5 className="text-xs font-bold text-orange-500 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>হেডার নেভিগেশন মেনু লিঙ্কসমূহ (Active Header Menu)</span>
+              <div className="p-4 rounded-2xl bg-orange-500/[0.04] border border-orange-500/20">
+                <h5 className="text-xs font-bold text-orange-500 flex items-center">
+                  <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                  <span>{isBn ? 'হেডার নেভিগেশন মেনু লিঙ্কসমূহ' : 'Active Header Navigation Menu'}</span>
+                  <InfoTooltip text={isBn ? 'আপনার হেডারে ডিফল্টভাবে হোম, কোর্সসমূহ, আমাদের সম্পর্কে ও যোগাযোগ মেনু থাকবে। এছাড়া সুপার অ্যাডমিন বা আপনার তৈরি করা কাস্টম পেজগুলো (যেমন: নোটিশ পেজ) স্বয়ংক্রিয়ভাবে হেডারের সাথে যুক্ত থাকবে।' : 'Default links include Home, Courses, About, and Contact along with your published custom pages.'} />
                 </h5>
-                <p className="text-[11px] text-foreground/70 leading-relaxed">
-                  আপনার হেডারে ডিফল্টভাবে <strong>হোম (Home)</strong>, <strong>কোর্সসমূহ (Courses)</strong>, <strong>আমাদের সম্পর্কে (About)</strong> ও <strong>যোগাযোগ (Contact)</strong> মেনু থাকবে। এছাড়া সুপার অ্যাডমিন বা আপনার তৈরি করা কাস্টম পেজগুলো (যেমন: নোটিশ পেজ) স্বয়ংক্রিয়ভাবে হেডারের সাথে যুক্ত থাকবে।
-                </p>
               </div>
 
             </div>
@@ -2546,13 +2553,11 @@ export default function TeacherHomePageBuilderPage() {
           {activeTab === 'footerSettings' && (
             <div className="space-y-8">
               <div className="border-b border-foreground/10 pb-4">
-                <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
-                  <Layers className="w-5 h-5 text-orange-500" />
-                  <span>২. ফুটার তথ্য ও সোশ্যাল লিঙ্ক (Footer Information & Socials)</span>
+                <h3 className="text-lg font-bold text-foreground flex items-center">
+                  <Layers className="w-5 h-5 text-orange-500 mr-2" />
+                  <span>{isBn ? '২. ফুটার তথ্য ও সোশ্যাল লিঙ্ক' : '2. Footer Information & Socials'}</span>
+                  <InfoTooltip text={isBn ? 'আপনার স্টোরফ্রন্ট ওয়েবসাইটের নিচের ফুটার অংশের ব্র্যান্ডিং, সরাসরি যোগাযোগের ঠিকানা, হেল্পলাইন ও সোশ্যাল মিডিয়া লিঙ্ক কনফিগার করুন।' : 'Configure your storefront footer branding, contact address, helpline, and social links.'} />
                 </h3>
-                <p className="text-xs text-foreground/60 mt-1">
-                  আপনার স্টোরফ্রন্ট ওয়েবসাইটের নিচের ফুটার অংশের ব্র্যান্ডিং, সরাসরি যোগাযোগের ঠিকানা, হেল্পলাইন ও সোশ্যাল মিডিয়া লিঙ্ক কনফিগার করুন।
-                </p>
               </div>
 
               {/* Live Interactive Footer Preview Box */}
@@ -2560,11 +2565,11 @@ export default function TeacherHomePageBuilderPage() {
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-foreground/80 block uppercase tracking-wider flex items-center gap-2">
                     <Eye className="w-4 h-4 text-orange-500" />
-                    <span>ফুটার লাইভ প্রিভিউ (Live Footer Preview)</span>
+                    <span>{isBn ? 'ফুটার লাইভ প্রিভিউ' : 'Live Footer Preview'}</span>
                   </label>
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold border border-emerald-500/30">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>রিয়েলটাইম প্রিভিউ</span>
+                    <span>{isBn ? 'রিয়েলটাইম প্রিভিউ' : 'Real-time Preview'}</span>
                   </span>
                 </div>
 
@@ -2594,38 +2599,38 @@ export default function TeacherHomePageBuilderPage() {
                         </div>
                       )}
                       <p className="text-white/60 text-[11px] leading-relaxed line-clamp-3">
-                        {footerBio || 'অনলাইন একাডেমিক ও ভর্তি পরীক্ষার জন্য একটি বিশেষায়িত লার্নিং প্ল্যাটফর্ম।'}
+                        {footerBio || (isBn ? 'অনলাইন একাডেমিক ও ভর্তি পরীক্ষার জন্য একটি বিশেষায়িত লার্নিং প্ল্যাটফর্ম।' : 'A specialized learning platform for academic & admission tests.')}
                       </p>
                     </div>
 
                     {/* Col 2 */}
                     <div className="space-y-2">
-                      <div className="font-bold text-orange-400 text-xs mb-2">একাডেমি পেইজসমূহ</div>
+                      <div className="font-bold text-orange-400 text-xs mb-2">{isBn ? 'একাডেমি পেইজসমূহ' : 'Academy Pages'}</div>
                       <div className="text-white/60 space-y-1 text-[11px]">
-                        <div>• হোম (Home)</div>
-                        <div>• কোর্সসমূহ (Courses)</div>
-                        <div>• আমাদের সম্পর্কে (About)</div>
-                        <div>• যোগাযোগ (Contact)</div>
+                        <div>• {isBn ? 'হোম (Home)' : 'Home'}</div>
+                        <div>• {isBn ? 'কোর্সসমূহ (Courses)' : 'Courses'}</div>
+                        <div>• {isBn ? 'আমাদের সম্পর্কে (About)' : 'About'}</div>
+                        <div>• {isBn ? 'যোগাযোগ (Contact)' : 'Contact'}</div>
                       </div>
                     </div>
 
                     {/* Col 3 */}
                     <div className="space-y-2">
-                      <div className="font-bold text-amber-400 text-xs mb-2">কোর্স ও প্রস্তুতি</div>
+                      <div className="font-bold text-amber-400 text-xs mb-2">{isBn ? 'কোর্স ও প্রস্তুতি' : 'Courses & Prep'}</div>
                       <div className="text-white/60 space-y-1 text-[11px]">
-                        <div>• অনলাইন রেকর্ডেড ক্লাস</div>
-                        <div>• লাইভ ইন্টারঅ্যাক্টিভ ব্যাচ</div>
-                        <div>• ডেইলি এক্সাম ও সলভ শিট</div>
+                        <div>• {isBn ? 'অনলাইন রেকর্ডেড ক্লাস' : 'Recorded Classes'}</div>
+                        <div>• {isBn ? 'লাইভ ইন্টারঅ্যাক্টিভ ব্যাচ' : 'Live Interactive Batches'}</div>
+                        <div>• {isBn ? 'ডেইলি এক্সাম ও সলভ শিট' : 'Daily Exams & Solutions'}</div>
                       </div>
                     </div>
 
                     {/* Col 4 */}
                     <div className="space-y-2">
-                      <div className="font-bold text-emerald-400 text-xs mb-2">সরাসরি যোগাযোগ</div>
+                      <div className="font-bold text-emerald-400 text-xs mb-2">{isBn ? 'সরাসরি যোগাযোগ' : 'Direct Contact'}</div>
                       <div className="text-white/70 space-y-1 text-[11px]">
                         <div className="flex items-center gap-1.5">
                           <MapPin className="w-3 h-3 text-orange-400 shrink-0" />
-                          <span className="truncate">{contactAddress || 'ঢাকা, বাংলাদেশ'}</span>
+                          <span className="truncate">{contactAddress || (isBn ? 'ঢাকা, বাংলাদেশ' : 'Dhaka, Bangladesh')}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <Phone className="w-3 h-3 text-emerald-400 shrink-0" />
@@ -2642,11 +2647,11 @@ export default function TeacherHomePageBuilderPage() {
                   {/* Bottom preview bar */}
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-white/50 pt-2">
                     <p>
-                      {footerCopyright || `© ${new Date().getFullYear()} ${displayName || 'Teacher Academy'}. সর্বস্বত্ব সংরক্ষিত। Powered by SkyLearners.`}
+                      {footerCopyright || `© ${new Date().getFullYear()} ${displayName || 'Teacher Academy'}. ${isBn ? 'সর্বস্বত্ব সংরক্ষিত। Powered by SkyLearners.' : 'All rights reserved. Powered by SkyLearners.'}`}
                     </p>
                     <div className="flex items-center gap-4">
-                      <span>প্রাইভেসি পলিসি</span>
-                      <span>শর্তাবলী</span>
+                      <span>{isBn ? 'প্রাইভেসি পলিসি' : 'Privacy Policy'}</span>
+                      <span>{isBn ? 'শর্তাবলী' : 'Terms & Conditions'}</span>
                     </div>
                   </div>
                 </div>
@@ -2654,16 +2659,19 @@ export default function TeacherHomePageBuilderPage() {
 
               {/* 1. Footer Brand Bio */}
               <div className="space-y-4 pt-4 border-t border-foreground/10">
-                <h4 className="text-sm font-bold text-foreground">ফুটার সংক্ষিপ্ত পরিচিতি বা স্লোগান</h4>
+                <h4 className="text-sm font-bold text-foreground flex items-center">
+                  <span>{isBn ? 'ফুটার সংক্ষিপ্ত পরিচিতি বা স্লোগান' : 'Footer Bio & Vision Statement'}</span>
+                  <InfoTooltip text={isBn ? 'ফুটার লোগোর নিচে দেখানোর জন্য সংক্ষিপ্ত পরিচিতি বা ভিশন স্টেটমেন্ট।' : 'Short overview or vision statement shown below the footer logo.'} />
+                </h4>
                 <div>
                   <label className="text-[11px] font-bold text-foreground/70 block mb-1">
-                    ফুটার পরিচিতি টেক্সট (Footer Bio / Vision Statement)
+                    {isBn ? 'ফুটার পরিচিতি টেক্সট (Footer Bio / Vision Statement)' : 'Footer Bio / Vision Statement'}
                   </label>
                   <textarea
                     rows={2}
                     value={footerBio}
                     onChange={(e) => { setFooterBio(e.target.value); setHasUnsavedChanges(true); }}
-                    placeholder="অনলাইন একাডেমিক ও ভর্তি পরীক্ষার জন্য একটি বিশেষায়িত লার্নিং প্ল্যাটফর্ম..."
+                    placeholder={isBn ? 'অনলাইন একাডেমিক ও ভর্তি পরীক্ষার জন্য একটি বিশেষায়িত লার্নিং প্ল্যাটফর্ম...' : 'A specialized online learning platform for academic & admission preparation...'}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500 leading-relaxed"
                   />
                 </div>
@@ -2671,28 +2679,29 @@ export default function TeacherHomePageBuilderPage() {
 
               {/* 2. Direct Contact Information */}
               <div className="space-y-4 pt-4 border-t border-foreground/10">
-                <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-orange-500" />
-                  <span>সরাসরি যোগাযোগের ঠিকানা ও হেল্পলাইন</span>
+                <h4 className="text-sm font-bold text-foreground flex items-center">
+                  <Phone className="w-4 h-4 text-orange-500 mr-2" />
+                  <span>{isBn ? 'সরাসরি যোগাযোগের ঠিকানা ও হেল্পলাইন' : 'Direct Contact & Helpline'}</span>
+                  <InfoTooltip text={isBn ? 'শিক্ষার্থীদের সাথে যোগাযোগের ঠিকানা, ফোন নম্বর, হোয়াটসঅ্যাপ ও অফিস সময়।' : 'Contact address, helpline phone, WhatsApp, email, and support hours.'} />
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-[11px] font-bold text-foreground/70 block mb-1">
-                      ক্যাম্পাস / ব্রাঞ্চ ঠিকানা (Campus Address)
+                      {isBn ? 'ক্যাম্পাস / ব্রাঞ্চ ঠিকানা (Campus Address)' : 'Campus / Branch Address'}
                     </label>
                     <input
                       type="text"
                       value={contactAddress}
                       onChange={(e) => { setContactAddress(e.target.value); setHasUnsavedChanges(true); }}
-                      placeholder="যেমন: বাড়ি ১২, রোড ৪, ধানমন্ডি, ঢাকা"
+                      placeholder={isBn ? 'যেমন: বাড়ি ১২, রোড ৪, ধানমন্ডি, ঢাকা' : 'e.g. House 12, Road 4, Dhanmondi, Dhaka'}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                     />
                   </div>
 
                   <div>
                     <label className="text-[11px] font-bold text-foreground/70 block mb-1">
-                      সরাসরি হেল্পলাইন ফোন (Helpline Phone)
+                      {isBn ? 'সরাসরি হেল্পলাইন ফোন (Helpline Phone)' : 'Helpline Phone'}
                     </label>
                     <input
                       type="text"
@@ -2705,7 +2714,7 @@ export default function TeacherHomePageBuilderPage() {
 
                   <div>
                     <label className="text-[11px] font-bold text-foreground/70 block mb-1">
-                      সরাসরি হোয়াটসঅ্যাপ নম্বর (WhatsApp Number)
+                      {isBn ? 'সরাসরি হোয়াটসঅ্যাপ নম্বর (WhatsApp Number)' : 'WhatsApp Number'}
                     </label>
                     <input
                       type="text"
@@ -2718,7 +2727,7 @@ export default function TeacherHomePageBuilderPage() {
 
                   <div>
                     <label className="text-[11px] font-bold text-foreground/70 block mb-1">
-                      অফিশিয়াল সাপোর্ট ইমেইল (Official Email)
+                      {isBn ? 'অফিশিয়াল সাপোর্ট ইমেইল (Official Email)' : 'Official Support Email'}
                     </label>
                     <input
                       type="email"
@@ -2731,13 +2740,13 @@ export default function TeacherHomePageBuilderPage() {
 
                   <div className="sm:col-span-2">
                     <label className="text-[11px] font-bold text-foreground/70 block mb-1">
-                      সাপোর্ট ও অফিস সময় (Office & Support Hours)
+                      {isBn ? 'সাপোর্ট ও অফিস সময় (Office & Support Hours)' : 'Office & Support Hours'}
                     </label>
                     <input
                       type="text"
                       value={contactOfficeHours}
                       onChange={(e) => { setContactOfficeHours(e.target.value); setHasUnsavedChanges(true); }}
-                      placeholder="যেমন: প্রতিদিন সকাল ৯:০০ টা — রাত ১০:০০ টা"
+                      placeholder={isBn ? 'যেমন: প্রতিদিন সকাল ৯:০০ টা — রাত ১০:০০ টা' : 'e.g. Daily 9:00 AM — 10:00 PM'}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                     />
                   </div>
@@ -2746,15 +2755,16 @@ export default function TeacherHomePageBuilderPage() {
 
               {/* 3. Social Media Channels */}
               <div className="space-y-4 pt-4 border-t border-foreground/10">
-                <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-orange-500" />
-                  <span>সোশ্যাল মিডিয়া ও কমিউনিটি লিঙ্ক</span>
+                <h4 className="text-sm font-bold text-foreground flex items-center">
+                  <Globe className="w-4 h-4 text-orange-500 mr-2" />
+                  <span>{isBn ? 'সোশ্যাল মিডিয়া ও কমিউনিটি লিঙ্ক' : 'Social Media & Community Links'}</span>
+                  <InfoTooltip text={isBn ? 'ফেসবুক পেইজ, গ্রুপ, ইউটিউব ও টেলিগ্রাম চ্যানেলের লিংক।' : 'Links to your Facebook, YouTube, and Telegram communities.'} />
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-[11px] font-bold text-foreground/70 block mb-1">
-                      ফেসবুক পেইজ লিংক (Facebook Page URL)
+                      {isBn ? 'ফেসবুক পেইজ লিংক (Facebook Page URL)' : 'Facebook Page URL'}
                     </label>
                     <input
                       type="text"
@@ -2767,7 +2777,7 @@ export default function TeacherHomePageBuilderPage() {
 
                   <div>
                     <label className="text-[11px] font-bold text-foreground/70 block mb-1">
-                      ফেসবুক গ্রুপ লিংক (Facebook Group / Community)
+                      {isBn ? 'ফেসবুক গ্রুপ লিংক (Facebook Group / Community)' : 'Facebook Group / Community'}
                     </label>
                     <input
                       type="text"
@@ -2780,7 +2790,7 @@ export default function TeacherHomePageBuilderPage() {
 
                   <div>
                     <label className="text-[11px] font-bold text-foreground/70 block mb-1">
-                      ইউটিউব চ্যানেল লিংক (YouTube Channel URL)
+                      {isBn ? 'ইউটিউব চ্যানেল লিংক (YouTube Channel URL)' : 'YouTube Channel URL'}
                     </label>
                     <input
                       type="text"
@@ -2793,7 +2803,7 @@ export default function TeacherHomePageBuilderPage() {
 
                   <div>
                     <label className="text-[11px] font-bold text-foreground/70 block mb-1">
-                      টেলিগ্রাম চ্যানেল / গ্রুপ (Telegram Community)
+                      {isBn ? 'টেলিগ্রাম চ্যানেল / গ্রুপ (Telegram Community)' : 'Telegram Community'}
                     </label>
                     <input
                       type="text"
@@ -2808,20 +2818,23 @@ export default function TeacherHomePageBuilderPage() {
 
               {/* 4. Footer Custom Copyright */}
               <div className="space-y-4 pt-4 border-t border-foreground/10">
-                <h4 className="text-sm font-bold text-foreground">ফুটার কপিরাইট বার্তা</h4>
+                <h4 className="text-sm font-bold text-foreground flex items-center">
+                  <span>{isBn ? 'ফুটার কপিরাইট বার্তা' : 'Footer Copyright Message'}</span>
+                  <InfoTooltip text={isBn ? 'ফুটারের সর্বনিচে আপনার নিজস্ব কপিরাইট টেক্সট।' : 'Custom copyright text displayed at the bottom of the footer.'} />
+                </h4>
                 <div>
                   <label className="text-[11px] font-bold text-foreground/70 block mb-1">
-                    কাস্টম কপিরাইট টেক্সট (Custom Copyright Text)
+                    {isBn ? 'কাস্টম কপিরাইট টেক্সট (Custom Copyright Text)' : 'Custom Copyright Text'}
                   </label>
                   <input
                     type="text"
                     value={footerCopyright}
                     onChange={(e) => { setFooterCopyright(e.target.value); setHasUnsavedChanges(true); }}
-                    placeholder={`যেমন: © ${new Date().getFullYear()} ${displayName || 'Teacher Academy'}. সর্বস্বত্ব সংরক্ষিত। Powered by SkyLearners.`}
+                    placeholder={isBn ? `যেমন: © ${new Date().getFullYear()} ${displayName || 'Teacher Academy'}. সর্বস্বত্ব সংরক্ষিত। Powered by SkyLearners.` : `e.g. © ${new Date().getFullYear()} ${displayName || 'Teacher Academy'}. All rights reserved.`}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-foreground/10 text-xs focus:outline-none focus:border-orange-500"
                   />
                   <p className="text-[11px] text-foreground/50 mt-1">
-                    খালি রাখলে স্বয়ংক্রিয়ভাবে ডিফল্ট কপিরাইট ও আপনার নাম যুক্ত থাকবে।
+                    💡 {isBn ? 'খালি রাখলে স্বয়ংক্রিয়ভাবে ডিফল্ট কপিরাইট ও আপনার নাম যুক্ত থাকবে।' : 'If left empty, default copyright with your name will be used.'}
                   </p>
                 </div>
               </div>

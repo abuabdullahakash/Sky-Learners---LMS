@@ -13,8 +13,7 @@ import {
   Library, 
   Sparkles, 
   ArrowRight,
-  School,
-  Search
+  School
 } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
@@ -43,13 +42,48 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
   const [mobileExpandedHscClass, setMobileExpandedHscClass] = useState<string | null>(null);
   const [mobileExpandedDept, setMobileExpandedDept] = useState<string | null>(null);
 
-  // Dynamic teacher-created departments and their exact years from Firestore
+  // Dynamic state from published courses in Firestore
   const [deptToYearsMap, setDeptToYearsMap] = useState<Record<string, string[]>>({});
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({
+    primary: 0,
+    high_school: 0,
+    intermediate: 0,
+    admission: 0,
+    honours: 0,
+    skills: 0,
+  });
+  const [classCounts, setClassCounts] = useState<Record<string, number>>({});
+  const [groupCounts, setGroupCounts] = useState<Record<string, number>>({});
+  const [deptCounts, setDeptCounts] = useState<Record<string, number>>({});
+  const [deptYearCounts, setDeptYearCounts] = useState<Record<string, number>>({});
   
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Fetch unique subjects/departments and exact years created by teachers
+  // Convert numbers to Bengali digits when in Bengali mode
+  const formatCount = (count: number | undefined) => {
+    const val = count || 0;
+    if (!isBn) return `(${val})`;
+    const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    const bnStr = String(val).replace(/[0-9]/g, (d) => bnDigits[Number(d)]);
+    return `(${bnStr})`;
+  };
+
+  // Helper for year translation
+  const formatYearLabel = (yr: string) => {
+    const lower = yr.toLowerCase();
+    if (isBn) {
+      if (lower.includes('1st') || lower === '1') return '১ম বর্ষ';
+      if (lower.includes('2nd') || lower === '2') return '২য় বর্ষ';
+      if (lower.includes('3rd') || lower === '3') return '৩য় বর্ষ';
+      if (lower.includes('4th') || lower === '4') return '৪র্থ বর্ষ';
+      if (lower.includes('master')) return 'মাস্টার্স';
+      return yr;
+    }
+    return yr;
+  };
+
+  // Fetch unique subjects, exact years and course counts from Firestore
   useEffect(() => {
     const fetchDynamicCategories = async () => {
       try {
@@ -59,26 +93,72 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
         );
         const snap = await getDocs(q);
         const map: Record<string, string[]> = {};
+        const catCnt: Record<string, number> = {
+          primary: 0,
+          high_school: 0,
+          intermediate: 0,
+          admission: 0,
+          honours: 0,
+          skills: 0,
+        };
+        const clsCnt: Record<string, number> = {};
+        const grpCnt: Record<string, number> = {};
+        const dptCnt: Record<string, number> = {};
+        const dptYrCnt: Record<string, number> = {};
         
         snap.forEach(docSnap => {
           const data = docSnap.data();
-          if ((data.category === 'honours' || data.category === 'masters') && data.department) {
-            const dept = data.department.trim();
-            if (!map[dept]) {
-              map[dept] = [];
-            }
-            if (data.year && data.year.trim()) {
-              const yr = data.year.trim();
-              if (!map[dept].includes(yr)) {
-                map[dept].push(yr);
+          const cat = (data.category || '').toLowerCase();
+          
+          if (cat === 'honours' || cat === 'masters') {
+            catCnt.honours = (catCnt.honours || 0) + 1;
+            if (data.department) {
+              const dept = data.department.trim();
+              if (!map[dept]) {
+                map[dept] = [];
+              }
+              dptCnt[dept] = (dptCnt[dept] || 0) + 1;
+              if (data.year && data.year.trim()) {
+                const yr = data.year.trim();
+                if (!map[dept].includes(yr)) {
+                  map[dept].push(yr);
+                }
+                const yrKey = `${dept}_${yr}`;
+                dptYrCnt[yrKey] = (dptYrCnt[yrKey] || 0) + 1;
               }
             }
+          } else if (catCnt[cat] !== undefined) {
+            catCnt[cat] = (catCnt[cat] || 0) + 1;
+          }
+
+          // Class level counting
+          if (data.eduClass || data.class) {
+            const cls = String(data.eduClass || data.class);
+            const clsKey = `${cat}_${cls}`;
+            clsCnt[clsKey] = (clsCnt[clsKey] || 0) + 1;
+
+            // Group level counting for HSC
+            if (cat === 'intermediate' && data.department) {
+              const grpKey = `intermediate_${cls}_${data.department.toLowerCase()}`;
+              grpCnt[grpKey] = (grpCnt[grpKey] || 0) + 1;
+            }
+          }
+
+          // Admission unit counting
+          if (cat === 'admission' && data.department) {
+            const admKey = `admission_${data.department.toLowerCase()}`;
+            grpCnt[admKey] = (grpCnt[admKey] || 0) + 1;
           }
         });
         
         setDeptToYearsMap(map);
+        setCategoryCounts(catCnt);
+        setClassCounts(clsCnt);
+        setGroupCounts(grpCnt);
+        setDeptCounts(dptCnt);
+        setDeptYearCounts(dptYrCnt);
       } catch (err) {
-        console.error("Failed to fetch dynamic subjects for mega menu:", err);
+        console.error("Failed to fetch dynamic counts for mega menu:", err);
       }
     };
     fetchDynamicCategories();
@@ -104,20 +184,6 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
     timeoutRef.current = setTimeout(() => {
       setIsOpen(false);
     }, 200);
-  };
-
-  // Helper for year translation
-  const formatYearLabel = (yr: string) => {
-    const lower = yr.toLowerCase();
-    if (isBn) {
-      if (lower.includes('1st') || lower === '1') return '১ম বর্ষ';
-      if (lower.includes('2nd') || lower === '2') return '২য় বর্ষ';
-      if (lower.includes('3rd') || lower === '3') return '৩য় বর্ষ';
-      if (lower.includes('4th') || lower === '4') return '৪র্থ বর্ষ';
-      if (lower.includes('master')) return 'মাস্টার্স';
-      return yr;
-    }
-    return yr;
   };
 
   // 1. Primary Classes (Form matched: Class 1 to 5)
@@ -208,7 +274,7 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
       labelEn: 'Skills', 
       labelBn: 'দক্ষতা', 
       icon: Sparkles,
-      hasSubMenu: false, // Direct link
+      hasSubMenu: false, // Direct clickable link
       href: '/courses?category=skills'
     },
   ];
@@ -221,8 +287,8 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
       <div className="w-full space-y-1.5">
         <div 
           onClick={() => setIsOpen(!isOpen)}
-          className={`flex items-center justify-between px-4 py-3.5 rounded-xl font-bold text-base transition-all cursor-pointer ${
-            isCoursesActive ? 'bg-primary/10 text-primary' : 'text-foreground/90 hover:bg-foreground/5'
+          className={`flex items-center justify-between px-4 py-3.5 rounded-xl font-medium text-base transition-all cursor-pointer ${
+            isCoursesActive ? 'bg-primary/10 text-primary font-semibold' : 'text-foreground/90 hover:bg-foreground/5'
           }`}
         >
           <span className="flex items-center gap-2.5">
@@ -238,7 +304,7 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
             <Link
               href="/courses"
               onClick={onItemClick}
-              className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-bold shadow-md hover:bg-primary/90 transition-all"
+              className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-medium shadow-md hover:bg-primary/90 transition-all"
             >
               <span>{isBn ? '🔍 সকল কোর্স একসাথে দেখুন' : '🔍 Browse All Courses'}</span>
               <ArrowRight className="w-4 h-4" />
@@ -247,6 +313,7 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
             {categories.map((cat) => {
               const Icon = cat.icon;
               const isExpanded = mobileExpandedLevel === cat.id;
+              const countBadge = formatCount(categoryCounts[cat.id === 'honours_masters' ? 'honours' : cat.id]);
 
               if (!cat.hasSubMenu) {
                 return (
@@ -254,13 +321,14 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
                     key={cat.id}
                     href={cat.href}
                     onClick={onItemClick}
-                    className="flex items-center justify-between p-3.5 rounded-xl border border-foreground/10 bg-foreground/[0.02] hover:bg-primary/10 hover:text-primary transition-all text-foreground font-bold text-sm"
+                    className="flex items-center justify-between p-3.5 rounded-xl border border-foreground/10 bg-foreground/[0.02] hover:bg-primary/10 hover:text-primary transition-all text-foreground font-medium text-sm"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
                         <Icon className="w-4 h-4" />
                       </div>
                       <span>{isBn ? cat.labelBn : cat.labelEn}</span>
+                      <span className="text-xs text-foreground/50 font-normal">{countBadge}</span>
                     </div>
                     <ArrowRight className="w-4 h-4 text-primary" />
                   </Link>
@@ -272,13 +340,14 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
                   <button
                     type="button"
                     onClick={() => setMobileExpandedLevel(isExpanded ? null : cat.id)}
-                    className="w-full flex items-center justify-between p-3.5 text-left hover:bg-foreground/5 transition-all font-bold text-sm text-foreground"
+                    className="w-full flex items-center justify-between p-3.5 text-left hover:bg-foreground/5 transition-all font-medium text-sm text-foreground"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
                         <Icon className="w-4 h-4" />
                       </div>
                       <span>{isBn ? cat.labelBn : cat.labelEn}</span>
+                      <span className="text-xs text-foreground/50 font-normal">{countBadge}</span>
                     </div>
                     <ChevronDown className={`w-4 h-4 text-foreground/50 transition-transform duration-200 ${isExpanded ? 'rotate-180 text-primary' : ''}`} />
                   </button>
@@ -288,34 +357,40 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
                       {/* 1. Primary Mobile */}
                       {cat.id === 'primary' && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
-                          {primaryClasses.map((item) => (
-                            <Link
-                              key={item.classNum}
-                              href={`/courses?category=primary&class=${item.classNum}`}
-                              onClick={onItemClick}
-                              className="px-3 py-2.5 rounded-xl bg-foreground/5 hover:bg-primary/10 hover:text-primary text-sm font-bold text-foreground transition-all flex items-center justify-between"
-                            >
-                              <span>{isBn ? item.bn : item.en}</span>
-                              <ChevronRight className="w-4 h-4 text-primary opacity-60" />
-                            </Link>
-                          ))}
+                          {primaryClasses.map((item) => {
+                            const cCount = classCounts[`primary_${item.classNum}`] || 0;
+                            return (
+                              <Link
+                                key={item.classNum}
+                                href={`/courses?category=primary&class=${item.classNum}`}
+                                onClick={onItemClick}
+                                className="px-3 py-2.5 rounded-xl bg-foreground/5 hover:bg-primary/10 hover:text-primary text-sm font-medium text-foreground transition-all flex items-center justify-between"
+                              >
+                                <span>{isBn ? item.bn : item.en} <span className="text-xs text-foreground/50">{formatCount(cCount)}</span></span>
+                                <ChevronRight className="w-4 h-4 text-primary opacity-60" />
+                              </Link>
+                            );
+                          })}
                         </div>
                       )}
 
                       {/* 2. High School Mobile */}
                       {cat.id === 'high_school' && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
-                          {highSchoolClasses.map((item) => (
-                            <Link
-                              key={item.classNum}
-                              href={`/courses?category=high_school&class=${item.classNum}`}
-                              onClick={onItemClick}
-                              className="px-3 py-2.5 rounded-xl bg-foreground/5 hover:bg-primary/10 hover:text-primary text-sm font-bold text-foreground transition-all flex items-center justify-between"
-                            >
-                              <span>{isBn ? item.bn : item.en}</span>
-                              <ChevronRight className="w-4 h-4 text-primary opacity-60" />
-                            </Link>
-                          ))}
+                          {highSchoolClasses.map((item) => {
+                            const cCount = classCounts[`high_school_${item.classNum}`] || 0;
+                            return (
+                              <Link
+                                key={item.classNum}
+                                href={`/courses?category=high_school&class=${item.classNum}`}
+                                onClick={onItemClick}
+                                className="px-3 py-2.5 rounded-xl bg-foreground/5 hover:bg-primary/10 hover:text-primary text-sm font-medium text-foreground transition-all flex items-center justify-between"
+                              >
+                                <span>{isBn ? item.bn : item.en} <span className="text-xs text-foreground/50">{formatCount(cCount)}</span></span>
+                                <ChevronRight className="w-4 h-4 text-primary opacity-60" />
+                              </Link>
+                            );
+                          })}
                         </div>
                       )}
 
@@ -324,33 +399,38 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
                         <div className="space-y-2 pt-2">
                           {hscClasses.map((cls) => {
                             const isClsExpanded = mobileExpandedHscClass === cls.classNum;
+                            const cCount = classCounts[`intermediate_${cls.classNum}`] || 0;
+
                             return (
                               <div key={cls.classNum} className="rounded-xl border border-foreground/10 bg-background p-2 space-y-2">
                                 <div 
                                   onClick={() => setMobileExpandedHscClass(isClsExpanded ? null : cls.classNum)}
-                                  className="flex items-center justify-between p-2 cursor-pointer font-bold text-sm text-foreground hover:text-primary"
+                                  className="flex items-center justify-between p-2 cursor-pointer font-medium text-sm text-foreground hover:text-primary"
                                 >
-                                  <span>{isBn ? cls.bn : cls.en}</span>
+                                  <span>{isBn ? cls.bn : cls.en} <span className="text-xs text-foreground/50">{formatCount(cCount)}</span></span>
                                   <ChevronDown className={`w-4 h-4 text-primary transition-transform ${isClsExpanded ? 'rotate-180' : ''}`} />
                                 </div>
 
                                 {isClsExpanded && (
                                   <div className="pl-2 space-y-1.5 pt-1 border-t border-foreground/5">
-                                    {hscGroups.map((grp) => (
-                                      <Link
-                                        key={grp.id}
-                                        href={`/courses?category=intermediate&class=${cls.classNum}&group=${grp.id}`}
-                                        onClick={onItemClick}
-                                        className="w-full px-3 py-2 rounded-lg bg-foreground/5 hover:bg-orange-500/10 hover:text-orange-500 text-xs font-bold text-foreground transition-all flex items-center justify-between"
-                                      >
-                                        <span>{isBn ? grp.bn : grp.en}</span>
-                                        <ChevronRight className="w-3.5 h-3.5 opacity-60" />
-                                      </Link>
-                                    ))}
+                                    {hscGroups.map((grp) => {
+                                      const gCount = groupCounts[`intermediate_${cls.classNum}_${grp.id}`] || 0;
+                                      return (
+                                        <Link
+                                          key={grp.id}
+                                          href={`/courses?category=intermediate&class=${cls.classNum}&group=${grp.id}`}
+                                          onClick={onItemClick}
+                                          className="w-full px-3 py-2 rounded-lg bg-foreground/5 hover:bg-orange-500/10 hover:text-orange-500 text-xs font-medium text-foreground transition-all flex items-center justify-between"
+                                        >
+                                          <span>{isBn ? grp.bn : grp.en} <span className="text-[10px] text-foreground/50">{formatCount(gCount)}</span></span>
+                                          <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+                                        </Link>
+                                      );
+                                    })}
                                     <Link
                                       href={`/courses?category=intermediate&class=${cls.classNum}`}
                                       onClick={onItemClick}
-                                      className="block text-center py-1.5 text-xs font-bold text-primary hover:underline"
+                                      className="block text-center py-1.5 text-xs font-medium text-primary hover:underline"
                                     >
                                       {isBn ? `এই শ্রেণির সকল কোর্স →` : `All Class ${cls.classNum} Courses →`}
                                     </Link>
@@ -365,59 +445,59 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
                       {/* 4. Admission Mobile */}
                       {cat.id === 'admission' && (
                         <div className="space-y-2 pt-2">
-                          {admissionSegments.map((item) => (
-                            <Link
-                              key={item.id}
-                              href={`/courses?category=admission&group=${item.id}`}
-                              onClick={onItemClick}
-                              className="w-full px-3.5 py-2.5 rounded-xl bg-foreground/5 hover:bg-primary/10 hover:text-primary text-sm font-bold text-foreground transition-all flex items-center justify-between"
-                            >
-                              <span>{isBn ? item.bn : item.en}</span>
-                              <ChevronRight className="w-4 h-4 text-primary opacity-60" />
-                            </Link>
-                          ))}
+                          {admissionSegments.map((item) => {
+                            const admCount = groupCounts[`admission_${item.id}`] || 0;
+                            return (
+                              <Link
+                                key={item.id}
+                                href={`/courses?category=admission&group=${item.id}`}
+                                onClick={onItemClick}
+                                className="w-full px-3.5 py-2.5 rounded-xl bg-foreground/5 hover:bg-primary/10 hover:text-primary text-sm font-medium text-foreground transition-all flex items-center justify-between"
+                              >
+                                <span>{isBn ? item.bn : item.en} <span className="text-xs text-foreground/50">{formatCount(admCount)}</span></span>
+                                <ChevronRight className="w-4 h-4 text-primary opacity-60" />
+                              </Link>
+                            );
+                          })}
                         </div>
                       )}
 
-                      {/* 5. Honours & Masters Mobile (Strictly dynamic years from database) */}
+                      {/* 5. Honours & Masters Mobile */}
                       {cat.id === 'honours_masters' && dynamicDeptList.length > 0 && (
                         <div className="space-y-2 pt-2">
                           {dynamicDeptList.map((dept) => {
                             const isDeptExpanded = mobileExpandedDept === dept;
                             const years = deptToYearsMap[dept] || [];
+                            const dCount = deptCounts[dept] || 0;
                             
                             return (
                               <div key={dept} className="rounded-xl border border-foreground/10 bg-background p-2 space-y-1.5">
                                 <button
                                   type="button"
                                   onClick={() => setMobileExpandedDept(isDeptExpanded ? null : dept)}
-                                  className="w-full flex items-center justify-between p-2 text-left text-sm font-bold"
+                                  className="w-full flex items-center justify-between p-2 text-left text-sm font-medium"
                                 >
-                                  <span>{dept}</span>
+                                  <span>{dept} <span className="text-xs text-foreground/50">{formatCount(dCount)}</span></span>
                                   {years.length > 0 && (
                                     <ChevronDown className={`w-4 h-4 text-primary transition-transform ${isDeptExpanded ? 'rotate-180' : ''}`} />
                                   )}
                                 </button>
                                 {isDeptExpanded && years.length > 0 && (
                                   <div className="p-2 bg-foreground/5 rounded-lg flex flex-col gap-1.5">
-                                    {years.map((yr) => (
-                                      <Link
-                                        key={yr}
-                                        href={`/courses?department=${encodeURIComponent(dept)}&year=${encodeURIComponent(yr)}`}
-                                        onClick={onItemClick}
-                                        className="px-3 py-2 rounded-md bg-background hover:bg-orange-500/10 hover:text-orange-500 text-xs font-bold text-foreground flex items-center justify-between shadow-xs"
-                                      >
-                                        <span>{formatYearLabel(yr)}</span>
-                                        <ChevronRight className="w-3.5 h-3.5 opacity-60" />
-                                      </Link>
-                                    ))}
-                                    <Link
-                                      href={`/courses?department=${encodeURIComponent(dept)}`}
-                                      onClick={onItemClick}
-                                      className="text-center py-1 text-xs font-bold text-primary hover:underline pt-1"
-                                    >
-                                      {isBn ? `${dept}-এর সকল কোর্স →` : `All ${dept} Courses →`}
-                                    </Link>
+                                    {years.map((yr) => {
+                                      const yrCount = deptYearCounts[`${dept}_${yr}`] || 0;
+                                      return (
+                                        <Link
+                                          key={yr}
+                                          href={`/courses?department=${encodeURIComponent(dept)}&year=${encodeURIComponent(yr)}`}
+                                          onClick={onItemClick}
+                                          className="px-3 py-2 rounded-md bg-background hover:bg-orange-500/10 hover:text-orange-500 text-xs font-medium text-foreground flex items-center justify-between shadow-xs"
+                                        >
+                                          <span>{formatYearLabel(yr)} <span className="text-[10px] text-foreground/50">{formatCount(yrCount)}</span></span>
+                                          <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+                                        </Link>
+                                      );
+                                    })}
                                   </div>
                                 )}
                               </div>
@@ -425,6 +505,18 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
                           })}
                         </div>
                       )}
+
+                      {/* Bottom Category Page Link for Mobile */}
+                      <div className="pt-2 border-t border-foreground/10">
+                        <Link
+                          href={cat.href}
+                          onClick={onItemClick}
+                          className="flex items-center justify-between px-3 py-2 rounded-lg bg-foreground/5 hover:bg-primary/10 text-xs font-medium text-primary transition-all"
+                        >
+                          <span>{isBn ? `সকল ${cat.labelBn} কোর্স দেখুন` : `View all ${cat.labelEn} courses`}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -437,7 +529,7 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
   }
 
   // ----------------------------------------------------
-  // DESKTOP MEGA MENU VIEW (10 Minute School Style: Auto Height, Clean & Crisp)
+  // DESKTOP MEGA MENU VIEW (Font-Medium, Dynamic Live Counts, Sleek & Clean)
   // ----------------------------------------------------
   const currentCategory = categories.find(c => c.id === activeLevel) || categories[0];
   const activeDeptYears = activeDepartment ? (deptToYearsMap[activeDepartment] || []) : [];
@@ -452,7 +544,7 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
       {/* Navbar Link Trigger */}
       <Link 
         href="/courses"
-        className={`flex items-center gap-1.5 font-bold text-base transition-colors py-2 group ${
+        className={`flex items-center gap-1.5 font-medium text-base transition-colors py-2 group ${
           isCoursesActive || isOpen ? 'text-primary' : 'text-foreground/85 hover:text-primary'
         }`}
       >
@@ -472,19 +564,20 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
           <div className="bg-background/95 backdrop-blur-2xl border border-foreground/15 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.45)] overflow-hidden flex flex-row divide-x divide-foreground/10 items-stretch">
             
             {/* PANEL 1: Left Category List (Level 1) */}
-            <div className="w-[230px] p-2.5 space-y-1 bg-foreground/[0.015] self-start">
+            <div className="w-[260px] p-2 space-y-1 bg-foreground/[0.015] self-start">
               {categories.map((cat) => {
                 const Icon = cat.icon;
                 const isActive = activeLevel === cat.id;
+                const countBadge = formatCount(categoryCounts[cat.id === 'honours_masters' ? 'honours' : cat.id]);
 
-                // Direct link category (like Skills)
+                // Direct clickable category (when no 2nd layer exists, e.g. Skills)
                 if (!cat.hasSubMenu) {
                   return (
                     <Link
                       key={cat.id}
                       href={cat.href}
                       onMouseEnter={() => setActiveLevel(cat.id)}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all text-sm font-bold ${
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all text-sm font-medium ${
                         isActive 
                           ? 'bg-primary/10 text-primary border border-primary/20 shadow-xs' 
                           : 'text-foreground/85 hover:bg-foreground/5 hover:text-foreground border border-transparent'
@@ -497,6 +590,9 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
                           <Icon className="w-4 h-4" />
                         </div>
                         <span className="truncate">{isBn ? cat.labelBn : cat.labelEn}</span>
+                        <span className={`text-xs ${isActive ? 'text-primary/80 font-normal' : 'text-foreground/45 font-normal'}`}>
+                          {countBadge}
+                        </span>
                       </div>
                       <ArrowRight className="w-3.5 h-3.5 text-primary opacity-60 shrink-0" />
                     </Link>
@@ -515,7 +611,7 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
                         setActiveDepartment(dynamicDeptList[0]);
                       }
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all text-sm font-bold ${
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all text-sm font-medium ${
                       isActive 
                         ? 'bg-primary/10 text-primary border border-primary/20 shadow-xs' 
                         : 'text-foreground/85 hover:bg-foreground/5 hover:text-foreground border border-transparent'
@@ -528,6 +624,9 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
                         <Icon className="w-4 h-4" />
                       </div>
                       <span className="truncate">{isBn ? cat.labelBn : cat.labelEn}</span>
+                      <span className={`text-xs ${isActive ? 'text-primary/80 font-normal' : 'text-foreground/45 font-normal'}`}>
+                        {countBadge}
+                      </span>
                     </div>
 
                     <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform ${isActive ? 'translate-x-0.5 text-primary' : 'text-foreground/30'}`} />
@@ -536,140 +635,221 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
               })}
             </div>
 
-            {/* PANEL 2: Middle Sub-Items (Level 2 - Auto height based on items) */}
+            {/* PANEL 2: Middle Sub-Items (Level 2) */}
             {currentCategory.hasSubMenu && (
-              <div className="w-[230px] p-2.5 space-y-1 bg-background/50 self-start">
-                
-                {/* 1. Primary Level 2 */}
-                {activeLevel === 'primary' && (
-                  <>
-                    {primaryClasses.map((item) => (
-                      <Link
-                        key={item.classNum}
-                        href={`/courses?category=primary&class=${item.classNum}`}
-                        className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-primary/10 hover:text-primary text-sm font-bold text-foreground/90 transition-all group"
-                      >
-                        <span>{isBn ? item.bn : item.en}</span>
-                        <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all text-primary" />
-                      </Link>
-                    ))}
-                  </>
-                )}
+              <div className="w-[260px] p-2 space-y-1 bg-background/50 self-start flex flex-col justify-between">
+                <div className="space-y-1">
+                  
+                  {/* 1. Primary Level 2 */}
+                  {activeLevel === 'primary' && (
+                    <>
+                      {primaryClasses.map((item) => {
+                        const cCount = classCounts[`primary_${item.classNum}`] || 0;
+                        return (
+                          <Link
+                            key={item.classNum}
+                            href={`/courses?category=primary&class=${item.classNum}`}
+                            className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-primary/10 hover:text-primary text-sm font-medium text-foreground/90 transition-all group"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span>{isBn ? item.bn : item.en}</span>
+                              <span className="text-xs text-foreground/45 font-normal">{formatCount(cCount)}</span>
+                            </div>
+                            <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all text-primary" />
+                          </Link>
+                        );
+                      })}
+                    </>
+                  )}
 
-                {/* 2. High School Level 2 */}
-                {activeLevel === 'high_school' && (
-                  <>
-                    {highSchoolClasses.map((item) => (
-                      <Link
-                        key={item.classNum}
-                        href={`/courses?category=high_school&class=${item.classNum}`}
-                        className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-primary/10 hover:text-primary text-sm font-bold text-foreground/90 transition-all group"
-                      >
-                        <span>{isBn ? item.bn : item.en}</span>
-                        <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all text-primary" />
-                      </Link>
-                    ))}
-                  </>
-                )}
+                  {/* 2. High School Level 2 */}
+                  {activeLevel === 'high_school' && (
+                    <>
+                      {highSchoolClasses.map((item) => {
+                        const cCount = classCounts[`high_school_${item.classNum}`] || 0;
+                        return (
+                          <Link
+                            key={item.classNum}
+                            href={`/courses?category=high_school&class=${item.classNum}`}
+                            className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-primary/10 hover:text-primary text-sm font-medium text-foreground/90 transition-all group"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span>{isBn ? item.bn : item.en}</span>
+                              <span className="text-xs text-foreground/45 font-normal">{formatCount(cCount)}</span>
+                            </div>
+                            <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all text-primary" />
+                          </Link>
+                        );
+                      })}
+                    </>
+                  )}
 
-                {/* 3. HSC Level 2 (Class 11 & 12) */}
-                {activeLevel === 'intermediate' && (
-                  <>
-                    {hscClasses.map((cls) => {
-                      const isClsActive = activeHscClass === cls.classNum;
-                      return (
-                        <div
-                          key={cls.classNum}
-                          onMouseEnter={() => setActiveHscClass(cls.classNum)}
-                          className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer text-sm font-bold transition-all ${
-                            isClsActive
-                              ? 'bg-orange-500/15 text-orange-500 border border-orange-500/25 shadow-xs'
-                              : 'text-foreground/85 hover:bg-foreground/5 hover:text-foreground'
-                          }`}
-                        >
-                          <span>{isBn ? cls.bn : cls.en}</span>
-                          <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isClsActive ? 'text-orange-500 translate-x-0.5' : 'text-foreground/30'}`} />
-                        </div>
-                      );
-                    })}
-                  </>
-                )}
+                  {/* 3. HSC Level 2 (Class 11 & 12) */}
+                  {activeLevel === 'intermediate' && (
+                    <>
+                      {hscClasses.map((cls) => {
+                        const isClsActive = activeHscClass === cls.classNum;
+                        const cCount = classCounts[`intermediate_${cls.classNum}`] || 0;
+                        return (
+                          <div
+                            key={cls.classNum}
+                            onMouseEnter={() => setActiveHscClass(cls.classNum)}
+                            className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer text-sm font-medium transition-all ${
+                              isClsActive
+                                ? 'bg-orange-500/15 text-orange-500 border border-orange-500/25 shadow-xs'
+                                : 'text-foreground/85 hover:bg-foreground/5 hover:text-foreground'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span>{isBn ? cls.bn : cls.en}</span>
+                              <span className={`text-xs ${isClsActive ? 'text-orange-500/80' : 'text-foreground/45'}`}>
+                                {formatCount(cCount)}
+                              </span>
+                            </div>
+                            <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isClsActive ? 'text-orange-500 translate-x-0.5' : 'text-foreground/30'}`} />
+                          </div>
+                        );
+                      })}
+                    </>
+                  )}
 
-                {/* 4. University Admission Level 2 */}
-                {activeLevel === 'admission' && (
-                  <>
-                    {admissionSegments.map((item) => (
-                      <Link
-                        key={item.id}
-                        href={`/courses?category=admission&group=${item.id}`}
-                        className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-primary/10 hover:text-primary text-sm font-bold text-foreground transition-all group"
-                      >
-                        <span>{isBn ? item.bn : item.en}</span>
-                        <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 text-primary" />
-                      </Link>
-                    ))}
-                  </>
-                )}
+                  {/* 4. University Admission Level 2 */}
+                  {activeLevel === 'admission' && (
+                    <>
+                      {admissionSegments.map((item) => {
+                        const admCount = groupCounts[`admission_${item.id}`] || 0;
+                        return (
+                          <Link
+                            key={item.id}
+                            href={`/courses?category=admission&group=${item.id}`}
+                            className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-primary/10 hover:text-primary text-sm font-medium text-foreground transition-all group"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span>{isBn ? item.bn : item.en}</span>
+                              <span className="text-xs text-foreground/45 font-normal">{formatCount(admCount)}</span>
+                            </div>
+                            <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 text-primary" />
+                          </Link>
+                        );
+                      })}
+                    </>
+                  )}
 
-                {/* 5. Honours & Masters Level 2 (Only teacher created departments) */}
-                {activeLevel === 'honours_masters' && dynamicDeptList.length > 0 && (
-                  <>
-                    {dynamicDeptList.map((dept) => {
-                      const isDeptActive = activeDepartment === dept;
-                      const hasYears = (deptToYearsMap[dept] || []).length > 0;
-                      
-                      return (
-                        <div
-                          key={dept}
-                          onMouseEnter={() => setActiveDepartment(dept)}
-                          className={`flex items-center justify-between px-3 py-2 rounded-xl text-sm font-bold cursor-pointer transition-all ${
-                            isDeptActive
-                              ? 'bg-primary/15 text-primary border border-primary/25 shadow-xs'
-                              : 'text-foreground/80 hover:bg-foreground/5 hover:text-foreground'
-                          }`}
-                        >
-                          <span>{dept}</span>
-                          {hasYears && (
-                            <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isDeptActive ? 'text-primary translate-x-0.5' : 'text-foreground/30'}`} />
-                          )}
-                        </div>
-                      );
-                    })}
-                  </>
-                )}
+                  {/* 5. Honours & Masters Level 2 */}
+                  {activeLevel === 'honours_masters' && dynamicDeptList.length > 0 && (
+                    <>
+                      {dynamicDeptList.map((dept) => {
+                        const isDeptActive = activeDepartment === dept;
+                        const hasYears = (deptToYearsMap[dept] || []).length > 0;
+                        const dCount = deptCounts[dept] || 0;
+                        
+                        return (
+                          <div
+                            key={dept}
+                            onMouseEnter={() => setActiveDepartment(dept)}
+                            className={`flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium cursor-pointer transition-all ${
+                              isDeptActive
+                                ? 'bg-primary/15 text-primary border border-primary/25 shadow-xs'
+                                : 'text-foreground/80 hover:bg-foreground/5 hover:text-foreground'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span>{dept}</span>
+                              <span className={`text-xs ${isDeptActive ? 'text-primary/80' : 'text-foreground/45'}`}>
+                                {formatCount(dCount)}
+                              </span>
+                            </div>
+                            {hasYears && (
+                              <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isDeptActive ? 'text-primary translate-x-0.5' : 'text-foreground/30'}`} />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </>
+                  )}
+                </div>
+
+                {/* Bottom View Category Page Link (As shown in screenshot 3) */}
+                <div className="pt-2 mt-2 border-t border-foreground/10">
+                  <Link
+                    href={currentCategory.href}
+                    className="flex items-center justify-between px-3 py-2 rounded-lg bg-foreground/5 hover:bg-primary/10 text-xs font-medium text-primary transition-all group"
+                  >
+                    <span>{isBn ? `সকল ${currentCategory.labelBn} কোর্স দেখুন` : `View all ${currentCategory.labelEn} courses`}</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                </div>
               </div>
             )}
 
-            {/* PANEL 3: Level 3 Flyout (Auto height matching items) */}
+            {/* PANEL 3: Level 3 Flyout */}
             {/* Case A: HSC Groups (Science, Arts, Commerce) */}
             {activeLevel === 'intermediate' && (
-              <div className="w-[210px] p-2.5 space-y-1 bg-foreground/[0.01] self-start animate-in fade-in duration-100">
-                {hscGroups.map((grp) => (
+              <div className="w-[240px] p-2 space-y-1 bg-foreground/[0.01] self-start animate-in fade-in duration-100 flex flex-col justify-between">
+                <div className="space-y-1">
+                  {hscGroups.map((grp) => {
+                    const gCount = groupCounts[`intermediate_${activeHscClass}_${grp.id}`] || 0;
+                    return (
+                      <Link
+                        key={grp.id}
+                        href={`/courses?category=intermediate&class=${activeHscClass}&group=${grp.id}`}
+                        className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-orange-500/10 hover:text-orange-500 text-sm font-medium text-foreground/90 transition-all group"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span>{isBn ? grp.bn : grp.en}</span>
+                          <span className="text-xs text-foreground/45 font-normal">{formatCount(gCount)}</span>
+                        </div>
+                        <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 text-orange-500 transition-all group-hover:translate-x-0.5" />
+                      </Link>
+                    );
+                  })}
+                </div>
+
+                {/* Bottom Class Link */}
+                <div className="pt-2 mt-2 border-t border-foreground/10">
                   <Link
-                    key={grp.id}
-                    href={`/courses?category=intermediate&class=${activeHscClass}&group=${grp.id}`}
-                    className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-orange-500/10 hover:text-orange-500 text-sm font-bold text-foreground/90 transition-all group"
+                    href={`/courses?category=intermediate&class=${activeHscClass}`}
+                    className="flex items-center justify-between px-3 py-2 rounded-lg bg-foreground/5 hover:bg-orange-500/10 text-xs font-medium text-orange-500 transition-all group"
                   >
-                    <span>{isBn ? grp.bn : grp.en}</span>
-                    <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 text-orange-500 transition-all group-hover:translate-x-0.5" />
+                    <span>{isBn ? `এই শ্রেণির সকল কোর্স দেখুন` : `View all Class ${activeHscClass} courses`}</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </Link>
-                ))}
+                </div>
               </div>
             )}
 
-            {/* Case B: Honours & Masters (STRICTLY ONLY the exact years in database for this department) */}
+            {/* Case B: Honours & Masters Dynamic Years */}
             {activeLevel === 'honours_masters' && activeDepartment && activeDeptYears.length > 0 && (
-              <div className="w-[200px] p-2.5 space-y-1 bg-foreground/[0.01] self-start animate-in fade-in duration-100">
-                {activeDeptYears.map((yr) => (
+              <div className="w-[220px] p-2 space-y-1 bg-foreground/[0.01] self-start animate-in fade-in duration-100 flex flex-col justify-between">
+                <div className="space-y-1">
+                  {activeDeptYears.map((yr) => {
+                    const yrCount = deptYearCounts[`${activeDepartment}_${yr}`] || 0;
+                    return (
+                      <Link
+                        key={yr}
+                        href={`/courses?department=${encodeURIComponent(activeDepartment)}&year=${encodeURIComponent(yr)}`}
+                        className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-primary/10 hover:text-primary text-sm font-medium text-foreground transition-all group"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span>{formatYearLabel(yr)}</span>
+                          <span className="text-xs text-foreground/45 font-normal">{formatCount(yrCount)}</span>
+                        </div>
+                        <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 text-primary transition-all group-hover:translate-x-0.5" />
+                      </Link>
+                    );
+                  })}
+                </div>
+
+                {/* Bottom Subject Link */}
+                <div className="pt-2 mt-2 border-t border-foreground/10">
                   <Link
-                    key={yr}
-                    href={`/courses?department=${encodeURIComponent(activeDepartment)}&year=${encodeURIComponent(yr)}`}
-                    className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-primary/10 hover:text-primary text-sm font-bold text-foreground transition-all group"
+                    href={`/courses?department=${encodeURIComponent(activeDepartment)}`}
+                    className="flex items-center justify-between px-3 py-2 rounded-lg bg-foreground/5 hover:bg-primary/10 text-xs font-medium text-primary transition-all group"
                   >
-                    <span>{formatYearLabel(yr)}</span>
-                    <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 text-primary transition-all group-hover:translate-x-0.5" />
+                    <span>{isBn ? `${activeDepartment}-এর সকল কোর্স` : `All ${activeDepartment} courses`}</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </Link>
-                ))}
+                </div>
               </div>
             )}
 

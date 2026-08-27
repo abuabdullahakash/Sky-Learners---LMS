@@ -477,7 +477,7 @@ export default function Footer() {
               <li>
                 <Link href="/contact" className="text-foreground/75 hover:text-orange-500 transition-colors flex items-center gap-2.5 group py-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-150 transition-all duration-200" />
-                  <span>{isBn ? 'হেল্প ও এফএকিউ' : 'FAQ & Help Center')}</span>
+                  <span>{isBn ? 'হেল্প ও এফএকিউ' : 'FAQ & Help Center'}</span>
                 </Link>
               </li>
             </ul>

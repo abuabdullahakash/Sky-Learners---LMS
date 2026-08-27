@@ -415,9 +415,13 @@ export default function CoursesPage() {
           descBn: 'ছোটদের পড়ালেখা হোক আনন্দের ও সহজ। ১ম থেকে ৫ম শ্রেণির সকল বিষয়ের সহজ পাঠ ও ভিত্তি গঠন।',
           descEn: 'Foundational learning made enjoyable and simple for Class 1 to 5 students.',
           icon: School,
-          sectionBg: 'bg-[#FFF9F2] dark:bg-[#251A10] border-amber-200/90 dark:border-amber-900/60',
-          colorBadge: 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 border-amber-300 dark:border-amber-800',
-          btnBg: 'bg-amber-600 hover:bg-amber-700 text-white',
+          glowOrb: 'from-amber-500/30 via-orange-500/20 to-transparent',
+          accentText: 'text-amber-500 dark:text-amber-400',
+          iconBg: 'bg-amber-500/15 text-amber-600 dark:text-amber-300 border-amber-500/30',
+          sectionBg: 'bg-gradient-to-br from-amber-500/[0.05] via-background/95 to-background dark:from-amber-950/25 dark:via-[#0d0f17] dark:to-[#080a10] border-amber-500/25 dark:border-amber-500/35 shadow-[0_4px_30px_rgba(245,158,11,0.04)]',
+          colorBadge: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30',
+          btnBg: 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white shadow-md shadow-amber-500/25 hover:shadow-lg hover:shadow-amber-500/40',
+          cardHoverBorder: 'hover:border-amber-500/40 dark:hover:border-amber-500/50',
           classes: [
             { num: '1', bn: '১ম শ্রেণি', en: 'Class 1' },
             { num: '2', bn: '২য় শ্রেণি', en: 'Class 2' },
@@ -436,9 +440,13 @@ export default function CoursesPage() {
           descBn: 'জেএসসি ও এসএসসি পরীক্ষার সেরা প্রস্তুতি এবং গণিত-বিজ্ঞানের বেসিক মজবুত করার পূর্ণাঙ্গ কোর্স।',
           descEn: 'Comprehensive preparation for high school and SSC board exam excellence.',
           icon: GraduationCap,
-          sectionBg: 'bg-[#F4F9FF] dark:bg-[#0F1E33] border-blue-200/90 dark:border-blue-900/60',
-          colorBadge: 'bg-blue-100 text-blue-900 dark:bg-blue-950 dark:text-blue-300 border-blue-300 dark:border-blue-800',
-          btnBg: 'bg-blue-600 hover:bg-blue-700 text-white',
+          glowOrb: 'from-sky-500/30 via-blue-500/20 to-transparent',
+          accentText: 'text-sky-500 dark:text-sky-400',
+          iconBg: 'bg-sky-500/15 text-sky-600 dark:text-sky-300 border-sky-500/30',
+          sectionBg: 'bg-gradient-to-br from-sky-500/[0.05] via-background/95 to-background dark:from-blue-950/25 dark:via-[#09121f] dark:to-[#060c14] border-sky-500/25 dark:border-sky-500/35 shadow-[0_4px_30px_rgba(14,165,233,0.04)]',
+          colorBadge: 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border-sky-500/30',
+          btnBg: 'bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 hover:from-sky-600 hover:to-blue-700 text-white shadow-md shadow-sky-500/25 hover:shadow-lg hover:shadow-sky-500/40',
+          cardHoverBorder: 'hover:border-sky-500/40 dark:hover:border-sky-500/50',
           classes: [
             { num: '6', bn: '৬ষ্ঠ শ্রেণি', en: 'Class 6' },
             { num: '7', bn: '৭ম শ্রেণি', en: 'Class 7' },
@@ -457,9 +465,13 @@ export default function CoursesPage() {
           descBn: 'বিজ্ঞান, মানবিক ও ব্যবসায় শিক্ষা বিভাগের জন্য অভিজ্ঞ শিক্ষকদের সাথে পূর্ণাঙ্গ এইচএসসি প্রস্তুতি।',
           descEn: 'Complete HSC preparation across Science, Arts, and Commerce streams.',
           icon: Award,
-          sectionBg: 'bg-[#F2FAF5] dark:bg-[#0D241A] border-emerald-200/90 dark:border-emerald-900/60',
-          colorBadge: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800',
-          btnBg: 'bg-emerald-600 hover:bg-emerald-700 text-white',
+          glowOrb: 'from-purple-500/30 via-indigo-500/20 to-transparent',
+          accentText: 'text-purple-500 dark:text-purple-400',
+          iconBg: 'bg-purple-500/15 text-purple-600 dark:text-purple-300 border-purple-500/30',
+          sectionBg: 'bg-gradient-to-br from-purple-500/[0.05] via-background/95 to-background dark:from-purple-950/25 dark:via-[#140b21] dark:to-[#0c0715] border-purple-500/25 dark:border-purple-500/35 shadow-[0_4px_30px_rgba(168,85,247,0.04)]',
+          colorBadge: 'bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30',
+          btnBg: 'bg-gradient-to-r from-purple-500 via-indigo-600 to-purple-600 hover:from-purple-600 hover:to-indigo-700 text-white shadow-md shadow-purple-500/25 hover:shadow-lg hover:shadow-purple-500/40',
+          cardHoverBorder: 'hover:border-purple-500/40 dark:hover:border-purple-500/50',
           classes: [
             { num: '11', bn: 'একাদশ শ্রেণি', en: 'Class 11' },
             { num: '12', bn: 'দ্বাদশ শ্রেণি', en: 'Class 12' },
@@ -475,9 +487,13 @@ export default function CoursesPage() {
           descBn: 'বুয়েট, মেডিকেল, ঢাকা বিশ্ববিদ্যালয় সহ শীর্ষ বিশ্ববিদ্যালয়ের ভর্তি পরীক্ষার সফল প্রস্তুতি।',
           descEn: 'Targeted preparation for Medical, BUET, and University admission tests.',
           icon: Building2,
-          sectionBg: 'bg-[#F9F5FF] dark:bg-[#201435] border-purple-200/90 dark:border-purple-900/60',
-          colorBadge: 'bg-purple-100 text-purple-900 dark:bg-purple-950 dark:text-purple-300 border-purple-300 dark:border-purple-800',
-          btnBg: 'bg-purple-600 hover:bg-purple-700 text-white',
+          glowOrb: 'from-emerald-500/30 via-teal-500/20 to-transparent',
+          accentText: 'text-emerald-500 dark:text-emerald-400',
+          iconBg: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/30',
+          sectionBg: 'bg-gradient-to-br from-emerald-500/[0.05] via-background/95 to-background dark:from-emerald-950/25 dark:via-[#081f15] dark:to-[#04120c] border-emerald-500/25 dark:border-emerald-500/35 shadow-[0_4px_30px_rgba(16,185,129,0.04)]',
+          colorBadge: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30',
+          btnBg: 'bg-gradient-to-r from-emerald-500 via-teal-600 to-emerald-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-md shadow-emerald-500/25 hover:shadow-lg hover:shadow-emerald-500/40',
+          cardHoverBorder: 'hover:border-emerald-500/40 dark:hover:border-emerald-500/50',
           classes: [
             { num: 'engineering', bn: 'ইঞ্জিনিয়ারিং', en: 'Engineering' },
             { num: 'medical', bn: 'মেডিকেল', en: 'Medical' },
@@ -497,9 +513,13 @@ export default function CoursesPage() {
           descBn: 'জাতীয় ও পাবলিক বিশ্ববিদ্যালয়ের বিভিন্ন বিষয়ের একাডেমিক সিলেবাস ও পরীক্ষার দিকনির্দেশনা।',
           descEn: 'University degree level academic curriculum and semester guidelines.',
           icon: Library,
-          sectionBg: 'bg-[#FFF5F7] dark:bg-[#271018] border-rose-200/90 dark:border-rose-900/60',
-          colorBadge: 'bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-300 border-rose-300 dark:border-rose-800',
-          btnBg: 'bg-rose-600 hover:bg-rose-700 text-white',
+          glowOrb: 'from-rose-500/30 via-pink-500/20 to-transparent',
+          accentText: 'text-rose-500 dark:text-rose-400',
+          iconBg: 'bg-rose-500/15 text-rose-600 dark:text-rose-300 border-rose-500/30',
+          sectionBg: 'bg-gradient-to-br from-rose-500/[0.05] via-background/95 to-background dark:from-rose-950/25 dark:via-[#210913] dark:to-[#12050b] border-rose-500/25 dark:border-rose-500/35 shadow-[0_4px_30px_rgba(244,63,94,0.04)]',
+          colorBadge: 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30',
+          btnBg: 'bg-gradient-to-r from-rose-500 via-pink-600 to-rose-600 hover:from-rose-600 hover:to-pink-700 text-white shadow-md shadow-rose-500/25 hover:shadow-lg hover:shadow-rose-500/40',
+          cardHoverBorder: 'hover:border-rose-500/40 dark:hover:border-rose-500/50',
           classes: []
         };
       case 'skills':
@@ -513,9 +533,13 @@ export default function CoursesPage() {
           descBn: 'প্রোগ্রামিং, ডিজাইন, ডিজিটাল মার্কেটিং এবং আধুনিক ফ্রিল্যান্সিং ক্যারিয়ার গড়ে তোলার কোর্স।',
           descEn: 'Practical career skills in programming, digital design, and freelancing.',
           icon: Sparkles,
-          sectionBg: 'bg-[#F0FDFA] dark:bg-[#0E2421] border-teal-200/90 dark:border-teal-900/60',
-          colorBadge: 'bg-teal-100 text-teal-900 dark:bg-teal-950 dark:text-teal-300 border-teal-300 dark:border-teal-800',
-          btnBg: 'bg-teal-600 hover:bg-teal-700 text-white',
+          glowOrb: 'from-cyan-500/30 via-violet-500/20 to-transparent',
+          accentText: 'text-cyan-500 dark:text-cyan-400',
+          iconBg: 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 border-cyan-500/30',
+          sectionBg: 'bg-gradient-to-br from-cyan-500/[0.05] via-background/95 to-background dark:from-cyan-950/25 dark:via-[#091b24] dark:to-[#040e14] border-cyan-500/25 dark:border-cyan-500/35 shadow-[0_4px_30px_rgba(6,182,212,0.04)]',
+          colorBadge: 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-500/30',
+          btnBg: 'bg-gradient-to-r from-cyan-500 via-violet-600 to-cyan-600 hover:from-cyan-600 hover:to-violet-700 text-white shadow-md shadow-cyan-500/25 hover:shadow-lg hover:shadow-cyan-500/40',
+          cardHoverBorder: 'hover:border-cyan-500/40 dark:hover:border-cyan-500/50',
           classes: []
         };
     }
@@ -1121,15 +1145,16 @@ export default function CoursesPage() {
           <div className="space-y-12">
             
             {/* Top Clean Header */}
-            <div className="border-b border-foreground/10 pb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div className="border-b border-foreground/[0.08] dark:border-white/[0.08] pb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-primary">
-                  {isBn ? 'গ্লোবাল লার্নিং মার্কেটপ্লেস' : 'All Courses & Academies'}
-                </span>
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground mt-1">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-black tracking-wider uppercase mb-2">
+                  <Sparkles className="w-3.5 h-3.5 text-orange-500" />
+                  <span>{isBn ? 'গ্লোবাল লার্নিং মার্কেটপ্লেস' : 'All Courses & Academies'}</span>
+                </div>
+                <h1 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight">
                   {isBn ? 'সকল শিক্ষাগত স্তর ও ক্যাটাগরি' : 'Educational Levels & Category Hub'}
                 </h1>
-                <p className="text-xs sm:text-sm text-foreground/60 mt-1 max-w-2xl">
+                <p className="text-xs sm:text-sm text-foreground/65 mt-1.5 max-w-2xl font-medium leading-relaxed">
                   {isBn 
                     ? 'আপনার পছন্দের বিষয় বা শ্রেণির কোর্স নির্বাচন করুন এবং সেরা শিক্ষকদের সাথে প্রস্তুতি নিন।' 
                     : 'Discover curated learning paths from primary foundation to board exams and university admission.'}
@@ -1137,9 +1162,10 @@ export default function CoursesPage() {
               </div>
 
               {/* Stats Badge */}
-              <div className="flex items-center gap-2 text-xs font-medium text-foreground/70 shrink-0">
-                <span className="px-3 py-1.5 rounded-md bg-foreground/5 border border-foreground/10">
-                  {toBnNum(courses.length)} {isBn ? 'টি সক্রিয় কোর্স' : 'Active Courses'}
+              <div className="flex items-center gap-2 text-xs font-bold text-foreground/75 shrink-0">
+                <span className="px-4 py-2 rounded-2xl bg-foreground/[0.04] dark:bg-white/[0.04] border border-foreground/[0.08] dark:border-white/[0.08] backdrop-blur-md shadow-xs flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>{toBnNum(courses.length)} {isBn ? 'টি সক্রিয় কোর্স' : 'Active Courses'}</span>
                 </span>
               </div>
             </div>
@@ -1161,24 +1187,28 @@ export default function CoursesPage() {
                 return (
                   <section 
                     key={catId}
-                    className={`rounded-xl border ${meta.sectionBg} p-5 sm:p-7 space-y-6 transition-all`}
+                    className={`relative rounded-3xl border ${meta.sectionBg} p-5 sm:p-8 space-y-6 sm:space-y-8 transition-all duration-500 group overflow-hidden backdrop-blur-xl hover:shadow-2xl`}
                   >
+                    {/* Blooming Colorful Flower Aura Glow on Hover */}
+                    <div className={`absolute -top-28 -right-28 w-96 h-96 bg-gradient-to-br ${meta.glowOrb} blur-[110px] rounded-full group-hover:scale-135 group-hover:opacity-100 opacity-50 transition-all duration-700 pointer-events-none`} />
+                    <div className={`absolute -bottom-24 -left-24 w-80 h-80 bg-gradient-to-tr ${meta.glowOrb} blur-[100px] rounded-full group-hover:scale-125 group-hover:opacity-80 opacity-30 transition-all duration-700 pointer-events-none`} />
+
                     {/* 1. Category Section Header */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-md bg-background text-foreground flex items-center justify-center shrink-0 border border-foreground/15">
-                          <Icon className="w-5 h-5 text-foreground" />
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/[0.08] dark:border-white/[0.08] pb-5 relative z-10">
+                      <div className="flex items-center gap-3.5 sm:gap-4">
+                        <div className={`w-12 h-12 rounded-2xl ${meta.iconBg} flex items-center justify-center shrink-0 shadow-xs group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>
+                          <Icon className="w-6 h-6" />
                         </div>
                         <div>
-                          <div className="flex items-center gap-2">
-                            <h2 className="text-xl font-bold text-foreground">
+                          <div className="flex flex-wrap items-center gap-2.5">
+                            <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
                               {isBn ? meta.nameBn : meta.nameEn}
                             </h2>
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${meta.colorBadge}`}>
+                            <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${meta.colorBadge}`}>
                               {isBn ? meta.badgeBn : meta.badgeEn}
                             </span>
                           </div>
-                          <p className="text-xs text-foreground/60 mt-0.5">
+                          <p className="text-xs sm:text-sm text-foreground/65 mt-1 font-medium">
                             {isBn ? meta.descBn : meta.descEn}
                           </p>
                         </div>
@@ -1188,105 +1218,113 @@ export default function CoursesPage() {
                       <button
                         type="button"
                         onClick={() => handleSelectCategory(catId)}
-                        className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md ${meta.btnBg} text-xs font-bold transition-all self-start sm:self-auto shrink-0 group`}
+                        className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl ${meta.btnBg} text-xs font-black transition-all self-start sm:self-auto shrink-0 group/btn`}
                       >
                         <span>{isBn ? `সকল ${meta.nameBn} কোর্স দেখুন` : `View All Courses`}</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
                       </button>
                     </div>
 
                     {/* 2. Featured Category Courses Horizontal / Grid Showcase */}
                     {catCourses.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 relative z-10">
                         {catCourses.slice(0, 3).map((course) => (
                           <div 
                             key={course.id}
-                            className="rounded-lg border border-foreground/10 bg-background p-4 flex flex-col justify-between hover:border-primary/50 transition-colors"
+                            className={`rounded-2xl border border-foreground/[0.08] dark:border-white/[0.08] bg-background/80 dark:bg-[#0c121e]/85 backdrop-blur-xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${meta.cardHoverBorder}`}
                           >
-                            <div className="space-y-3">
+                            {/* Card Subtle Top Glow on Hover */}
+                            <div className={`absolute -top-12 -right-12 w-32 h-32 bg-gradient-to-br ${meta.glowOrb} blur-[40px] rounded-full opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-none`} />
+
+                            <div className="space-y-3.5 relative z-10">
                               {/* Thumbnail & Badge */}
-                              <div className="relative aspect-video w-full rounded-md bg-foreground/5 overflow-hidden border border-foreground/10">
+                              <div className="relative aspect-video w-full rounded-xl bg-foreground/5 overflow-hidden border border-foreground/10 group-hover/card:shadow-md transition-all">
                                 {course.thumbnailUrl ? (
-                                  <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover" />
+                                  <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
                                 ) : (
                                   <div className="w-full h-full flex items-center justify-center text-primary/40">
                                     <BookOpen className="w-8 h-8" />
                                   </div>
                                 )}
-                                <span className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 text-[10px] font-bold text-white uppercase tracking-wider">
+                                <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-black/65 backdrop-blur-md text-[10px] font-extrabold text-white uppercase tracking-wider border border-white/15">
                                   {course.category || 'Course'}
                                 </span>
                               </div>
 
                               {/* Details */}
                               <div>
-                                <p className="text-[11px] font-semibold text-primary">
+                                <p className={`text-xs font-bold ${meta.accentText} truncate`}>
                                   {course.coachingName || course.instructorName || 'Sky Learners Academy'}
                                 </p>
-                                <h3 className="font-bold text-sm text-foreground line-clamp-2 mt-0.5">
+                                <h3 className="font-extrabold text-sm sm:text-base text-foreground line-clamp-2 mt-1 leading-snug group-hover/card:text-orange-500 transition-colors">
                                   {course.title}
                                 </h3>
                                 {course.subtitle && (
-                                  <p className="text-xs text-foreground/60 line-clamp-2 mt-1">
+                                  <p className="text-xs text-foreground/60 line-clamp-2 mt-1 leading-relaxed">
                                     {course.subtitle}
                                   </p>
                                 )}
                               </div>
 
                               {/* Key Highlights Bullet points */}
-                              <div className="space-y-1 text-[11px] text-foreground/75 pt-1">
-                                <div className="flex items-center gap-1.5">
-                                  <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
+                              <div className="space-y-1.5 text-xs text-foreground/75 pt-1">
+                                <div className="flex items-center gap-2">
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                                   <span className="truncate">পূর্ণাঙ্গ সিলেবাস ও লাইভ ক্লাস সাপোর্ট</span>
                                 </div>
-                                <div className="flex items-center gap-1.5">
-                                  <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
+                                <div className="flex items-center gap-2">
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                                   <span className="truncate">অধ্যায়ভিত্তিক এক্সাম ও সলভ শীট</span>
                                 </div>
                               </div>
                             </div>
 
                             {/* Card Footer */}
-                            <div className="pt-3 mt-3 border-t border-foreground/10 flex items-center justify-between">
-                              <div className="font-extrabold text-sm text-foreground">
-                                {course.price === 0 || !course.price ? (
-                                  <span className="text-emerald-500 font-bold">ফ্রি (Free)</span>
-                                ) : (
-                                  <span>৳{toBnNum(course.price)}</span>
-                                )}
+                            <div className="pt-3.5 mt-4 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-3 relative z-10">
+                              <div>
+                                <span className="text-[10px] uppercase font-bold text-foreground/50 block leading-none">Course Fee</span>
+                                <div className="font-black text-base text-foreground mt-0.5">
+                                  {course.price === 0 || !course.price ? (
+                                    <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
+                                  ) : (
+                                    <span>৳{toBnNum(course.price)}</span>
+                                  )}
+                                </div>
                               </div>
                               <Link
                                 href={generateCourseUrl(course)}
-                                className="px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors"
+                                className={`px-4 py-2 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
                               >
-                                {isBn ? 'বিস্তারিত দেখুন' : 'View Details'}
+                                <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
+                                <ArrowRight className="w-3.5 h-3.5" />
                               </Link>
                             </div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="py-6 text-center border border-dashed border-foreground/15 rounded-lg bg-background/50">
-                        <p className="text-xs text-foreground/50">
+                      <div className="py-8 text-center border border-dashed border-foreground/15 rounded-2xl bg-background/50 relative z-10">
+                        <p className="text-xs sm:text-sm font-medium text-foreground/50">
                           {isBn ? 'এই ক্যাটাগরিতে নতুন কোর্স শীঘ্রই যুক্ত করা হচ্ছে।' : 'New courses for this category are in preparation.'}
                         </p>
                       </div>
                     )}
 
                     {/* 3. Top Mentors Horizontal Carousel Strip */}
-                    <div className="pt-3 border-t border-foreground/10 space-y-3">
+                    <div className="pt-4 border-t border-foreground/[0.08] dark:border-white/[0.08] space-y-3.5 relative z-10">
                       <div className="flex items-center justify-between">
-                        <p className="text-xs font-bold uppercase tracking-wider text-foreground/70 flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5 text-primary" />
+                        <p className="text-xs font-extrabold uppercase tracking-wider text-foreground/75 flex items-center gap-2">
+                          <span className={`w-2 h-2 rounded-full ${meta.accentText} bg-current`} />
+                          <Users className="w-3.5 h-3.5 text-foreground/70" />
                           <span>{isBn ? 'শীর্ষ শিক্ষকবৃন্দ (Top Mentors)' : 'Top Instructors'}</span>
                         </p>
 
                         {/* Slider Controls */}
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1.5">
                           <button
                             type="button"
                             onClick={() => scrollMentors(sliderId, 'left')}
-                            className="w-7 h-7 rounded-md border border-foreground/10 bg-background hover:bg-foreground/5 flex items-center justify-center text-foreground/70 transition-colors"
+                            className="w-8 h-8 rounded-xl border border-foreground/10 bg-background/80 hover:bg-foreground/10 flex items-center justify-center text-foreground/70 transition-all shadow-xs active:scale-90"
                             aria-label="Previous teachers"
                           >
                             <ChevronLeft className="w-4 h-4" />
@@ -1294,7 +1332,7 @@ export default function CoursesPage() {
                           <button
                             type="button"
                             onClick={() => scrollMentors(sliderId, 'right')}
-                            className="w-7 h-7 rounded-md border border-foreground/10 bg-background hover:bg-foreground/5 flex items-center justify-center text-foreground/70 transition-colors"
+                            className="w-8 h-8 rounded-xl border border-foreground/10 bg-background/80 hover:bg-foreground/10 flex items-center justify-center text-foreground/70 transition-all shadow-xs active:scale-90"
                             aria-label="Next teachers"
                           >
                             <ChevronRight className="w-4 h-4" />
@@ -1305,7 +1343,7 @@ export default function CoursesPage() {
                       {/* Mentors Horizontal Row */}
                       <div 
                         id={sliderId}
-                        className="flex gap-3 overflow-x-auto scrollbar-none py-1 scroll-smooth"
+                        className="flex gap-3.5 overflow-x-auto scrollbar-none py-1.5 scroll-smooth"
                       >
                         {mentors.map((m, idx) => (
                           <Link
@@ -1313,19 +1351,19 @@ export default function CoursesPage() {
                             href={`/teachers/${m.slug}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="min-w-[230px] sm:min-w-[260px] p-2.5 rounded-lg border border-foreground/10 bg-background hover:border-primary/40 hover:bg-primary/[0.02] flex items-center gap-3 transition-all shrink-0 group cursor-pointer"
+                            className="min-w-[240px] sm:min-w-[270px] p-3 rounded-2xl border border-foreground/[0.08] dark:border-white/[0.08] bg-background/90 dark:bg-[#0e1522]/90 backdrop-blur-md hover:border-foreground/25 hover:shadow-lg flex items-center gap-3.5 transition-all shrink-0 group/mentor cursor-pointer"
                           >
-                            <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-foreground/10">
+                            <div className="relative w-11 h-11 rounded-2xl overflow-hidden shrink-0 ring-2 ring-foreground/10 group-hover/mentor:ring-orange-500/50 group-hover/mentor:scale-105 transition-all duration-300">
                               <img src={m.photo} alt={m.name} className="w-full h-full object-cover" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="text-xs font-bold text-foreground group-hover:text-primary truncate transition-colors">
+                              <p className="text-xs font-bold text-foreground group-hover/mentor:text-orange-500 truncate transition-colors">
                                 {m.name}
                               </p>
-                              <p className="text-[10px] text-orange-600 dark:text-orange-400 font-semibold truncate">
+                              <p className={`text-[10px] ${meta.accentText} font-bold truncate`}>
                                 {m.institute}
                               </p>
-                              <p className="text-[10px] text-foreground/50 truncate">
+                              <p className="text-[10px] text-foreground/55 truncate font-medium">
                                 {m.exp}
                               </p>
                             </div>
@@ -1363,38 +1401,43 @@ export default function CoursesPage() {
             </div>
 
             {/* Category Banner Card with specific section tint */}
-            <div className={`p-6 rounded-xl border ${activeCategoryMeta.sectionBg} flex flex-col sm:flex-row sm:items-center justify-between gap-6`}>
-              <div className="space-y-1.5">
+            <div className={`relative p-6 sm:p-8 rounded-3xl border ${activeCategoryMeta.sectionBg} flex flex-col sm:flex-row sm:items-center justify-between gap-6 overflow-hidden backdrop-blur-xl shadow-lg`}>
+              {/* Subtle Ambient Glow */}
+              <div className={`absolute -top-20 -right-20 w-80 h-80 bg-gradient-to-br ${activeCategoryMeta.glowOrb} blur-[90px] rounded-full pointer-events-none opacity-60`} />
+
+              <div className="space-y-2 relative z-10">
                 <div className="flex items-center gap-2">
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${activeCategoryMeta.colorBadge}`}>
+                  <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${activeCategoryMeta.colorBadge}`}>
                     {isBn ? activeCategoryMeta.badgeBn : activeCategoryMeta.badgeEn}
                   </span>
                   {selectedClassFilter && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">
+                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/20">
                       {isBn ? `ক্লাস: ${selectedClassFilter}` : `Class: ${selectedClassFilter}`}
                     </span>
                   )}
                 </div>
-                <h1 className="text-xl sm:text-2xl font-extrabold text-foreground">
+                <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
                   {searchQuery ? `"${searchQuery}" এর কোর্স ফলাফল` : (isBn ? activeCategoryMeta.nameBn : activeCategoryMeta.nameEn)}
                 </h1>
-                <p className="text-xs sm:text-sm text-foreground/65 max-w-xl">
+                <p className="text-xs sm:text-sm text-foreground/65 max-w-xl font-medium">
                   {isBn ? activeCategoryMeta.descBn : activeCategoryMeta.descEn}
                 </p>
               </div>
 
               {/* Class Sub-Filter Pills */}
               {activeCategoryMeta.classes.length > 0 && (
-                <div className="p-2.5 rounded-lg border border-foreground/10 bg-background self-start shrink-0 space-y-1.5">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-foreground/50 px-1">
-                    {isBn ? 'ক্লাস অনুযায়ী দেখুন:' : 'Filter by Class:'}
+                <div className="p-3 rounded-2xl border border-foreground/[0.08] dark:border-white/[0.08] bg-background/80 dark:bg-[#0e1522]/80 backdrop-blur-md self-start shrink-0 space-y-2 relative z-10 shadow-xs">
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-foreground/50 px-1">
+                    {isBn ? 'ক্লাস ফিল্টার:' : 'Filter by Class:'}
                   </p>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-1.5">
                     <button
                       type="button"
                       onClick={() => setSelectedClassFilter(null)}
-                      className={`text-xs px-2.5 py-1 rounded font-medium transition-colors ${
-                        !selectedClassFilter ? 'bg-primary text-white font-bold' : 'bg-foreground/5 text-foreground hover:bg-foreground/10'
+                      className={`text-xs px-3 py-1.5 rounded-xl font-bold transition-all ${
+                        !selectedClassFilter 
+                          ? `${activeCategoryMeta.btnBg}` 
+                          : 'bg-foreground/5 text-foreground hover:bg-foreground/10'
                       }`}
                     >
                       {isBn ? 'সব' : 'All'}
@@ -1404,8 +1447,10 @@ export default function CoursesPage() {
                         key={c.num}
                         type="button"
                         onClick={() => setSelectedClassFilter(c.num)}
-                        className={`text-xs px-2.5 py-1 rounded font-medium transition-colors ${
-                          selectedClassFilter === c.num ? 'bg-primary text-white font-bold' : 'bg-foreground/5 text-foreground hover:bg-foreground/10'
+                        className={`text-xs px-3 py-1.5 rounded-xl font-bold transition-all ${
+                          selectedClassFilter === c.num 
+                            ? `${activeCategoryMeta.btnBg}` 
+                            : 'bg-foreground/5 text-foreground hover:bg-foreground/10'
                         }`}
                       >
                         {isBn ? c.bn : c.en}
@@ -1418,37 +1463,37 @@ export default function CoursesPage() {
 
             {/* Courses List Grid */}
             {filteredCourses.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pt-2">
                 {filteredCourses.map((course) => (
                   <div 
                     key={course.id}
-                    className="rounded-lg border border-foreground/10 bg-background p-4 flex flex-col justify-between hover:border-primary/50 transition-colors"
+                    className={`rounded-2xl border border-foreground/[0.08] dark:border-white/[0.08] bg-background/80 dark:bg-[#0c121e]/85 backdrop-blur-xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${activeCategoryMeta.cardHoverBorder}`}
                   >
-                    <div className="space-y-3">
+                    <div className="space-y-3.5 relative z-10">
                       {/* Thumbnail & Category Badge */}
-                      <div className="relative aspect-video w-full rounded-md bg-foreground/5 overflow-hidden border border-foreground/10">
+                      <div className="relative aspect-video w-full rounded-xl bg-foreground/5 overflow-hidden border border-foreground/10 group-hover/card:shadow-md transition-all">
                         {course.thumbnailUrl ? (
-                          <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover" />
+                          <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-primary/40">
                             <BookOpen className="w-8 h-8" />
                           </div>
                         )}
-                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 text-[10px] font-bold text-white uppercase tracking-wider">
+                        <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-black/65 backdrop-blur-md text-[10px] font-extrabold text-white uppercase tracking-wider border border-white/15">
                           {course.category || 'Course'}
                         </span>
                       </div>
 
                       {/* Details */}
                       <div>
-                        <p className="text-[11px] font-semibold text-primary">
+                        <p className={`text-xs font-bold ${activeCategoryMeta.accentText} truncate`}>
                           {course.coachingName || course.instructorName || 'Instructor'}
                         </p>
-                        <h3 className="font-bold text-sm text-foreground line-clamp-2 mt-0.5">
+                        <h3 className="font-extrabold text-sm sm:text-base text-foreground line-clamp-2 mt-1 leading-snug group-hover/card:text-orange-500 transition-colors">
                           {course.title}
                         </h3>
                         {course.subtitle && (
-                          <p className="text-xs text-foreground/60 line-clamp-2 mt-1">
+                          <p className="text-xs text-foreground/60 line-clamp-2 mt-1 leading-relaxed">
                             {course.subtitle}
                           </p>
                         )}
@@ -1456,26 +1501,30 @@ export default function CoursesPage() {
                     </div>
 
                     {/* Card Footer */}
-                    <div className="pt-3 mt-3 border-t border-foreground/10 flex items-center justify-between">
-                      <div className="font-extrabold text-sm text-foreground">
-                        {course.price === 0 || !course.price ? (
-                          <span className="text-emerald-500 font-bold">ফ্রি (Free)</span>
-                        ) : (
-                          <span>৳{toBnNum(course.price)}</span>
-                        )}
+                    <div className="pt-3.5 mt-4 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-3 relative z-10">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-foreground/50 block leading-none">Course Fee</span>
+                        <div className="font-black text-base text-foreground mt-0.5">
+                          {course.price === 0 || !course.price ? (
+                            <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
+                          ) : (
+                            <span>৳{toBnNum(course.price)}</span>
+                          )}
+                        </div>
                       </div>
                       <Link
                         href={generateCourseUrl(course)}
-                        className="px-3 py-1.5 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition-colors"
+                        className={`px-4 py-2 rounded-xl ${activeCategoryMeta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
                       >
-                        {isBn ? 'বিস্তারিত দেখুন' : 'View Details'}
+                        <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 px-4 rounded-xl border border-foreground/10 bg-foreground/[0.015] space-y-4">
+              <div className="text-center py-16 px-4 rounded-3xl border border-foreground/[0.08] dark:border-white/[0.08] bg-foreground/[0.015] backdrop-blur-md space-y-4">
                 <BookOpen className="w-10 h-10 text-primary mx-auto opacity-40" />
                 <h3 className="text-base font-bold text-foreground">
                   {isBn ? 'এই ক্যাটাগরিতে বর্তমানে কোনো কোর্স নেই' : 'No courses found'}
@@ -1486,7 +1535,7 @@ export default function CoursesPage() {
                 <button
                   type="button"
                   onClick={handleBackToAllCategories}
-                  className="px-4 py-2 rounded-md bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-colors"
+                  className="px-5 py-2.5 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold shadow-md shadow-orange-500/20 transition-all hover:scale-105 active:scale-95"
                 >
                   {isBn ? 'সকল ক্যাটাগরিতে ফিরে যান' : 'Back to All Categories'}
                 </button>

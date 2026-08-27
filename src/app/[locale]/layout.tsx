@@ -62,7 +62,7 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} className="dark" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${hindSiliguri.variable} antialiased min-h-screen max-w-full overflow-x-hidden bg-background text-foreground flex flex-col`}
         style={{ fontFamily: 'var(--font-inter), var(--font-hind-siliguri), sans-serif' }}

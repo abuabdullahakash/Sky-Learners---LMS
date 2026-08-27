@@ -544,14 +544,16 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
       {/* Navbar Link Trigger */}
       <Link 
         href="/courses"
-        className={`flex items-center gap-1.5 font-medium text-base transition-colors py-2 group ${
-          isCoursesActive || isOpen ? 'text-primary' : 'text-foreground/85 hover:text-primary'
+        className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-semibold text-sm transition-all duration-200 group ${
+          isCoursesActive || isOpen 
+            ? 'text-orange-500 bg-orange-500/10 dark:bg-orange-500/15 border border-orange-500/25 shadow-xs' 
+            : 'text-foreground/80 hover:text-foreground hover:bg-foreground/[0.05] dark:hover:bg-white/[0.06]'
         }`}
       >
         <span>{t('courses') || (isBn ? 'কোর্স' : 'Courses')}</span>
         <ChevronDown 
-          className={`w-4 h-4 transition-transform duration-200 ${
-            isOpen ? 'rotate-180 text-primary' : 'text-foreground/50 group-hover:text-primary'
+          className={`w-3.5 h-3.5 transition-transform duration-200 ${
+            isOpen ? 'rotate-180 text-orange-500' : 'text-foreground/50 group-hover:text-foreground'
           }`} 
         />
       </Link>

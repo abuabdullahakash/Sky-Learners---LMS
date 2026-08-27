@@ -108,8 +108,8 @@ export default function HeaderSearchBar({ isTeacherStorefrontMode = false, activ
 
   return (
     <div ref={containerRef} className="relative w-full">
-      <form onSubmit={handleSearchSubmit} className="relative flex items-center w-full">
-        <div className="absolute left-3.5 text-foreground/45 pointer-events-none flex items-center">
+      <form onSubmit={handleSearchSubmit} className="relative flex items-center w-full group">
+        <div className="absolute left-3.5 text-foreground/45 group-focus-within:text-orange-500 pointer-events-none flex items-center transition-colors">
           <Search className="w-4 h-4" />
         </div>
 
@@ -121,8 +121,8 @@ export default function HeaderSearchBar({ isTeacherStorefrontMode = false, activ
             setIsOpen(true);
           }}
           onFocus={() => setIsOpen(true)}
-          placeholder={isBn ? "সার্চ করুন..." : "Search courses..."}
-          className="w-full pl-9 pr-8 py-2 text-sm bg-foreground/[0.04] hover:bg-foreground/[0.07] focus:bg-background border border-foreground/10 focus:border-primary/50 focus:ring-2 focus:ring-primary/15 rounded-full transition-all text-foreground placeholder:text-foreground/45 focus:outline-none"
+          placeholder={isBn ? "কোর্স খুঁজুন..." : "Search courses..."}
+          className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-foreground/[0.04] hover:bg-foreground/[0.07] dark:bg-white/[0.05] dark:hover:bg-white/[0.08] focus:bg-background border border-foreground/10 dark:border-white/10 focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 rounded-full transition-all text-foreground placeholder:text-foreground/45 focus:outline-none shadow-xs"
         />
 
         {searchQuery && (
@@ -132,7 +132,7 @@ export default function HeaderSearchBar({ isTeacherStorefrontMode = false, activ
               setSearchQuery('');
               setFilteredSuggestions([]);
             }}
-            className="absolute right-3 text-foreground/40 hover:text-foreground transition-colors"
+            className="absolute right-3 text-foreground/40 hover:text-foreground transition-colors p-0.5 rounded-full hover:bg-foreground/10"
           >
             <X className="w-3.5 h-3.5" />
           </button>

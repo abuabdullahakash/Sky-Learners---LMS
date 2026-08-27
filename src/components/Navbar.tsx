@@ -390,13 +390,21 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed w-full top-0 z-50 bg-background/85 backdrop-blur-md border-b border-foreground/10">
+      <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${
+        isTeacherStorefrontMode 
+          ? 'bg-background/85 backdrop-blur-md border-b border-foreground/10' 
+          : 'bg-background/80 dark:bg-[#070b14]/80 backdrop-blur-xl sm:backdrop-blur-2xl border-b border-foreground/[0.08] dark:border-white/[0.08] shadow-[0_4px_30px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.4)]'
+      }`}>
+        {/* Marketplace subtle bottom liquid accent line */}
+        {!isTeacherStorefrontMode && (
+          <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-orange-500/25 to-transparent pointer-events-none" />
+        )}
         <div className={`${isDashboard ? 'w-full' : 'max-w-[1280px]'} mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px]`}>
           <div className="flex justify-between items-center h-20 gap-4 md:gap-6">
             {/* Left Side: Logo + Nav Links together */}
             <div className="flex items-center gap-6 lg:gap-8 z-10">
               {/* Logo (Dynamic: Teacher Academy Branding vs Marketplace SkyLearners Logo) */}
-              <Link href={homeLink} className="flex items-center gap-2 shrink-0 group">
+              <Link href={homeLink} className="flex items-center gap-2 shrink-0 group transition-transform duration-200 hover:scale-[1.02]">
                 {isTeacherStorefrontMode && (storefrontTeacherData?.headerLogo || storefrontTeacherData?.logoUrl) ? (
                   /* Pure Brand Logo Image - No redundant text beside it */
                   <div className="relative h-10 sm:h-11 md:h-12 w-auto max-w-[180px] sm:max-w-[240px] flex items-center justify-start py-0.5">
@@ -440,8 +448,8 @@ export default function Navbar() {
                   /* Modern Buttery-Smooth Sliding Pill Navigation for Teacher Storefront */
                   <TeacherStorefrontNav navLinks={activePublicNavLinks} />
                 ) : (
-                  /* Original Marketplace Desktop Navigation Links (100% UNTOUCHED) */
-                  <div className="flex items-center space-x-6 lg:space-x-8">
+                  /* Liquid Soft Marketplace Desktop Navigation Links */
+                  <div className="flex items-center gap-1 lg:gap-2">
                     {activePublicNavLinks.map((item) => {
                       if (item.href === '/courses') {
                         return <CourseMegaMenu key="desktop-courses-mega-menu" />;
@@ -450,7 +458,11 @@ export default function Navbar() {
                         <Link 
                           key={item.href + item.name} 
                           href={item.href} 
-                          className={`font-medium text-sm lg:text-base transition-colors hover:text-primary ${item.isActive ? 'text-primary font-semibold' : 'text-foreground/80'}`}
+                          className={`relative px-3.5 py-1.5 rounded-full font-semibold text-sm transition-all duration-200 ${
+                            item.isActive 
+                              ? 'text-orange-500 bg-orange-500/10 dark:bg-orange-500/15 border border-orange-500/25 shadow-xs' 
+                              : 'text-foreground/80 hover:text-foreground hover:bg-foreground/[0.05] dark:hover:bg-white/[0.06]'
+                          }`}
                         >
                           {item.name}
                         </Link>
@@ -722,9 +734,11 @@ export default function Navbar() {
                 ) : (
                   <Link 
                     href={effectiveTeacherId ? `/register?ref=${effectiveTeacherId}` : '/register'} 
-                    className="px-6 py-2 bg-primary text-primary-foreground font-bold rounded-full hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all"
+                    className="relative group px-5 sm:px-6 py-2 rounded-full font-bold text-xs sm:text-sm text-white overflow-hidden shadow-[0_0_20px_rgba(249,115,22,0.3)] hover:shadow-[0_0_30px_rgba(249,115,22,0.55)] transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center justify-center shrink-0"
                   >
-                    Login / Join
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 transition-all" />
+                    <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <span className="relative z-10 font-black tracking-wide">Login / Join</span>
                   </Link>
                 )}
               </div>

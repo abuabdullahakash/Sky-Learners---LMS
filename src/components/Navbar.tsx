@@ -130,8 +130,54 @@ export default function Navbar() {
   const isStudent = !isAdmin && userData?.role === 'student' && Boolean(userData?.onboardingComplete);
   const hasCompletedRole = isAdmin || isTeacher || isStudent;
   const userProfileLink = isAdmin ? '/admin' : (isTeacher ? '/teacher-dashboard' : (isStudent ? '/dashboard' : '/onboarding'));
-  const [preferredTeacherName, setPreferredTeacherName] = useState<string>('');
-  const [guestTeacherId, setGuestTeacherId] = useState<string | null>(null);
+  
+  const [guestTeacherId, setGuestTeacherId] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('referralTeacherId');
+      return stored && stored !== 'global' ? stored : null;
+    }
+    return null;
+  });
+
+  // Check if current route has a teacher context
+  let routeTeacherId: string | null = null;
+  if (pathname.includes('/teachers/')) {
+    const parts = pathname.split('/teachers/');
+    if (parts[1]) {
+      routeTeacherId = parts[1].split('/')[0].split('#')[0].split('?')[0];
+    }
+  }
+
+  const preferredTeacherId = userData?.preferredTeacherId;
+  const isCustomTeacherMode = Boolean(isStudent && preferredTeacherId && preferredTeacherId !== 'global');
+  
+  // Active teacher for dynamic link routing
+  const effectiveTeacherId = isForcedMarketplace
+    ? null
+    : (routeTeacherId 
+        ? routeTeacherId 
+        : (isStudent 
+            ? (preferredTeacherId && preferredTeacherId !== 'global' ? preferredTeacherId : null)
+            : (isTeacher 
+                ? user?.uid 
+                : (!user && guestTeacherId && guestTeacherId !== 'global' ? guestTeacherId : null)
+              )
+          )
+      );
+
+  const [preferredTeacherName, setPreferredTeacherName] = useState<string>(() => {
+    if (typeof window !== 'undefined' && effectiveTeacherId) {
+      try {
+        const raw = localStorage.getItem(`cached_teacher_header_${effectiveTeacherId}`);
+        if (raw) {
+          const data = JSON.parse(raw);
+          return data.displayName || data.name || '';
+        }
+      } catch {}
+    }
+    return '';
+  });
+
   const [storefrontTeacherData, setStorefrontTeacherData] = useState<{
     disabledPages?: string[];
     customNavLinks?: Array<{ id: string; name: string; slug: string; enabled: boolean }>;
@@ -139,7 +185,16 @@ export default function Navbar() {
     headerLogo?: string;
     logoUrl?: string;
     headerTagline?: string;
-  } | null>(null);
+  } | null>(() => {
+    if (typeof window !== 'undefined' && effectiveTeacherId) {
+      try {
+        const raw = localStorage.getItem(`cached_teacher_header_${effectiveTeacherId}`);
+        if (raw) return JSON.parse(raw);
+      } catch {}
+    }
+    return null;
+  });
+
   const [platformGlobalPages, setPlatformGlobalPages] = useState<Array<{ id: string; name: string; slug: string; excludedTeacherIds?: string[] }>>([]);
 
   useEffect(() => {
@@ -174,38 +229,24 @@ export default function Navbar() {
     return () => unsubGlobalPages();
   }, []);
 
-  // Check if current route has a teacher context
-  let routeTeacherId: string | null = null;
-  if (pathname.includes('/teachers/')) {
-    const parts = pathname.split('/teachers/');
-    if (parts[1]) {
-      routeTeacherId = parts[1].split('/')[0].split('#')[0].split('?')[0];
-    }
-  }
-
-  const preferredTeacherId = userData?.preferredTeacherId;
-  const isCustomTeacherMode = Boolean(isStudent && preferredTeacherId && preferredTeacherId !== 'global');
-  
-  // Active teacher for dynamic link routing
-  const effectiveTeacherId = isForcedMarketplace
-    ? null
-    : (routeTeacherId 
-        ? routeTeacherId 
-        : (isStudent 
-            ? (preferredTeacherId && preferredTeacherId !== 'global' ? preferredTeacherId : null)
-            : (isTeacher 
-                ? user?.uid 
-                : (!user && guestTeacherId && guestTeacherId !== 'global' ? guestTeacherId : null)
-              )
-          )
-      );
-
   // Real-Time Listener for Active Teacher Storefront Config
   useEffect(() => {
     if (!effectiveTeacherId) {
       setPreferredTeacherName('');
       setStorefrontTeacherData(null);
       return;
+    }
+
+    // Immediately load from local cache to eliminate any async loading flash
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem(`cached_teacher_header_${effectiveTeacherId}`);
+        if (raw) {
+          const cached = JSON.parse(raw);
+          setPreferredTeacherName(cached.displayName || cached.name || '');
+          setStorefrontTeacherData(cached);
+        }
+      } catch {}
     }
 
     let unsub: (() => void) | null = null;
@@ -230,28 +271,44 @@ export default function Navbar() {
         unsub = onSnapshot(doc(db, 'teacherProfiles', resolvedUid), (tDoc) => {
           if (tDoc.exists()) {
             const data = tDoc.data();
-            setPreferredTeacherName(data.displayName || data.academyName || 'Teacher Academy');
-            setStorefrontTeacherData({
+            const displayName = data.displayName || data.academyName || 'Teacher Academy';
+            const teacherConfig = {
+              displayName,
               disabledPages: data.disabledPages || [],
               customNavLinks: data.customNavLinks || [],
               profilePhoto: data.profilePhoto || data.photoUrl || '',
               headerLogo: data.headerLogo || data.logoUrl || '',
               logoUrl: data.logoUrl || data.headerLogo || '',
               headerTagline: data.headerTagline || 'Teacher Academy'
-            });
+            };
+            setPreferredTeacherName(displayName);
+            setStorefrontTeacherData(teacherConfig);
+            if (typeof window !== 'undefined') {
+              try {
+                localStorage.setItem(`cached_teacher_header_${resolvedUid}`, JSON.stringify(teacherConfig));
+              } catch {}
+            }
           } else {
             getDoc(doc(db, 'users', resolvedUid)).then(uDoc => {
               if (uDoc.exists()) {
                 const uData = uDoc.data();
-                setPreferredTeacherName(uData.name || uData.displayName || 'Teacher Academy');
-                setStorefrontTeacherData({
+                const displayName = uData.name || uData.displayName || 'Teacher Academy';
+                const userConfig = {
+                  displayName,
                   disabledPages: [],
                   customNavLinks: [],
                   profilePhoto: uData.profilePhoto || uData.photoURL || uData.photoUrl || '',
                   headerLogo: uData.headerLogo || uData.logoUrl || '',
                   logoUrl: uData.logoUrl || uData.headerLogo || '',
                   headerTagline: uData.headerTagline || 'Teacher Academy'
-                });
+                };
+                setPreferredTeacherName(displayName);
+                setStorefrontTeacherData(userConfig);
+                if (typeof window !== 'undefined') {
+                  try {
+                    localStorage.setItem(`cached_teacher_header_${resolvedUid}`, JSON.stringify(userConfig));
+                  } catch {}
+                }
               }
             }).catch(() => {});
             setStorefrontTeacherData({ disabledPages: [], customNavLinks: [] });
@@ -415,38 +472,49 @@ export default function Navbar() {
             <div className="flex items-center gap-6 lg:gap-8 z-10">
               {/* Logo (Dynamic: Teacher Academy Branding vs Marketplace SkyLearners Logo) */}
               <Link href={homeLink} className="flex items-center gap-2 shrink-0 group transition-transform duration-200 hover:scale-[1.02]">
-                {isTeacherStorefrontMode && (storefrontTeacherData?.headerLogo || storefrontTeacherData?.logoUrl) ? (
-                  /* Pure Brand Logo Image - No redundant text beside it */
-                  <div className="relative h-10 sm:h-11 md:h-12 w-auto max-w-[180px] sm:max-w-[240px] flex items-center justify-start py-0.5">
-                    <img 
-                      src={storefrontTeacherData.headerLogo || storefrontTeacherData.logoUrl} 
-                      alt={preferredTeacherName || 'Teacher Logo'} 
-                      className="h-full w-auto max-h-12 max-w-[180px] sm:max-w-[240px] object-contain object-left" 
-                    />
-                  </div>
-                ) : isTeacherStorefrontMode && preferredTeacherName ? (
-                  /* Fallback to Avatar + Name + Tagline only when NO image logo is uploaded */
-                  <div className="flex items-center gap-2.5">
-                    {storefrontTeacherData?.profilePhoto ? (
-                      <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-orange-500/30 bg-orange-500/10 shadow-sm shrink-0">
-                        <img src={storefrontTeacherData.profilePhoto} alt={preferredTeacherName} className="w-full h-full object-cover" />
-                      </div>
-                    ) : (
-                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center shadow-md shadow-orange-500/20 text-sm">
-                        {preferredTeacherName.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    <div className="flex flex-col">
-                      <span className="font-extrabold text-sm sm:text-base leading-tight text-foreground group-hover:text-primary transition-colors truncate max-w-[140px] sm:max-w-[200px]">
-                        {preferredTeacherName}
-                      </span>
-                      <span className="text-[10px] font-semibold text-orange-500 leading-none">
-                        {storefrontTeacherData?.headerTagline || 'Teacher Academy'}
-                      </span>
+                {isTeacherStorefrontMode ? (
+                  /* Teacher Storefront Logo Slot (Zero Marketplace Fallback) */
+                  storefrontTeacherData?.headerLogo || storefrontTeacherData?.logoUrl ? (
+                    <div className="relative h-10 sm:h-11 md:h-12 w-auto max-w-[180px] sm:max-w-[240px] flex items-center justify-start py-0.5 transition-all duration-300">
+                      <img 
+                        src={storefrontTeacherData.headerLogo || storefrontTeacherData.logoUrl} 
+                        alt={preferredTeacherName || 'Teacher Logo'} 
+                        className="h-full w-auto max-h-12 max-w-[180px] sm:max-w-[240px] object-contain object-left" 
+                      />
                     </div>
-                  </div>
+                  ) : preferredTeacherName ? (
+                    <div className="flex items-center gap-2.5 transition-all duration-300">
+                      {storefrontTeacherData?.profilePhoto ? (
+                        <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-orange-500/30 bg-orange-500/10 shadow-sm shrink-0">
+                          <img src={storefrontTeacherData.profilePhoto} alt={preferredTeacherName} className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center shadow-md shadow-orange-500/20 text-sm">
+                          {preferredTeacherName.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div className="flex flex-col">
+                        <span className="font-extrabold text-sm sm:text-base leading-tight text-foreground group-hover:text-primary transition-colors truncate max-w-[140px] sm:max-w-[200px]">
+                          {preferredTeacherName}
+                        </span>
+                        <span className="text-[10px] font-semibold text-orange-500 leading-none">
+                          {storefrontTeacherData?.headerTagline || 'Teacher Academy'}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    /* In Teacher Mode while loading, show subtle branded placeholder instead of flashing marketplace logo */
+                    <div className="flex items-center gap-2.5 transition-opacity duration-300">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-orange-500/15 border border-orange-500/20 animate-pulse shrink-0" />
+                      <div className="flex flex-col gap-1">
+                        <div className="w-24 h-3.5 bg-foreground/10 rounded-full animate-pulse" />
+                        <div className="w-16 h-2 bg-orange-500/20 rounded-full animate-pulse" />
+                      </div>
+                    </div>
+                  )
                 ) : (
-                  <div className="relative w-[140px] h-[38px] sm:w-[165px] sm:h-[44px] md:w-[185px] md:h-[48px] flex items-center justify-start">
+                  /* Marketplace SkyLearners Logo */
+                  <div className="relative w-[140px] h-[38px] sm:w-[165px] sm:h-[44px] md:w-[185px] md:h-[48px] flex items-center justify-start transition-all duration-300">
                     <Image src="/Skylearnars Academy logo.png" alt="Sky Learners Logo" fill className="object-contain object-left" priority />
                   </div>
                 )}

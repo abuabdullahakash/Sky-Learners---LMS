@@ -498,35 +498,54 @@ export default function Navbar() {
               )}
                 
                 {loading ? (
-                  <div className="w-[120px] h-[40px] bg-foreground/10 animate-pulse rounded-full"></div>
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-foreground/10 animate-pulse rounded-full"></div>
                 ) : user ? (
                   <div className="relative group">
-                    <Link 
-                      href={userProfileLink}
-                      className={`flex items-center ${hasCompletedRole ? 'gap-2 px-2.5 py-1.5' : 'p-1'} rounded-full bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 transition-all font-medium text-xs text-foreground group`}
-                      title={user?.displayName || userData?.name || (isTeacher ? 'Teacher' : 'Student')}
-                    >
-                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden border border-primary/20 shrink-0">
-                        {avatarUrl ? (
-                          <img src={avatarUrl} alt="User" className="w-full h-full object-cover" />
+                    {isTeacherStorefrontMode ? (
+                      /* Tier 2 & Tier 3 Teacher Storefront: Sleek, compact Icon-only Dashboard Trigger */
+                      <Link 
+                        href={userProfileLink}
+                        className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-foreground/[0.04] hover:bg-orange-500/10 dark:bg-white/[0.06] dark:hover:bg-orange-500/15 border border-orange-500/30 hover:border-orange-500/60 shadow-xs hover:shadow-[0_0_12px_rgba(249,115,22,0.25)] transition-all duration-200 group"
+                        title={user?.displayName || userData?.name || (isAdmin ? 'Admin Dashboard' : isTeacher ? 'Teacher Dashboard' : 'Student Dashboard')}
+                        aria-label="Dashboard Menu"
+                      >
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden flex items-center justify-center bg-primary/10">
+                          {avatarUrl ? (
+                            <img src={avatarUrl} alt="User Profile" className="w-full h-full object-cover" />
+                          ) : (
+                            <LayoutDashboard className="w-4 h-4 text-orange-500 transition-transform duration-200 group-hover:scale-110" />
+                          )}
+                        </div>
+                      </Link>
+                    ) : (
+                      /* Tier 1 Marketplace: Original Full Pill Badge with Role Text */
+                      <Link 
+                        href={userProfileLink}
+                        className={`flex items-center ${hasCompletedRole ? 'gap-2 px-2.5 py-1.5' : 'p-1'} rounded-full bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 transition-all font-medium text-xs text-foreground group`}
+                        title={user?.displayName || userData?.name || (isTeacher ? 'Teacher' : 'Student')}
+                      >
+                        <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden border border-primary/20 shrink-0">
+                          {avatarUrl ? (
+                            <img src={avatarUrl} alt="User" className="w-full h-full object-cover" />
+                          ) : (
+                            <UserIcon className="w-4 h-4 text-primary" />
+                          )}
+                        </div>
+                        {hasCompletedRole ? (
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            isAdmin 
+                              ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30 shadow-[0_0_8px_rgba(168,85,247,0.2)]'
+                              : (isTeacher ? 'bg-orange-500/15 text-orange-500' : 'bg-blue-500/15 text-blue-500')
+                          }`}>
+                            {isAdmin ? 'Admin' : (isTeacher ? 'Teacher' : 'Student')}
+                          </span>
                         ) : (
-                          <UserIcon className="w-4 h-4 text-primary" />
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500">
+                            Setup
+                          </span>
                         )}
-                      </div>
-                      {hasCompletedRole ? (
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          isAdmin 
-                            ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30 shadow-[0_0_8px_rgba(168,85,247,0.2)]'
-                            : (isTeacher ? 'bg-orange-500/15 text-orange-500' : 'bg-blue-500/15 text-blue-500')
-                        }`}>
-                          {isAdmin ? 'Admin' : (isTeacher ? 'Teacher' : 'Student')}
-                        </span>
-                      ) : (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500">
-                          Setup
-                        </span>
-                      )}
-                    </Link>
+                      </Link>
+                    )}
 
                     {/* Desktop Hover Dropdown Menu */}
                     <div className="absolute right-0 top-full mt-2 w-64 bg-background border border-foreground/15 rounded-2xl shadow-2xl p-2 space-y-1.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-1 group-hover:translate-y-0 z-50">
@@ -743,7 +762,7 @@ export default function Navbar() {
                 )}
               </div>
 
-            {/* Mobile Controls (Toggles + Hamburger Trigger) */}
+            {/* Mobile Controls (Toggles + Dashboard Icon in Teacher Mode + Hamburger Trigger) */}
             <div className="flex md:hidden items-center gap-1.5 sm:gap-2">
               {isTeacherStorefrontMode || isTeacherDashboard ? (
                 <>
@@ -755,6 +774,24 @@ export default function Navbar() {
                   <ThemeToggle />
                   <LanguageToggle />
                 </>
+              )}
+
+              {/* In Teacher Storefront Mode, compact Dashboard/Profile shortcut button on mobile header */}
+              {isTeacherStorefrontMode && user && (
+                <Link
+                  href={userProfileLink}
+                  className="relative flex items-center justify-center w-8 h-8 rounded-full bg-foreground/[0.04] border border-orange-500/30 hover:border-orange-500/60 shadow-xs shrink-0 overflow-hidden"
+                  title={user?.displayName || 'Dashboard'}
+                  aria-label="Dashboard"
+                >
+                  <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center bg-primary/10">
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <LayoutDashboard className="w-3.5 h-3.5 text-orange-500" />
+                    )}
+                  </div>
+                </Link>
               )}
               
               <button

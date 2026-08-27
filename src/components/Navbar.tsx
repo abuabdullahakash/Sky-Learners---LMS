@@ -484,7 +484,7 @@ export default function Navbar() {
             )}
 
             {/* Desktop Controls (Right) */}
-            <div className="flex items-center gap-2.5 lg:gap-3.5 pl-2 shrink-0">
+            <div className="hidden md:flex items-center gap-2.5 lg:gap-3.5 pl-2 shrink-0">
               {isTeacherStorefrontMode || isTeacherDashboard ? (
                 <>
                   <TeacherThemeToggle />
@@ -762,7 +762,7 @@ export default function Navbar() {
                 )}
               </div>
 
-            {/* Mobile Controls (Toggles + Dashboard Icon in Teacher Mode + Hamburger Trigger) */}
+            {/* Mobile / Tablet Controls (Toggles + Hamburger Trigger) */}
             <div className="flex md:hidden items-center gap-1.5 sm:gap-2">
               {isTeacherStorefrontMode || isTeacherDashboard ? (
                 <>
@@ -774,24 +774,6 @@ export default function Navbar() {
                   <ThemeToggle />
                   <LanguageToggle />
                 </>
-              )}
-
-              {/* In Teacher Storefront Mode, compact Dashboard/Profile shortcut button on mobile header */}
-              {isTeacherStorefrontMode && user && (
-                <Link
-                  href={userProfileLink}
-                  className="relative flex items-center justify-center w-8 h-8 rounded-full bg-foreground/[0.04] border border-orange-500/30 hover:border-orange-500/60 shadow-xs shrink-0 overflow-hidden"
-                  title={user?.displayName || 'Dashboard'}
-                  aria-label="Dashboard"
-                >
-                  <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center bg-primary/10">
-                    {avatarUrl ? (
-                      <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
-                    ) : (
-                      <LayoutDashboard className="w-3.5 h-3.5 text-orange-500" />
-                    )}
-                  </div>
-                </Link>
               )}
               
               <button

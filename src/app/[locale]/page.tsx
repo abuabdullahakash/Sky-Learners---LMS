@@ -422,7 +422,15 @@ export default function HomePage() {
     exam_alert: { label: locale === 'bn' ? '📝 পরীক্ষার বার্তা' : '📝 Exam Alert', color: 'bg-purple-500/10 text-purple-500 border-purple-500/20' },
   };
 
+  const cookieTeacherId = typeof document !== 'undefined' 
+    ? (document.cookie.match(/(^| )skylearners_active_teacher=([^;]+)/)?.[2] || null)
+    : null;
+  const decodedCookieTeacher = cookieTeacherId && cookieTeacherId !== 'global' ? decodeURIComponent(cookieTeacherId) : null;
+
   if (loading) {
+    if (!isForcedMarketplace && decodedCookieTeacher) {
+      return <TeacherStorefrontView teacherId={decodedCookieTeacher} isOwner={false} />;
+    }
     return (
       <div className="min-h-[80vh] flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />

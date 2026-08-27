@@ -151,6 +151,10 @@ export default function Navbar() {
   const preferredTeacherId = userData?.preferredTeacherId;
   const isCustomTeacherMode = Boolean(isStudent && preferredTeacherId && preferredTeacherId !== 'global');
   
+  const cookieTeacherId = typeof document !== 'undefined' 
+    ? (document.cookie.match(/(^| )skylearners_active_teacher=([^;]+)/)?.[2] || null)
+    : null;
+
   // Active teacher for dynamic link routing
   const effectiveTeacherId = isForcedMarketplace
     ? null
@@ -160,15 +164,19 @@ export default function Navbar() {
             ? (preferredTeacherId && preferredTeacherId !== 'global' ? preferredTeacherId : null)
             : (isTeacher 
                 ? user?.uid 
-                : (!user && guestTeacherId && guestTeacherId !== 'global' ? guestTeacherId : null)
+                : (!user && guestTeacherId && guestTeacherId !== 'global' 
+                    ? guestTeacherId 
+                    : (loading && cookieTeacherId && cookieTeacherId !== 'global' ? decodeURIComponent(cookieTeacherId) : null)
+                  )
               )
           )
       );
 
   const [preferredTeacherName, setPreferredTeacherName] = useState<string>(() => {
-    if (typeof window !== 'undefined' && effectiveTeacherId) {
+    const targetId = effectiveTeacherId || (cookieTeacherId && cookieTeacherId !== 'global' ? decodeURIComponent(cookieTeacherId) : null);
+    if (typeof window !== 'undefined' && targetId) {
       try {
-        const raw = localStorage.getItem(`cached_teacher_header_${effectiveTeacherId}`);
+        const raw = localStorage.getItem(`cached_teacher_header_${targetId}`);
         if (raw) {
           const data = JSON.parse(raw);
           return data.displayName || data.name || '';
@@ -186,9 +194,10 @@ export default function Navbar() {
     logoUrl?: string;
     headerTagline?: string;
   } | null>(() => {
-    if (typeof window !== 'undefined' && effectiveTeacherId) {
+    const targetId = effectiveTeacherId || (cookieTeacherId && cookieTeacherId !== 'global' ? decodeURIComponent(cookieTeacherId) : null);
+    if (typeof window !== 'undefined' && targetId) {
       try {
-        const raw = localStorage.getItem(`cached_teacher_header_${effectiveTeacherId}`);
+        const raw = localStorage.getItem(`cached_teacher_header_${targetId}`);
         if (raw) return JSON.parse(raw);
       } catch {}
     }
@@ -341,8 +350,20 @@ export default function Navbar() {
     routeTeacherId ||
     (user && isTeacher) ||
     (isStudent && preferredTeacherId && preferredTeacherId !== 'global') ||
-    (!user && guestTeacherId && guestTeacherId !== 'global')
+    (!user && guestTeacherId && guestTeacherId !== 'global') ||
+    (loading && cookieTeacherId && cookieTeacherId !== 'global')
   );
+
+  // Sync cookie whenever resolved
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      if (isTeacherStorefrontMode && effectiveTeacherId) {
+        document.cookie = `skylearners_active_teacher=${encodeURIComponent(effectiveTeacherId)}; path=/; max-age=2592000; SameSite=Lax`;
+      } else if (!isTeacherStorefrontMode) {
+        document.cookie = `skylearners_active_teacher=global; path=/; max-age=2592000; SameSite=Lax`;
+      }
+    }
+  }, [isTeacherStorefrontMode, effectiveTeacherId]);
 
   // 1. Marketplace Navigation Menu Category (১০০% ক্লিন ও পিওর SEO URL)
   const marketplaceNavLinks = [

@@ -31,7 +31,7 @@ export default function Footer() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isForcedMarketplace = searchParams.get('view') === 'marketplace';
-  const { user, userData } = useAuth();
+  const { user, userData, loading } = useAuth();
 
   const isDashboard = pathname.startsWith('/dashboard') || pathname.startsWith('/teacher-dashboard') || pathname.startsWith('/admin');
 
@@ -61,11 +61,16 @@ export default function Footer() {
     }
   }
 
+  const cookieTeacherId = typeof document !== 'undefined' 
+    ? (document.cookie.match(/(^| )skylearners_active_teacher=([^;]+)/)?.[2] || null)
+    : null;
+
   const isTeacherStorefrontMode = !isForcedMarketplace && Boolean(
     routeTeacherId ||
     (user && isTeacher) ||
     (isStudent && preferredTeacherId && preferredTeacherId !== 'global') ||
-    (!user && guestTeacherId && guestTeacherId !== 'global')
+    (!user && guestTeacherId && guestTeacherId !== 'global') ||
+    (loading && cookieTeacherId && cookieTeacherId !== 'global')
   );
 
   const effectiveTeacherId = isForcedMarketplace
@@ -76,7 +81,10 @@ export default function Footer() {
             ? (preferredTeacherId && preferredTeacherId !== 'global' ? preferredTeacherId : null)
             : (isTeacher 
                 ? user?.uid 
-                : (!user && guestTeacherId && guestTeacherId !== 'global' ? guestTeacherId : null)
+                : (!user && guestTeacherId && guestTeacherId !== 'global' 
+                    ? guestTeacherId 
+                    : (loading && cookieTeacherId && cookieTeacherId !== 'global' ? decodeURIComponent(cookieTeacherId) : null)
+                  )
               )
           )
       );

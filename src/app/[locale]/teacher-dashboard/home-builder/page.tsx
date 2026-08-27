@@ -2149,22 +2149,8 @@ export default function TeacherHomePageBuilderPage() {
                 );
               }
 
-              // Default Storefront Preview Button
-              return (
-                <div className="relative group">
-                  <a
-                    href={`/teachers/${user?.uid || ''}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="p-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-foreground/70 border border-foreground/10 transition-all flex items-center justify-center"
-                  >
-                    <Eye className="w-4 h-4" />
-                  </a>
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 rounded-lg bg-slate-950 text-white text-[11px] font-bold whitespace-nowrap shadow-2xl border border-foreground/10 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-30">
-                    👁️ টিচার স্টোরফ্রন্ট লাইভ দেখুন
-                  </div>
-                </div>
-              );
+              // When not on a custom sub-page, form headers contain their own dedicated live preview button
+              return null;
             })()}
 
           </div>

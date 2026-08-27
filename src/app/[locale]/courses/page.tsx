@@ -636,58 +636,69 @@ export default function CoursesPage() {
       );
     }
 
-    // 2. HIGH SCHOOL (Class 6-10 / SSC) -> Modern Sleek Horizontal Strip Rows
+    // 2. HIGH SCHOOL (Class 6-10 / SSC) -> 3 Columns on Desktop, 2 on Tablet, 1 on Mobile
     if (catId === 'high_school') {
       return (
-        <div className="space-y-3.5 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 relative z-10">
           {catCourses.slice(0, 3).map((course) => (
             <div
               key={course.id}
-              className={`rounded-2xl border border-sky-500/15 dark:border-sky-500/25 bg-background/85 dark:bg-[#09121f]/85 backdrop-blur-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:shadow-xl hover:translate-x-1.5 transition-all duration-300 group/card relative overflow-hidden ${meta.cardHoverBorder}`}
+              className={`rounded-2xl border border-sky-500/15 dark:border-sky-500/25 bg-background/85 dark:bg-[#09121f]/85 backdrop-blur-xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${meta.cardHoverBorder}`}
             >
-              <div className="flex items-start sm:items-center gap-4 min-w-0 flex-1">
-                <div className="relative w-28 sm:w-36 aspect-video rounded-xl bg-sky-500/5 overflow-hidden border border-foreground/10 shrink-0 group-hover/card:shadow-md transition-all">
+              {/* Card Subtle Top Glow on Hover */}
+              <div className={`absolute -top-12 -right-12 w-32 h-32 bg-gradient-to-br ${meta.glowOrb} blur-[40px] rounded-full opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-none`} />
+
+              <div className="space-y-3.5 relative z-10">
+                {/* Thumbnail & Badges */}
+                <div className="relative aspect-video w-full rounded-xl bg-sky-500/5 overflow-hidden border border-foreground/10 group-hover/card:shadow-md transition-all">
                   {course.thumbnailUrl ? (
                     <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-sky-500/40">
-                      <GraduationCap className="w-7 h-7" />
+                      <GraduationCap className="w-8 h-8" />
                     </div>
                   )}
-                  <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-sky-600/90 text-[9px] font-black text-white uppercase">
-                    {course.eduClass ? `${isBn ? 'শ্রেণি' : 'Class'} ${toBnNum(course.eduClass)}` : 'SSC'}
+                  <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-sky-600/95 text-[10px] font-black text-white uppercase tracking-wide shadow-sm">
+                    {course.eduClass ? `${isBn ? 'শ্রেণি' : 'Class'} ${toBnNum(course.eduClass)}` : 'SSC 2026'}
+                  </span>
+                  <span className="absolute bottom-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-[10px] font-bold text-sky-300">
+                    {isBn ? 'বোর্ড স্ট্যান্ডার্ড' : 'Board Standard'}
                   </span>
                 </div>
 
-                <div className="min-w-0 flex-1 space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-xs font-bold text-sky-600 dark:text-sky-400 truncate">
-                      {course.coachingName || course.instructorName || 'Sky Learners Academy'}
-                    </p>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-300 border border-sky-500/20">
-                      {isBn ? 'বোর্ড স্ট্যান্ডার্ড' : 'Board Standard'}
-                    </span>
-                  </div>
-                  <h3 className="font-extrabold text-sm sm:text-base text-foreground truncate group-hover/card:text-sky-500 transition-colors">
+                {/* Details */}
+                <div>
+                  <p className="text-xs font-bold text-sky-600 dark:text-sky-400 truncate">
+                    {course.coachingName || course.instructorName || 'Sky Learners Academy'}
+                  </p>
+                  <h3 className="font-extrabold text-sm sm:text-base text-foreground line-clamp-2 mt-1 leading-snug group-hover/card:text-sky-500 transition-colors">
                     {course.title}
                   </h3>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-foreground/70 font-medium pt-0.5">
-                    <span className="flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                      <span>{isBn ? 'পূর্ণাঙ্গ সিলেবাস ও লাইভ ক্লাস' : 'Full Syllabus & Live'}</span>
-                    </span>
-                    <span className="flex items-center gap-1.5 hidden md:flex">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                      <span>{isBn ? 'অধ্যায়ভিত্তিক এক্সাম ও টেস্ট পেপার সলভ' : 'Chapter-wise Exams'}</span>
-                    </span>
+                  {course.subtitle && (
+                    <p className="text-xs text-foreground/60 line-clamp-2 mt-1 leading-relaxed">
+                      {course.subtitle}
+                    </p>
+                  )}
+                </div>
+
+                {/* Key Highlights Bullet points */}
+                <div className="space-y-1.5 text-xs text-foreground/75 pt-1">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span className="truncate">{isBn ? 'পূর্ণাঙ্গ সিলেবাস ও লাইভ ক্লাস' : 'Full Syllabus & Live'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span className="truncate">{isBn ? 'অধ্যায়ভিত্তিক এক্সাম ও টেস্ট পেপার সলভ' : 'Chapter-wise Exams'}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between sm:justify-end gap-5 pt-3 sm:pt-0 border-t sm:border-t-0 border-foreground/[0.08] dark:border-white/[0.08] shrink-0">
-                <div className="text-left sm:text-right">
+              {/* Card Footer */}
+              <div className="pt-3.5 mt-4 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-3 relative z-10">
+                <div>
                   <span className="text-[10px] uppercase font-bold text-foreground/50 block leading-none">Course Fee</span>
-                  <div className="font-black text-base sm:text-lg text-foreground mt-0.5">
+                  <div className="font-black text-base text-foreground mt-0.5">
                     {course.price === 0 || !course.price ? (
                       <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
                     ) : (
@@ -697,7 +708,7 @@ export default function CoursesPage() {
                 </div>
                 <Link
                   href={generateCourseUrl(course)}
-                  className={`px-4 sm:px-5 py-2.5 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5 shrink-0`}
+                  className={`px-4 py-2 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
                 >
                   <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
                   <ArrowRight className="w-3.5 h-3.5" />

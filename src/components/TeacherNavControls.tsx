@@ -11,10 +11,12 @@ import { motion } from "framer-motion";
  * Modern BN | EN Sliding Pill Language Switcher
  * Powered by Framer Motion Spring Physics Shared Layout Animation
  */
-export function TeacherLanguageToggle() {
+export function TeacherLanguageToggle({ instanceId }: { instanceId?: string }) {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+  const reactId = React.useId();
+  const layoutId = instanceId || `activeTeacherLangPill-${reactId.replace(/:/g, "")}`;
 
   const [optimisticLocale, setOptimisticLocale] = React.useState<"bn" | "en">(
     (locale as "bn" | "en") || "en"
@@ -49,18 +51,18 @@ export function TeacherLanguageToggle() {
       >
         {isBn && (
           <motion.div
-            layoutId="activeTeacherLangPill"
+            layoutId={layoutId}
             className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-md shadow-orange-500/30"
             transition={{
               type: "spring",
-              stiffness: 380,
-              damping: 26,
-              mass: 0.6
+              stiffness: 420,
+              damping: 28,
+              mass: 0.5
             }}
           />
         )}
         <span
-          className={`relative z-10 transition-colors duration-200 ${
+          className={`relative z-10 transition-colors duration-200 font-bold ${
             isBn ? "text-white drop-shadow-xs" : "text-foreground/70 hover:text-foreground"
           }`}
         >
@@ -77,18 +79,18 @@ export function TeacherLanguageToggle() {
       >
         {!isBn && (
           <motion.div
-            layoutId="activeTeacherLangPill"
+            layoutId={layoutId}
             className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-md shadow-orange-500/30"
             transition={{
               type: "spring",
-              stiffness: 380,
-              damping: 26,
-              mass: 0.6
+              stiffness: 420,
+              damping: 28,
+              mass: 0.5
             }}
           />
         )}
         <span
-          className={`relative z-10 transition-colors duration-200 ${
+          className={`relative z-10 transition-colors duration-200 font-bold ${
             !isBn ? "text-white drop-shadow-xs" : "text-foreground/70 hover:text-foreground"
           }`}
         >

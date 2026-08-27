@@ -45,6 +45,7 @@ import HeaderSearchBar from './HeaderSearchBar';
 import { resolveTeacherBySlugOrId } from '@/lib/slug';
 import { TeacherThemeToggle, TeacherLanguageToggle } from './TeacherNavControls';
 import TeacherStorefrontNav from './TeacherStorefrontNav';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
   const t = useTranslations('Navigation');
@@ -488,7 +489,7 @@ export default function Navbar() {
               {isTeacherStorefrontMode || isTeacherDashboard ? (
                 <>
                   <TeacherThemeToggle />
-                  <TeacherLanguageToggle />
+                  <TeacherLanguageToggle instanceId="desktop-teacher-lang" />
                 </>
               ) : (
                 <>
@@ -767,12 +768,12 @@ export default function Navbar() {
               {isTeacherStorefrontMode || isTeacherDashboard ? (
                 <>
                   <TeacherThemeToggle />
-                  <TeacherLanguageToggle />
+                  <TeacherLanguageToggle instanceId="mobile-teacher-lang" />
                 </>
               ) : (
                 <>
                   <ThemeToggle />
-                  <LanguageToggle />
+                            <LanguageToggle />
                 </>
               )}
               
@@ -788,466 +789,487 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Off-Canvas Drawer Menu */}
-      <div 
-        className={`fixed inset-0 z-[100] md:hidden transition-all duration-300 ${
-          isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
-      >
-        {/* Backdrop Overlay */}
-        <div 
-          className={`absolute inset-0 bg-black/75 backdrop-blur-md transition-opacity duration-300 ${
-            isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
-          }`}
-          onClick={() => {
-            setIsMobileMenuOpen(false);
-            setShowProfileMenu(false);
-          }}
-        ></div>
-
-        {/* Drawer Content Panel */}
-        <div 
-          className={`fixed top-0 right-0 bottom-0 w-[85%] max-w-[340px] z-[101] bg-background/98 dark:bg-slate-950/98 backdrop-blur-2xl border-l border-foreground/15 shadow-[-12px_0_40px_rgba(0,0,0,0.4)] flex flex-col justify-between transition-transform duration-300 ease-out overflow-hidden ${
-            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
-        >
-          {/* Drawer Top Header Bar */}
-          <div className="flex items-center justify-between p-4 border-b border-foreground/10 bg-foreground/[0.03]">
-            <div className="flex items-center gap-2">
-              {isTeacherStorefrontMode || isTeacherDashboard ? (
-                <>
-                  <TeacherThemeToggle />
-                  <TeacherLanguageToggle />
-                </>
-              ) : (
-                <>
-                  <ThemeToggle />
-                  <LanguageToggle />
-                </>
-              )}
-            </div>
-            <button
+      {/* Mobile Off-Canvas Drawer Menu (Ultra-Smooth Liquid Spring Motion) */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <div className="fixed inset-0 z-[100] md:hidden">
+            {/* Backdrop Overlay */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0 bg-black/75 backdrop-blur-md"
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 setShowProfileMenu(false);
               }}
-              className="p-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-foreground transition-all"
-              aria-label="Close menu"
+            />
+
+            {/* Drawer Content Panel */}
+            <motion.div 
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ 
+                type: "spring", 
+                damping: 32, 
+                stiffness: 300, 
+                mass: 0.75 
+              }}
+              className="fixed top-0 right-0 bottom-0 w-[85%] max-w-[340px] z-[101] bg-background/98 dark:bg-slate-950/98 backdrop-blur-2xl border-l border-foreground/15 shadow-[-16px_0_50px_rgba(0,0,0,0.5)] flex flex-col justify-between overflow-hidden"
             >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Main Navigation Scroll Area */}
-          <div className="space-y-5 flex-1 overflow-y-auto p-4 custom-scrollbar">
-
-            {/* CASE 1: Inside Specific Course Dashboard */}
-            {isCourseDashboard ? (
-              <div className="space-y-4">
-                {/* Back Button */}
-                <Link
-                  href={isTeacherCourseDashboard ? "/teacher-dashboard/courses" : "/dashboard/courses"}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="inline-flex items-center gap-2 text-xs font-bold text-orange-500 hover:text-orange-600 bg-orange-500/10 border border-orange-500/20 px-3.5 py-2 rounded-xl transition-all shadow-sm"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span>{isTeacherCourseDashboard ? 'Back to All Courses' : 'Back to My Courses'}</span>
-                </Link>
-
-                {/* Course Header Card */}
-                <div className="p-3.5 rounded-2xl bg-foreground/[0.03] border border-foreground/10 shadow-sm space-y-2">
-                  {currentCourseData?.thumbnailUrl && (
-                    <div className="w-full h-24 relative rounded-xl overflow-hidden border border-foreground/10">
-                      <Image src={currentCourseData.thumbnailUrl} alt={currentCourseData.title || 'Course'} fill className="object-cover" />
-                    </div>
+              {/* Drawer Top Header Bar */}
+              <div className="flex items-center justify-between p-4 border-b border-foreground/10 bg-foreground/[0.03]">
+                <div className="flex items-center gap-2">
+                  {isTeacherStorefrontMode || isTeacherDashboard ? (
+                    <>
+                      <TeacherThemeToggle />
+                      <TeacherLanguageToggle instanceId="drawer-teacher-lang" />
+                    </>
+                  ) : (
+                    <>
+                      <ThemeToggle />
+                      <LanguageToggle />
+                    </>
                   )}
-                  <h4 className="font-bold text-sm text-foreground line-clamp-2" title={currentCourseData?.title || currentCourseTitle}>
-                    {currentCourseData?.title || currentCourseTitle || 'Course Management'}
-                  </h4>
-                  <span className="inline-block text-[10px] px-2.5 py-0.5 rounded-full font-extrabold bg-primary/10 text-primary border border-primary/20 uppercase tracking-wider">
-                    {currentCourseData?.category || (isTeacherCourseDashboard ? 'Teacher View' : 'Student Learning')}
-                  </span>
                 </div>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setShowProfileMenu(false);
+                  }}
+                  className="p-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-foreground transition-all active:scale-95"
+                  aria-label="Close menu"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
 
-                {/* Course Navigation Items */}
-                <div className="space-y-1 pt-1">
-                  <div className="text-[10px] font-extrabold uppercase tracking-wider text-foreground/40 px-3 mb-2">
-                    Course Menu
-                  </div>
-                  {(isTeacherCourseDashboard ? teacherCourseLinks : studentCourseLinks).map((item) => {
-                    const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all border ${
-                          isActive 
-                            ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold shadow-md shadow-orange-500/20 border-orange-400/30' 
-                            : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                        <span className="flex-1">{item.name}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : isDashboard ? (
-              /* CASE 2: Inside Main Dashboard (Student or Teacher) */
-              <div className="space-y-3">
-                <div className="text-[11px] font-extrabold uppercase tracking-wider text-orange-500/90 px-3 py-1 bg-orange-500/10 rounded-full w-fit border border-orange-500/20 flex items-center gap-1.5 shadow-sm">
-                  <Sparkles className="w-3.5 h-3.5 text-orange-500" />
-                  <span>{isTeacherDashboard ? 'Teacher Dashboard' : 'Student Dashboard'}</span>
-                </div>
-                
-                <div className="space-y-1.5 pt-1">
-                  {(isTeacherDashboard ? teacherDashboardLinks : studentDashboardLinks).map((item) => {
-                    const isActive = pathname === item.href;
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all border ${
-                          isActive
-                            ? isTeacherDashboard 
-                              ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold shadow-md shadow-orange-500/20 border-orange-400/30' 
-                              : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-md shadow-blue-500/20 border-blue-400/30'
-                            : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                        <span className="flex-1">{item.name}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : (
-              /* CASE 3: Public Site Pages (Marketplace vs Teacher Storefront Menu) */
-              <div className="space-y-3">
-                {/* Teacher Storefront Mini Brand Profile Card (Only in Teacher Mode) */}
-                {isTeacherStorefrontMode && (
-                  <div className="p-3.5 rounded-2xl bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-transparent border border-orange-500/20 shadow-xs mb-2 flex items-center gap-3">
-                    {storefrontTeacherData?.headerLogo || storefrontTeacherData?.logoUrl ? (
-                      <div className="h-10 w-auto max-w-[110px] flex items-center shrink-0">
-                        <img 
-                          src={storefrontTeacherData.headerLogo || storefrontTeacherData.logoUrl} 
-                          alt={preferredTeacherName || 'Academy Logo'} 
-                          className="h-full w-auto max-h-10 object-contain object-left" 
-                        />
+              {/* Main Navigation Scroll Area */}
+              <div className="space-y-5 flex-1 overflow-y-auto p-4 custom-scrollbar">
+
+                {/* CASE 1: Inside Specific Course Dashboard */}
+                {isCourseDashboard ? (
+                  <div className="space-y-4">
+                    {/* Back Button */}
+                    <Link
+                      href={isTeacherCourseDashboard ? "/teacher-dashboard/courses" : "/dashboard/courses"}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="inline-flex items-center gap-2 text-xs font-bold text-orange-500 hover:text-orange-600 bg-orange-500/10 border border-orange-500/20 px-3.5 py-2 rounded-xl transition-all shadow-sm"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      <span>{isTeacherCourseDashboard ? 'Back to All Courses' : 'Back to My Courses'}</span>
+                    </Link>
+
+                    {/* Course Header Card */}
+                    <div className="p-3.5 rounded-2xl bg-foreground/[0.03] border border-foreground/10 shadow-sm space-y-2">
+                      {currentCourseData?.thumbnailUrl && (
+                        <div className="w-full h-24 relative rounded-xl overflow-hidden border border-foreground/10">
+                          <Image src={currentCourseData.thumbnailUrl} alt={currentCourseData.title || 'Course'} fill className="object-cover" />
+                        </div>
+                      )}
+                      <h4 className="font-bold text-sm text-foreground line-clamp-2" title={currentCourseData?.title || currentCourseTitle}>
+                        {currentCourseData?.title || currentCourseTitle || 'Course Management'}
+                      </h4>
+                      <span className="inline-block text-[10px] px-2.5 py-0.5 rounded-full font-extrabold bg-primary/10 text-primary border border-primary/20 uppercase tracking-wider">
+                        {currentCourseData?.category || (isTeacherCourseDashboard ? 'Teacher View' : 'Student Learning')}
+                      </span>
+                    </div>
+
+                    {/* Course Navigation Items */}
+                    <div className="space-y-1 pt-1">
+                      <div className="text-[10px] font-extrabold uppercase tracking-wider text-foreground/40 px-3 mb-2">
+                        Course Menu
                       </div>
-                    ) : (
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center text-sm shadow-sm shadow-orange-500/20 shrink-0">
-                        {(preferredTeacherName || 'T').charAt(0).toUpperCase()}
+                      {(isTeacherCourseDashboard ? teacherCourseLinks : studentCourseLinks).map((item) => {
+                        const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+                        const Icon = item.icon;
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all border ${
+                              isActive 
+                                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold shadow-md shadow-orange-500/20 border-orange-400/30' 
+                                : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
+                            }`}
+                          >
+                            <Icon className="w-4 h-4" />
+                            <span className="flex-1">{item.name}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : isDashboard ? (
+                  /* CASE 2: Inside Main Dashboard (Student or Teacher) */
+                  <div className="space-y-3">
+                    <div className="text-[11px] font-extrabold uppercase tracking-wider text-orange-500/90 px-3 py-1 bg-orange-500/10 rounded-full w-fit border border-orange-500/20 flex items-center gap-1.5 shadow-sm">
+                      <Sparkles className="w-3.5 h-3.5 text-orange-500" />
+                      <span>{isTeacherDashboard ? 'Teacher Dashboard' : 'Student Dashboard'}</span>
+                    </div>
+                    
+                    <div className="space-y-1.5 pt-1">
+                      {(isTeacherDashboard ? teacherDashboardLinks : studentDashboardLinks).map((item) => {
+                        const isActive = pathname === item.href;
+                        const Icon = item.icon;
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all border ${
+                              isActive
+                                ? isTeacherDashboard 
+                                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold shadow-md shadow-orange-500/20 border-orange-400/30' 
+                                  : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-md shadow-blue-500/20 border-blue-400/30'
+                                : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
+                            }`}
+                          >
+                            <Icon className="w-4 h-4" />
+                            <span className="flex-1">{item.name}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  /* CASE 3: Public Site Pages (Marketplace vs Teacher Storefront Menu) */
+                  <div className="space-y-3">
+                    {/* Teacher Storefront Mini Brand Profile Card (Only in Teacher Mode) */}
+                    {isTeacherStorefrontMode && (
+                      <div className="p-3.5 rounded-2xl bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-transparent border border-orange-500/20 shadow-xs mb-2 flex items-center gap-3">
+                        {storefrontTeacherData?.headerLogo || storefrontTeacherData?.logoUrl ? (
+                          <div className="h-10 w-auto max-w-[110px] flex items-center shrink-0">
+                            <img 
+                              src={storefrontTeacherData.headerLogo || storefrontTeacherData.logoUrl} 
+                              alt={preferredTeacherName || 'Academy Logo'} 
+                              className="h-full w-auto max-h-10 object-contain object-left" 
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center text-sm shadow-sm shadow-orange-500/20 shrink-0">
+                            {(preferredTeacherName || 'T').charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="font-extrabold text-sm text-foreground truncate">
+                            {preferredTeacherName || 'Teacher Academy'}
+                          </p>
+                          <p className="text-[10px] font-semibold text-orange-500 truncate">
+                            {storefrontTeacherData?.headerTagline || 'অফিশিয়াল একাডেমি'}
+                          </p>
+                        </div>
                       </div>
                     )}
-                    <div className="min-w-0 flex-1">
-                      <p className="font-extrabold text-sm text-foreground truncate">
-                        {preferredTeacherName || 'Teacher Academy'}
-                      </p>
-                      <p className="text-[10px] font-semibold text-orange-500 truncate">
-                        {storefrontTeacherData?.headerTagline || 'অফিশিয়াল একাডেমি'}
-                      </p>
+
+                    {/* Mobile Search Bar */}
+                    <div className="px-1 pt-1 pb-1">
+                      <HeaderSearchBar 
+                        isTeacherStorefrontMode={isTeacherStorefrontMode} 
+                        activeTeacherId={effectiveTeacherId} 
+                      />
                     </div>
+
+                    <div className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/40 px-3 mb-1 flex items-center justify-between">
+                      <span>Navigation</span>
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-foreground/5 text-foreground/60 font-mono">
+                        {isTeacherStorefrontMode ? 'Teacher Academy' : 'Marketplace'}
+                      </span>
+                    </div>
+                    {activePublicNavLinks.map((item) => {
+                      if (!isTeacherStorefrontMode && item.href === '/courses') {
+                        return (
+                          <CourseMegaMenu 
+                            key="mobile-courses-mega-menu" 
+                            isMobile={true} 
+                            onItemClick={() => setIsMobileMenuOpen(false)} 
+                          />
+                        );
+                      }
+                      return (
+                        <Link
+                          key={item.href + item.name}
+                          href={item.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
+                            item.isActive 
+                              ? isTeacherStorefrontMode
+                                ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 border-orange-400/40 ring-1 ring-orange-400/30'
+                                : 'bg-primary text-primary-foreground shadow-md shadow-primary/30 border-primary/40'
+                              : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
+                          }`}
+                        >
+                          <span className="flex items-center gap-2.5">
+                            <span className={`w-2 h-2 rounded-full ${item.isActive ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
+                            <span>{item.name}</span>
+                          </span>
+                          <ChevronRight className={`w-4 h-4 transition-transform ${item.isActive ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
+                        </Link>
+                      );
+                    })}
+
+                    {user && (
+                      <Link
+                        href={userProfileLink}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center justify-between px-4 py-3 mt-3 rounded-xl font-bold text-sm bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 transition-all shadow-sm"
+                      >
+                        <span className="flex items-center gap-2">
+                          <LayoutDashboard className="w-4 h-4" />
+                          {isTeacher ? 'Teacher Dashboard' : (isStudent ? 'Student Dashboard' : 'Complete Setup')}
+                        </span>
+                        <ChevronRight className="w-4 h-4" />
+                      </Link>
+                    )}
                   </div>
                 )}
 
-                {/* Mobile Search Bar */}
-                <div className="px-1 pt-1 pb-1">
-                  <HeaderSearchBar 
-                    isTeacherStorefrontMode={isTeacherStorefrontMode} 
-                    activeTeacherId={effectiveTeacherId} 
-                  />
-                </div>
-
-                <div className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/40 px-3 mb-1 flex items-center justify-between">
-                  <span>Navigation</span>
-                  <span className="text-[9px] px-2 py-0.5 rounded-full bg-foreground/5 text-foreground/60 font-mono">
-                    {isTeacherStorefrontMode ? 'Teacher Academy' : 'Marketplace'}
-                  </span>
-                </div>
-                {activePublicNavLinks.map((item) => {
-                  if (!isTeacherStorefrontMode && item.href === '/courses') {
-                    return (
-                      <CourseMegaMenu 
-                        key="mobile-courses-mega-menu" 
-                        isMobile={true} 
-                        onItemClick={() => setIsMobileMenuOpen(false)} 
-                      />
-                    );
-                  }
-                  return (
-                    <Link
-                      key={item.href + item.name}
-                      href={item.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all border ${
-                        item.isActive 
-                          ? isTeacherStorefrontMode
-                            ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 border-orange-400/40 ring-1 ring-orange-400/30'
-                            : 'bg-primary text-primary-foreground shadow-md shadow-primary/30 border-primary/40'
-                          : 'hover:bg-foreground/5 text-foreground/80 hover:text-foreground border-transparent hover:border-foreground/10'
-                      }`}
-                    >
-                      <span className="flex items-center gap-2.5">
-                        <span className={`w-2 h-2 rounded-full ${item.isActive ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-transparent'}`}></span>
-                        <span>{item.name}</span>
-                      </span>
-                      <ChevronRight className={`w-4 h-4 transition-transform ${item.isActive ? 'text-white translate-x-0.5' : 'opacity-40'}`} />
-                    </Link>
-                  );
-                })}
-
-                {user && (
-                  <Link
-                    href={userProfileLink}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-4 py-3 mt-3 rounded-xl font-bold text-sm bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 transition-all shadow-sm"
-                  >
-                    <span className="flex items-center gap-2">
-                      <LayoutDashboard className="w-4 h-4" />
-                      {isTeacher ? 'Teacher Dashboard' : (isStudent ? 'Student Dashboard' : 'Complete Setup')}
-                    </span>
-                    <ChevronRight className="w-4 h-4" />
-                  </Link>
-                )}
               </div>
-            )}
 
-          </div>
+              {/* Bottom Fixed User Profile Card */}
+              <div className="p-4 border-t border-foreground/10 bg-foreground/[0.02] relative">
+                {user ? (
+                  <>
+                    {/* Popover Menu on Click / Hover */}
+                    {showProfileMenu && (
+                      <div className="absolute bottom-full left-4 right-4 mb-3 bg-background border border-foreground/10 rounded-2xl shadow-2xl p-2 space-y-1 animate-in slide-in-from-bottom-2 duration-200 z-50">
+                        {isTeacher ? (
+                          <>
+                            <Link 
+                              href="/teacher-dashboard"
+                              onClick={() => {
+                                setIsMobileMenuOpen(false);
+                                setShowProfileMenu(false);
+                              }} 
+                              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-orange-500/10 text-orange-600 dark:text-orange-400 text-sm font-bold transition-colors"
+                            >
+                              <LayoutDashboard className="w-4 h-4 text-orange-500" /> Teacher Dashboard
+                            </Link>
 
-          {/* Bottom Fixed User Profile Card */}
-          <div className="p-4 border-t border-foreground/10 bg-foreground/[0.02] relative">
-            {user ? (
-              <>
-                {/* Popover Menu on Click / Hover */}
-                {showProfileMenu && (
-                  <div className="absolute bottom-full left-4 right-4 mb-3 bg-background border border-foreground/10 rounded-2xl shadow-2xl p-2 space-y-1 animate-in slide-in-from-bottom-2 duration-200 z-50">
-                    {isTeacher ? (
-                      <>
-                        <Link 
-                          href="/teacher-dashboard"
-                          onClick={() => {
-                            setIsMobileMenuOpen(false);
-                            setShowProfileMenu(false);
-                          }} 
-                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-orange-500/10 text-orange-500 text-sm font-bold transition-colors"
-                        >
-                          <LayoutDashboard className="w-4 h-4" /> Teacher Dashboard
-                        </Link>
-                        <Link 
-                          href="/teacher-dashboard/courses"
-                          onClick={() => {
-                            setIsMobileMenuOpen(false);
-                            setShowProfileMenu(false);
-                          }} 
-                          className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
-                        >
-                          <Video className="w-3.5 h-3.5 text-foreground/60" /> My Created Courses
-                        </Link>
-                        {!isAdmin && (
+                            <Link 
+                              href="/teacher-dashboard/courses"
+                              onClick={() => {
+                                setIsMobileMenuOpen(false);
+                                setShowProfileMenu(false);
+                              }} 
+                              className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
+                            >
+                              <Video className="w-4 h-4 text-foreground/60" /> My Courses
+                            </Link>
+
+                            <Link 
+                              href="/teacher-dashboard/students"
+                              onClick={() => {
+                                setIsMobileMenuOpen(false);
+                                setShowProfileMenu(false);
+                              }} 
+                              className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
+                            >
+                              <Users className="w-4 h-4 text-foreground/60" /> Enrolled Students
+                            </Link>
+
+                            <Link 
+                              href="/teacher-dashboard/earnings"
+                              onClick={() => {
+                                setIsMobileMenuOpen(false);
+                                setShowProfileMenu(false);
+                              }} 
+                              className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
+                            >
+                              <DollarSign className="w-4 h-4 text-foreground/60" /> Earnings & Revenue
+                            </Link>
+
+                            {/* Dual Site Switcher (Main Site vs Teacher Site) */}
+                            {isAdmin && (
+                              <div className="pt-2 pb-1 border-t border-foreground/10 my-1">
+                                <p className="text-[10px] font-bold text-foreground/40 px-1 mb-1.5 uppercase tracking-wider">Site Switcher</p>
+                                <div className="grid grid-cols-2 gap-1.5 p-1 bg-foreground/[0.04] border border-foreground/10 rounded-xl">
+                                  <Link 
+                                    href="/?view=marketplace" 
+                                    onClick={() => {
+                                      if (typeof window !== 'undefined') {
+                                        sessionStorage.removeItem('referralTeacherId');
+                                        window.dispatchEvent(new Event('storage'));
+                                      }
+                                      setIsMobileMenuOpen(false);
+                                      setShowProfileMenu(false);
+                                    }}
+                                    className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg border text-xs font-bold transition-all text-center shadow-xs ${
+                                      isForcedMarketplace 
+                                        ? 'bg-blue-500 text-white border-blue-600' 
+                                        : 'bg-background hover:bg-blue-500/10 border-foreground/10 text-foreground/80 hover:text-blue-500'
+                                    }`}
+                                  >
+                                    <Globe className="w-3.5 h-3.5 shrink-0" />
+                                    <span>Main Site</span>
+                                  </Link>
+
+                                  <Link 
+                                    href="/" 
+                                    onClick={() => {
+                                      if (typeof window !== 'undefined' && user?.uid) {
+                                        sessionStorage.setItem('referralTeacherId', user.uid);
+                                        window.dispatchEvent(new Event('storage'));
+                                      }
+                                      setIsMobileMenuOpen(false);
+                                      setShowProfileMenu(false);
+                                    }}
+                                    className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg border text-xs font-bold transition-all text-center shadow-xs ${
+                                      !isForcedMarketplace 
+                                        ? 'bg-orange-500 text-white border-orange-600' 
+                                        : 'bg-background hover:bg-orange-500/10 border-foreground/10 text-foreground/80 hover:text-orange-500'
+                                    }`}
+                                  >
+                                    <Building2 className="w-3.5 h-3.5 shrink-0" />
+                                    <span>Teacher Site</span>
+                                  </Link>
+                                </div>
+                              </div>
+                            )}
+
+                            <Link 
+                              href="/teacher-dashboard/home-builder"
+                              onClick={() => {
+                                setIsMobileMenuOpen(false);
+                                setShowProfileMenu(false);
+                              }} 
+                              className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
+                            >
+                              <Globe className="w-4 h-4 text-orange-500" /> Website Builder
+                            </Link>
+                          </>
+                        ) : isStudent ? (
+                          <>
+                            <Link 
+                              href="/dashboard"
+                              onClick={() => {
+                                setIsMobileMenuOpen(false);
+                                setShowProfileMenu(false);
+                              }} 
+                              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-500/10 text-blue-500 text-sm font-bold transition-colors"
+                            >
+                              <GraduationCap className="w-4 h-4" /> Student Dashboard
+                            </Link>
+                            <Link 
+                              href="/dashboard/courses"
+                              onClick={() => {
+                                setIsMobileMenuOpen(false);
+                                setShowProfileMenu(false);
+                              }} 
+                              className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
+                            >
+                              <BookOpen className="w-3.5 h-3.5 text-foreground/60" /> My Courses
+                            </Link>
+                          </>
+                        ) : (
                           <Link 
-                            href="/"
+                            href="/onboarding"
                             onClick={() => {
                               setIsMobileMenuOpen(false);
                               setShowProfileMenu(false);
                             }} 
-                            className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm font-bold transition-colors"
                           >
-                            <Globe className="w-4 h-4 text-orange-500" /> View Live Website
+                            <Sparkles className="w-4 h-4" /> Complete Setup
                           </Link>
                         )}
 
-                        {/* Dual Site Switcher (Main Site vs Teacher Site) - Strictly Super Admin */}
-                        {isAdmin && (
-                          <div className="pt-2 pb-1 px-1">
-                            <div className="grid grid-cols-2 gap-1.5 p-1 bg-foreground/[0.04] border border-foreground/10 rounded-xl">
-                              <Link 
-                                href="/?view=marketplace" 
-                                onClick={() => {
-                                  if (typeof window !== 'undefined') {
-                                    sessionStorage.removeItem('referralTeacherId');
-                                    window.dispatchEvent(new Event('storage'));
-                                  }
-                                  setIsMobileMenuOpen(false);
-                                  setShowProfileMenu(false);
-                                }}
-                                className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg border text-xs font-bold transition-all text-center shadow-xs ${
-                                  isForcedMarketplace 
-                                    ? 'bg-blue-500 text-white border-blue-600' 
-                                    : 'bg-background hover:bg-blue-500/10 border-foreground/10 text-foreground/80 hover:text-blue-500'
-                                }`}
-                              >
-                                <Globe className="w-3.5 h-3.5 shrink-0" />
-                                <span>Main Site</span>
-                              </Link>
-
-                              <Link 
-                                href="/" 
-                                onClick={() => {
-                                  if (typeof window !== 'undefined' && user?.uid) {
-                                    sessionStorage.setItem('referralTeacherId', user.uid);
-                                    window.dispatchEvent(new Event('storage'));
-                                  }
-                                  setIsMobileMenuOpen(false);
-                                  setShowProfileMenu(false);
-                                }}
-                                className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg border text-xs font-bold transition-all text-center shadow-xs ${
-                                  !isForcedMarketplace 
-                                    ? 'bg-orange-500 text-white border-orange-600' 
-                                    : 'bg-background hover:bg-orange-500/10 border-foreground/10 text-foreground/80 hover:text-orange-500'
-                                }`}
-                              >
-                                <Building2 className="w-3.5 h-3.5 shrink-0" />
-                                <span>Teacher Site</span>
-                              </Link>
-                            </div>
-                          </div>
+                        {hasCompletedRole && (
+                          <Link 
+                            href={isTeacher ? "/teacher-dashboard/settings" : "/dashboard/settings"}
+                            onClick={() => {
+                              setIsMobileMenuOpen(false);
+                              setShowProfileMenu(false);
+                            }} 
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
+                          >
+                            <Settings className="w-4 h-4 text-foreground/70" /> Account Settings
+                          </Link>
                         )}
 
-                        <Link 
-                          href="/teacher-dashboard/home-builder"
-                          onClick={() => {
-                            setIsMobileMenuOpen(false);
-                            setShowProfileMenu(false);
-                          }} 
-                          className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
-                        >
-                          <Globe className="w-4 h-4 text-orange-500" /> Website Builder
-                        </Link>
-                      </>
-                    ) : isStudent ? (
-                      <>
-                        <Link 
-                          href="/dashboard"
-                          onClick={() => {
-                            setIsMobileMenuOpen(false);
-                            setShowProfileMenu(false);
-                          }} 
-                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-500/10 text-blue-500 text-sm font-bold transition-colors"
-                        >
-                          <GraduationCap className="w-4 h-4" /> Student Dashboard
-                        </Link>
-                        <Link 
-                          href="/dashboard/courses"
-                          onClick={() => {
-                            setIsMobileMenuOpen(false);
-                            setShowProfileMenu(false);
-                          }} 
-                          className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground text-xs font-medium transition-colors"
-                        >
-                          <BookOpen className="w-3.5 h-3.5 text-foreground/60" /> My Courses
-                        </Link>
-                      </>
-                    ) : (
-                      <Link 
-                        href="/onboarding"
-                        onClick={() => {
-                          setIsMobileMenuOpen(false);
-                          setShowProfileMenu(false);
-                        }} 
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm font-bold transition-colors"
-                      >
-                        <Sparkles className="w-4 h-4" /> Complete Setup
-                      </Link>
-                    )}
-
-                    {hasCompletedRole && (
-                      <Link 
-                        href={isTeacher ? "/teacher-dashboard/settings" : "/dashboard/settings"}
-                        onClick={() => {
-                          setIsMobileMenuOpen(false);
-                          setShowProfileMenu(false);
-                        }} 
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/5 text-sm font-medium transition-colors"
-                      >
-                        <Settings className="w-4 h-4 text-foreground/70" /> Account Settings
-                      </Link>
-                    )}
-
-                    {/* Active Academy Indicator for Students (Mobile) */}
-                    {isStudent && (
-                      <div className="p-3 rounded-xl bg-foreground/[0.03] border border-foreground/10 space-y-1.5 my-1">
-                        <div className="flex items-center justify-between text-[11px] font-bold text-foreground/50">
-                          <span>বর্তমান একাডেমি:</span>
-                          <span className={`px-1.5 py-0.2 rounded text-[10px] font-black ${isCustomTeacherMode ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'}`}>
-                            {isCustomTeacherMode ? 'ফোকাসড একাডেমি' : 'মার্কেটপ্লেস'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
-                            {isCustomTeacherMode ? <Building2 className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />}
+                        {/* Active Academy Indicator for Students (Mobile) */}
+                        {isStudent && (
+                          <div className="p-3 rounded-xl bg-foreground/[0.03] border border-foreground/10 space-y-1.5 my-1">
+                            <div className="flex items-center justify-between text-[11px] font-bold text-foreground/50">
+                              <span>বর্তমান একাডেমি:</span>
+                              <span className={`px-1.5 py-0.2 rounded text-[10px] font-black ${isCustomTeacherMode ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'}`}>
+                                {isCustomTeacherMode ? 'ফোকাসড একাডেমি' : 'মার্কেটপ্লেস'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
+                                {isCustomTeacherMode ? <Building2 className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-xs font-black text-foreground truncate">
+                                  {isCustomTeacherMode ? (preferredTeacherName || 'শিক্ষক একাডেমি') : 'SkyLearners মার্কেটপ্লেস'}
+                                </p>
+                              </div>
+                            </div>
+                            <Link
+                              href="/dashboard/settings"
+                              onClick={() => {
+                                setIsMobileMenuOpen(false);
+                                setShowProfileMenu(false);
+                              }}
+                              className="text-[11px] font-bold text-orange-500 hover:underline flex items-center gap-1 pt-0.5"
+                            >
+                              <span>⚙️ একাডেমি পরিবর্তন / সেটিংস</span>
+                            </Link>
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-black text-foreground truncate">
-                              {isCustomTeacherMode ? (preferredTeacherName || 'শিক্ষক একাডেমি') : 'SkyLearners মার্কেটপ্লেস'}
-                            </p>
-                          </div>
-                        </div>
-                        <Link
-                          href="/dashboard/settings"
-                          onClick={() => {
-                            setIsMobileMenuOpen(false);
-                            setShowProfileMenu(false);
-                          }}
-                          className="text-[11px] font-bold text-orange-500 hover:underline flex items-center gap-1 pt-0.5"
+                        )}
+                        <div className="h-px bg-foreground/10 my-1 mx-2"></div>
+                        <button 
+                          onClick={() => setShowLogoutConfirm(true)} 
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-500/10 text-red-500 text-sm font-medium transition-colors"
                         >
-                          <span>⚙️ একাডেমি পরিবর্তন / সেটিংস</span>
-                        </Link>
+                          <LogOut className="w-4 h-4" /> Log Out
+                        </button>
                       </div>
                     )}
-                    <div className="h-px bg-foreground/10 my-1 mx-2"></div>
-                    <button 
-                      onClick={() => setShowLogoutConfirm(true)} 
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-500/10 text-red-500 text-sm font-medium transition-colors"
+
+                    {/* Profile Card Button */}
+                    <div 
+                      onClick={() => setShowProfileMenu(!showProfileMenu)}
+                      className="flex items-center gap-3 w-full p-3 rounded-2xl bg-background hover:bg-foreground/5 border border-foreground/10 hover:border-orange-500/30 transition-all cursor-pointer select-none shadow-sm"
                     >
-                      <LogOut className="w-4 h-4" /> Log Out
-                    </button>
-                  </div>
+                      <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center overflow-hidden shrink-0 ring-2 ring-orange-500/20">
+                        {avatarUrl ? (
+                          <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+                        ) : (
+                          <UserIcon className="w-5 h-5 text-orange-500" />
+                        )}
+                      </div>
+                      <div className="flex-1 overflow-hidden">
+                        <p className="text-sm font-bold text-foreground truncate">
+                          {user.displayName || userData?.name || 'User Account'}
+                        </p>
+                        <p className="text-[11px] text-foreground/50 truncate capitalize">
+                          {userData?.role || 'Member'}
+                        </p>
+                      </div>
+                      <MoreVertical className="w-4 h-4 text-foreground/40 shrink-0" />
+                    </div>
+                  </>
+                ) : (
+                  <Link
+                    href="/register"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full py-3 bg-primary text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 shadow-md"
+                  >
+                    <UserIcon className="w-4 h-4" />
+                    <span>Login / Join</span>
+                  </Link>
                 )}
+              </div>
 
-                {/* Profile Card Button */}
-                <div 
-                  onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-3 w-full p-3 rounded-2xl bg-background hover:bg-foreground/5 border border-foreground/10 hover:border-orange-500/30 transition-all cursor-pointer select-none shadow-sm"
-                >
-                  <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center overflow-hidden shrink-0 ring-2 ring-orange-500/20">
-                    {avatarUrl ? (
-                      <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
-                    ) : (
-                      <UserIcon className="w-5 h-5 text-orange-500" />
-                    )}
-                  </div>
-                  <div className="flex-1 overflow-hidden">
-                    <p className="text-sm font-bold text-foreground truncate">
-                      {user.displayName || userData?.name || 'User Account'}
-                    </p>
-                    <p className="text-[11px] text-foreground/50 truncate capitalize">
-                      {userData?.role || 'Member'}
-                    </p>
-                  </div>
-                  <MoreVertical className="w-4 h-4 text-foreground/40 shrink-0" />
-                </div>
-              </>
-            ) : (
-              <Link
-                href="/register"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full py-3 bg-primary text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 shadow-md"
-              >
-                <UserIcon className="w-4 h-4" />
-                <span>Login / Join</span>
-              </Link>
-            )}
+            </motion.div>
           </div>
-
-        </div>
-      </div>
+        )}
+      </AnimatePresence>
 
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (

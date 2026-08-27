@@ -345,116 +345,195 @@ export default function Footer() {
   }
 
   // =========================================================================
-  // CASE B: GLOBAL MARKETPLACE FOOTER (Category 1: Central Marketplace Footer)
+  // CASE B: GLOBAL MARKETPLACE FOOTER (Category 1: Central Marketplace Liquid Footer)
   // =========================================================================
   return (
-    <footer className="bg-background/80 backdrop-blur-md border-t border-foreground/10 pt-16 pb-8 mt-20 relative overflow-hidden">
-      {/* Decorative glows */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 blur-[120px] rounded-full pointer-events-none"></div>
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-accent/10 blur-[120px] rounded-full pointer-events-none"></div>
+    <footer className="relative overflow-hidden pt-16 sm:pt-20 pb-10 mt-20 border-t border-foreground/[0.08] dark:border-white/[0.08] bg-gradient-to-b from-background/90 via-background/95 to-background dark:from-[#070b14]/90 dark:via-[#05080f]/95 dark:to-[#020408] backdrop-blur-2xl shadow-[0_-4px_30px_rgba(0,0,0,0.02)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.35)]">
+      {/* Top subtle liquid accent highlight line */}
+      <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-orange-500/30 to-transparent pointer-events-none" />
 
-      <div className="max-w-[1280px] mx-auto w-full px-[15px] md:px-[20px] lg:px-[30px] relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-16 mb-12">
+      {/* Decorative Soft Liquid Ambient Glowing Orbs */}
+      <div className="absolute -top-28 left-1/4 w-[500px] h-[320px] bg-orange-500/10 dark:bg-orange-500/[0.08] blur-[140px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/3 right-1/4 w-[450px] h-[300px] bg-amber-500/[0.08] dark:bg-amber-500/[0.06] blur-[140px] rounded-full pointer-events-none" />
+
+      <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 mb-14">
           
-          {/* Brand & About */}
+          {/* 1. Brand Logo, Mission & Animated Social Capsules */}
           <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2 mb-2">
-              <div className="relative w-[180px] h-[50px] md:w-[240px] md:h-[60px] flex items-center justify-start">
+            <Link href="/" className="inline-flex items-center gap-2 group transition-transform duration-300 hover:scale-[1.02]">
+              <div className="relative w-[170px] h-[46px] sm:w-[200px] sm:h-[52px] md:w-[220px] md:h-[56px] flex items-center justify-start">
                 <Image src="/Skylearnars Academy logo.png" alt="Sky Learners Logo" fill className="object-contain object-left" priority />
               </div>
             </Link>
-            <p className="text-foreground/70 leading-relaxed text-sm">
-              {t('about')}
+
+            <p className="text-foreground/75 text-xs sm:text-sm leading-relaxed font-medium">
+              {t('about') || (isBn ? 'দেশের শীর্ষ শিক্ষক ও মানসম্মত কোচিং সেন্টারের সেরা একাডেমিক ও দক্ষতা উন্নয়ন কোর্সসমূহ।' : 'Nationwide top educators and coaching centers for academic excellence and skill mastery.')}
             </p>
-            <div className="flex items-center gap-4 pt-4">
-              <a href="#" className="w-10 h-10 rounded-full bg-foreground/5 hover:bg-primary hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm">
-                <FacebookIcon className="w-5 h-5" />
+
+            {/* Social Media Channels - Animated Liquid Glass Capsules */}
+            <div className="flex items-center gap-2.5 pt-2">
+              <a 
+                href="https://facebook.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-10 h-10 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white border border-blue-500/20 flex items-center justify-center transition-all duration-300 shadow-xs hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-1 hover:scale-110 active:scale-95"
+                title="Facebook"
+              >
+                <FacebookIcon className="w-4 h-4 transition-transform duration-300" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-foreground/5 hover:bg-primary hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm">
-                <TwitterIcon className="w-5 h-5" />
+
+              <a 
+                href="https://twitter.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-10 h-10 rounded-2xl bg-foreground/[0.05] text-foreground/80 hover:bg-foreground hover:text-background border border-foreground/10 flex items-center justify-center transition-all duration-300 shadow-xs hover:shadow-lg hover:-translate-y-1 hover:scale-110 active:scale-95"
+                title="X / Twitter"
+              >
+                <TwitterIcon className="w-4 h-4 transition-transform duration-300" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-foreground/5 hover:bg-primary hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm">
-                <InstagramIcon className="w-5 h-5" />
+
+              <a 
+                href="https://instagram.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500/10 via-rose-500/10 to-purple-500/10 text-rose-500 hover:bg-gradient-to-tr hover:from-amber-500 hover:via-rose-500 hover:to-purple-500 hover:text-white border border-rose-500/20 flex items-center justify-center transition-all duration-300 shadow-xs hover:shadow-lg hover:shadow-rose-500/30 hover:-translate-y-1 hover:scale-110 active:scale-95"
+                title="Instagram"
+              >
+                <InstagramIcon className="w-4 h-4 transition-transform duration-300" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-foreground/5 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm">
-                <YoutubeIcon className="w-5 h-5" />
+
+              <a 
+                href="https://youtube.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-10 h-10 rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white border border-red-500/20 flex items-center justify-center transition-all duration-300 shadow-xs hover:shadow-lg hover:shadow-red-500/30 hover:-translate-y-1 hover:scale-110 active:scale-95"
+                title="YouTube"
+              >
+                <YoutubeIcon className="w-4 h-4 transition-transform duration-300" />
               </a>
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* 2. Quick Links (Liquid Hover Items) */}
           <div>
-            <h3 className="font-bold text-lg mb-6">{t('quickLinks')}</h3>
-            <ul className="space-y-3 text-sm">
+            <h4 className="font-extrabold text-sm sm:text-base text-foreground mb-5 flex items-center gap-2.5 tracking-tight">
+              <span className="w-2 h-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-xs shadow-orange-500/40" />
+              <span>{t('quickLinks') || (isBn ? 'প্রয়োজনীয় লিংক' : 'Quick Links')}</span>
+            </h4>
+            <ul className="space-y-3 text-xs sm:text-sm font-medium">
               <li>
-                <Link href="/" className="text-foreground/70 hover:text-primary transition-colors flex items-center gap-2 group">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors"></span>
-                  {t('home')}
+                <Link href="/" className="text-foreground/75 hover:text-orange-500 transition-colors flex items-center gap-2.5 group py-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-150 transition-all duration-200" />
+                  <span>{t('home') || (isBn ? 'হোম' : 'Home')}</span>
                 </Link>
               </li>
               <li>
-                <Link href="/courses" className="text-foreground/70 hover:text-primary transition-colors flex items-center gap-2 group">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors"></span>
-                  {t('courses')}
+                <Link href="/courses" className="text-foreground/75 hover:text-orange-500 transition-colors flex items-center gap-2.5 group py-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-150 transition-all duration-200" />
+                  <span>{t('courses') || (isBn ? 'সকল কোর্স' : 'All Courses')}</span>
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="text-foreground/70 hover:text-primary transition-colors flex items-center gap-2 group">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors"></span>
-                  {t('aboutUs')}
+                <Link href="/about" className="text-foreground/75 hover:text-orange-500 transition-colors flex items-center gap-2.5 group py-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-150 transition-all duration-200" />
+                  <span>{t('aboutUs') || (isBn ? 'আমাদের সম্পর্কে' : 'About Us')}</span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-foreground/75 hover:text-orange-500 transition-colors flex items-center gap-2.5 group py-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-150 transition-all duration-200" />
+                  <span>{isBn ? 'যোগাযোগ' : 'Contact Support'}</span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/onboarding?role=teacher" className="text-foreground/75 hover:text-orange-500 transition-colors flex items-center gap-2.5 group py-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-150 transition-all duration-200" />
+                  <span>{isBn ? 'শিক্ষক হিসেবে যুক্ত হোন' : 'Become an Instructor'}</span>
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Legal */}
+          {/* 3. Legal & Guidelines */}
           <div>
-            <h3 className="font-bold text-lg mb-6">{t('legal')}</h3>
-            <ul className="space-y-3 text-sm">
+            <h4 className="font-extrabold text-sm sm:text-base text-foreground mb-5 flex items-center gap-2.5 tracking-tight">
+              <span className="w-2 h-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-xs shadow-orange-500/40" />
+              <span>{t('legal') || (isBn ? 'নীতিমালা ও শর্তাবলী' : 'Legal & Policies')}</span>
+            </h4>
+            <ul className="space-y-3 text-xs sm:text-sm font-medium">
               <li>
-                <Link href="/privacy" className="text-foreground/70 hover:text-primary transition-colors flex items-center gap-2 group">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors"></span>
-                  {t('privacy')}
+                <Link href="/privacy" className="text-foreground/75 hover:text-orange-500 transition-colors flex items-center gap-2.5 group py-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-150 transition-all duration-200" />
+                  <span>{t('privacy') || (isBn ? 'গোপনীয়তা নীতি' : 'Privacy Policy')}</span>
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-foreground/70 hover:text-primary transition-colors flex items-center gap-2 group">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors"></span>
-                  {t('terms')}
+                <Link href="/terms" className="text-foreground/75 hover:text-orange-500 transition-colors flex items-center gap-2.5 group py-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-150 transition-all duration-200" />
+                  <span>{t('terms') || (isBn ? 'ব্যবহারের শর্তাবলী' : 'Terms of Service')}</span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-foreground/75 hover:text-orange-500 transition-colors flex items-center gap-2.5 group py-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-150 transition-all duration-200" />
+                  <span>{isBn ? 'হেল্প ও এফএকিউ' : 'FAQ & Help Center')}</span>
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* 4. Contact Info with Interactive Liquid Badges */}
           <div>
-            <h3 className="font-bold text-lg mb-6">{t('contact')}</h3>
-            <ul className="space-y-4 text-sm">
-              <li className="flex items-start gap-3 text-foreground/70">
-                <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <span>123 Learning Street, Education City, 10001</span>
+            <h4 className="font-extrabold text-sm sm:text-base text-foreground mb-5 flex items-center gap-2.5 tracking-tight">
+              <span className="w-2 h-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-xs shadow-orange-500/40" />
+              <span>{t('contact') || (isBn ? 'যোগাযোগ' : 'Contact Us')}</span>
+            </h4>
+            <ul className="space-y-3.5 text-xs sm:text-sm font-medium">
+              <li className="flex items-start gap-3 text-foreground/80 group">
+                <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-500 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300 shadow-xs">
+                  <MapPin className="w-4 h-4" />
+                </div>
+                <span className="pt-1.5 leading-relaxed font-medium">
+                  {isBn ? 'ঢাকা, বাংলাদেশ' : 'Dhaka, Bangladesh'}
+                </span>
               </li>
-              <li className="flex items-center gap-3 text-foreground/70">
-                <Phone className="w-5 h-5 text-primary flex-shrink-0" />
-                <span>+1 (555) 123-4567</span>
+
+              <li className="flex items-center gap-3 text-foreground/80 group">
+                <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-500 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300 shadow-xs">
+                  <Phone className="w-4 h-4" />
+                </div>
+                <a href="tel:+8801700000000" className="hover:text-orange-500 transition-colors font-medium">
+                  +880 1700-000000
+                </a>
               </li>
-              <li className="flex items-center gap-3 text-foreground/70">
-                <Mail className="w-5 h-5 text-primary flex-shrink-0" />
-                <span>support@skylearners.com</span>
+
+              <li className="flex items-center gap-3 text-foreground/80 group">
+                <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-500 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300 shadow-xs">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <a href="mailto:support@skylearners.com" className="hover:text-orange-500 transition-colors font-medium truncate">
+                  support@skylearners.com
+                </a>
               </li>
             </ul>
           </div>
 
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-foreground/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-foreground/50 text-sm">
-            © {new Date().getFullYear()} SkyLearners. {t('rights')}
+        {/* Bottom Copyright & Trust Bar */}
+        <div className="pt-8 border-t border-foreground/[0.08] dark:border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-foreground/60">
+          <p className="text-center sm:text-left">
+            © {new Date().getFullYear()} <span className="font-bold text-foreground">SkyLearners</span>. {t('rights') || (isBn ? 'সর্বস্বত্ব সংরক্ষিত।' : 'All rights reserved.')}
           </p>
-          <div className="flex items-center gap-6 text-sm text-foreground/50">
-            <Link href="/privacy" className="hover:text-primary transition-colors">{t('privacy')}</Link>
-            <Link href="/terms" className="hover:text-primary transition-colors">{t('terms')}</Link>
+          <div className="flex items-center gap-6">
+            <Link href="/privacy" className="hover:text-orange-500 transition-colors">
+              {t('privacy') || (isBn ? 'গোপনীয়তা নীতি' : 'Privacy Policy')}
+            </Link>
+            <span className="w-1 h-1 rounded-full bg-foreground/20" />
+            <Link href="/terms" className="hover:text-orange-500 transition-colors">
+              {t('terms') || (isBn ? 'ব্যবহারের শর্তাবলী' : 'Terms of Service')}
+            </Link>
           </div>
         </div>
       </div>

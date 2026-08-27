@@ -31,7 +31,9 @@ export function TeacherLanguageToggle({ instanceId }: { instanceId?: string }) {
   const handleSwitch = (newLocale: "bn" | "en") => {
     if (optimisticLocale === newLocale) return;
     setOptimisticLocale(newLocale);
-    router.replace(pathname, { locale: newLocale });
+    React.startTransition(() => {
+      router.replace(pathname, { locale: newLocale });
+    });
   };
 
   const isBn = optimisticLocale === "bn";

@@ -596,9 +596,7 @@ export default function Navbar() {
                 </>
               )}
                 
-                {loading ? (
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-foreground/10 animate-pulse rounded-full"></div>
-                ) : user ? (
+                {user ? (
                   <div className="relative group">
                     {isTeacherStorefrontMode ? (
                       /* Tier 2 & Tier 3 Teacher Storefront: Sleek, compact Icon-only Dashboard Trigger */

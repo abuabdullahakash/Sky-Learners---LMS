@@ -609,10 +609,10 @@ export default function SettingsPage() {
                       </div>
                       <div className="min-w-0">
                         <p className="font-medium text-sm sm:text-base">{t('security.google')}</p>
-                        <p className="text-xs text-foreground/50 truncate max-w-[200px] sm:max-w-none">{user?.providerData.some(p => p.providerId === 'google.com') ? user.email : t('security.notConnectedStatus')}</p>
+                        <p className="text-xs text-foreground/50 truncate max-w-[200px] sm:max-w-none">{user?.providerData.some((p: any) => p.providerId === 'google.com') ? user.email : t('security.notConnectedStatus')}</p>
                       </div>
                     </div>
-                    {user?.providerData.some(p => p.providerId === 'google.com') ? (
+                    {user?.providerData.some((p: any) => p.providerId === 'google.com') ? (
                       <span className="flex items-center gap-1 text-xs font-bold text-green-500 bg-green-500/10 px-2.5 py-1 rounded-md shrink-0 self-start sm:self-auto">
                         <CheckCircle2 className="w-3.5 h-3.5" /> {t('security.connectedStatus')}
                       </span>
@@ -628,10 +628,10 @@ export default function SettingsPage() {
                       </div>
                       <div className="min-w-0">
                         <p className="font-medium text-sm sm:text-base">{t('security.facebook')}</p>
-                        <p className="text-xs text-foreground/50 truncate max-w-[200px] sm:max-w-none">{user?.providerData.some(p => p.providerId === 'facebook.com') ? 'Connected via Facebook' : t('security.notConnectedStatus')}</p>
+                        <p className="text-xs text-foreground/50 truncate max-w-[200px] sm:max-w-none">{user?.providerData.some((p: any) => p.providerId === 'facebook.com') ? 'Connected via Facebook' : t('security.notConnectedStatus')}</p>
                       </div>
                     </div>
-                    {user?.providerData.some(p => p.providerId === 'facebook.com') ? (
+                    {user?.providerData.some((p: any) => p.providerId === 'facebook.com') ? (
                       <span className="flex items-center gap-1 text-xs font-bold text-green-500 bg-green-500/10 px-2.5 py-1 rounded-md shrink-0 self-start sm:self-auto">
                         <CheckCircle2 className="w-3.5 h-3.5" /> {t('security.connectedStatus')}
                       </span>

@@ -38,9 +38,23 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(() => auth.currentUser);
+  const [userData, setUserData] = useState<UserData | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('cached_user_data');
+        return cached ? JSON.parse(cached) : null;
+      } catch {}
+    }
+    return null;
+  });
+  const [loading, setLoading] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('cached_user_data');
+      return !auth.currentUser && !cached;
+    }
+    return true;
+  });
 
   const detectUserRoleAndRepair = async (uid: string, existingData?: UserData, email?: string | null): Promise<UserData> => {
     let role: 'student' | 'teacher' | 'admin' | undefined = undefined;
@@ -200,15 +214,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               const rawData = docSnap.data() as UserData;
               const repairedData = await detectUserRoleAndRepair(currentUser.uid, rawData, currentUser.email);
               setUserData(repairedData);
+              if (typeof window !== 'undefined') {
+                try {
+                  localStorage.setItem('cached_user_data', JSON.stringify(repairedData));
+                } catch {}
+              }
             } else {
               const repairedData = await detectUserRoleAndRepair(currentUser.uid, {}, currentUser.email);
-              setUserData(Object.keys(repairedData).length > 0 ? repairedData : null);
+              const finalData = Object.keys(repairedData).length > 0 ? repairedData : null;
+              setUserData(finalData);
+              if (typeof window !== 'undefined' && finalData) {
+                try {
+                  localStorage.setItem('cached_user_data', JSON.stringify(finalData));
+                } catch {}
+              }
             }
             setLoading(false);
           },
           (error) => {
             console.error("Error listening to user document:", error);
             setUserData(null);
+            if (typeof window !== 'undefined') {
+              try {
+                localStorage.removeItem('cached_user_data');
+              } catch {}
+            }
             setLoading(false);
           }
         );
@@ -218,6 +248,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           unsubscribeDoc = null;
         }
         setUserData(null);
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.removeItem('cached_user_data');
+          } catch {}
+        }
         setLoading(false);
       }
     });
@@ -232,6 +267,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('cached_user_data');
+        localStorage.removeItem('referralTeacherId');
+        sessionStorage.removeItem('referralTeacherId');
+        document.cookie = 'skylearners_active_teacher=global; path=/; max-age=0';
+      }
       await signOut(auth);
       setUserData(null);
     } catch (error) {

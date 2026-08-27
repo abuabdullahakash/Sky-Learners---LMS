@@ -887,35 +887,33 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Off-Canvas Drawer Menu (Ultra-Smooth Liquid Spring Motion) */}
+      {/* Mobile Off-Canvas Drawer Menu (Ultra-Soft Fluid Apple-Style Motion) */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <div className="fixed inset-0 z-[100] md:hidden">
-            {/* Backdrop Overlay */}
+            {/* Soft Cinematic Glass Backdrop Overlay */}
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute inset-0 bg-black/75 backdrop-blur-md"
+              transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+              className="absolute inset-0 bg-slate-950/45 dark:bg-black/60 backdrop-blur-[2px]"
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 setShowProfileMenu(false);
               }}
             />
 
-            {/* Drawer Content Panel */}
+            {/* Drawer Content Panel (Silky Liquid Fluid Slide) */}
             <motion.div 
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ 
-                type: "spring", 
-                damping: 32, 
-                stiffness: 300, 
-                mass: 0.75 
+                duration: 0.38, 
+                ease: [0.32, 0.72, 0, 1] 
               }}
-              className="fixed top-0 right-0 bottom-0 w-[85%] max-w-[340px] z-[101] bg-background/98 dark:bg-slate-950/98 backdrop-blur-2xl border-l border-foreground/15 shadow-[-16px_0_50px_rgba(0,0,0,0.5)] flex flex-col justify-between overflow-hidden"
+              className="fixed top-0 right-0 bottom-0 w-[85%] max-w-[340px] z-[101] bg-background/98 dark:bg-slate-950/98 backdrop-blur-2xl border-l border-foreground/10 shadow-[-12px_0_35px_rgba(0,0,0,0.25)] dark:shadow-[-16px_0_40px_rgba(0,0,0,0.6)] flex flex-col justify-between overflow-hidden"
             >
               {/* Drawer Top Header Bar */}
               <div className="flex items-center justify-between p-4 border-b border-foreground/10 bg-foreground/[0.03]">

@@ -182,6 +182,15 @@ export default function SettingsPage() {
         preferredTeacherId: teacherId
       });
       setPreferredTeacher(teacherId);
+      if (typeof window !== 'undefined') {
+        if (teacherId === 'global') {
+          sessionStorage.removeItem('referralTeacherId');
+          localStorage.removeItem('referralTeacherId');
+        } else {
+          sessionStorage.setItem('referralTeacherId', teacherId);
+        }
+        window.dispatchEvent(new Event('storage'));
+      }
       if (refreshUserData) {
         await refreshUserData();
       }

@@ -189,7 +189,16 @@ export default function Navbar() {
   // Active teacher for dynamic link routing
   const effectiveTeacherId = isForcedMarketplace
     ? null
-    : (routeTeacherId || guestTeacherId || (isCustomTeacherMode && preferredTeacherId ? preferredTeacherId : (isTeacher ? user?.uid : null)));
+    : (routeTeacherId 
+        ? routeTeacherId 
+        : (isStudent 
+            ? (preferredTeacherId && preferredTeacherId !== 'global' ? preferredTeacherId : null)
+            : (isTeacher 
+                ? user?.uid 
+                : (!user && guestTeacherId && guestTeacherId !== 'global' ? guestTeacherId : null)
+              )
+          )
+      );
 
   // Real-Time Listener for Active Teacher Storefront Config
   useEffect(() => {
@@ -270,12 +279,12 @@ export default function Navbar() {
   const isContactActive = pathname === '/contact' || pathname.startsWith('/contact');
 
   // Determine Active Platform Mode:
-  // True if: Logged-in teacher (isTeacher), on a /teachers/[slug] route, or visitor with referral link in this specific tab (guestTeacherId), or student with focused academy
+  // True if: Logged-in teacher (isTeacher), on a /teachers/[slug] route, or student with focused academy, or guest with referral link
   const isTeacherStorefrontMode = !isForcedMarketplace && Boolean(
+    routeTeacherId ||
     (user && isTeacher) ||
-    routeTeacherId || 
-    (guestTeacherId && guestTeacherId !== 'global') ||
-    (isStudent && preferredTeacherId && preferredTeacherId !== 'global')
+    (isStudent && preferredTeacherId && preferredTeacherId !== 'global') ||
+    (!user && guestTeacherId && guestTeacherId !== 'global')
   );
 
   // 1. Marketplace Navigation Menu Category (১০০% ক্লিন ও পিওর SEO URL)

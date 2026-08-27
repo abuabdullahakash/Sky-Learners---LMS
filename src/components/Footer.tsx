@@ -62,15 +62,24 @@ export default function Footer() {
   }
 
   const isTeacherStorefrontMode = !isForcedMarketplace && Boolean(
+    routeTeacherId ||
     (user && isTeacher) ||
-    routeTeacherId || 
-    (guestTeacherId && guestTeacherId !== 'global') ||
-    (isStudent && preferredTeacherId && preferredTeacherId !== 'global')
+    (isStudent && preferredTeacherId && preferredTeacherId !== 'global') ||
+    (!user && guestTeacherId && guestTeacherId !== 'global')
   );
 
   const effectiveTeacherId = isForcedMarketplace
     ? null
-    : (routeTeacherId || guestTeacherId || (isStudent && preferredTeacherId ? preferredTeacherId : (isTeacher ? user?.uid : null)));
+    : (routeTeacherId 
+        ? routeTeacherId 
+        : (isStudent 
+            ? (preferredTeacherId && preferredTeacherId !== 'global' ? preferredTeacherId : null)
+            : (isTeacher 
+                ? user?.uid 
+                : (!user && guestTeacherId && guestTeacherId !== 'global' ? guestTeacherId : null)
+              )
+          )
+      );
 
   useEffect(() => {
     if (!effectiveTeacherId || !isTeacherStorefrontMode) {

@@ -223,12 +223,65 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
   // 3. Custom Categories
   const customCategories = config.customCategories && config.customCategories.length > 0
     ? config.customCategories
-    : ['সকল কোর্স', 'এইচএসসি সাইকেল', 'মেডিকেল এডমিশন', 'ভার্সিটি এডমিশন'];
+    : (isBn 
+        ? ['সকল কোর্স', 'এইচএসসি সাইকেল', 'মেডিকেল এডমিশন', 'ভার্সিটি এডমিশন']
+        : ['All Courses', 'HSC Cycle', 'Medical Admission', 'Varsity Admission']);
+
+  // Sync active category on locale switch
+  useEffect(() => {
+    setActiveCategory(isBn ? 'সকল কোর্স' : 'All Courses');
+  }, [isBn]);
+
+  // Localized Category Helper
+  const getCategoryLabel = (category: string | undefined): string => {
+    if (!category) return isBn ? 'কোর্স' : 'Course';
+    const c = category.toLowerCase().trim();
+
+    switch (c) {
+      case 'high_school':
+      case 'ssc':
+      case 'secondary':
+        return isBn ? 'মাধ্যমিক' : 'High School';
+      
+      case 'intermediate':
+      case 'hsc':
+      case 'college':
+        return isBn ? 'উচ্চ মাধ্যমিক' : 'HSC';
+
+      case 'admission':
+      case 'varsity':
+      case 'medical':
+      case 'engineering':
+        return isBn ? 'ভর্তি প্রস্তুতি' : 'Admission';
+
+      case 'primary':
+        return isBn ? 'প্রাথমিক' : 'Primary';
+
+      case 'honours':
+      case 'honours_masters':
+      case 'degree':
+      case 'masters':
+        return isBn ? 'অনার্স ও ডিগ্রি' : 'Honours & Degree';
+
+      case 'skills':
+      case 'skill':
+        return isBn ? 'স্কিল ডেভেলপমেন্ট' : 'Skills';
+
+      default:
+        return category;
+    }
+  };
 
   // Filter courses by category
   const filteredCourses = courses.filter(c => {
-    if (activeCategory === 'সকল কোর্স') return true;
-    return c.category?.toLowerCase() === activeCategory.toLowerCase() || activeCategory === 'সকল কোর্স';
+    if (activeCategory === 'সকল কোর্স' || activeCategory === 'All Courses') return true;
+    const catLabel = getCategoryLabel(c.category);
+    return (
+      c.category?.toLowerCase() === activeCategory.toLowerCase() ||
+      catLabel.toLowerCase() === activeCategory.toLowerCase() ||
+      activeCategory.toLowerCase().includes(catLabel.toLowerCase()) ||
+      catLabel.toLowerCase().includes(activeCategory.toLowerCase())
+    );
   });
 
   useEffect(() => {
@@ -663,7 +716,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                       {course.category ? (
                         <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md text-white text-[11px] font-extrabold border border-white/20 shadow-md flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
-                          {course.category}
+                          {getCategoryLabel(course.category)}
                         </span>
                       ) : <span />}
 

@@ -140,41 +140,41 @@ export default function Footer() {
     const contactOfficeHours = teacherData.contactOfficeHours || (isBn ? 'প্রতিদিন সকাল ৯:০০ টা — রাত ১০:০০ টা' : 'Everyday 9:00 AM — 10:00 PM');
 
     return (
-      <footer className="relative overflow-hidden pt-16 sm:pt-20 pb-10 mt-20 border-t border-foreground/10 bg-gradient-to-b from-foreground/[0.02] via-background/95 to-background backdrop-blur-2xl">
+      <footer className="relative overflow-hidden pt-12 sm:pt-20 pb-12 mt-16 sm:mt-24 border-t border-foreground/10 bg-gradient-to-b from-foreground/[0.02] via-background/95 to-background backdrop-blur-2xl">
         {/* Soft Liquid Ambient Glowing Orbs */}
         <div className="absolute -top-24 left-1/4 w-[500px] h-[300px] bg-orange-500/10 blur-[140px] rounded-full pointer-events-none" />
         <div className="absolute top-1/2 right-1/4 w-[450px] h-[300px] bg-amber-500/[0.08] blur-[140px] rounded-full pointer-events-none" />
 
-        <div className="max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 mb-12">
+        <div className="max-w-[1280px] mx-auto w-full px-5 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 mb-12">
             
             {/* 1. Teacher Brand & Bio Card */}
             <div className="space-y-4">
-              <Link href="/" className="flex items-center gap-3.5 group">
+              <Link href="/" className="inline-flex items-center gap-3.5 group">
                 {teacherData.headerLogo || teacherData.logoUrl ? (
-                  <div className="h-11 sm:h-12 w-auto max-w-[210px] flex items-center justify-start py-0.5">
+                  <div className="h-12 sm:h-14 w-auto max-w-[240px] flex items-center justify-start py-0.5">
                     <img 
                       src={teacherData.headerLogo || teacherData.logoUrl} 
                       alt={displayName} 
-                      className="h-full w-auto max-h-12 max-w-[210px] object-contain object-left" 
+                      className="h-full w-auto max-h-14 max-w-[240px] object-contain object-left" 
                     />
                   </div>
                 ) : (
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3.5">
                     {photo ? (
-                      <div className="relative w-13 h-13 rounded-2xl overflow-hidden border-2 border-orange-500/40 shadow-md shadow-orange-500/20 shrink-0 bg-orange-500/10">
+                      <div className="relative w-14 h-14 rounded-2xl overflow-hidden border-2 border-orange-500/40 shadow-md shadow-orange-500/20 shrink-0 bg-orange-500/10">
                         <img src={photo} alt={displayName} className="w-full h-full object-cover" />
                       </div>
                     ) : (
-                      <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center shadow-lg shadow-orange-500/25 text-lg shrink-0">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-black flex items-center justify-center shadow-lg shadow-orange-500/25 text-xl shrink-0">
                         {displayName.charAt(0).toUpperCase()}
                       </div>
                     )}
-                    <div className="flex flex-col">
-                      <h3 className="font-black text-lg leading-tight text-foreground group-hover:text-orange-500 transition-colors">
+                    <div className="flex flex-col gap-0.5">
+                      <h3 className="font-black text-lg sm:text-xl leading-tight text-foreground group-hover:text-orange-500 transition-colors">
                         {displayName}
                       </h3>
-                      <span className="text-[11px] font-bold text-orange-500">
+                      <span className="inline-flex items-center text-xs font-bold text-orange-500">
                         {teacherData.headerTagline || (isBn ? 'অফিশিয়াল একাডেমি' : 'Official Academy')}
                       </span>
                     </div>
@@ -182,21 +182,31 @@ export default function Footer() {
                 )}
               </Link>
 
-              <p className="text-foreground/75 text-xs sm:text-sm leading-relaxed line-clamp-3 font-medium">
+              {/* Tagline / Subtitle Badge if Logo is shown */}
+              {(teacherData.headerLogo || teacherData.logoUrl) && (
+                <div>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 text-xs sm:text-sm font-bold shadow-xs">
+                    <Sparkles className="w-3.5 h-3.5 text-orange-500" />
+                    {teacherData.headerTagline || (isBn ? 'অফিশিয়াল শিক্ষক একাডেমি' : 'Official Teacher Academy')}
+                  </span>
+                </div>
+              )}
+
+              <p className="text-foreground/80 text-sm sm:text-base leading-relaxed line-clamp-3 font-medium">
                 {headline}
               </p>
 
               {/* Social Channels - Modern Liquid Glass Capsules */}
-              <div className="flex items-center gap-2.5 pt-2">
+              <div className="flex items-center gap-3 pt-2">
                 {teacherData.socialFacebook && (
                   <a 
                     href={teacherData.socialFacebook} 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="w-10 h-10 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white border border-blue-500/20 flex items-center justify-center transition-all duration-300 shadow-xs hover:shadow-md hover:shadow-blue-500/25 hover:-translate-y-0.5"
+                    className="w-11 h-11 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white border border-blue-500/20 flex items-center justify-center transition-all duration-300 shadow-xs hover:shadow-md hover:shadow-blue-500/25 hover:-translate-y-0.5 active:scale-95"
                     title="Facebook Page / Group"
                   >
-                    <FacebookIcon className="w-4 h-4" />
+                    <FacebookIcon className="w-5 h-5" />
                   </a>
                 )}
                 {teacherData.socialYoutube && (
@@ -204,62 +214,62 @@ export default function Footer() {
                     href={teacherData.socialYoutube} 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="w-10 h-10 rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white border border-red-500/20 flex items-center justify-center transition-all duration-300 shadow-xs hover:shadow-md hover:shadow-red-500/25 hover:-translate-y-0.5"
+                    className="w-11 h-11 rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white border border-red-500/20 flex items-center justify-center transition-all duration-300 shadow-xs hover:shadow-md hover:shadow-red-500/25 hover:-translate-y-0.5 active:scale-95"
                     title="YouTube Channel"
                   >
-                    <YoutubeIcon className="w-4 h-4" />
+                    <YoutubeIcon className="w-5 h-5" />
                   </a>
                 )}
                 <a 
                   href={`https://wa.me/${contactWhatsapp.replace(/[^\d+]/g, '')}`} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/20 flex items-center justify-center transition-all duration-300 shadow-xs hover:shadow-md hover:shadow-emerald-500/25 hover:-translate-y-0.5"
+                  className="w-11 h-11 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/20 flex items-center justify-center transition-all duration-300 shadow-xs hover:shadow-md hover:shadow-emerald-500/25 hover:-translate-y-0.5 active:scale-95"
                   title="Direct WhatsApp Message"
                 >
-                  <MessageCircle className="w-4 h-4" />
+                  <MessageCircle className="w-5 h-5" />
                 </a>
               </div>
             </div>
 
             {/* 2. Teacher Quick Links (Localized) */}
             <div>
-              <h4 className="font-extrabold text-sm sm:text-base text-foreground mb-5 flex items-center gap-2.5 tracking-tight">
-                <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-xs shadow-orange-500/40" />
+              <h4 className="font-extrabold text-base sm:text-lg text-foreground mb-4 sm:mb-5 flex items-center gap-2.5 tracking-tight">
+                <span className="w-3 h-3 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-xs shadow-orange-500/40" />
                 <span>{isBn ? 'একাডেমি পেইজসমূহ' : 'Academy Pages'}</span>
               </h4>
-              <ul className="space-y-2.5 text-xs sm:text-sm font-medium">
+              <ul className="space-y-1.5 sm:space-y-2 text-sm sm:text-base font-semibold">
                 <li>
-                  <Link href="/" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
-                    <span>{isBn ? 'হোম' : 'Home'}</span>
+                  <Link href="/" className="text-foreground/80 hover:text-orange-500 transition-colors flex items-center gap-2.5 py-1.5 px-2 -mx-2 rounded-xl hover:bg-orange-500/[0.07] group">
+                    <span className="w-2 h-2 rounded-full bg-orange-500/30 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
+                    <span className="group-hover:translate-x-1 transition-transform">{isBn ? 'হোম' : 'Home'}</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/courses" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
-                    <span>{isBn ? 'কোর্সসমূহ' : 'Courses'}</span>
+                  <Link href="/courses" className="text-foreground/80 hover:text-orange-500 transition-colors flex items-center gap-2.5 py-1.5 px-2 -mx-2 rounded-xl hover:bg-orange-500/[0.07] group">
+                    <span className="w-2 h-2 rounded-full bg-orange-500/30 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
+                    <span className="group-hover:translate-x-1 transition-transform">{isBn ? 'কোর্সসমূহ' : 'Courses'}</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/about" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
-                    <span>{isBn ? 'আমাদের সম্পর্কে' : 'About Us'}</span>
+                  <Link href="/about" className="text-foreground/80 hover:text-orange-500 transition-colors flex items-center gap-2.5 py-1.5 px-2 -mx-2 rounded-xl hover:bg-orange-500/[0.07] group">
+                    <span className="w-2 h-2 rounded-full bg-orange-500/30 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
+                    <span className="group-hover:translate-x-1 transition-transform">{isBn ? 'আমাদের সম্পর্কে' : 'About Us'}</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contact" className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
-                    <span>{isBn ? 'যোগাযোগ' : 'Contact'}</span>
+                  <Link href="/contact" className="text-foreground/80 hover:text-orange-500 transition-colors flex items-center gap-2.5 py-1.5 px-2 -mx-2 rounded-xl hover:bg-orange-500/[0.07] group">
+                    <span className="w-2 h-2 rounded-full bg-orange-500/30 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
+                    <span className="group-hover:translate-x-1 transition-transform">{isBn ? 'যোগাযোগ' : 'Contact'}</span>
                   </Link>
                 </li>
                 {customNavs.map((c: any) => {
                   const navLabel = isBn ? (c.nameBn || c.name || c.title) : (c.nameEn || c.name || c.title);
                   return (
                     <li key={c.id || c.slug}>
-                      <Link href={c.slug} className="text-foreground/70 hover:text-orange-500 transition-colors flex items-center gap-2 group">
-                        <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
-                        <span>{navLabel}</span>
+                      <Link href={c.slug} className="text-foreground/80 hover:text-orange-500 transition-colors flex items-center gap-2.5 py-1.5 px-2 -mx-2 rounded-xl hover:bg-orange-500/[0.07] group">
+                        <span className="w-2 h-2 rounded-full bg-orange-500/30 group-hover:bg-orange-500 group-hover:scale-125 transition-all" />
+                        <span className="group-hover:translate-x-1 transition-transform">{navLabel}</span>
                       </Link>
                     </li>
                   );
@@ -269,33 +279,33 @@ export default function Footer() {
 
             {/* 3. Learning & Resources (Localized) */}
             <div>
-              <h4 className="font-extrabold text-sm sm:text-base text-foreground mb-5 flex items-center gap-2.5 tracking-tight">
-                <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-400 shadow-xs shadow-amber-500/40" />
+              <h4 className="font-extrabold text-base sm:text-lg text-foreground mb-4 sm:mb-5 flex items-center gap-2.5 tracking-tight">
+                <span className="w-3 h-3 rounded-full bg-gradient-to-r from-amber-500 to-orange-400 shadow-xs shadow-amber-500/40" />
                 <span>{isBn ? 'কোর্স ক্যাটাগরি ও প্রস্তুতি' : 'Course Tracks & Prep'}</span>
               </h4>
-              <ul className="space-y-2.5 text-xs sm:text-sm font-medium">
+              <ul className="space-y-1.5 sm:space-y-2 text-sm sm:text-base font-semibold">
                 <li>
-                  <Link href="/courses?type=paid" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
-                    <span>{isBn ? 'অনলাইন রেকর্ডেড ক্লাস' : 'Recorded Video Courses'}</span>
+                  <Link href="/courses?type=paid" className="text-foreground/80 hover:text-amber-500 transition-colors flex items-center gap-2.5 py-1.5 px-2 -mx-2 rounded-xl hover:bg-amber-500/[0.07] group">
+                    <span className="w-2 h-2 rounded-full bg-amber-500/30 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
+                    <span className="group-hover:translate-x-1 transition-transform">{isBn ? 'অনলাইন রেকর্ডেড ক্লাস' : 'Recorded Video Courses'}</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/courses?type=paid" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
-                    <span>{isBn ? 'লাইভ ইন্টারঅ্যাক্টিভ ব্যাচ' : 'Live Interactive Batches'}</span>
+                  <Link href="/courses?type=paid" className="text-foreground/80 hover:text-amber-500 transition-colors flex items-center gap-2.5 py-1.5 px-2 -mx-2 rounded-xl hover:bg-amber-500/[0.07] group">
+                    <span className="w-2 h-2 rounded-full bg-amber-500/30 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
+                    <span className="group-hover:translate-x-1 transition-transform">{isBn ? 'লাইভ ইন্টারঅ্যাক্টিভ ব্যাচ' : 'Live Interactive Batches'}</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/courses?type=free" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
-                    <span>{isBn ? 'ফ্রি ক্লাস ও ডেমো লেকচার' : 'Free Demo Classes'}</span>
+                  <Link href="/courses?type=free" className="text-foreground/80 hover:text-amber-500 transition-colors flex items-center gap-2.5 py-1.5 px-2 -mx-2 rounded-xl hover:bg-amber-500/[0.07] group">
+                    <span className="w-2 h-2 rounded-full bg-amber-500/30 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
+                    <span className="group-hover:translate-x-1 transition-transform">{isBn ? 'ফ্রি ক্লাস ও ডেমো লেকচার' : 'Free Demo Classes'}</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/courses" className="text-foreground/70 hover:text-amber-500 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
-                    <span>{isBn ? 'ডেইলি এক্সাম ও সলভ শিট' : 'Daily Exams & Solves'}</span>
+                  <Link href="/courses" className="text-foreground/80 hover:text-amber-500 transition-colors flex items-center gap-2.5 py-1.5 px-2 -mx-2 rounded-xl hover:bg-amber-500/[0.07] group">
+                    <span className="w-2 h-2 rounded-full bg-amber-500/30 group-hover:bg-amber-500 group-hover:scale-125 transition-all" />
+                    <span className="group-hover:translate-x-1 transition-transform">{isBn ? 'ডেইলি এক্সাম ও সলভ শিট' : 'Daily Exams & Solves'}</span>
                   </Link>
                 </li>
               </ul>
@@ -303,38 +313,67 @@ export default function Footer() {
 
             {/* 4. Direct Teacher Contact with Glass Icon Badges (Localized) */}
             <div>
-              <h4 className="font-extrabold text-sm sm:text-base text-foreground mb-5 flex items-center gap-2.5 tracking-tight">
-                <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 shadow-xs shadow-emerald-500/40" />
+              <h4 className="font-extrabold text-base sm:text-lg text-foreground mb-4 sm:mb-5 flex items-center gap-2.5 tracking-tight">
+                <span className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 shadow-xs shadow-emerald-500/40" />
                 <span>{isBn ? 'সরাসরি যোগাযোগ' : 'Direct Contact'}</span>
               </h4>
-              <ul className="space-y-3.5 text-xs sm:text-sm">
-                <li className="flex items-start gap-3 text-foreground/75">
-                  <div className="w-8 h-8 rounded-xl bg-orange-500/10 text-orange-500 border border-orange-500/20 flex items-center justify-center shrink-0 shadow-xs mt-0.5">
-                    <MapPin className="w-4 h-4" />
+              <ul className="space-y-3">
+                <li>
+                  <div className="p-3 rounded-2xl bg-foreground/[0.03] dark:bg-white/[0.03] border border-foreground/[0.07] hover:border-orange-500/30 transition-all flex items-start gap-3.5 shadow-xs">
+                    <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-500 border border-orange-500/20 flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-foreground/45 uppercase tracking-wider">{isBn ? 'ঠিকানা' : 'Address'}</span>
+                      <span className="text-sm font-bold text-foreground/90 leading-snug">{contactAddress}</span>
+                    </div>
                   </div>
-                  <span className="leading-snug">{contactAddress}</span>
                 </li>
-                <li className="flex items-center gap-3 text-foreground/75">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-xs">
-                    <Phone className="w-4 h-4" />
-                  </div>
-                  <a href={`tel:${contactPhone}`} className="hover:text-emerald-500 transition-colors font-semibold">
-                    {contactPhone}
+
+                <li>
+                  <a 
+                    href={`tel:${contactPhone}`} 
+                    className="p-3 rounded-2xl bg-foreground/[0.03] dark:bg-white/[0.03] border border-foreground/[0.07] hover:border-emerald-500/30 transition-all flex items-center gap-3.5 shadow-xs group cursor-pointer block"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+                      <Phone className="w-4 h-4" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[10px] font-bold text-foreground/45 uppercase tracking-wider">{isBn ? 'ফোন নাম্বার' : 'Phone'}</span>
+                      <span className="text-sm sm:text-base font-extrabold text-foreground group-hover:text-emerald-500 transition-colors truncate">
+                        {contactPhone}
+                      </span>
+                    </div>
                   </a>
                 </li>
-                <li className="flex items-center gap-3 text-foreground/75">
-                  <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-xs">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <a href={`mailto:${contactEmail}`} className="hover:text-blue-500 transition-colors truncate font-semibold">
-                    {contactEmail}
+
+                <li>
+                  <a 
+                    href={`mailto:${contactEmail}`} 
+                    className="p-3 rounded-2xl bg-foreground/[0.03] dark:bg-white/[0.03] border border-foreground/[0.07] hover:border-blue-500/30 transition-all flex items-center gap-3.5 shadow-xs group cursor-pointer block"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[10px] font-bold text-foreground/45 uppercase tracking-wider">{isBn ? 'ইমেইল' : 'Email'}</span>
+                      <span className="text-sm sm:text-base font-extrabold text-foreground group-hover:text-blue-500 transition-colors truncate">
+                        {contactEmail}
+                      </span>
+                    </div>
                   </a>
                 </li>
-                <li className="flex items-center gap-3 text-foreground/75">
-                  <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-xs">
-                    <Clock className="w-4 h-4" />
+
+                <li>
+                  <div className="p-3 rounded-2xl bg-foreground/[0.03] dark:bg-white/[0.03] border border-foreground/[0.07] hover:border-amber-500/30 transition-all flex items-center gap-3.5 shadow-xs">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-xs">
+                      <Clock className="w-4 h-4" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-foreground/45 uppercase tracking-wider">{isBn ? 'অফিস সময়' : 'Office Hours'}</span>
+                      <span className="text-xs sm:text-sm font-bold text-foreground/80 leading-tight">{contactOfficeHours}</span>
+                    </div>
                   </div>
-                  <span className="text-[11px] font-medium leading-tight">{contactOfficeHours}</span>
                 </li>
               </ul>
             </div>
@@ -342,7 +381,7 @@ export default function Footer() {
           </div>
 
           {/* Bottom Bar with Teacher Academy Copyright & Legal Links */}
-          <div className="pt-8 border-t border-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-foreground/60">
+          <div className="pt-8 border-t border-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm font-semibold text-foreground/60 text-center sm:text-left">
             <p>
               © {new Date().getFullYear()} <span className="text-foreground font-bold">{displayName}</span>. {isBn ? 'সর্বস্বত্ব সংরক্ষিত।' : 'All rights reserved.'} Powered by <span className="font-bold text-orange-500">SkyLearners</span>.
             </p>

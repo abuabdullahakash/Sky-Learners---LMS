@@ -632,96 +632,121 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredCourses.map((course) => (
-              <div 
-                key={course.id}
-                className="group relative rounded-[2rem] bg-card/90 dark:bg-neutral-900/90 border border-foreground/10 dark:border-white/10 hover:border-orange-500/50 dark:hover:border-orange-500/50 flex flex-col justify-between overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1.5 shadow-sm"
-              >
-                {/* Ambient glow on hover */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl pointer-events-none group-hover:scale-150 transition-transform duration-500" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            {filteredCourses.map((course) => {
+              const hasDiscount = Boolean(course.regularPrice && course.regularPrice > (course.price || 0));
+              const discountAmount = hasDiscount ? ((course.regularPrice || 0) - (course.price || 0)) : 0;
+              const discountPercent = hasDiscount ? Math.round((discountAmount / (course.regularPrice || 1)) * 100) : 0;
 
-                {/* Thumbnail Area */}
-                <div className="relative aspect-[16/9] w-full bg-foreground/5 overflow-hidden">
-                  <img 
-                    src={course.thumbnailUrl || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop'} 
-                    alt={course.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  
-                  {/* Subtle gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent pointer-events-none" />
+              return (
+                <Link
+                  key={course.id}
+                  href={generateCourseUrl(course)}
+                  className="group relative rounded-2xl sm:rounded-[2rem] bg-card/95 dark:bg-neutral-900/95 border border-foreground/[0.08] dark:border-white/[0.08] hover:border-orange-500/50 dark:hover:border-orange-500/50 flex flex-col justify-between overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/15 hover:-translate-y-1.5 active:scale-[0.99] shadow-xs cursor-pointer"
+                >
+                  {/* Ambient glow on hover */}
+                  <div className="absolute top-0 right-0 w-36 h-36 bg-orange-500/15 rounded-full blur-2xl pointer-events-none group-hover:scale-150 transition-transform duration-500" />
 
-                  {/* Top Badges */}
-                  <div className="absolute top-3 inset-x-3 flex items-center justify-between pointer-events-none">
-                    {course.category ? (
-                      <span className="px-3 py-1 rounded-full bg-black/70 backdrop-blur-md text-white text-[11px] font-bold border border-white/15 shadow-sm flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />
-                        {course.category}
-                      </span>
-                    ) : <span />}
-
-                    {course.regularPrice && course.regularPrice > (course.price || 0) && (
-                      <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-red-600 to-rose-600 text-white text-[10px] font-black shadow-md">
-                        {Math.round(((course.regularPrice - (course.price || 0)) / course.regularPrice) * 100)}% ছাড়
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Bottom Image Info */}
-                  <div className="absolute bottom-2.5 left-3.5 right-3.5 flex items-center justify-between text-white text-[11px] font-bold">
-                    <span className="flex items-center gap-1 text-amber-300 drop-shadow">
-                      <Sparkles className="w-3 h-3 text-amber-400" />
-                      <span>ফুল কোর্স ব্যাচ</span>
-                    </span>
-                    <span className="flex items-center gap-1 text-white/90 drop-shadow">
-                      <Users className="w-3 h-3 text-white/80" />
-                      <span>অনলাইন</span>
-                    </span>
-                  </div>
-                </div>
-
-                {/* Content Area */}
-                <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4 relative z-10">
-                  <div className="space-y-2.5">
-                    <h3 className="font-black text-base sm:text-lg text-foreground group-hover:text-orange-500 transition-colors line-clamp-2 leading-snug">
-                      {course.title}
-                    </h3>
+                  {/* Thumbnail Area */}
+                  <div className="relative aspect-[16/9] w-full bg-foreground/5 overflow-hidden">
+                    <img 
+                      src={course.thumbnailUrl || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop'} 
+                      alt={course.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                     
-                    <div className="flex items-center gap-2 pt-0.5">
-                      <div className="w-6 h-6 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center text-[10px] font-black shrink-0 border border-orange-500/30">
-                        👨‍🏫
-                      </div>
-                      <p className="text-xs text-foreground/75 font-bold truncate">
-                        {course.instructorName || profileData?.displayName || 'Instructors'}
-                      </p>
-                    </div>
-                  </div>
+                    {/* Subtle gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
 
-                  {/* Pricing and Action Button */}
-                  <div className="pt-4 border-t border-foreground/10 flex items-center justify-between gap-3">
-                    <div>
-                      <div className="text-lg sm:text-xl font-black text-orange-500 dark:text-orange-400">
-                        {course.price ? `৳ ${course.price}` : 'ফ্রি'}
-                      </div>
-                      {course.regularPrice && course.regularPrice > (course.price || 0) && (
-                        <div className="text-[11px] text-foreground/45 line-through font-semibold">
-                          ৳ {course.regularPrice}
-                        </div>
+                    {/* Top Floating Badges */}
+                    <div className="absolute top-3 inset-x-3 flex items-center justify-between pointer-events-none z-10">
+                      {course.category ? (
+                        <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md text-white text-[11px] font-extrabold border border-white/20 shadow-md flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
+                          {course.category}
+                        </span>
+                      ) : <span />}
+
+                      {hasDiscount && (
+                        <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 text-white text-[11px] font-black shadow-md border border-white/20">
+                          {discountPercent}% ছাড়
+                        </span>
                       )}
                     </div>
 
-                    <Link
-                      href={generateCourseUrl(course)}
-                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-black transition-all shadow-md hover:shadow-orange-500/25 flex items-center gap-1.5 group/btn shrink-0"
-                    >
-                      <span>বিস্তারিত</span>
-                      <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
-                    </Link>
+                    {/* Bottom Thumbnail Micro Features */}
+                    <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white text-[11px] font-extrabold z-10">
+                      <span className="flex items-center gap-1 text-amber-300 drop-shadow-md bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-xs">
+                        <Sparkles className="w-3 h-3 text-amber-400 shrink-0" />
+                        <span>ফুল কোর্স ব্যাচ</span>
+                      </span>
+                      <span className="flex items-center gap-1 text-white/95 drop-shadow-md bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-xs">
+                        <Video className="w-3 h-3 text-emerald-400 shrink-0" />
+                        <span>লাইভ + রেকর্ড</span>
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
+
+                  {/* Content Area */}
+                  <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3.5 relative z-10">
+                    
+                    <div className="space-y-2.5">
+                      {/* Course Title */}
+                      <h3 className="font-black text-base sm:text-lg text-foreground group-hover:text-orange-500 transition-colors line-clamp-2 leading-snug">
+                        {course.title}
+                      </h3>
+                      
+                      {/* High-Conversion Value Feature Highlights */}
+                      <div className="grid grid-cols-2 gap-1.5 pt-1">
+                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-foreground/75 bg-foreground/[0.03] dark:bg-white/[0.04] p-1.5 rounded-lg border border-foreground/[0.06] dark:border-white/[0.06]">
+                          <Video className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                          <span className="truncate">ডেইলি লাইভ ক্লাস</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-foreground/75 bg-foreground/[0.03] dark:bg-white/[0.04] p-1.5 rounded-lg border border-foreground/[0.06] dark:border-white/[0.06]">
+                          <FileText className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                          <span className="truncate">এক্সাম ও সলভ শিট</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-foreground/75 bg-foreground/[0.03] dark:bg-white/[0.04] p-1.5 rounded-lg border border-foreground/[0.06] dark:border-white/[0.06]">
+                          <BookOpen className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                          <span className="truncate">রঙিন PDF নোটস</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-foreground/75 bg-foreground/[0.03] dark:bg-white/[0.04] p-1.5 rounded-lg border border-foreground/[0.06] dark:border-white/[0.06]">
+                          <Users className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                          <span className="truncate">{course.enrolledCount ? `${course.enrolledCount}+ এনরোল্ড` : 'ভর্তি চলছে'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Pricing, Discount Savings and Soft Action Button */}
+                    <div className="pt-3 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-lg sm:text-xl font-black text-orange-600 dark:text-orange-400">
+                            {course.price ? `৳ ${course.price}` : 'ফ্রি'}
+                          </span>
+                          {hasDiscount && (
+                            <span className="text-xs text-foreground/40 line-through font-bold">
+                              ৳ {course.regularPrice}
+                            </span>
+                          )}
+                        </div>
+                        {hasDiscount && (
+                          <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold truncate">
+                            সাশ্রয়: ৳ {discountAmount}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="py-2 px-3.5 sm:px-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 group-hover:from-orange-600 group-hover:to-amber-600 text-white text-xs font-black transition-all shadow-md shadow-orange-500/25 group-hover:shadow-orange-500/40 flex items-center gap-1.5 shrink-0 group-hover:scale-105 active:scale-95">
+                        <span>বিস্তারিত</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </div>
+
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </section>

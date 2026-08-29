@@ -86,6 +86,27 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const slideTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Category Horizontal Navigation & Scroll State
+  const categoryScrollRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollCategoryLeft, setCanScrollCategoryLeft] = useState(false);
+  const [canScrollCategoryRight, setCanScrollCategoryRight] = useState(false);
+
+  const checkCategoryScroll = () => {
+    if (categoryScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = categoryScrollRef.current;
+      setCanScrollCategoryLeft(scrollLeft > 4);
+      setCanScrollCategoryRight(scrollLeft + clientWidth < scrollWidth - 4);
+    }
+  };
+
+  const handleCategoryScroll = (direction: 'left' | 'right') => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = direction === 'left' ? -240 : 240;
+      categoryScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      setTimeout(checkCategoryScroll, 350);
+    }
+  };
+
   useEffect(() => {
     if (typeof window !== 'undefined' && teacherId) {
       sessionStorage.setItem('referralTeacherId', teacherId);
@@ -209,6 +230,17 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
     if (activeCategory === 'সকল কোর্স') return true;
     return c.category?.toLowerCase() === activeCategory.toLowerCase() || activeCategory === 'সকল কোর্স';
   });
+
+  useEffect(() => {
+    checkCategoryScroll();
+    const handleResize = () => checkCategoryScroll();
+    window.addEventListener('resize', handleResize);
+    const timer = setTimeout(checkCategoryScroll, 300);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timer);
+    };
+  }, [customCategories, isLoading]);
 
   // 4. Feature Cards & Bento Layout
   const featuresTitle = config.featuresTitle || 'একজন শিক্ষার্থীর পূর্ণাঙ্গ প্রস্তুতিতে যা যা প্রয়োজন';
@@ -517,21 +549,75 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
           </p>
         </div>
 
-        {/* Dynamic Category Filter Tabs */}
-        <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mb-12">
-          {customCategories.map((cat: string, idx: number) => (
+        {/* Dynamic Category Filter Tabs with Smooth Horizontal Navigation */}
+        <div className="relative max-w-5xl mx-auto mb-12 px-1 sm:px-4">
+          
+          {/* Left Arrow Navigation Button */}
+          <div className={`absolute left-0 sm:-left-2 top-1/2 -translate-y-1/2 z-20 transition-all duration-300 ${
+            canScrollCategoryLeft 
+              ? 'opacity-100 translate-x-0 pointer-events-auto' 
+              : 'opacity-0 -translate-x-2 pointer-events-none'
+          }`}>
             <button
-              key={idx}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold transition-all ${
-                activeCategory === cat
-                  ? 'bg-orange-500 text-white shadow-sm scale-105'
-                  : 'bg-foreground/5 hover:bg-foreground/10 text-foreground/70 hover:text-foreground border border-foreground/10'
-              }`}
+              type="button"
+              onClick={() => handleCategoryScroll('left')}
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-background/95 dark:bg-neutral-900/95 backdrop-blur-md hover:bg-orange-500 text-foreground/80 hover:text-white border border-foreground/15 dark:border-white/15 shadow-lg shadow-black/10 flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-90"
+              aria-label="Scroll Left"
             >
-              {cat}
+              <ChevronLeft className="w-4 h-4" />
             </button>
-          ))}
+          </div>
+
+          {/* Left Soft Edge Gradient Mask */}
+          {canScrollCategoryLeft && (
+            <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-16 bg-gradient-to-r from-background via-background/80 to-transparent pointer-events-none z-10" />
+          )}
+
+          {/* Smooth Touch & Scroll Container */}
+          <div
+            ref={categoryScrollRef}
+            onScroll={checkCategoryScroll}
+            className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto py-2.5 px-3 sm:px-6 scrollbar-none scroll-smooth justify-start md:justify-center no-scrollbar select-none"
+          >
+            {customCategories.map((cat: string, idx: number) => {
+              const isSelected = activeCategory === cat;
+              return (
+                <button
+                  key={idx}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`relative px-5 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold whitespace-nowrap transition-all duration-300 cursor-pointer shrink-0 select-none active:scale-95 ${
+                    isSelected
+                      ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 text-white shadow-md shadow-orange-500/25 border border-orange-400/40 scale-105'
+                      : 'bg-foreground/[0.04] dark:bg-white/[0.05] hover:bg-foreground/[0.08] dark:hover:bg-white/[0.1] text-foreground/75 hover:text-foreground border border-foreground/[0.08] dark:border-white/[0.08] hover:border-orange-500/30'
+                  }`}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Right Soft Edge Gradient Mask */}
+          {canScrollCategoryRight && (
+            <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-16 bg-gradient-to-l from-background via-background/80 to-transparent pointer-events-none z-10" />
+          )}
+
+          {/* Right Arrow Navigation Button */}
+          <div className={`absolute right-0 sm:-right-2 top-1/2 -translate-y-1/2 z-20 transition-all duration-300 ${
+            canScrollCategoryRight 
+              ? 'opacity-100 translate-x-0 pointer-events-auto' 
+              : 'opacity-0 translate-x-2 pointer-events-none'
+          }`}>
+            <button
+              type="button"
+              onClick={() => handleCategoryScroll('right')}
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-background/95 dark:bg-neutral-900/95 backdrop-blur-md hover:bg-orange-500 text-foreground/80 hover:text-white border border-foreground/15 dark:border-white/15 shadow-lg shadow-black/10 flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-90"
+              aria-label="Scroll Right"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
         </div>
 
         {/* Courses Grid */}

@@ -914,31 +914,31 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       {/* ========================================================================= */}
       {/* 5. ভর্তি নির্দেশিকা (Step-by-Step Admission Guide - Light/Dark Harmonized) */}
       {/* ========================================================================= */}
-      <section className="py-20 sm:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        <div className="rounded-[3rem] p-8 sm:p-12 lg:p-16 bg-gradient-to-br from-orange-500/[0.04] via-card to-amber-500/[0.02] dark:from-neutral-900 dark:via-zinc-950 dark:to-black text-foreground dark:text-white border border-foreground/10 dark:border-white/10 shadow-md relative overflow-hidden">
+      <section className="py-12 sm:py-20 lg:py-28 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+        <div className="rounded-3xl sm:rounded-[2.5rem] lg:rounded-[3rem] p-5 sm:p-8 md:p-10 lg:p-14 bg-gradient-to-br from-orange-500/[0.04] via-card to-amber-500/[0.02] dark:from-neutral-900 dark:via-zinc-950 dark:to-black text-foreground dark:text-white border border-foreground/10 dark:border-white/10 shadow-md relative overflow-hidden">
           
           {/* Ambient Glow */}
           <div className="absolute top-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-14 items-center relative z-10">
             
             {/* Left: Steps Flow */}
-            <div className="lg:col-span-7 space-y-8">
+            <div className="lg:col-span-7 space-y-6 sm:space-y-8">
               <div>
-                <span className="px-4 py-1.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 border border-orange-500/30 text-orange-600 dark:text-orange-400 text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 shadow-sm">
+                <span className="px-3.5 sm:px-4 py-1.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 border border-orange-500/30 text-orange-600 dark:text-orange-400 text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 shadow-sm">
                   <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                   <span>সহজ ৩ ধাপের প্রক্রিয়া</span>
                 </span>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black mt-3 text-foreground dark:text-white tracking-tight">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mt-2.5 sm:mt-3 text-foreground dark:text-white tracking-tight leading-tight">
                   কীভাবে কোর্সে <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">ভর্তি হবেন?</span>
                 </h2>
-                <p className="text-foreground/70 dark:text-gray-400 text-sm sm:text-base mt-2 font-medium leading-relaxed">
+                <p className="text-foreground/70 dark:text-gray-400 text-xs sm:text-sm md:text-base mt-2 font-medium leading-relaxed">
                   মাত্র ৩টি সহজ ধাপে ঘরে বসেই আপনার কাঙ্ক্ষিত কোর্সে যুক্ত হয়ে সেরা প্রস্তুতি শুরু করুন।
                 </p>
               </div>
 
               {/* Connected Timeline Steps */}
-              <div className="space-y-6 relative before:absolute before:left-6 before:top-4 before:bottom-4 before:w-0.5 before:bg-gradient-to-b before:from-orange-500 before:via-amber-500 before:to-emerald-500">
+              <div className="space-y-4 sm:space-y-6 relative before:absolute before:left-5 sm:before:left-6 before:top-4 before:bottom-4 before:w-0.5 before:bg-gradient-to-b before:from-orange-500 before:via-amber-500 before:to-emerald-500">
                 {admissionSteps.map((st: any, idx: number) => {
                   const stepNum = st.stepNumber || idx + 1;
                   const stepColors = [
@@ -949,12 +949,12 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   const colorClass = stepColors[idx % stepColors.length];
 
                   return (
-                    <div key={st.id || idx} className="flex items-start gap-5 relative group">
-                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${colorClass} font-black text-lg flex items-center justify-center shrink-0 shadow-sm ring-4 ring-background dark:ring-neutral-900 z-10 group-hover:scale-110 transition-transform`}>
+                    <div key={st.id || idx} className="flex items-start gap-3.5 sm:gap-5 relative group">
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-tr ${colorClass} font-black text-sm sm:text-lg flex items-center justify-center shrink-0 shadow-sm ring-4 ring-background dark:ring-neutral-900 z-10 group-hover:scale-105 transition-transform`}>
                         0{stepNum}
                       </div>
-                      <div className="p-5 rounded-2xl bg-card dark:bg-white/[0.04] border border-foreground/10 dark:border-white/10 hover:border-orange-500/40 transition-colors flex-1 space-y-1 shadow-sm">
-                        <h4 className="font-extrabold text-base sm:text-lg text-foreground dark:text-white group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors">
+                      <div className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-card dark:bg-white/[0.04] border border-foreground/10 dark:border-white/10 hover:border-orange-500/40 transition-colors flex-1 space-y-1 shadow-xs">
+                        <h4 className="font-extrabold text-sm sm:text-base md:text-lg text-foreground dark:text-white group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors">
                           {st.title}
                         </h4>
                         <p className="text-xs sm:text-sm text-foreground/70 dark:text-gray-300 leading-relaxed font-medium">
@@ -967,33 +967,33 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               </div>
             </div>
 
-            {/* Right: Quick Counseling & Payment Widget */}
-            <div className="lg:col-span-5 p-8 sm:p-10 rounded-3xl bg-card/90 dark:bg-white/[0.03] border border-foreground/10 dark:border-white/10 backdrop-blur-xl shadow-md space-y-6 text-center relative overflow-hidden">
+            {/* Right: Quick Counseling & Payment Widget (Mobile & Tablet Optimized) */}
+            <div className="lg:col-span-5 p-5 sm:p-7 md:p-8 lg:p-10 rounded-2xl sm:rounded-3xl bg-card/95 dark:bg-white/[0.03] border border-foreground/10 dark:border-white/10 backdrop-blur-xl shadow-md space-y-5 sm:space-y-6 text-center relative overflow-hidden w-full">
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-orange-500/15 rounded-full blur-2xl pointer-events-none" />
               
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center mx-auto shadow-sm">
-                <Phone className="w-8 h-8" />
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center mx-auto shadow-md shadow-orange-500/20">
+                <Phone className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
 
               <div>
-                <span className="px-3 py-1 rounded-full bg-orange-500/10 dark:bg-white/10 text-orange-600 dark:text-orange-400 text-xs font-extrabold uppercase tracking-wider">
+                <span className="px-3 py-1 rounded-full bg-orange-500/10 dark:bg-white/10 text-orange-600 dark:text-orange-400 text-[11px] sm:text-xs font-extrabold uppercase tracking-wider inline-flex items-center">
                   হেল্প ও ভর্তি সহায়তা
                 </span>
-                <h3 className="text-xl sm:text-2xl font-black text-foreground dark:text-white mt-2">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-black text-foreground dark:text-white mt-2 leading-tight">
                   ভর্তি সংক্রান্ত যেকোনো তথ্যে
                 </h3>
-                <p className="text-xs sm:text-sm text-foreground/70 dark:text-gray-300 mt-1 font-medium">
+                <p className="text-xs sm:text-sm text-foreground/70 dark:text-gray-300 mt-1.5 font-medium leading-relaxed max-w-sm mx-auto">
                   আমাদের এক্সপার্ট কাউন্সিলরদের সাথে সরাসরি কথা বলে সঠিক কোর্স বেছে নিন
                 </p>
               </div>
 
-              <div className="space-y-3 pt-2">
+              <div className="space-y-2.5 sm:space-y-3 pt-1 w-full">
                 <a
                   href={`tel:${contactPhone}`}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm flex items-center justify-center gap-2.5 transition-all shadow-sm hover:scale-[1.02]"
+                  className="w-full py-3.5 sm:py-4 px-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-orange-500/25 active:scale-98"
                 >
-                  <Phone className="w-4 h-4" />
-                  <span>সরাসরি কল করুন: {contactPhone}</span>
+                  <Phone className="w-4 h-4 shrink-0" />
+                  <span className="truncate">সরাসরি কল করুন: {contactPhone}</span>
                 </a>
 
                 {contactWhatsapp && (
@@ -1001,21 +1001,21 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                     href={`https://wa.me/${String(contactWhatsapp).replace(/[^0-9]/g, '')}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-sm flex items-center justify-center gap-2.5 transition-all shadow-sm hover:scale-[1.02]"
+                    className="w-full py-3.5 sm:py-4 px-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-600/25 active:scale-98"
                   >
-                    <MessageCircle className="w-4 h-4" />
+                    <MessageCircle className="w-4 h-4 shrink-0" />
                     <span>WhatsApp-এ মেসেজ দিন</span>
                   </a>
                 )}
               </div>
 
-              <div className="pt-4 border-t border-foreground/10 dark:border-white/10">
-                <p className="text-[11px] text-foreground/60 dark:text-gray-400 font-bold mb-2">সমর্থিত পেমেন্ট মাধ্যমসমূহ</p>
-                <div className="flex items-center justify-center gap-2 flex-wrap text-xs text-foreground/80 dark:text-gray-300 font-extrabold">
-                  <span className="px-2.5 py-1 rounded-lg bg-pink-500/10 text-pink-600 dark:bg-pink-500/20 dark:text-pink-300 border border-pink-500/20 dark:border-pink-500/30">bKash</span>
-                  <span className="px-2.5 py-1 rounded-lg bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-300 border border-orange-500/20 dark:border-orange-500/30">Nagad</span>
-                  <span className="px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-300 border border-purple-500/20 dark:border-purple-500/30">Rocket</span>
-                  <span className="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300 border border-blue-500/20 dark:border-blue-500/30">Cards</span>
+              <div className="pt-3.5 sm:pt-4 border-t border-foreground/10 dark:border-white/10">
+                <p className="text-[11px] sm:text-xs text-foreground/60 dark:text-gray-400 font-bold mb-2.5">সমর্থিত পেমেন্ট মাধ্যমসমূহ</p>
+                <div className="grid grid-cols-4 gap-1.5 sm:flex sm:items-center sm:justify-center sm:gap-2 text-[11px] sm:text-xs text-foreground/80 dark:text-gray-300 font-extrabold">
+                  <span className="py-1 sm:px-2.5 sm:py-1 rounded-lg bg-pink-500/10 text-pink-600 dark:bg-pink-500/20 dark:text-pink-300 border border-pink-500/20 dark:border-pink-500/30 text-center font-black">bKash</span>
+                  <span className="py-1 sm:px-2.5 sm:py-1 rounded-lg bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-300 border border-orange-500/20 dark:border-orange-500/30 text-center font-black">Nagad</span>
+                  <span className="py-1 sm:px-2.5 sm:py-1 rounded-lg bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-300 border border-purple-500/20 dark:border-purple-500/30 text-center font-black">Rocket</span>
+                  <span className="py-1 sm:px-2.5 sm:py-1 rounded-lg bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300 border border-blue-500/20 dark:border-blue-500/30 text-center font-black">Cards</span>
                 </div>
               </div>
 

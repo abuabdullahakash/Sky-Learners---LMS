@@ -61,6 +61,8 @@ interface CourseItem {
   category?: string;
   price?: number;
   regularPrice?: number;
+  discountPrice?: number | string | null;
+  discountValidUntil?: any;
   enrolledCount?: number;
   rating?: number;
   duration?: string;
@@ -101,25 +103,25 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
   const handleCategoryScroll = (direction: 'left' | 'right') => {
     if (categoryScrollRef.current) {
-      const scrollAmount = direction === 'left' ? -240 : 240;
-      categoryScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      const scrollAmount = 240;
+      categoryScrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
       setTimeout(checkCategoryScroll, 350);
     }
   };
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && teacherId) {
-      sessionStorage.setItem('referralTeacherId', teacherId);
-      localStorage.removeItem('referralTeacherId');
-      document.cookie = 'referralTeacherId=; path=/; max-age=0; SameSite=Lax';
-    }
-
     const fetchAcademyStorefront = async () => {
-      if (!teacherId) {
-        setIsLoading(false);
-        return;
-      }
       try {
+        setIsLoading(true);
+        if (typeof window !== 'undefined' && teacherId) {
+          sessionStorage.setItem('referralTeacherId', teacherId);
+          localStorage.removeItem('referralTeacherId');
+          document.cookie = 'referralTeacherId=; path=/; max-age=0; SameSite=Lax';
+        }
+
         // 1. Fetch Teacher Profile & Home Page Config (Supports direct UID or custom handle/slug)
         let resolvedId = teacherId;
         let profile = null;
@@ -159,6 +161,8 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             category: data.category,
             price: data.price,
             regularPrice: data.regularPrice,
+            discountPrice: data.discountPrice,
+            discountValidUntil: data.discountValidUntil,
             enrolledCount: data.enrolledCount || 0,
             rating: 4.9,
             duration: data.duration,
@@ -232,6 +236,60 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
     setActiveCategory(isBn ? 'সকল কোর্স' : 'All Courses');
   }, [isBn]);
 
+  // Convert numbers to Bengali digits
+  const toBnNum = (val: number | string | undefined | null) => {
+    if (val === undefined || val === null || val === '') return '';
+    if (!isBn) return String(val);
+    const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    return String(val).replace(/[0-9]/g, (d) => bnDigits[Number(d)]);
+  };
+
+  // Discount and Validity Calculator (Real-time expiry & savings)
+  const getDiscountInfo = (course: CourseItem) => {
+    const regularPrice = Number(course.regularPrice || course.price || 0);
+    const rawDiscount = course.discountPrice;
+    const hasDiscountPrice = rawDiscount !== undefined && rawDiscount !== null && String(rawDiscount).trim() !== '' && Number(rawDiscount) > 0 && Number(rawDiscount) < regularPrice;
+
+    let isDiscountValid = false;
+    if (hasDiscountPrice) {
+      if (course.discountValidUntil) {
+        try {
+          let validUntilDate: Date;
+          if (typeof course.discountValidUntil?.toDate === 'function') {
+            validUntilDate = course.discountValidUntil.toDate();
+          } else {
+            validUntilDate = new Date(course.discountValidUntil);
+          }
+
+          if (!isNaN(validUntilDate.getTime())) {
+            // Set to end of day 23:59:59
+            validUntilDate.setHours(23, 59, 59, 999);
+            isDiscountValid = new Date() <= validUntilDate;
+          } else {
+            isDiscountValid = true;
+          }
+        } catch {
+          isDiscountValid = true;
+        }
+      } else {
+        isDiscountValid = true;
+      }
+    }
+
+    const activePrice = isDiscountValid ? Number(rawDiscount) : regularPrice;
+    const discountAmount = isDiscountValid ? (regularPrice - activePrice) : 0;
+    const discountPercent = (isDiscountValid && regularPrice > 0) ? Math.round((discountAmount / regularPrice) * 100) : 0;
+
+    return {
+      isDiscountValid,
+      activePrice,
+      regularPrice,
+      discountAmount,
+      discountPercent,
+      isFree: activePrice === 0
+    };
+  };
+
   // Localized Category Helper
   const getCategoryLabel = (category: string | undefined): string => {
     if (!category) return isBn ? 'কোর্স' : 'Course';
@@ -261,7 +319,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       case 'honours_masters':
       case 'degree':
       case 'masters':
-        return isBn ? 'অনার্স ও ডিগ্রি' : 'Honours & Degree';
+        return isBn ? 'অনার্স' : 'Honours';
 
       case 'skills':
       case 'skill':
@@ -687,9 +745,14 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {filteredCourses.map((course) => {
-              const hasDiscount = Boolean(course.regularPrice && course.regularPrice > (course.price || 0));
-              const discountAmount = hasDiscount ? ((course.regularPrice || 0) - (course.price || 0)) : 0;
-              const discountPercent = hasDiscount ? Math.round((discountAmount / (course.regularPrice || 1)) * 100) : 0;
+              const {
+                isDiscountValid,
+                activePrice,
+                regularPrice,
+                discountAmount,
+                discountPercent,
+                isFree
+              } = getDiscountInfo(course);
 
               return (
                 <Link
@@ -720,9 +783,9 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                         </span>
                       ) : <span />}
 
-                      {hasDiscount && (
+                      {isDiscountValid && (
                         <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 text-white text-[11px] font-black shadow-md border border-white/20">
-                          {discountPercent}% ছাড়
+                          {toBnNum(discountPercent)}% {isBn ? 'ছাড়' : 'OFF'}
                         </span>
                       )}
                     </div>
@@ -731,11 +794,11 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                     <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white text-[11px] font-extrabold z-10">
                       <span className="flex items-center gap-1 text-amber-300 drop-shadow-md bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-xs">
                         <Sparkles className="w-3 h-3 text-amber-400 shrink-0" />
-                        <span>ফুল কোর্স ব্যাচ</span>
+                        <span>{isBn ? 'ফুল কোর্স ব্যাচ' : 'Full Course'}</span>
                       </span>
                       <span className="flex items-center gap-1 text-white/95 drop-shadow-md bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-xs">
                         <Video className="w-3 h-3 text-emerald-400 shrink-0" />
-                        <span>লাইভ + রেকর্ড</span>
+                        <span>{isBn ? 'লাইভ + রেকর্ড' : 'Live & Recorded'}</span>
                       </span>
                     </div>
                   </div>
@@ -753,19 +816,23 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                       <div className="grid grid-cols-2 gap-1.5 pt-1">
                         <div className="flex items-center gap-1.5 text-[11px] font-bold text-foreground/75 bg-foreground/[0.03] dark:bg-white/[0.04] p-1.5 rounded-lg border border-foreground/[0.06] dark:border-white/[0.06]">
                           <Video className="w-3.5 h-3.5 text-orange-500 shrink-0" />
-                          <span className="truncate">ডেইলি লাইভ ক্লাস</span>
+                          <span className="truncate">{isBn ? 'ডেইলি লাইভ ক্লাস' : 'Daily Live Class'}</span>
                         </div>
                         <div className="flex items-center gap-1.5 text-[11px] font-bold text-foreground/75 bg-foreground/[0.03] dark:bg-white/[0.04] p-1.5 rounded-lg border border-foreground/[0.06] dark:border-white/[0.06]">
                           <FileText className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                          <span className="truncate">এক্সাম ও সলভ শিট</span>
+                          <span className="truncate">{isBn ? 'এক্সাম ও সলভ শিট' : 'Exams & Solves'}</span>
                         </div>
                         <div className="flex items-center gap-1.5 text-[11px] font-bold text-foreground/75 bg-foreground/[0.03] dark:bg-white/[0.04] p-1.5 rounded-lg border border-foreground/[0.06] dark:border-white/[0.06]">
                           <BookOpen className="w-3.5 h-3.5 text-purple-500 shrink-0" />
-                          <span className="truncate">রঙিন PDF নোটস</span>
+                          <span className="truncate">{isBn ? 'রঙিন PDF নোটস' : 'Color PDF Notes'}</span>
                         </div>
                         <div className="flex items-center gap-1.5 text-[11px] font-bold text-foreground/75 bg-foreground/[0.03] dark:bg-white/[0.04] p-1.5 rounded-lg border border-foreground/[0.06] dark:border-white/[0.06]">
                           <Users className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                          <span className="truncate">{course.enrolledCount ? `${course.enrolledCount}+ এনরোল্ড` : 'ভর্তি চলছে'}</span>
+                          <span className="truncate">
+                            {course.enrolledCount 
+                              ? `${toBnNum(course.enrolledCount)}+ ${isBn ? 'এনরোল্ড' : 'Enrolled'}` 
+                              : (isBn ? 'ভর্তি চলছে' : 'Enrolling Now')}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -775,23 +842,23 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                       <div className="min-w-0">
                         <div className="flex items-baseline gap-1.5">
                           <span className="text-lg sm:text-xl font-black text-orange-600 dark:text-orange-400">
-                            {course.price ? `৳ ${course.price}` : 'ফ্রি'}
+                            {isFree ? (isBn ? 'ফ্রি' : 'Free') : `৳ ${toBnNum(activePrice)}`}
                           </span>
-                          {hasDiscount && (
+                          {isDiscountValid && (
                             <span className="text-xs text-foreground/40 line-through font-bold">
-                              ৳ {course.regularPrice}
+                              ৳ {toBnNum(regularPrice)}
                             </span>
                           )}
                         </div>
-                        {hasDiscount && (
+                        {isDiscountValid && (
                           <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold truncate">
-                            সাশ্রয়: ৳ {discountAmount}
+                            {isBn ? `সাশ্রয়: ৳ ${toBnNum(discountAmount)}` : `Save: ৳ ${discountAmount}`}
                           </p>
                         )}
                       </div>
 
                       <div className="py-2 px-3.5 sm:px-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 group-hover:from-orange-600 group-hover:to-amber-600 text-white text-xs font-black transition-all shadow-md shadow-orange-500/25 group-hover:shadow-orange-500/40 flex items-center gap-1.5 shrink-0 group-hover:scale-105 active:scale-95">
-                        <span>বিস্তারিত</span>
+                        <span>{isBn ? 'বিস্তারিত' : 'Details'}</span>
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </div>
                     </div>

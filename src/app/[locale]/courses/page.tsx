@@ -433,7 +433,7 @@ export default function CoursesPage() {
       case 'high_school':
         return {
           id: 'high_school',
-          nameBn: 'উচ্চ বিদ্যালয় (৬ষ্ঠ - ১০ম শ্রেণি)',
+          nameBn: 'মাধ্যমিক (৬ষ্ঠ - ১০ম শ্রেণি)',
           nameEn: 'High School & SSC Preparation',
           badgeBn: '৬ষ্ঠ - ১০ম শ্রেণি (SSC)',
           badgeEn: 'Class 6 to 10 (SSC)',
@@ -1527,7 +1527,7 @@ export default function CoursesPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {teacherFilteredCourses.map((course) => {
-                let badgeText = course.category === 'intermediate' ? 'HSC' : course.category === 'primary' ? (isBn ? 'প্রাথমিক' : 'Primary') : course.category === 'high_school' ? (isBn ? 'উচ্চ বিদ্যালয়' : 'High School') : (course.category || 'Course');
+                let badgeText = course.category === 'intermediate' ? 'HSC' : course.category === 'primary' ? (isBn ? 'প্রাথমিক' : 'Primary') : course.category === 'high_school' ? (isBn ? 'মাধ্যমিক' : 'High School') : (course.category || 'Course');
                 if (course.eduClass) badgeText += ` - ${getClassLabel(String(course.eduClass))}`;
                 if (course.department && course.category !== 'admission' && course.category !== 'honours' && course.category !== 'masters') {
                   badgeText += ` (${getGroupLabel(course.department)})`;

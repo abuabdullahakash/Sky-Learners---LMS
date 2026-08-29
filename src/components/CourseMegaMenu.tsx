@@ -239,7 +239,7 @@ export default function CourseMegaMenu({ isMobile = false, onItemClick }: Course
     { 
       id: 'high_school', 
       labelEn: 'High School', 
-      labelBn: 'উচ্চ বিদ্যালয়', 
+      labelBn: 'মাধ্যমিক', 
       icon: GraduationCap,
       hasSubMenu: true,
       href: '/courses?category=high_school'

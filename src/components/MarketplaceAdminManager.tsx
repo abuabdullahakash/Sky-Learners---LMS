@@ -228,7 +228,7 @@ export default function MarketplaceAdminManager({ courses, onRefresh }: Marketpl
   const categories = [
     { id: 'all', name: 'সকল ক্যাটাগরি', icon: Layers },
     { id: 'primary', name: 'প্রাথমিক বিদ্যালয় (Primary)', icon: School },
-    { id: 'high_school', name: 'উচ্চ বিদ্যালয় (High School)', icon: GraduationCap },
+    { id: 'high_school', name: 'মাধ্যমিক (High School)', icon: GraduationCap },
     { id: 'intermediate', name: 'উচ্চ মাধ্যমিক (HSC)', icon: Award },
     { id: 'admission', name: 'বিশ্ববিদ্যালয় ভর্তি', icon: Building2 },
     { id: 'honours', name: 'অনার্স / মাস্টার্স', icon: Library },

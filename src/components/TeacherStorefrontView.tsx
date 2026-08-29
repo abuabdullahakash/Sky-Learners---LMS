@@ -765,55 +765,60 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             </p>
           </div>
 
-          {/* Bento Grid Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {/* Bento Grid Layout - Ultra Premium & Balanced on Tablet / Mobile / Desktop */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 sm:gap-6">
             
-            {/* Card 1 (Span 2) - Live & Recorded Classes */}
-            <div className="md:col-span-2 p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-orange-500/[0.08] via-background to-amber-500/[0.04] border border-orange-500/20 hover:border-orange-500/50 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
+            {/* Card 1 - Live & Recorded Classes (Full width on tablet, 7 cols on desktop) */}
+            <div className="sm:col-span-2 lg:col-span-7 p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl lg:rounded-[2.5rem] bg-gradient-to-br from-orange-500/[0.08] via-card to-amber-500/[0.04] border border-orange-500/20 hover:border-orange-500/50 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
               <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
               
               <div className="space-y-4 relative z-10">
                 <div className="flex items-center justify-between">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                    <Video className="w-7 h-7" />
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-md shadow-orange-500/20 group-hover:scale-110 transition-transform">
+                    <Video className="w-6 h-6 sm:w-7 sm:h-7" />
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-orange-500/15 text-orange-500 text-xs font-bold border border-orange-500/30 flex items-center gap-1.5">
+                  <span className="px-3 py-1 rounded-full bg-orange-500/15 text-orange-600 dark:text-orange-400 text-xs font-black border border-orange-500/30 flex items-center gap-1.5 shadow-xs">
                     <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping" />
                     <span>HD Live & Recording</span>
                   </span>
                 </div>
 
-                <h3 className="text-2xl sm:text-3xl font-black text-foreground group-hover:text-orange-500 transition-colors">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground group-hover:text-orange-500 transition-colors">
                   ইন্টারেক্টিভ লাইভ ও রেকর্ডেড ক্লাস
                 </h3>
-                <p className="text-foreground/75 text-sm sm:text-base leading-relaxed">
+                <p className="text-foreground/75 text-xs sm:text-sm md:text-base leading-relaxed font-medium">
                   প্রতিটি বিষয়ের কনসেপ্ট ক্লিয়ার করতে রয়েছে সর্বোচ্চ মানের ডিজিটাল স্মার্টবোর্ড লেকচার, লাইভ ডিসকাশন এবং আনলিমিটেড রিভিশনের সুযোগ।
                 </p>
               </div>
 
               <div className="flex items-center gap-2 flex-wrap pt-2 relative z-10">
-                <span className="px-3.5 py-1.5 rounded-xl bg-background/80 border border-foreground/10 text-xs font-bold text-foreground/80 shadow-sm">
+                <span className="px-3 py-1.5 rounded-xl bg-background/90 border border-foreground/10 text-xs font-extrabold text-foreground/80 shadow-xs">
                   ✨ 4K আল্ট্রা HD ক্লাস
                 </span>
-                <span className="px-3.5 py-1.5 rounded-xl bg-background/80 border border-foreground/10 text-xs font-bold text-foreground/80 shadow-sm">
-                  🎥 স্মার্টবোর্ড ডিজিটাল লেকচার
+                <span className="px-3 py-1.5 rounded-xl bg-background/90 border border-foreground/10 text-xs font-extrabold text-foreground/80 shadow-xs">
+                  🎥 স্মার্টবোর্ড লেকচার
                 </span>
-                <span className="px-3.5 py-1.5 rounded-xl bg-background/80 border border-foreground/10 text-xs font-bold text-foreground/80 shadow-sm">
+                <span className="px-3 py-1.5 rounded-xl bg-background/90 border border-foreground/10 text-xs font-extrabold text-foreground/80 shadow-xs">
                   🔄 আনলিমিটেড রিভিশন
                 </span>
               </div>
             </div>
 
-            {/* Card 2 - Online Exam & Leaderboard */}
-            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-500/[0.08] via-background to-blue-500/[0.02] border border-blue-500/20 hover:border-blue-500/50 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
+            {/* Card 2 - Online Exam & Leaderboard (50% on tablet, 5 cols on desktop) */}
+            <div className="sm:col-span-1 lg:col-span-5 p-6 sm:p-7 lg:p-8 rounded-2xl sm:rounded-3xl lg:rounded-[2.5rem] bg-gradient-to-br from-blue-500/[0.08] via-card to-blue-500/[0.02] border border-blue-500/20 hover:border-blue-500/50 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
               <div className="space-y-4 relative z-10">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                  <FileText className="w-7 h-7" />
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20 group-hover:scale-110 transition-transform">
+                    <FileText className="w-6 h-6 sm:w-7 sm:h-7" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400 text-xs font-black border border-blue-500/30">
+                    রিয়েলটাইম মেরিট
+                  </span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-black text-foreground group-hover:text-blue-500 transition-colors">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-black text-foreground group-hover:text-blue-500 transition-colors">
                   অনলাইন এক্সাম ও লিডারবোর্ড
                 </h3>
-                <p className="text-foreground/75 text-sm leading-relaxed">
+                <p className="text-foreground/75 text-xs sm:text-sm leading-relaxed font-medium">
                   নিয়মিত এমসিকিউ ও স্ট্যান্ডার্ড রিটেন পরীক্ষা দিয়ে দেশব্যাপী রিয়েলটাইম মেরিট লিস্টে নিজের অবস্থান যাচাই করুন।
                 </p>
               </div>
@@ -830,16 +835,21 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               </div>
             </div>
 
-            {/* Card 3 - Lecture Sheet & Practice Book */}
-            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-purple-500/[0.08] via-background to-purple-500/[0.02] border border-purple-500/20 hover:border-purple-500/50 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
+            {/* Card 3 - Lecture Sheet & Practice Book (50% on tablet, 6 cols on desktop) */}
+            <div className="sm:col-span-1 lg:col-span-6 p-6 sm:p-7 lg:p-8 rounded-2xl sm:rounded-3xl lg:rounded-[2.5rem] bg-gradient-to-br from-purple-500/[0.08] via-card to-purple-500/[0.02] border border-purple-500/20 hover:border-purple-500/50 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
               <div className="space-y-4 relative z-10">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                  <BookOpen className="w-7 h-7" />
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 text-white flex items-center justify-center shadow-md shadow-purple-500/20 group-hover:scale-110 transition-transform">
+                    <BookOpen className="w-6 h-6 sm:w-7 sm:h-7" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-purple-500/15 text-purple-600 dark:text-purple-400 text-xs font-black border border-purple-500/30">
+                    রঙিন PDF নোটস
+                  </span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-black text-foreground group-hover:text-purple-500 transition-colors">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-black text-foreground group-hover:text-purple-500 transition-colors">
                   লেকচার শিট ও প্র্যাকটিস বুক
                 </h3>
-                <p className="text-foreground/75 text-sm leading-relaxed">
+                <p className="text-foreground/75 text-xs sm:text-sm leading-relaxed font-medium">
                   প্রতিটি চ্যাপ্টারের পূর্ণাঙ্গ টাইপভিত্তিক গোছানো রঙিন পিডিএফ নোটস ও স্ট্যান্ডার্ড প্রশ্নব্যাংক।
                 </p>
               </div>
@@ -856,16 +866,21 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               </div>
             </div>
 
-            {/* Card 4 - 24/7 Doubt Solving */}
-            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-emerald-500/[0.08] via-background to-emerald-500/[0.02] border border-emerald-500/20 hover:border-emerald-500/50 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
+            {/* Card 4 - 24/7 Doubt Solving (50% on tablet, 6 cols on desktop) */}
+            <div className="sm:col-span-1 lg:col-span-6 p-6 sm:p-7 lg:p-8 rounded-2xl sm:rounded-3xl lg:rounded-[2.5rem] bg-gradient-to-br from-emerald-500/[0.08] via-card to-emerald-500/[0.02] border border-emerald-500/20 hover:border-emerald-500/50 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group relative overflow-hidden">
               <div className="space-y-4 relative z-10">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                  <MessageCircle className="w-7 h-7" />
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20 group-hover:scale-110 transition-transform">
+                    <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-xs font-black border border-emerald-500/30">
+                    ২৪/৭ ইনস্ট্যান্ট
+                  </span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-black text-foreground group-hover:text-emerald-500 transition-colors">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-black text-foreground group-hover:text-emerald-500 transition-colors">
                   ২৪/৭ ডাউট সলভিং
                 </h3>
-                <p className="text-foreground/75 text-sm leading-relaxed">
+                <p className="text-foreground/75 text-xs sm:text-sm leading-relaxed font-medium">
                   পড়াশোনায় যেকোনো সমস্যায় সরাসরি ডেডিকেটেড এক্সপার্ট মেন্টরদের থেকে দ্রুত সমাধান পাওয়ার সুবিধা।
                 </p>
               </div>
@@ -882,24 +897,24 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               </div>
             </div>
 
-            {/* Card 5 (Span 3) - Success CTA Banner */}
-            <div className="md:col-span-3 p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-r from-orange-500/15 via-amber-500/10 to-orange-600/15 border-2 border-orange-500/30 shadow-md flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
-              <div className="space-y-2 relative z-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 text-orange-500 text-xs font-bold border border-orange-500/30 mb-1">
-                  <Flame className="w-3.5 h-3.5 animate-pulse" />
+            {/* Card 5 - Full Width CTA Banner */}
+            <div className="sm:col-span-2 lg:col-span-12 p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl lg:rounded-[2.5rem] bg-gradient-to-r from-orange-500/15 via-amber-500/10 to-orange-600/15 border-2 border-orange-500/30 shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+              <div className="space-y-2 relative z-10 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-black border border-orange-500/30 mb-1">
+                  <Flame className="w-3.5 h-3.5 animate-pulse text-orange-500" />
                   <span>স্বপ্ন জয়ের সেরা প্ল্যাটফর্ম</span>
                 </div>
-                <h3 className="text-2xl sm:text-3xl font-black text-foreground">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground">
                   সেরা মেন্টরদের সাথে তোমার সাফল্য সুনিশ্চিত করো
                 </h3>
-                <p className="text-foreground/75 text-sm sm:text-base font-medium">
+                <p className="text-foreground/75 text-xs sm:text-sm md:text-base font-medium leading-relaxed">
                   হাজারো সফল শিক্ষার্থীর কাতারে যুক্ত হতে এখনই তোমার কাঙ্ক্ষিত কোর্সে এনরোল করো।
                 </p>
               </div>
 
               <a 
                 href="#courses" 
-                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm shadow-sm hover:scale-105 transition-all shrink-0 flex items-center gap-2"
+                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm shadow-md shadow-orange-500/25 hover:scale-105 transition-all shrink-0 flex items-center gap-2"
               >
                 <span>কোর্সসমূহ দেখুন</span>
                 <ArrowRight className="w-4 h-4" />
@@ -1146,16 +1161,16 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       {/* ========================================================================= */}
       {/* 6. আমাদের সম্পর্কে (About Section - Light/Dark Harmonized & Premium)       */}
       {/* ========================================================================= */}
-      <section className="py-20 sm:py-28 bg-foreground/[0.02] border-y border-foreground/10 relative overflow-hidden">
+      <section className="py-14 sm:py-20 lg:py-28 bg-foreground/[0.02] border-y border-foreground/10 relative overflow-hidden">
         {/* Ambient floating lights */}
         <div className="absolute top-10 left-1/4 w-80 h-80 bg-orange-500/10 rounded-full blur-[100px] pointer-events-none animate-pulse" />
         <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-amber-500/10 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 relative z-10">
           
-          <div className="flex items-center justify-center gap-3 sm:gap-6 mb-12">
+          <div className="flex items-center justify-center gap-3 sm:gap-6 mb-8 sm:mb-12">
             <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-orange-500" />
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground tracking-tight text-center">
               {aboutTitle.includes('সম্পর্কে') ? (
                 <>
                   {aboutTitle.replace('সম্পর্কে', '').trim()}{' '}
@@ -1172,12 +1187,12 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-orange-500" />
           </div>
 
-          <div className="p-8 sm:p-14 rounded-[3.5rem] bg-gradient-to-br from-orange-500/[0.05] via-card to-amber-500/[0.03] dark:from-neutral-900 dark:via-zinc-950 dark:to-black text-foreground dark:text-white border border-foreground/10 dark:border-white/10 shadow-md relative overflow-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+          <div className="p-5 sm:p-8 md:p-10 lg:p-14 rounded-3xl sm:rounded-[2.5rem] lg:rounded-[3.5rem] bg-gradient-to-br from-orange-500/[0.05] via-card to-amber-500/[0.03] dark:from-neutral-900 dark:via-zinc-950 dark:to-black text-foreground dark:text-white border border-foreground/10 dark:border-white/10 shadow-md relative overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-14 items-center">
               
               {/* Left: Founder Avatar with glowing rings */}
-              <div className="lg:col-span-5 text-center space-y-5">
-                <div className="relative w-64 h-64 sm:w-76 sm:h-76 mx-auto rounded-full bg-gradient-to-tr from-orange-500 via-amber-400 to-orange-600 p-2.5 flex items-center justify-center shadow-md group">
+              <div className="lg:col-span-5 text-center space-y-4 sm:space-y-5">
+                <div className="relative w-48 h-48 sm:w-60 sm:h-60 md:w-64 md:h-64 lg:w-72 lg:h-72 mx-auto rounded-full bg-gradient-to-tr from-orange-500 via-amber-400 to-orange-600 p-2 sm:p-2.5 flex items-center justify-center shadow-md group">
                   <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-background dark:border-neutral-950 bg-card dark:bg-neutral-900 shadow-inner">
                     <img 
                       src={aboutPhoto} 
@@ -1187,21 +1202,21 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   </div>
 
                   {/* Floating Badges */}
-                  <div className="absolute -top-2 left-0 px-4 py-1.5 rounded-full bg-card/90 dark:bg-neutral-900/90 border border-orange-500/40 shadow-sm text-xs font-black text-orange-600 dark:text-orange-400 backdrop-blur-md flex items-center gap-1.5">
+                  <div className="absolute -top-1 sm:-top-2 left-0 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-card/90 dark:bg-neutral-900/90 border border-orange-500/40 shadow-sm text-[11px] sm:text-xs font-black text-orange-600 dark:text-orange-400 backdrop-blur-md flex items-center gap-1.5">
                     <span>🏆</span>
                     <span>চিফ মেন্টর</span>
                   </div>
 
-                  <div className="absolute -bottom-2 right-0 px-4 py-1.5 rounded-full bg-card/90 dark:bg-neutral-900/90 border border-amber-500/40 shadow-sm text-xs font-black text-amber-600 dark:text-amber-300 backdrop-blur-md flex items-center gap-1.5">
+                  <div className="absolute -bottom-1 sm:-bottom-2 right-0 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-card/90 dark:bg-neutral-900/90 border border-amber-500/40 shadow-sm text-[11px] sm:text-xs font-black text-amber-600 dark:text-amber-300 backdrop-blur-md flex items-center gap-1.5">
                     <span>⚡</span>
                     <span>১০+ বছর অভিজ্ঞতা</span>
                   </div>
                 </div>
 
-                <div className="inline-block px-8 py-3.5 rounded-2xl bg-card/90 dark:bg-white/[0.05] border border-foreground/10 dark:border-white/10 shadow-sm text-center backdrop-blur-md">
+                <div className="inline-block px-6 sm:px-8 py-2.5 sm:py-3.5 rounded-2xl bg-card/90 dark:bg-white/[0.05] border border-foreground/10 dark:border-white/10 shadow-sm text-center backdrop-blur-md">
                   <div className="flex items-center justify-center gap-2">
-                    <h4 className="text-xl font-black text-foreground dark:text-white">{profileData?.displayName || 'Instructor Name'}</h4>
-                    <CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" />
+                    <h4 className="text-lg sm:text-xl font-black text-foreground dark:text-white">{profileData?.displayName || 'Instructor Name'}</h4>
+                    <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 shrink-0" />
                   </div>
                   <p className="text-xs text-orange-600 dark:text-orange-400 font-bold mt-1 tracking-wide">
                     {founderRole}
@@ -1210,47 +1225,47 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
               </div>
 
               {/* Right: Story & Animated Stats */}
-              <div className="lg:col-span-7 space-y-6">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 text-xs font-black uppercase tracking-wider">
+              <div className="lg:col-span-7 space-y-5 sm:space-y-6">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 text-xs font-black uppercase tracking-wider">
                   <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                   <span>স্বপ্ন ছোঁয়ার প্রস্তুতি</span>
                 </div>
 
-                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground dark:text-white leading-[1.25] tracking-tight">
+                <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-foreground dark:text-white leading-tight tracking-tight">
                   {aboutHeadline}
                 </h3>
 
                 <div className="relative">
                   <Quote className="w-8 h-8 text-orange-500/20 absolute -top-4 -left-3 pointer-events-none" />
-                  <p className="text-foreground/75 dark:text-gray-300 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-medium pl-4 border-l-2 border-orange-500/40">
+                  <p className="text-foreground/75 dark:text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed whitespace-pre-wrap font-medium pl-4 border-l-2 border-orange-500/40">
                     {aboutBio}
                   </p>
                 </div>
 
                 {/* 3 Rich Animated Stats Cards */}
-                <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-4">
-                  <div className="p-4 sm:p-5 rounded-2xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-orange-500/40 shadow-sm hover:shadow-md transition-all text-center group hover:-translate-y-1">
-                    <div className="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-600 dark:text-orange-400 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                      <Users className="w-4 h-4" />
+                <div className="grid grid-cols-3 gap-2.5 sm:gap-4 pt-2 sm:pt-4">
+                  <div className="p-3 sm:p-5 rounded-2xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-orange-500/40 shadow-xs hover:shadow-md transition-all text-center group hover:-translate-y-0.5">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-orange-500/20 text-orange-600 dark:text-orange-400 flex items-center justify-center mx-auto mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform">
+                      <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
-                    <div className="text-xl sm:text-2xl md:text-3xl font-black text-orange-600 dark:text-orange-400">১০,০০০+</div>
-                    <div className="text-[11px] sm:text-xs font-bold text-foreground/60 dark:text-gray-400 mt-1 uppercase tracking-wider">মোট শিক্ষার্থী</div>
+                    <div className="text-base sm:text-2xl md:text-3xl font-black text-orange-600 dark:text-orange-400">১০,০০০+</div>
+                    <div className="text-[10px] sm:text-xs font-bold text-foreground/60 dark:text-gray-400 mt-0.5 sm:mt-1 uppercase tracking-wider">মোট শিক্ষার্থী</div>
                   </div>
 
-                  <div className="p-4 sm:p-5 rounded-2xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-emerald-500/40 shadow-sm hover:shadow-md transition-all text-center group hover:-translate-y-1">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                      <Trophy className="w-4 h-4" />
+                  <div className="p-3 sm:p-5 rounded-2xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-emerald-500/40 shadow-xs hover:shadow-md transition-all text-center group hover:-translate-y-0.5">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform">
+                      <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
-                    <div className="text-xl sm:text-2xl md:text-3xl font-black text-emerald-600 dark:text-emerald-400">৯৯%</div>
-                    <div className="text-[11px] sm:text-xs font-bold text-foreground/60 dark:text-gray-400 mt-1 uppercase tracking-wider">সফলতার হার</div>
+                    <div className="text-base sm:text-2xl md:text-3xl font-black text-emerald-600 dark:text-emerald-400">৯৯%</div>
+                    <div className="text-[10px] sm:text-xs font-bold text-foreground/60 dark:text-gray-400 mt-0.5 sm:mt-1 uppercase tracking-wider">সফলতার হার</div>
                   </div>
 
-                  <div className="p-4 sm:p-5 rounded-2xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-amber-500/40 shadow-sm hover:shadow-md transition-all text-center group hover:-translate-y-1">
-                    <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                      <Video className="w-4 h-4" />
+                  <div className="p-3 sm:p-5 rounded-2xl bg-card dark:bg-white/[0.04] hover:bg-foreground/[0.03] dark:hover:bg-white/[0.08] border border-foreground/10 dark:border-white/10 hover:border-amber-500/40 shadow-xs hover:shadow-md transition-all text-center group hover:-translate-y-0.5">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform">
+                      <Video className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
-                    <div className="text-xl sm:text-2xl md:text-3xl font-black text-amber-600 dark:text-amber-400">৫০০+</div>
-                    <div className="text-[11px] sm:text-xs font-bold text-foreground/60 dark:text-gray-400 mt-1 uppercase tracking-wider">মোট ক্লাস লেকচার</div>
+                    <div className="text-base sm:text-2xl md:text-3xl font-black text-amber-600 dark:text-amber-400">৫০০+</div>
+                    <div className="text-[10px] sm:text-xs font-bold text-foreground/60 dark:text-gray-400 mt-0.5 sm:mt-1 uppercase tracking-wider">ক্লাস লেকচার</div>
                   </div>
                 </div>
               </div>
@@ -1490,23 +1505,23 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
       {/* ========================================================================= */}
       {/* 8. ট্রাস্ট ও কল-টু-অ্যাকশন ব্যানার (Light/Dark Harmonized & Slider)         */}
       {/* ========================================================================= */}
-      <section className="py-16 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
-        <div className="rounded-[3.5rem] p-8 sm:p-14 lg:p-16 bg-gradient-to-br from-orange-500/[0.06] via-card to-amber-500/[0.03] dark:from-neutral-900 dark:via-zinc-950 dark:to-black text-foreground dark:text-white border-2 border-orange-500/30 shadow-md relative overflow-hidden">
+      <section className="py-12 sm:py-16 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+        <div className="rounded-3xl sm:rounded-[2.5rem] lg:rounded-[3.5rem] p-5 sm:p-8 md:p-10 lg:p-14 bg-gradient-to-br from-orange-500/[0.06] via-card to-amber-500/[0.03] dark:from-neutral-900 dark:via-zinc-950 dark:to-black text-foreground dark:text-white border-2 border-orange-500/30 shadow-md relative overflow-hidden">
           
           {/* Ambient Glow */}
           <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-96 h-96 bg-orange-500/15 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-stretch relative z-10">
             
             {/* Left Content Column */}
-            <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 text-xs font-black uppercase tracking-wider">
+            <div className="lg:col-span-7 flex flex-col justify-between space-y-5 sm:space-y-6">
+              <div className="space-y-3 sm:space-y-4">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 text-xs font-black uppercase tracking-wider">
                   <Award className="w-3.5 h-3.5 text-amber-500" />
                   <span>শীর্ষস্থানীয় এডটেক একাডেমি</span>
                 </div>
 
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground dark:text-white leading-[1.2] tracking-tight">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground dark:text-white leading-tight tracking-tight">
                   {cleanTrustTitle}{' '}
                   <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-clip-text text-transparent">
                     {trustHighlight}
@@ -1514,11 +1529,11 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                   একটি আস্থার নাম
                 </h2>
 
-                <p className="text-foreground/75 dark:text-gray-300 text-sm sm:text-base leading-relaxed font-medium">
+                <p className="text-foreground/75 dark:text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed font-medium">
                   {trustSubtitle}
                 </p>
 
-                <div className="flex items-center gap-3 flex-wrap text-xs font-bold text-foreground/80 dark:text-gray-300 pt-1">
+                <div className="flex items-center gap-2 sm:gap-3 flex-wrap text-xs font-bold text-foreground/80 dark:text-gray-300 pt-1">
                   <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-foreground/[0.04] dark:bg-white/[0.05] border border-foreground/10 dark:border-white/10">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
                     <span>১০০% লাইভ ইন্টারঅ্যাকশন</span>
@@ -1534,10 +1549,10 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 flex-wrap pt-2">
+              <div className="flex items-center gap-3 sm:gap-4 flex-wrap pt-2">
                 <a
                   href="#courses"
-                  className="px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm shadow-sm hover:scale-105 transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs sm:text-sm shadow-md shadow-orange-500/25 hover:scale-105 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <span>{trustPaidBtnText}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -1545,7 +1560,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
                 <a
                   href={trustFreeLink}
-                  className="px-8 py-4 rounded-2xl bg-foreground/5 hover:bg-foreground/10 dark:bg-white/[0.08] dark:hover:bg-white/[0.15] border border-foreground/15 dark:border-white/20 text-foreground dark:text-white font-black text-sm transition-all hover:scale-105 backdrop-blur-md cursor-pointer"
+                  className="px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-foreground/5 hover:bg-foreground/10 dark:bg-white/[0.08] dark:hover:bg-white/[0.15] border border-foreground/15 dark:border-white/20 text-foreground dark:text-white font-black text-xs sm:text-sm transition-all hover:scale-105 backdrop-blur-md cursor-pointer"
                 >
                   {trustFreeBtnText}
                 </a>
@@ -1554,7 +1569,7 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
 
             {/* Right Equal-Height Image Slider Column */}
             <div className="lg:col-span-5 flex flex-col">
-              <div className="relative w-full h-full min-h-[360px] sm:min-h-[420px] rounded-3xl overflow-hidden shadow-md border-2 border-foreground/10 dark:border-white/20 bg-gradient-to-tr from-orange-500/20 via-foreground/5 dark:via-white/5 to-transparent group flex flex-col justify-between">
+              <div className="relative w-full h-full min-h-[280px] sm:min-h-[360px] md:min-h-[400px] lg:min-h-[440px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-md border-2 border-foreground/10 dark:border-white/20 bg-gradient-to-tr from-orange-500/20 via-foreground/5 dark:via-white/5 to-transparent group flex flex-col justify-between">
                 
                 {/* Active Image */}
                 <img 

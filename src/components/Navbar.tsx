@@ -474,7 +474,9 @@ export default function Navbar() {
     { name: 'Help & Doubts', href: `/dashboard/courses/${courseId}/help`, icon: HelpCircle },
   ];
 
-  const avatarUrl = userData?.profilePhoto || userData?.photoURL || userData?.photoUrl || user?.photoURL;
+  // Priority: User's actual Google/Gmail Auth photoURL first so that the user's personal Google account avatar is displayed
+  const googleAuthPhoto = user?.photoURL || user?.providerData?.find(p => p?.photoURL)?.photoURL;
+  const avatarUrl = googleAuthPhoto || userData?.photoURL || userData?.photoUrl || userData?.profilePhoto;
 
   return (
     <>
@@ -608,9 +610,11 @@ export default function Navbar() {
                       >
                         <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden flex items-center justify-center bg-primary/10">
                           {avatarUrl ? (
-                            <img src={avatarUrl} alt="User Profile" className="w-full h-full object-cover" />
+                            <img src={avatarUrl} alt="User Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           ) : (
-                            <LayoutDashboard className="w-4 h-4 text-orange-500 transition-transform duration-200 group-hover:scale-110" />
+                            <div className="w-full h-full bg-gradient-to-br from-orange-500 to-amber-500 text-white font-bold flex items-center justify-center text-xs">
+                              {(user?.displayName || userData?.name || user?.email || 'U').charAt(0).toUpperCase()}
+                            </div>
                           )}
                         </div>
                       </Link>
@@ -623,9 +627,11 @@ export default function Navbar() {
                       >
                         <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden border border-primary/20 shrink-0">
                           {avatarUrl ? (
-                            <img src={avatarUrl} alt="User" className="w-full h-full object-cover" />
+                            <img src={avatarUrl} alt="User" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           ) : (
-                            <UserIcon className="w-4 h-4 text-primary" />
+                            <div className="w-full h-full bg-gradient-to-br from-orange-500 to-amber-500 text-white font-bold flex items-center justify-center text-[10px]">
+                              {(user?.displayName || userData?.name || user?.email || 'U').charAt(0).toUpperCase()}
+                            </div>
                           )}
                         </div>
                         {hasCompletedRole ? (
@@ -646,9 +652,20 @@ export default function Navbar() {
 
                     {/* Desktop Hover Dropdown Menu */}
                     <div className="absolute right-0 top-full mt-2 w-64 bg-background border border-foreground/15 rounded-2xl shadow-2xl p-2 space-y-1.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-1 group-hover:translate-y-0 z-50">
-                      <div className="px-3 py-2 border-b border-foreground/10">
-                        <p className="text-xs font-bold text-foreground truncate">{user?.displayName || userData?.name || 'User'}</p>
-                        <p className="text-[11px] text-foreground/50 truncate">{user?.email}</p>
+                      <div className="px-3 py-2 border-b border-foreground/10 flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-foreground/10 bg-primary/10">
+                          {avatarUrl ? (
+                            <img src={avatarUrl} alt="User Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-orange-500 to-amber-500 text-white font-bold flex items-center justify-center text-xs">
+                              {(user?.displayName || userData?.name || user?.email || 'U').charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-bold text-foreground truncate">{user?.displayName || userData?.name || 'User'}</p>
+                          <p className="text-[11px] text-foreground/50 truncate">{user?.email}</p>
+                        </div>
                       </div>
 
                       {isAdmin && (
@@ -1332,9 +1349,11 @@ export default function Navbar() {
                     >
                       <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center overflow-hidden shrink-0 ring-2 ring-orange-500/20">
                         {avatarUrl ? (
-                          <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+                          <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                         ) : (
-                          <UserIcon className="w-5 h-5 text-orange-500" />
+                          <div className="w-full h-full bg-gradient-to-br from-orange-500 to-amber-500 text-white font-bold flex items-center justify-center text-sm">
+                            {(user?.displayName || userData?.name || user?.email || 'U').charAt(0).toUpperCase()}
+                          </div>
                         )}
                       </div>
                       <div className="flex-1 overflow-hidden">

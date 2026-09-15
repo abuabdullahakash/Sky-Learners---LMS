@@ -59,6 +59,7 @@ interface CourseItem {
   totalStudents?: number;
   rating?: number;
   duration?: string;
+  isDemo?: boolean;
 }
 
 interface CoachingProfile {
@@ -209,6 +210,7 @@ export default function HomePage() {
             totalStudents: data.enrolledCount || Math.floor(Math.random() * 80) + 20,
             rating: 4.8 + Math.round((Math.random() * 0.2) * 10) / 10,
             duration: data.duration || '20+ Hours',
+            isDemo: Boolean(data.isDemo),
           });
         }
         setCourses(fetchedCourses);
@@ -758,107 +760,125 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredCourses.map((course) => (
-                <div 
-                  key={course.id}
-                  className="group rounded-3xl bg-background border border-foreground/10 hover:border-primary/50 transition-all duration-300 shadow-md hover:shadow-2xl flex flex-col overflow-hidden"
-                >
-                  <div className="relative aspect-video w-full bg-foreground/10 overflow-hidden">
-                    {course.thumbnailUrl ? (
-                      <img 
-                        src={course.thumbnailUrl} 
-                        alt={course.title} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-900 to-indigo-950 text-white">
-                        <BookOpen className="w-10 h-10 text-primary" />
-                      </div>
-                    )}
-                    
-                    <div className="absolute top-3 left-3 flex gap-2">
-                      {course.isCoachingCourse ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-orange-500/90 text-white text-[11px] font-extrabold uppercase tracking-wide backdrop-blur-md shadow-md">
-                          <Building2 className="w-3 h-3" />
-                          <span>{t('featuredCourses.coachingBadge')}</span>
-                        </span>
+              {filteredCourses.map((course) => {
+                const isDemo = isDemoCourse(course);
+                const courseUrl = generateCourseUrl(course);
+
+                const handleCourseAction = (e: React.MouseEvent) => {
+                  if (isDemo) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setSelectedDemoCourse(course);
+                    setIsDemoModalOpen(true);
+                  }
+                };
+
+                return (
+                  <div 
+                    key={course.id}
+                    onClick={handleCourseAction}
+                    className={`group rounded-3xl bg-background border border-foreground/10 hover:border-primary/50 transition-all duration-300 shadow-md hover:shadow-2xl flex flex-col overflow-hidden ${isDemo ? 'cursor-pointer' : ''}`}
+                  >
+                    <Link 
+                      href={courseUrl} 
+                      onClick={handleCourseAction}
+                      className="relative aspect-video w-full bg-foreground/10 overflow-hidden block"
+                    >
+                      {course.thumbnailUrl ? (
+                        <img 
+                          src={course.thumbnailUrl} 
+                          alt={course.title} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-blue-600/90 text-white text-[11px] font-extrabold uppercase tracking-wide backdrop-blur-md shadow-md">
-                          <UserCheck className="w-3 h-3" />
-                          <span>{t('featuredCourses.individualBadge')}</span>
-                        </span>
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-900 to-indigo-950 text-white">
+                          <BookOpen className="w-10 h-10 text-primary" />
+                        </div>
                       )}
-                    </div>
-                  </div>
-
-                  <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                    <div>
-                      <div className="flex items-center gap-2 text-xs font-semibold text-foreground/60 mb-2">
+                      
+                      <div className="absolute top-3 left-3 flex gap-2">
                         {course.isCoachingCourse ? (
-                          <Building2 className="w-3.5 h-3.5 text-orange-500 flex-shrink-0" />
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-orange-500/90 text-white text-[11px] font-extrabold uppercase tracking-wide backdrop-blur-md shadow-md">
+                            <Building2 className="w-3 h-3" />
+                            <span>{t('featuredCourses.coachingBadge')}</span>
+                          </span>
                         ) : (
-                          <UserCheck className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-blue-600/90 text-white text-[11px] font-extrabold uppercase tracking-wide backdrop-blur-md shadow-md">
+                            <UserCheck className="w-3 h-3" />
+                            <span>{t('featuredCourses.individualBadge')}</span>
+                          </span>
                         )}
-                        <span className="truncate">{course.instructorName}</span>
                       </div>
+                    </Link>
 
-                      <h3 className="font-bold text-base sm:text-lg text-foreground line-clamp-2 leading-snug group-hover:text-primary transition-colors">
-                        {course.title}
-                      </h3>
-                    </div>
-
-                    <div className="pt-3 border-t border-foreground/10 space-y-3">
-                      <div className="flex items-center justify-between text-xs text-foreground/70">
-                        <div className="flex items-center gap-1 text-amber-500 font-bold">
-                          <Star className="w-3.5 h-3.5 fill-amber-500" />
-                          <span>{course.rating || 4.9}</span>
-                        </div>
-                        <div className="flex items-center gap-1 font-medium">
-                          <Users className="w-3.5 h-3.5" />
-                          <span>{course.totalStudents} {t('featuredCourses.enrolled')}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div>
-                          {course.price && course.price > 0 ? (
-                            <div className="flex items-baseline gap-2">
-                              <span className="text-lg font-black text-primary">
-                                ৳{course.price}
-                              </span>
-                              {course.regularPrice && course.regularPrice > course.price && (
-                                <span className="text-xs text-foreground/40 line-through">
-                                  ৳{course.regularPrice}
-                                </span>
-                              )}
-                            </div>
+                    <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                      <div>
+                        <div className="flex items-center gap-2 text-xs font-semibold text-foreground/60 mb-2">
+                          {course.isCoachingCourse ? (
+                            <Building2 className="w-3.5 h-3.5 text-orange-500 flex-shrink-0" />
                           ) : (
-                            <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-500 font-bold text-xs">
-                              {t('featuredCourses.free')}
-                            </span>
+                            <UserCheck className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
                           )}
+                          <span className="truncate">{course.instructorName}</span>
                         </div>
 
                         <Link 
-                          href={generateCourseUrl(course)}
-                          onClick={(e) => {
-                            if (isDemoCourse(course)) {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              setSelectedDemoCourse(course);
-                              setIsDemoModalOpen(true);
-                            }
-                          }}
-                          className="px-4 py-2 rounded-xl bg-foreground/5 hover:bg-primary hover:text-white font-bold text-xs transition-all flex items-center gap-1 group/btn cursor-pointer"
+                          href={courseUrl}
+                          onClick={handleCourseAction}
+                          className="block"
                         >
-                          <span>{t('featuredCourses.viewDetails')}</span>
-                          <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
+                          <h3 className="font-bold text-base sm:text-lg text-foreground line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+                            {course.title}
+                          </h3>
                         </Link>
+                      </div>
+
+                      <div className="pt-3 border-t border-foreground/10 space-y-3">
+                        <div className="flex items-center justify-between text-xs text-foreground/70">
+                          <div className="flex items-center gap-1 text-amber-500 font-bold">
+                            <Star className="w-3.5 h-3.5 fill-amber-500" />
+                            <span>{course.rating || 4.9}</span>
+                          </div>
+                          <div className="flex items-center gap-1 font-medium">
+                            <Users className="w-3.5 h-3.5" />
+                            <span>{course.totalStudents} {t('featuredCourses.enrolled')}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div>
+                            {course.price && course.price > 0 ? (
+                              <div className="flex items-baseline gap-2">
+                                <span className="text-lg font-black text-primary">
+                                  ৳{course.price}
+                                </span>
+                                {course.regularPrice && course.regularPrice > course.price && (
+                                  <span className="text-xs text-foreground/40 line-through">
+                                    ৳{course.regularPrice}
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-500 font-bold text-xs">
+                                {t('featuredCourses.free')}
+                              </span>
+                            )}
+                          </div>
+
+                          <Link 
+                            href={courseUrl}
+                            onClick={handleCourseAction}
+                            className="px-4 py-2 rounded-xl bg-foreground/5 hover:bg-primary hover:text-white font-bold text-xs transition-all flex items-center gap-1 group/btn cursor-pointer"
+                          >
+                            <span>{t('featuredCourses.viewDetails')}</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 

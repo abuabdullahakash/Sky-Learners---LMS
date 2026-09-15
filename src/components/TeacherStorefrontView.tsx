@@ -68,6 +68,7 @@ interface CourseItem {
   rating?: number;
   duration?: string;
   instructorName?: string;
+  isDemo?: boolean;
 }
 
 interface TeacherStorefrontViewProps {
@@ -171,7 +172,8 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
             enrolledCount: data.enrolledCount || 0,
             rating: 4.9,
             duration: data.duration,
-            instructorName: data.coachingName || profile?.displayName || 'Instructor'
+            instructorName: data.coachingName || profile?.displayName || 'Instructor',
+            isDemo: Boolean(data.isDemo)
           });
         });
         setCourses(fetchedCourses);

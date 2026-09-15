@@ -575,76 +575,96 @@ export default function CoursesPage() {
     if (catId === 'primary') {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 relative z-10">
-          {catCourses.slice(0, 3).map((course) => (
-            <div
-              key={course.id}
-              className={`rounded-2xl border border-amber-500/15 dark:border-amber-500/25 bg-background/85 dark:bg-[#0f1420]/85 backdrop-blur-xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${meta.cardHoverBorder}`}
-            >
-              <div className="space-y-3.5 relative z-10">
-                <div className="relative aspect-video w-full rounded-xl bg-amber-500/5 overflow-hidden border border-foreground/10 group-hover/card:shadow-md transition-all">
-                  {course.thumbnailUrl ? (
-                    <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-amber-500/40">
-                      <School className="w-8 h-8" />
-                    </div>
-                  )}
-                  <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-amber-500/90 text-[10px] font-black text-white uppercase tracking-wide shadow-sm">
-                    {course.eduClass ? `${isBn ? 'শ্রেণি' : 'Class'} ${toBnNum(course.eduClass)}` : (course.category || 'Primary')}
-                  </span>
-                  <span className="absolute bottom-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-[10px] font-bold text-amber-300">
-                    {isBn ? 'সহজ পাঠ' : 'Foundations'}
-                  </span>
-                </div>
-
-                <div>
-                  <p className="text-xs font-bold text-amber-600 dark:text-amber-400 truncate">
-                    {course.coachingName || course.instructorName || 'Sky Learners Academy'}
-                  </p>
-                  <h3 className="font-extrabold text-sm sm:text-base text-foreground line-clamp-2 mt-1 leading-snug group-hover/card:text-amber-500 transition-colors">
-                    {course.title}
-                  </h3>
-                  {course.subtitle && (
-                    <p className="text-xs text-foreground/60 line-clamp-2 mt-1 leading-relaxed">
-                      {course.subtitle}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-1.5 text-xs text-foreground/75 pt-1">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    <span className="truncate">{isBn ? 'সহজ ব্যাখ্যা ও রঙিন হ্যান্ডনোট' : 'Colorful notes & simple lessons'}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    <span className="truncate">{isBn ? 'সাপ্তাহিক কুইজ ও হোমওয়ার্ক সাপোর্ট' : 'Weekly quizzes & tutor support'}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-3.5 mt-4 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-3 relative z-10">
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-foreground/50 block leading-none">Course Fee</span>
-                  <div className="font-black text-base text-foreground mt-0.5">
-                    {course.price === 0 || !course.price ? (
-                      <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
+          {catCourses.slice(0, 3).map((course) => {
+            const isDemo = isDemoCourse(course);
+            return (
+              <div
+                key={course.id}
+                onClick={(e) => {
+                  if (isDemo) {
+                    e.preventDefault();
+                    setSelectedDemoCourse(course);
+                    setIsDemoModalOpen(true);
+                  }
+                }}
+                className={`rounded-2xl border border-amber-500/15 dark:border-amber-500/25 bg-background/85 dark:bg-[#0f1420]/85 backdrop-blur-xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${meta.cardHoverBorder} ${isDemo ? 'cursor-pointer' : ''}`}
+              >
+                <div className="space-y-3.5 relative z-10">
+                  <Link
+                    href={generateCourseUrl(course)}
+                    onClick={(e) => handleCourseClick(e, course)}
+                    className="relative aspect-video w-full rounded-xl bg-amber-500/5 overflow-hidden border border-foreground/10 group-hover/card:shadow-md transition-all block"
+                  >
+                    {course.thumbnailUrl ? (
+                      <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
                     ) : (
-                      <span>৳{toBnNum(course.price)}</span>
+                      <div className="w-full h-full flex items-center justify-center text-amber-500/40">
+                        <School className="w-8 h-8" />
+                      </div>
+                    )}
+                    <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-amber-500/90 text-[10px] font-black text-white uppercase tracking-wide shadow-sm">
+                      {course.eduClass ? `${isBn ? 'শ্রেণি' : 'Class'} ${toBnNum(course.eduClass)}` : (course.category || 'Primary')}
+                    </span>
+                    <span className="absolute bottom-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-[10px] font-bold text-amber-300">
+                      {isBn ? 'সহজ পাঠ' : 'Foundations'}
+                    </span>
+                  </Link>
+
+                  <div>
+                    <p className="text-xs font-bold text-amber-600 dark:text-amber-400 truncate">
+                      {course.coachingName || course.instructorName || 'Sky Learners Academy'}
+                    </p>
+                    <Link
+                      href={generateCourseUrl(course)}
+                      onClick={(e) => handleCourseClick(e, course)}
+                      className="block"
+                    >
+                      <h3 className="font-extrabold text-sm sm:text-base text-foreground line-clamp-2 mt-1 leading-snug group-hover/card:text-amber-500 transition-colors">
+                        {course.title}
+                      </h3>
+                    </Link>
+                    {course.subtitle && (
+                      <p className="text-xs text-foreground/60 line-clamp-2 mt-1 leading-relaxed">
+                        {course.subtitle}
+                      </p>
                     )}
                   </div>
+
+                  <div className="space-y-1.5 text-xs text-foreground/75 pt-1">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <span className="truncate">{isBn ? 'সহজ ব্যাখ্যা ও রঙিন হ্যান্ডনোট' : 'Colorful notes & simple lessons'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <span className="truncate">{isBn ? 'সাপ্তাহিক কুইজ ও হোমওয়ার্ক সাপোর্ট' : 'Weekly quizzes & tutor support'}</span>
+                    </div>
+                  </div>
                 </div>
-                <Link
-                  href={generateCourseUrl(course)}
-                  onClick={(e) => handleCourseClick(e, course)}
-                  className={`px-4 py-2 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
-                >
-                  <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+
+                <div className="pt-3.5 mt-4 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-3 relative z-10">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-foreground/50 block leading-none">Course Fee</span>
+                    <div className="font-black text-base text-foreground mt-0.5">
+                      {course.price === 0 || !course.price ? (
+                        <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
+                      ) : (
+                        <span>৳{toBnNum(course.price)}</span>
+                      )}
+                    </div>
+                  </div>
+                  <Link
+                    href={generateCourseUrl(course)}
+                    onClick={(e) => handleCourseClick(e, course)}
+                    className={`px-4 py-2 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
+                  >
+                    <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       );
     }
@@ -653,83 +673,103 @@ export default function CoursesPage() {
     if (catId === 'high_school') {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 relative z-10">
-          {catCourses.slice(0, 3).map((course) => (
-            <div
-              key={course.id}
-              className={`rounded-2xl border border-sky-500/15 dark:border-sky-500/25 bg-background/85 dark:bg-[#09121f]/85 backdrop-blur-xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${meta.cardHoverBorder}`}
-            >
-              {/* Card Subtle Top Glow on Hover */}
-              <div className={`absolute -top-12 -right-12 w-32 h-32 bg-gradient-to-br ${meta.glowOrb} blur-[40px] rounded-full opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-none`} />
+          {catCourses.slice(0, 3).map((course) => {
+            const isDemo = isDemoCourse(course);
+            return (
+              <div
+                key={course.id}
+                onClick={(e) => {
+                  if (isDemo) {
+                    e.preventDefault();
+                    setSelectedDemoCourse(course);
+                    setIsDemoModalOpen(true);
+                  }
+                }}
+                className={`rounded-2xl border border-sky-500/15 dark:border-sky-500/25 bg-background/85 dark:bg-[#09121f]/85 backdrop-blur-xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${meta.cardHoverBorder} ${isDemo ? 'cursor-pointer' : ''}`}
+              >
+                {/* Card Subtle Top Glow on Hover */}
+                <div className={`absolute -top-12 -right-12 w-32 h-32 bg-gradient-to-br ${meta.glowOrb} blur-[40px] rounded-full opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-none`} />
 
-              <div className="space-y-3.5 relative z-10">
-                {/* Thumbnail & Badges */}
-                <div className="relative aspect-video w-full rounded-xl bg-sky-500/5 overflow-hidden border border-foreground/10 group-hover/card:shadow-md transition-all">
-                  {course.thumbnailUrl ? (
-                    <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-sky-500/40">
-                      <GraduationCap className="w-8 h-8" />
-                    </div>
-                  )}
-                  <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-sky-600/95 text-[10px] font-black text-white uppercase tracking-wide shadow-sm">
-                    {course.eduClass ? `${isBn ? 'শ্রেণি' : 'Class'} ${toBnNum(course.eduClass)}` : 'SSC 2026'}
-                  </span>
-                  <span className="absolute bottom-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-[10px] font-bold text-sky-300">
-                    {isBn ? 'বোর্ড স্ট্যান্ডার্ড' : 'Board Standard'}
-                  </span>
-                </div>
-
-                {/* Details */}
-                <div>
-                  <p className="text-xs font-bold text-sky-600 dark:text-sky-400 truncate">
-                    {course.coachingName || course.instructorName || 'Sky Learners Academy'}
-                  </p>
-                  <h3 className="font-extrabold text-sm sm:text-base text-foreground line-clamp-2 mt-1 leading-snug group-hover/card:text-sky-500 transition-colors">
-                    {course.title}
-                  </h3>
-                  {course.subtitle && (
-                    <p className="text-xs text-foreground/60 line-clamp-2 mt-1 leading-relaxed">
-                      {course.subtitle}
-                    </p>
-                  )}
-                </div>
-
-                {/* Key Highlights Bullet points */}
-                <div className="space-y-1.5 text-xs text-foreground/75 pt-1">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span className="truncate">{isBn ? 'পূর্ণাঙ্গ সিলেবাস ও লাইভ ক্লাস' : 'Full Syllabus & Live'}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span className="truncate">{isBn ? 'অধ্যায়ভিত্তিক এক্সাম ও টেস্ট পেপার সলভ' : 'Chapter-wise Exams'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card Footer */}
-              <div className="pt-3.5 mt-4 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-3 relative z-10">
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-foreground/50 block leading-none">Course Fee</span>
-                  <div className="font-black text-base text-foreground mt-0.5">
-                    {course.price === 0 || !course.price ? (
-                      <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
+                <div className="space-y-3.5 relative z-10">
+                  {/* Thumbnail & Badges */}
+                  <Link
+                    href={generateCourseUrl(course)}
+                    onClick={(e) => handleCourseClick(e, course)}
+                    className="relative aspect-video w-full rounded-xl bg-sky-500/5 overflow-hidden border border-foreground/10 group-hover/card:shadow-md transition-all block"
+                  >
+                    {course.thumbnailUrl ? (
+                      <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
                     ) : (
-                      <span>৳{toBnNum(course.price)}</span>
+                      <div className="w-full h-full flex items-center justify-center text-sky-500/40">
+                        <GraduationCap className="w-8 h-8" />
+                      </div>
+                    )}
+                    <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-sky-600/95 text-[10px] font-black text-white uppercase tracking-wide shadow-sm">
+                      {course.eduClass ? `${isBn ? 'শ্রেণি' : 'Class'} ${toBnNum(course.eduClass)}` : 'SSC 2026'}
+                    </span>
+                    <span className="absolute bottom-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-[10px] font-bold text-sky-300">
+                      {isBn ? 'বোর্ড স্ট্যান্ডার্ড' : 'Board Standard'}
+                    </span>
+                  </Link>
+
+                  {/* Details */}
+                  <div>
+                    <p className="text-xs font-bold text-sky-600 dark:text-sky-400 truncate">
+                      {course.coachingName || course.instructorName || 'Sky Learners Academy'}
+                    </p>
+                    <Link
+                      href={generateCourseUrl(course)}
+                      onClick={(e) => handleCourseClick(e, course)}
+                      className="block"
+                    >
+                      <h3 className="font-extrabold text-sm sm:text-base text-foreground line-clamp-2 mt-1 leading-snug group-hover/card:text-sky-500 transition-colors">
+                        {course.title}
+                      </h3>
+                    </Link>
+                    {course.subtitle && (
+                      <p className="text-xs text-foreground/60 line-clamp-2 mt-1 leading-relaxed">
+                        {course.subtitle}
+                      </p>
                     )}
                   </div>
+
+                  {/* Key Highlights Bullet points */}
+                  <div className="space-y-1.5 text-xs text-foreground/75 pt-1">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <span className="truncate">{isBn ? 'পূর্ণাঙ্গ সিলেবাস ও লাইভ ক্লাস' : 'Full Syllabus & Live'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <span className="truncate">{isBn ? 'অধ্যায়ভিত্তিক এক্সাম ও টেস্ট পেপার সলভ' : 'Chapter-wise Exams'}</span>
+                    </div>
+                  </div>
                 </div>
-                <Link
-                  href={generateCourseUrl(course)}
-                  onClick={(e) => handleCourseClick(e, course)}
-                  className={`px-4 py-2 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
-                >
-                  <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+
+                {/* Card Footer */}
+                <div className="pt-3.5 mt-4 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-3 relative z-10">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-foreground/50 block leading-none">Course Fee</span>
+                    <div className="font-black text-base text-foreground mt-0.5">
+                      {course.price === 0 || !course.price ? (
+                        <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
+                      ) : (
+                        <span>৳{toBnNum(course.price)}</span>
+                      )}
+                    </div>
+                  </div>
+                  <Link
+                    href={generateCourseUrl(course)}
+                    onClick={(e) => handleCourseClick(e, course)}
+                    className={`px-4 py-2 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
+                  >
+                    <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       );
     }
@@ -740,131 +780,173 @@ export default function CoursesPage() {
       const sideCourses = catCourses.slice(1, 3);
       return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 relative z-10">
-          {mainCourse && (
-            <div className="lg:col-span-7 rounded-3xl border border-purple-500/20 dark:border-purple-500/30 bg-background/90 dark:bg-[#140b21]/90 backdrop-blur-xl p-5 sm:p-6 flex flex-col justify-between hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden">
-              <div className="space-y-4 relative z-10">
-                <div className="relative aspect-video w-full rounded-2xl bg-purple-500/10 overflow-hidden border border-foreground/10 group-hover/card:shadow-md">
-                  {mainCourse.thumbnailUrl ? (
-                    <img src={mainCourse.thumbnailUrl} alt={mainCourse.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-purple-500/40">
-                      <Award className="w-12 h-12" />
-                    </div>
-                  )}
-                  <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-purple-600/95 backdrop-blur-md text-xs font-extrabold text-white uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>{isBn ? 'ফ্ল্যাগশিপ এইচএসসি ব্যাচ' : 'Flagship HSC Batch'}</span>
-                  </span>
-                  <span className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md text-xs font-bold text-purple-300">
-                    {mainCourse.category || 'HSC'}
-                  </span>
-                </div>
-
-                <div>
-                  <p className="text-xs font-bold text-purple-600 dark:text-purple-400">
-                    {mainCourse.coachingName || mainCourse.instructorName || 'Sky Learners Academy'}
-                  </p>
-                  <h3 className="font-black text-base sm:text-xl text-foreground mt-1 leading-snug group-hover/card:text-purple-500 transition-colors">
-                    {mainCourse.title}
-                  </h3>
-                  {mainCourse.subtitle && (
-                    <p className="text-xs sm:text-sm text-foreground/65 mt-1.5 line-clamp-2">
-                      {mainCourse.subtitle}
-                    </p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-foreground/75 pt-1">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>{isBn ? 'লাইভ মাস্টারক্লাস + আনলিমিটেড ডাউট সলভিং' : 'Live Masterclass & Doubt Solve'}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>{isBn ? 'অধ্যায়ভিত্তিক প্রিন্টেড সলভ লেকচার শিট' : 'Lecture sheets & study notes'}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>{isBn ? 'ডেইলি ও উইকলি সিলেক্টিভ বোর্ড মক টেস্ট' : 'Weekly Board Mock Tests'}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>{isBn ? 'টপ র‍্যাঙ্কারদের মেন্টরশিপ সাপোর্ট' : 'Top Ranker Mentorship'}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-4 mt-5 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-4 relative z-10">
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-foreground/50 block leading-none">Course Fee</span>
-                  <div className="font-black text-xl text-foreground mt-0.5">
-                    {mainCourse.price === 0 || !mainCourse.price ? (
-                      <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
-                    ) : (
-                      <span>৳{toBnNum(mainCourse.price)}</span>
-                    )}
-                  </div>
-                </div>
-                <Link
-                  href={generateCourseUrl(mainCourse)}
-                  onClick={(e) => handleCourseClick(e, mainCourse)}
-                  className={`px-5 py-2.5 rounded-2xl ${meta.btnBg} text-white text-xs font-black transition-all hover:scale-105 active:scale-95 flex items-center gap-2`}
-                >
-                  <span>{isBn ? 'এনরোল করুন' : 'Enroll Now'}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-          )}
-
-          {/* Right Column (Stacked 2 Cards) */}
-          <div className="lg:col-span-5 flex flex-col gap-4">
-            {sideCourses.map((course) => (
-              <div
-                key={course.id}
-                className="flex-1 rounded-2xl border border-purple-500/15 dark:border-purple-500/25 bg-background/85 dark:bg-[#140b21]/85 backdrop-blur-xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all group/card relative overflow-hidden"
+          {mainCourse && (() => {
+            const isDemo = isDemoCourse(mainCourse);
+            return (
+              <div 
+                onClick={(e) => {
+                  if (isDemo) {
+                    e.preventDefault();
+                    setSelectedDemoCourse(mainCourse);
+                    setIsDemoModalOpen(true);
+                  }
+                }}
+                className={`lg:col-span-7 rounded-3xl border border-purple-500/20 dark:border-purple-500/30 bg-background/90 dark:bg-[#140b21]/90 backdrop-blur-xl p-5 sm:p-6 flex flex-col justify-between hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${isDemo ? 'cursor-pointer' : ''}`}
               >
-                <div className="flex items-start gap-4">
-                  <div className="relative w-24 sm:w-28 aspect-video rounded-xl bg-purple-500/10 overflow-hidden border border-foreground/10 shrink-0">
-                    {course.thumbnailUrl ? (
-                      <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
+                <div className="space-y-4 relative z-10">
+                  <Link
+                    href={generateCourseUrl(mainCourse)}
+                    onClick={(e) => handleCourseClick(e, mainCourse)}
+                    className="relative aspect-video w-full rounded-2xl bg-purple-500/10 overflow-hidden border border-foreground/10 group-hover/card:shadow-md block"
+                  >
+                    {mainCourse.thumbnailUrl ? (
+                      <img src={mainCourse.thumbnailUrl} alt={mainCourse.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-purple-500/40">
-                        <Award className="w-6 h-6" />
+                        <Award className="w-12 h-12" />
                       </div>
                     )}
+                    <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-purple-600/95 backdrop-blur-md text-xs font-extrabold text-white uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>{isBn ? 'ফ্ল্যাগশিপ এইচএসসি ব্যাচ' : 'Flagship HSC Batch'}</span>
+                    </span>
+                    <span className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md text-xs font-bold text-purple-300">
+                      {mainCourse.category || 'HSC'}
+                    </span>
+                  </Link>
+
+                  <div>
+                    <p className="text-xs font-bold text-purple-600 dark:text-purple-400">
+                      {mainCourse.coachingName || mainCourse.instructorName || 'Sky Learners Academy'}
+                    </p>
+                    <Link
+                      href={generateCourseUrl(mainCourse)}
+                      onClick={(e) => handleCourseClick(e, mainCourse)}
+                      className="block"
+                    >
+                      <h3 className="font-black text-base sm:text-xl text-foreground mt-1 leading-snug group-hover/card:text-purple-500 transition-colors">
+                        {mainCourse.title}
+                      </h3>
+                    </Link>
+                    {mainCourse.subtitle && (
+                      <p className="text-xs sm:text-sm text-foreground/65 mt-1.5 line-clamp-2">
+                        {mainCourse.subtitle}
+                      </p>
+                    )}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold text-purple-600 dark:text-purple-400 truncate">
-                      {course.coachingName || course.instructorName || 'Sky Learners Academy'}
-                    </p>
-                    <h3 className="font-extrabold text-sm text-foreground line-clamp-2 mt-0.5 group-hover/card:text-purple-500 transition-colors">
-                      {course.title}
-                    </h3>
-                    <p className="text-xs text-foreground/60 line-clamp-1 mt-0.5">
-                      {course.subtitle || (isBn ? 'এইচএসসি স্পেশাল কোর্স' : 'HSC Academic')}
-                    </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-foreground/75 pt-1">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span>{isBn ? 'লাইভ মাস্টারক্লাস + আনলিমিটেড ডাউট সলভিং' : 'Live Masterclass & Doubt Solve'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span>{isBn ? 'অধ্যায়ভিত্তিক প্রিন্টেড সলভ লেকচার শিট' : 'Lecture sheets & study notes'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span>{isBn ? 'ডেইলি ও উইকলি সিলেক্টিভ বোর্ড মক টেস্ট' : 'Weekly Board Mock Tests'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span>{isBn ? 'টপ র‍্যাঙ্কারদের মেন্টরশিপ সাপোর্ট' : 'Top Ranker Mentorship'}</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="pt-3 mt-3 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-3">
-                  <div className="font-black text-sm text-foreground">
-                    {course.price === 0 || !course.price ? (
-                      <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
-                    ) : (
-                      <span>৳{toBnNum(course.price)}</span>
-                    )}
+                <div className="pt-4 mt-5 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-4 relative z-10">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-foreground/50 block leading-none">Course Fee</span>
+                    <div className="font-black text-xl text-foreground mt-0.5">
+                      {mainCourse.price === 0 || !mainCourse.price ? (
+                        <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
+                      ) : (
+                        <span>৳{toBnNum(mainCourse.price)}</span>
+                      )}
+                    </div>
                   </div>
                   <Link
-                    href={generateCourseUrl(course)}
-                    onClick={(e) => handleCourseClick(e, course)}
-                    className={`px-3.5 py-1.5 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105`}
+                    href={generateCourseUrl(mainCourse)}
+                    onClick={(e) => handleCourseClick(e, mainCourse)}
+                    className={`px-5 py-2.5 rounded-2xl ${meta.btnBg} text-white text-xs font-black transition-all hover:scale-105 active:scale-95 flex items-center gap-2`}
                   >
-                    {isBn ? 'বিস্তারিত দেখুন' : 'View Details'}
+                    <span>{isBn ? 'এনরোল করুন' : 'Enroll Now'}</span>
+                    <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               </div>
-            ))}
+            );
+          })()}
+
+          {/* Right Column (Stacked 2 Cards) */}
+          <div className="lg:col-span-5 flex flex-col gap-4">
+            {sideCourses.map((course) => {
+              const isDemo = isDemoCourse(course);
+              return (
+                <div
+                  key={course.id}
+                  onClick={(e) => {
+                    if (isDemo) {
+                      e.preventDefault();
+                      setSelectedDemoCourse(course);
+                      setIsDemoModalOpen(true);
+                    }
+                  }}
+                  className={`flex-1 rounded-2xl border border-purple-500/15 dark:border-purple-500/25 bg-background/85 dark:bg-[#140b21]/85 backdrop-blur-xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all group/card relative overflow-hidden ${isDemo ? 'cursor-pointer' : ''}`}
+                >
+                  <div className="flex items-start gap-4">
+                    <Link
+                      href={generateCourseUrl(course)}
+                      onClick={(e) => handleCourseClick(e, course)}
+                      className="relative w-24 sm:w-28 aspect-video rounded-xl bg-purple-500/10 overflow-hidden border border-foreground/10 shrink-0 block"
+                    >
+                      {course.thumbnailUrl ? (
+                        <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-purple-500/40">
+                          <Award className="w-6 h-6" />
+                        </div>
+                      )}
+                    </Link>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-bold text-purple-600 dark:text-purple-400 truncate">
+                        {course.coachingName || course.instructorName || 'Sky Learners Academy'}
+                      </p>
+                      <Link
+                        href={generateCourseUrl(course)}
+                        onClick={(e) => handleCourseClick(e, course)}
+                        className="block"
+                      >
+                        <h3 className="font-extrabold text-sm text-foreground line-clamp-2 mt-0.5 group-hover/card:text-purple-500 transition-colors">
+                          {course.title}
+                        </h3>
+                      </Link>
+                      <p className="text-xs text-foreground/60 line-clamp-1 mt-0.5">
+                        {course.subtitle || (isBn ? 'এইচএসসি স্পেশাল কোর্স' : 'HSC Academic')}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 mt-3 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-3">
+                    <div className="font-black text-sm text-foreground">
+                      {course.price === 0 || !course.price ? (
+                        <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
+                      ) : (
+                        <span>৳{toBnNum(course.price)}</span>
+                      )}
+                    </div>
+                    <Link
+                      href={generateCourseUrl(course)}
+                      onClick={(e) => handleCourseClick(e, course)}
+                      className={`px-3.5 py-1.5 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105`}
+                    >
+                      {isBn ? 'বিস্তারিত দেখুন' : 'View Details'}
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       );
@@ -874,76 +956,96 @@ export default function CoursesPage() {
     if (catId === 'admission') {
       return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 relative z-10">
-          {catCourses.slice(0, 3).map((course) => (
-            <div
-              key={course.id}
-              className={`rounded-2xl border border-emerald-500/15 dark:border-emerald-500/25 bg-background/85 dark:bg-[#081f15]/85 backdrop-blur-xl p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${meta.cardHoverBorder}`}
-            >
-              <div className="space-y-3.5 relative z-10">
-                <div className="relative aspect-video w-full rounded-xl bg-emerald-500/5 overflow-hidden border border-foreground/10 group-hover/card:shadow-md transition-all">
-                  {course.thumbnailUrl ? (
-                    <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-emerald-500/40">
-                      <Building2 className="w-8 h-8" />
-                    </div>
-                  )}
-                  <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-emerald-600 text-[10px] font-extrabold text-white uppercase tracking-wider shadow-sm">
-                    {isBn ? 'এডমিশন স্পেশাল' : 'Admission Program'}
-                  </span>
-                  <span className="absolute bottom-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-[10px] font-bold text-emerald-300">
-                    {isBn ? 'প্রশ্নব্যাংক সলভ' : 'Question Bank'}
-                  </span>
-                </div>
-
-                <div>
-                  <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 truncate">
-                    {course.coachingName || course.instructorName || 'Sky Learners Academy'}
-                  </p>
-                  <h3 className="font-extrabold text-sm sm:text-base text-foreground line-clamp-2 mt-1 leading-snug group-hover/card:text-emerald-500 transition-colors">
-                    {course.title}
-                  </h3>
-                  {course.subtitle && (
-                    <p className="text-xs text-foreground/60 line-clamp-2 mt-1">
-                      {course.subtitle}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-1.5 text-xs text-foreground/75 pt-1">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span className="truncate">{isBn ? 'টপ ভার্সিটি প্রশ্নব্যাংক ও স্পেশাল ট্রিকস' : 'Question Bank Analysis'}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span className="truncate">{isBn ? 'ডেইলি লাইভ সিবিটি এক্সাম ও মেরিট লিস্ট' : 'Daily Live CBT Mock Exams'}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-3.5 mt-4 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-3 relative z-10">
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-foreground/50 block leading-none">Course Fee</span>
-                  <div className="font-black text-base text-foreground mt-0.5">
-                    {course.price === 0 || !course.price ? (
-                      <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
+          {catCourses.slice(0, 3).map((course) => {
+            const isDemo = isDemoCourse(course);
+            return (
+              <div
+                key={course.id}
+                onClick={(e) => {
+                  if (isDemo) {
+                    e.preventDefault();
+                    setSelectedDemoCourse(course);
+                    setIsDemoModalOpen(true);
+                  }
+                }}
+                className={`rounded-2xl border border-emerald-500/15 dark:border-emerald-500/25 bg-background/85 dark:bg-[#081f15]/85 backdrop-blur-xl p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${meta.cardHoverBorder} ${isDemo ? 'cursor-pointer' : ''}`}
+              >
+                <div className="space-y-3.5 relative z-10">
+                  <Link
+                    href={generateCourseUrl(course)}
+                    onClick={(e) => handleCourseClick(e, course)}
+                    className="relative aspect-video w-full rounded-xl bg-emerald-500/5 overflow-hidden border border-foreground/10 group-hover/card:shadow-md transition-all block"
+                  >
+                    {course.thumbnailUrl ? (
+                      <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
                     ) : (
-                      <span>৳{toBnNum(course.price)}</span>
+                      <div className="w-full h-full flex items-center justify-center text-emerald-500/40">
+                        <Building2 className="w-8 h-8" />
+                      </div>
+                    )}
+                    <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-emerald-600 text-[10px] font-extrabold text-white uppercase tracking-wider shadow-sm">
+                      {isBn ? 'এডমিশন স্পেশাল' : 'Admission Program'}
+                    </span>
+                    <span className="absolute bottom-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-[10px] font-bold text-emerald-300">
+                      {isBn ? 'প্রশ্নব্যাংক সলভ' : 'Question Bank'}
+                    </span>
+                  </Link>
+
+                  <div>
+                    <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 truncate">
+                      {course.coachingName || course.instructorName || 'Sky Learners Academy'}
+                    </p>
+                    <Link
+                      href={generateCourseUrl(course)}
+                      onClick={(e) => handleCourseClick(e, course)}
+                      className="block"
+                    >
+                      <h3 className="font-extrabold text-sm sm:text-base text-foreground line-clamp-2 mt-1 leading-snug group-hover/card:text-emerald-500 transition-colors">
+                        {course.title}
+                      </h3>
+                    </Link>
+                    {course.subtitle && (
+                      <p className="text-xs text-foreground/60 line-clamp-2 mt-1">
+                        {course.subtitle}
+                      </p>
                     )}
                   </div>
+
+                  <div className="space-y-1.5 text-xs text-foreground/75 pt-1">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <span className="truncate">{isBn ? 'টপ ভার্সিটি প্রশ্নব্যাংক ও স্পেশাল ট্রিকস' : 'Question Bank Analysis'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <span className="truncate">{isBn ? 'ডেইলি লাইভ সিবিটি এক্সাম ও মেরিট লিস্ট' : 'Daily Live CBT Mock Exams'}</span>
+                    </div>
+                  </div>
                 </div>
-                <Link
-                  href={generateCourseUrl(course)}
-                  onClick={(e) => handleCourseClick(e, course)}
-                  className={`px-4 py-2 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
-                >
-                  <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+
+                <div className="pt-3.5 mt-4 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-3 relative z-10">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-foreground/50 block leading-none">Course Fee</span>
+                    <div className="font-black text-base text-foreground mt-0.5">
+                      {course.price === 0 || !course.price ? (
+                        <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
+                      ) : (
+                        <span>৳{toBnNum(course.price)}</span>
+                      )}
+                    </div>
+                  </div>
+                  <Link
+                    href={generateCourseUrl(course)}
+                    onClick={(e) => handleCourseClick(e, course)}
+                    className={`px-4 py-2 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
+                  >
+                    <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       );
     }
@@ -952,35 +1054,151 @@ export default function CoursesPage() {
     if (catId === 'honours_masters' || catId === 'honours' || catId === 'masters') {
       return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 relative z-10">
-          {catCourses.slice(0, 3).map((course) => (
+          {catCourses.slice(0, 3).map((course) => {
+            const isDemo = isDemoCourse(course);
+            return (
+              <div
+                key={course.id}
+                onClick={(e) => {
+                  if (isDemo) {
+                    e.preventDefault();
+                    setSelectedDemoCourse(course);
+                    setIsDemoModalOpen(true);
+                  }
+                }}
+                className={`rounded-2xl border border-rose-500/15 dark:border-rose-500/25 bg-background/85 dark:bg-[#210913]/85 backdrop-blur-xl p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${meta.cardHoverBorder} ${isDemo ? 'cursor-pointer' : ''}`}
+              >
+                <div className="space-y-3.5 relative z-10">
+                  <Link
+                    href={generateCourseUrl(course)}
+                    onClick={(e) => handleCourseClick(e, course)}
+                    className="relative aspect-video w-full rounded-xl bg-rose-500/5 overflow-hidden border border-foreground/10 group-hover/card:shadow-md transition-all block"
+                  >
+                    {course.thumbnailUrl ? (
+                      <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-rose-500/40">
+                        <Library className="w-8 h-8" />
+                      </div>
+                    )}
+                    <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-rose-600 text-[10px] font-extrabold text-white uppercase tracking-wider shadow-sm">
+                      {course.department || (isBn ? 'ডিগ্রি / অনার্স' : 'Honours')}
+                    </span>
+                    <span className="absolute bottom-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-[10px] font-bold text-rose-300">
+                      {isBn ? 'সেমিস্টার গাইড' : 'Semester Guide'}
+                    </span>
+                  </Link>
+
+                  <div>
+                    <p className="text-xs font-bold text-rose-600 dark:text-rose-400 truncate">
+                      {course.coachingName || course.instructorName || 'Sky Learners Academy'}
+                    </p>
+                    <Link
+                      href={generateCourseUrl(course)}
+                      onClick={(e) => handleCourseClick(e, course)}
+                      className="block"
+                    >
+                      <h3 className="font-extrabold text-sm sm:text-base text-foreground line-clamp-2 mt-1 leading-snug group-hover/card:text-rose-500 transition-colors">
+                        {course.title}
+                      </h3>
+                    </Link>
+                    {course.subtitle && (
+                      <p className="text-xs text-foreground/60 line-clamp-2 mt-1">
+                        {course.subtitle}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5 text-xs text-foreground/75 pt-1">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <span className="truncate">{isBn ? 'সিলেবাস ভিত্তিক চ্যাপ্টার লেকচার' : 'Curriculum Chapter Lectures'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <span className="truncate">{isBn ? 'সাজেশন, ব্রড প্রশ্ন ও সলভ শীট' : 'Suggestions & Solved PDFs'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3.5 mt-4 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-3 relative z-10">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-foreground/50 block leading-none">Course Fee</span>
+                    <div className="font-black text-base text-foreground mt-0.5">
+                      {course.price === 0 || !course.price ? (
+                        <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
+                      ) : (
+                        <span>৳{toBnNum(course.price)}</span>
+                      )}
+                    </div>
+                  </div>
+                  <Link
+                    href={generateCourseUrl(course)}
+                    onClick={(e) => handleCourseClick(e, course)}
+                    className={`px-4 py-2 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
+                  >
+                    <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // 6. SKILLS & IT -> Interactive Cyber/Tech Floating Grid
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 relative z-10">
+        {catCourses.slice(0, 3).map((course) => {
+          const isDemo = isDemoCourse(course);
+          return (
             <div
               key={course.id}
-              className={`rounded-2xl border border-rose-500/15 dark:border-rose-500/25 bg-background/85 dark:bg-[#210913]/85 backdrop-blur-xl p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${meta.cardHoverBorder}`}
+              onClick={(e) => {
+                if (isDemo) {
+                  e.preventDefault();
+                  setSelectedDemoCourse(course);
+                  setIsDemoModalOpen(true);
+                }
+              }}
+              className={`rounded-2xl border border-cyan-500/15 dark:border-cyan-500/25 bg-background/85 dark:bg-[#091b24]/85 backdrop-blur-xl p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${meta.cardHoverBorder} ${isDemo ? 'cursor-pointer' : ''}`}
             >
               <div className="space-y-3.5 relative z-10">
-                <div className="relative aspect-video w-full rounded-xl bg-rose-500/5 overflow-hidden border border-foreground/10 group-hover/card:shadow-md transition-all">
+                <Link
+                  href={generateCourseUrl(course)}
+                  onClick={(e) => handleCourseClick(e, course)}
+                  className="relative aspect-video w-full rounded-xl bg-cyan-500/5 overflow-hidden border border-foreground/10 group-hover/card:shadow-md transition-all block"
+                >
                   {course.thumbnailUrl ? (
                     <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-rose-500/40">
-                      <Library className="w-8 h-8" />
+                    <div className="w-full h-full flex items-center justify-center text-cyan-500/40">
+                      <Sparkles className="w-8 h-8" />
                     </div>
                   )}
-                  <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-rose-600 text-[10px] font-extrabold text-white uppercase tracking-wider shadow-sm">
-                    {course.department || (isBn ? 'ডিগ্রি / অনার্স' : 'Honours')}
+                  <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 text-[10px] font-black text-white uppercase tracking-wider shadow-sm">
+                    {isBn ? 'প্রজেক্ট বেসড' : 'Project Based'}
                   </span>
-                  <span className="absolute bottom-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-[10px] font-bold text-rose-300">
-                    {isBn ? 'সেমিস্টার গাইড' : 'Semester Guide'}
+                  <span className="absolute bottom-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-[10px] font-bold text-cyan-300">
+                    {isBn ? 'সার্টিফিকেট সহ' : 'With Certificate'}
                   </span>
-                </div>
+                </Link>
 
                 <div>
-                  <p className="text-xs font-bold text-rose-600 dark:text-rose-400 truncate">
+                  <p className="text-xs font-bold text-cyan-600 dark:text-cyan-400 truncate">
                     {course.coachingName || course.instructorName || 'Sky Learners Academy'}
                   </p>
-                  <h3 className="font-extrabold text-sm sm:text-base text-foreground line-clamp-2 mt-1 leading-snug group-hover/card:text-rose-500 transition-colors">
-                    {course.title}
-                  </h3>
+                  <Link
+                    href={generateCourseUrl(course)}
+                    onClick={(e) => handleCourseClick(e, course)}
+                    className="block"
+                  >
+                    <h3 className="font-extrabold text-sm sm:text-base text-foreground line-clamp-2 mt-1 leading-snug group-hover/card:text-cyan-500 transition-colors">
+                      {course.title}
+                    </h3>
+                  </Link>
                   {course.subtitle && (
                     <p className="text-xs text-foreground/60 line-clamp-2 mt-1">
                       {course.subtitle}
@@ -991,11 +1209,11 @@ export default function CoursesPage() {
                 <div className="space-y-1.5 text-xs text-foreground/75 pt-1">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span className="truncate">{isBn ? 'সিলেবাস ভিত্তিক চ্যাপ্টার লেকচার' : 'Curriculum Chapter Lectures'}</span>
+                    <span className="truncate">{isBn ? 'হ্যান্ডস-অন প্র্যাকটিক্যাল রিয়েল লাইফ প্রজেক্ট' : 'Real-life portfolio projects'}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span className="truncate">{isBn ? 'সাজেশন, ব্রড প্রশ্ন ও সলভ শীট' : 'Suggestions & Solved PDFs'}</span>
+                    <span className="truncate">{isBn ? 'মার্কেটপ্লেস ও ক্যারিয়ার গাইডলাইন' : 'Freelancing & Career Guide'}</span>
                   </div>
                 </div>
               </div>
@@ -1021,84 +1239,8 @@ export default function CoursesPage() {
                 </Link>
               </div>
             </div>
-          ))}
-        </div>
-      );
-    }
-
-    // 6. SKILLS & IT -> Interactive Cyber/Tech Floating Grid
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 relative z-10">
-        {catCourses.slice(0, 3).map((course) => (
-          <div
-            key={course.id}
-            className={`rounded-2xl border border-cyan-500/15 dark:border-cyan-500/25 bg-background/85 dark:bg-[#091b24]/85 backdrop-blur-xl p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${meta.cardHoverBorder}`}
-          >
-            <div className="space-y-3.5 relative z-10">
-              <div className="relative aspect-video w-full rounded-xl bg-cyan-500/5 overflow-hidden border border-foreground/10 group-hover/card:shadow-md transition-all">
-                {course.thumbnailUrl ? (
-                  <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-cyan-500/40">
-                    <Sparkles className="w-8 h-8" />
-                  </div>
-                )}
-                <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 text-[10px] font-black text-white uppercase tracking-wider shadow-sm">
-                  {isBn ? 'প্রজেক্ট বেসড' : 'Project Based'}
-                </span>
-                <span className="absolute bottom-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-[10px] font-bold text-cyan-300">
-                  {isBn ? 'সার্টিফিকেট সহ' : 'With Certificate'}
-                </span>
-              </div>
-
-              <div>
-                <p className="text-xs font-bold text-cyan-600 dark:text-cyan-400 truncate">
-                  {course.coachingName || course.instructorName || 'Sky Learners Academy'}
-                </p>
-                <h3 className="font-extrabold text-sm sm:text-base text-foreground line-clamp-2 mt-1 leading-snug group-hover/card:text-cyan-500 transition-colors">
-                  {course.title}
-                </h3>
-                {course.subtitle && (
-                  <p className="text-xs text-foreground/60 line-clamp-2 mt-1">
-                    {course.subtitle}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-1.5 text-xs text-foreground/75 pt-1">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  <span className="truncate">{isBn ? 'হ্যান্ডস-অন প্র্যাকটিক্যাল রিয়েল লাইফ প্রজেক্ট' : 'Real-life portfolio projects'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  <span className="truncate">{isBn ? 'মার্কেটপ্লেস ও ক্যারিয়ার গাইডলাইন' : 'Freelancing & Career Guide'}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-3.5 mt-4 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-3 relative z-10">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-foreground/50 block leading-none">Course Fee</span>
-                <div className="font-black text-base text-foreground mt-0.5">
-                  {course.price === 0 || !course.price ? (
-                    <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
-                  ) : (
-                    <span>৳{toBnNum(course.price)}</span>
-                  )}
-                </div>
-              </div>
-              <Link
-                href={generateCourseUrl(course)}
-                onClick={(e) => handleCourseClick(e, course)}
-                className={`px-4 py-2 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
-              >
-                <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   };
@@ -1947,65 +2089,85 @@ export default function CoursesPage() {
             {/* Courses List Grid */}
             {filteredCourses.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pt-2">
-                {filteredCourses.map((course) => (
-                  <div 
-                    key={course.id}
-                    className={`rounded-2xl border border-foreground/[0.08] dark:border-white/[0.08] bg-background/80 dark:bg-[#0c121e]/85 backdrop-blur-xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${activeCategoryMeta.cardHoverBorder}`}
-                  >
-                    <div className="space-y-3.5 relative z-10">
-                      {/* Thumbnail & Category Badge */}
-                      <div className="relative aspect-video w-full rounded-xl bg-foreground/5 overflow-hidden border border-foreground/10 group-hover/card:shadow-md transition-all">
-                        {course.thumbnailUrl ? (
-                          <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-primary/40">
-                            <BookOpen className="w-8 h-8" />
-                          </div>
-                        )}
-                        <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-black/65 backdrop-blur-md text-[10px] font-extrabold text-white uppercase tracking-wider border border-white/15">
-                          {course.category || 'Course'}
-                        </span>
-                      </div>
-
-                      {/* Details */}
-                      <div>
-                        <p className={`text-xs font-bold ${activeCategoryMeta.accentText} truncate`}>
-                          {course.coachingName || course.instructorName || 'Instructor'}
-                        </p>
-                        <h3 className="font-extrabold text-sm sm:text-base text-foreground line-clamp-2 mt-1 leading-snug group-hover/card:text-orange-500 transition-colors">
-                          {course.title}
-                        </h3>
-                        {course.subtitle && (
-                          <p className="text-xs text-foreground/60 line-clamp-2 mt-1 leading-relaxed">
-                            {course.subtitle}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Card Footer */}
-                    <div className="pt-3.5 mt-4 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-3 relative z-10">
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-foreground/50 block leading-none">Course Fee</span>
-                        <div className="font-black text-base text-foreground mt-0.5">
-                          {course.price === 0 || !course.price ? (
-                            <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
+                {filteredCourses.map((course) => {
+                  const isDemo = isDemoCourse(course);
+                  return (
+                    <div 
+                      key={course.id}
+                      onClick={(e) => {
+                        if (isDemo) {
+                          e.preventDefault();
+                          setSelectedDemoCourse(course);
+                          setIsDemoModalOpen(true);
+                        }
+                      }}
+                      className={`rounded-2xl border border-foreground/[0.08] dark:border-white/[0.08] bg-background/80 dark:bg-[#0c121e]/85 backdrop-blur-xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group/card relative overflow-hidden ${activeCategoryMeta.cardHoverBorder} ${isDemo ? 'cursor-pointer' : ''}`}
+                    >
+                      <div className="space-y-3.5 relative z-10">
+                        {/* Thumbnail & Category Badge */}
+                        <Link
+                          href={generateCourseUrl(course)}
+                          onClick={(e) => handleCourseClick(e, course)}
+                          className="relative aspect-video w-full rounded-xl bg-foreground/5 overflow-hidden border border-foreground/10 group-hover/card:shadow-md transition-all block"
+                        >
+                          {course.thumbnailUrl ? (
+                            <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
                           ) : (
-                            <span>৳{toBnNum(course.price)}</span>
+                            <div className="w-full h-full flex items-center justify-center text-primary/40">
+                              <BookOpen className="w-8 h-8" />
+                            </div>
+                          )}
+                          <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-black/65 backdrop-blur-md text-[10px] font-extrabold text-white uppercase tracking-wider border border-white/15">
+                            {course.category || 'Course'}
+                          </span>
+                        </Link>
+
+                        {/* Details */}
+                        <div>
+                          <p className={`text-xs font-bold ${activeCategoryMeta.accentText} truncate`}>
+                            {course.coachingName || course.instructorName || 'Instructor'}
+                          </p>
+                          <Link
+                            href={generateCourseUrl(course)}
+                            onClick={(e) => handleCourseClick(e, course)}
+                            className="block"
+                          >
+                            <h3 className="font-extrabold text-sm sm:text-base text-foreground line-clamp-2 mt-1 leading-snug group-hover/card:text-orange-500 transition-colors">
+                              {course.title}
+                            </h3>
+                          </Link>
+                          {course.subtitle && (
+                            <p className="text-xs text-foreground/60 line-clamp-2 mt-1 leading-relaxed">
+                              {course.subtitle}
+                            </p>
                           )}
                         </div>
                       </div>
-                      <Link
-                        href={generateCourseUrl(course)}
-                        onClick={(e) => handleCourseClick(e, course)}
-                        className={`px-4 py-2 rounded-xl ${activeCategoryMeta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
-                      >
-                        <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
+
+                      {/* Card Footer */}
+                      <div className="pt-3.5 mt-4 border-t border-foreground/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-3 relative z-10">
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-foreground/50 block leading-none">Course Fee</span>
+                          <div className="font-black text-base text-foreground mt-0.5">
+                            {course.price === 0 || !course.price ? (
+                              <span className="text-emerald-500 font-extrabold">ফ্রি (Free)</span>
+                            ) : (
+                              <span>৳{toBnNum(course.price)}</span>
+                            )}
+                          </div>
+                        </div>
+                        <Link
+                          href={generateCourseUrl(course)}
+                          onClick={(e) => handleCourseClick(e, course)}
+                          className={`px-4 py-2 rounded-xl ${activeCategoryMeta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
+                        >
+                          <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center py-16 px-4 rounded-3xl border border-foreground/[0.08] dark:border-white/[0.08] bg-foreground/[0.015] backdrop-blur-md space-y-4">

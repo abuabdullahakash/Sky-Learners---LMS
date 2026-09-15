@@ -29,20 +29,18 @@ export const DEMO_COURSE_TITLES = [
 
 /**
  * 100% Reliable Demo Course Detector
- * Detects demo courses via isDemo flag, instructor identity, or default seed titles
+ * A course is a demo course ONLY if:
+ * 1. It explicitly has isDemo: true (or string 'true' / isDummy: true)
+ * 2. OR its title EXACTLY matches one of the 10 seeded demo course titles
+ * 
+ * It is NEVER a demo course based on instructorName or coachingName!
  */
 export function isDemoCourse(course: any): boolean {
   if (!course) return false;
   if (course.isDemo === true || course.isDemo === 'true' || course.isDummy === true || course.isSeed === true) {
     return true;
   }
-  if (course.instructorName === 'Sky Learners Academy' || course.coachingName === 'Sky Learners Academy') {
-    return true;
-  }
-  if (course.teacherId === 'demo' || course.teacherId === 'admin_seed') {
-    return true;
-  }
-  if (course.title && DEMO_COURSE_TITLES.some(t => course.title.includes(t) || t.includes(course.title))) {
+  if (course.title && DEMO_COURSE_TITLES.includes(course.title.trim())) {
     return true;
   }
   return false;

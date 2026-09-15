@@ -65,6 +65,7 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import MarketplaceAdminManager from '@/components/MarketplaceAdminManager';
+import ArchitectureGuidelineManager from '@/components/ArchitectureGuidelineManager';
 
 interface UserItem {
   id: string;
@@ -155,7 +156,7 @@ export default function AdminDashboardPage() {
   ];
 
   // Active Tab & Mode
-  const [adminMode, setAdminMode] = useState<'database' | 'marketplace'>('database');
+  const [adminMode, setAdminMode] = useState<'database' | 'marketplace' | 'architecture'>('database');
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'teachers' | 'courses'>('overview');
 
   // Loading & Data states
@@ -680,6 +681,17 @@ export default function AdminDashboardPage() {
             >
               <Sparkles className="w-3.5 h-3.5" /> Marketplace Manager
             </button>
+            <button
+              type="button"
+              onClick={() => setAdminMode('architecture')}
+              className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                adminMode === 'architecture' 
+                  ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md' 
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" /> Architecture & AI Guidelines
+            </button>
           </div>
 
           <button
@@ -695,6 +707,8 @@ export default function AdminDashboardPage() {
 
       {adminMode === 'marketplace' ? (
         <MarketplaceAdminManager courses={courses} onRefresh={fetchAllData} />
+      ) : adminMode === 'architecture' ? (
+        <ArchitectureGuidelineManager />
       ) : (
         <>
 

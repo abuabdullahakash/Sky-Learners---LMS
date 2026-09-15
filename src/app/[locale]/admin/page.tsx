@@ -646,25 +646,29 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       
-      {/* Header & Refresh */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-900/60 backdrop-blur-md p-6 rounded-2xl border border-slate-800">
+      {/* Header & Controls */}
+      <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 bg-slate-900/70 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-slate-800 shadow-xl">
         <div>
-          <h1 className="text-2xl font-extrabold text-white flex items-center gap-2.5">
-            <ShieldCheck className="w-7 h-7 text-purple-400" />
+          <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2.5 tracking-tight">
+            <span className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
+              <ShieldCheck className="w-6 h-6" />
+            </span>
             {t('title')}
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
             {t('subtitle')}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center p-1 rounded-xl bg-slate-950/80 border border-slate-800">
+
+        {/* Unified Control Toolbar (Never wraps Refresh awkwardly) */}
+        <div className="flex items-center gap-2.5 overflow-x-auto pb-1 xl:pb-0 scrollbar-none shrink-0">
+          <div className="inline-flex items-center p-1 rounded-2xl bg-slate-950/90 border border-slate-800 shadow-inner shrink-0">
             <button
               type="button"
               onClick={() => setAdminMode('database')}
-              className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
                 adminMode === 'database' 
-                  ? 'bg-purple-600 text-white shadow-md' 
+                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30' 
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -673,9 +677,9 @@ export default function AdminDashboardPage() {
             <button
               type="button"
               onClick={() => setAdminMode('marketplace')}
-              className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
                 adminMode === 'marketplace' 
-                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md' 
+                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20' 
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -684,9 +688,9 @@ export default function AdminDashboardPage() {
             <button
               type="button"
               onClick={() => setAdminMode('architecture')}
-              className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
                 adminMode === 'architecture' 
-                  ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md' 
+                  ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-600/20' 
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -697,10 +701,11 @@ export default function AdminDashboardPage() {
           <button
             onClick={fetchAllData}
             disabled={refreshing}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-bold transition-all disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-bold transition-all disabled:opacity-50 shrink-0 shadow-sm active:scale-95"
+            title="Refresh Data"
           >
-            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-            {refreshing ? 'Refreshing...' : 'Refresh'}
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+            <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
           </button>
         </div>
       </div>

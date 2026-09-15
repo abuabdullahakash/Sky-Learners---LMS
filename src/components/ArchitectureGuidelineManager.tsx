@@ -115,8 +115,8 @@ ${promptTier === 'tier1'
             <p className="text-sm font-black text-cyan-300 mt-0.5">3-Tier Category</p>
           </div>
           <div className="bg-slate-950/60 rounded-xl p-3 border border-slate-800">
-            <span className="text-[10px] uppercase font-bold text-slate-400">Header MegaMenu</span>
-            <p className="text-sm font-black text-purple-300 mt-0.5">6 Course Categories</p>
+            <span className="text-[10px] uppercase font-bold text-slate-400">Teacher Mode Rule</span>
+            <p className="text-sm font-black text-purple-300 mt-0.5">Zero MegaMenu (Strict)</p>
           </div>
           <div className="bg-slate-950/60 rounded-xl p-3 border border-slate-800">
             <span className="text-[10px] uppercase font-bold text-slate-400">Footer Structure</span>

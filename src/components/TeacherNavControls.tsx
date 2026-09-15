@@ -15,8 +15,6 @@ export function TeacherLanguageToggle({ instanceId }: { instanceId?: string }) {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
-  const reactId = React.useId();
-  const layoutId = instanceId || `activeTeacherLangPill-${reactId.replace(/:/g, "")}`;
 
   const [optimisticLocale, setOptimisticLocale] = React.useState<"bn" | "en">(
     (locale as "bn" | "en") || "en"
@@ -40,10 +38,25 @@ export function TeacherLanguageToggle({ instanceId }: { instanceId?: string }) {
 
   return (
     <div 
-      className="relative flex items-center p-0.5 rounded-full bg-foreground/[0.06] dark:bg-foreground/[0.08] border border-foreground/10 backdrop-blur-md shadow-xs select-none"
+      className="relative grid grid-cols-2 p-0.5 rounded-full bg-foreground/[0.06] dark:bg-foreground/[0.08] border border-foreground/10 backdrop-blur-md shadow-xs select-none"
       role="group"
       aria-label="Language Switcher"
     >
+      {/* Active sliding pill - Strictly horizontal glide, zero vertical jump */}
+      <motion.div
+        className="absolute top-0.5 bottom-0.5 left-0.5 w-[calc(50%-2px)] rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-md shadow-orange-500/30 pointer-events-none"
+        initial={false}
+        animate={{
+          x: isBn ? "0%" : "100%",
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 420,
+          damping: 28,
+          mass: 0.5
+        }}
+      />
+
       {/* BN Button */}
       <button
         type="button"
@@ -51,18 +64,6 @@ export function TeacherLanguageToggle({ instanceId }: { instanceId?: string }) {
         className="relative z-10 px-2.5 sm:px-3 h-6 sm:h-7 flex items-center justify-center text-[10px] sm:text-xs font-black transition-colors duration-200 cursor-pointer"
         aria-pressed={isBn}
       >
-        {isBn && (
-          <motion.div
-            layoutId={layoutId}
-            className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-md shadow-orange-500/30"
-            transition={{
-              type: "spring",
-              stiffness: 420,
-              damping: 28,
-              mass: 0.5
-            }}
-          />
-        )}
         <span
           className={`relative z-10 transition-colors duration-200 font-bold ${
             isBn ? "text-white drop-shadow-xs" : "text-foreground/70 hover:text-foreground"
@@ -79,18 +80,6 @@ export function TeacherLanguageToggle({ instanceId }: { instanceId?: string }) {
         className="relative z-10 px-2.5 sm:px-3 h-6 sm:h-7 flex items-center justify-center text-[10px] sm:text-xs font-black transition-colors duration-200 cursor-pointer"
         aria-pressed={!isBn}
       >
-        {!isBn && (
-          <motion.div
-            layoutId={layoutId}
-            className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-md shadow-orange-500/30"
-            transition={{
-              type: "spring",
-              stiffness: 420,
-              damping: 28,
-              mass: 0.5
-            }}
-          />
-        )}
         <span
           className={`relative z-10 transition-colors duration-200 font-bold ${
             !isBn ? "text-white drop-shadow-xs" : "text-foreground/70 hover:text-foreground"

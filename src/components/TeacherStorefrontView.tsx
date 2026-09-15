@@ -6,7 +6,7 @@ import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firesto
 import { generateCourseUrl, resolveTeacherBySlugOrId } from '@/lib/slug';
 import { Link } from '@/i18n/routing';
 import { useLocale } from 'next-intl';
-import DemoCourseModal from '@/components/DemoCourseModal';
+import DemoCourseModal, { isDemoCourse } from '@/components/DemoCourseModal';
 import { 
   Building2, 
   User, 
@@ -759,15 +759,16 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 isFree
               } = getDiscountInfo(course);
 
-              const isDemoCourse = (course as any).isDemo === true;
+              const isDemo = isDemoCourse(course);
 
               return (
                 <Link
                   key={course.id}
                   href={generateCourseUrl(course)}
                   onClick={(e) => {
-                    if (isDemoCourse) {
+                    if (isDemo) {
                       e.preventDefault();
+                      e.stopPropagation();
                       setSelectedDemoCourse(course);
                       setIsDemoModalOpen(true);
                     }

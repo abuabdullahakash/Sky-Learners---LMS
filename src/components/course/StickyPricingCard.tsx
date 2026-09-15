@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import DemoCourseModal from '@/components/DemoCourseModal';
+import DemoCourseModal, { isDemoCourse } from '@/components/DemoCourseModal';
 
 import { generateCategorySlug } from '@/lib/slug';
 
@@ -123,7 +123,7 @@ export default function StickyPricingCard({ course }: { course: any }) {
 
         <button 
           onClick={() => {
-            if (course?.isDemo === true) {
+            if (isDemoCourse(course)) {
               setIsDemoModalOpen(true);
             } else {
               router.push(`/courses/${generateCategorySlug(course.category)}/${course.slug || course.id}/checkout`);

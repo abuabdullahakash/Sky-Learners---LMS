@@ -10,7 +10,7 @@ import { generateCourseUrl } from '@/lib/slug';
 import { useAuth } from '@/context/AuthContext';
 import RoleSelectionModal from '@/components/RoleSelectionModal';
 import TeacherStorefrontView from '@/components/TeacherStorefrontView';
-import DemoCourseModal from '@/components/DemoCourseModal';
+import DemoCourseModal, { isDemoCourse } from '@/components/DemoCourseModal';
 import gsap from 'gsap';
 import { 
   Search, 
@@ -842,13 +842,14 @@ export default function HomePage() {
                         <Link 
                           href={generateCourseUrl(course)}
                           onClick={(e) => {
-                            if ((course as any).isDemo === true) {
+                            if (isDemoCourse(course)) {
                               e.preventDefault();
+                              e.stopPropagation();
                               setSelectedDemoCourse(course);
                               setIsDemoModalOpen(true);
                             }
                           }}
-                          className="px-4 py-2 rounded-xl bg-foreground/5 hover:bg-primary hover:text-white font-bold text-xs transition-all flex items-center gap-1 group/btn"
+                          className="px-4 py-2 rounded-xl bg-foreground/5 hover:bg-primary hover:text-white font-bold text-xs transition-all flex items-center gap-1 group/btn cursor-pointer"
                         >
                           <span>{t('featuredCourses.viewDetails')}</span>
                           <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />

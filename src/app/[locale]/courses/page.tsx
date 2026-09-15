@@ -31,7 +31,7 @@ import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
 import { generateCourseUrl, resolveTeacherBySlugOrId } from '@/lib/slug';
 import { Link } from '@/i18n/routing';
-import DemoCourseModal from '@/components/DemoCourseModal';
+import DemoCourseModal, { isDemoCourse } from '@/components/DemoCourseModal';
 
 // Top Mentors Data for Global Marketplace
 const categoryMentors: Record<string, Array<{ name: string; institute: string; exp: string; photo: string; slug: string }>> = {
@@ -231,8 +231,9 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true);
 
   const handleCourseClick = (e: React.MouseEvent, courseItem: any) => {
-    if (courseItem?.isDemo === true) {
+    if (isDemoCourse(courseItem)) {
       e.preventDefault();
+      e.stopPropagation();
       setSelectedDemoCourse(courseItem);
       setIsDemoModalOpen(true);
     }
@@ -1564,10 +1565,18 @@ export default function CoursesPage() {
                 const activePrice = isDiscountValid ? Number(course.discountPrice) : Number(course.price || 0);
                 const isFree = activePrice === 0;
 
+                const isDemo = isDemoCourse(course);
+
                 return (
                   <div 
                     key={course.id} 
-                    className="bg-background rounded-3xl border border-foreground/10 hover:border-orange-500/50 transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-orange-500/10 overflow-hidden group flex flex-col relative"
+                    onClick={() => {
+                      if (isDemo) {
+                        setSelectedDemoCourse(course);
+                        setIsDemoModalOpen(true);
+                      }
+                    }}
+                    className={`bg-background rounded-3xl border border-foreground/10 hover:border-orange-500/50 transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-orange-500/10 overflow-hidden group flex flex-col relative ${isDemo ? 'cursor-pointer' : ''}`}
                   >
                     {/* Discount Top Banner */}
                     {isDiscountValid && (

@@ -31,6 +31,7 @@ import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
 import { generateCourseUrl, resolveTeacherBySlugOrId } from '@/lib/slug';
 import { Link } from '@/i18n/routing';
+import DemoCourseModal from '@/components/DemoCourseModal';
 
 // Top Mentors Data for Global Marketplace
 const categoryMentors: Record<string, Array<{ name: string; institute: string; exp: string; photo: string; slug: string }>> = {
@@ -222,10 +223,20 @@ export default function CoursesPage() {
 
   const [courses, setCourses] = useState<any[]>([]);
   const [teacherProfile, setTeacherProfile] = useState<any>(null);
+  const [selectedDemoCourse, setSelectedDemoCourse] = useState<any | null>(null);
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(urlSearch || '');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedClassFilter, setSelectedClassFilter] = useState<string | null>(urlClass || null);
   const [loading, setLoading] = useState(true);
+
+  const handleCourseClick = (e: React.MouseEvent, courseItem: any) => {
+    if (courseItem?.isDemo === true) {
+      e.preventDefault();
+      setSelectedDemoCourse(courseItem);
+      setIsDemoModalOpen(true);
+    }
+  };
 
   // Category Carousel Horizontal Scroll State
   const categoryScrollRef = useRef<HTMLDivElement>(null);
@@ -624,6 +635,7 @@ export default function CoursesPage() {
                 </div>
                 <Link
                   href={generateCourseUrl(course)}
+                  onClick={(e) => handleCourseClick(e, course)}
                   className={`px-4 py-2 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
                 >
                   <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
@@ -708,6 +720,7 @@ export default function CoursesPage() {
                 </div>
                 <Link
                   href={generateCourseUrl(course)}
+                  onClick={(e) => handleCourseClick(e, course)}
                   className={`px-4 py-2 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
                 >
                   <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
@@ -793,6 +806,7 @@ export default function CoursesPage() {
                 </div>
                 <Link
                   href={generateCourseUrl(mainCourse)}
+                  onClick={(e) => handleCourseClick(e, mainCourse)}
                   className={`px-5 py-2.5 rounded-2xl ${meta.btnBg} text-white text-xs font-black transition-all hover:scale-105 active:scale-95 flex items-center gap-2`}
                 >
                   <span>{isBn ? 'এনরোল করুন' : 'Enroll Now'}</span>
@@ -842,6 +856,7 @@ export default function CoursesPage() {
                   </div>
                   <Link
                     href={generateCourseUrl(course)}
+                    onClick={(e) => handleCourseClick(e, course)}
                     className={`px-3.5 py-1.5 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105`}
                   >
                     {isBn ? 'বিস্তারিত দেখুন' : 'View Details'}
@@ -919,6 +934,7 @@ export default function CoursesPage() {
                 </div>
                 <Link
                   href={generateCourseUrl(course)}
+                  onClick={(e) => handleCourseClick(e, course)}
                   className={`px-4 py-2 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
                 >
                   <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
@@ -996,6 +1012,7 @@ export default function CoursesPage() {
                 </div>
                 <Link
                   href={generateCourseUrl(course)}
+                  onClick={(e) => handleCourseClick(e, course)}
                   className={`px-4 py-2 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
                 >
                   <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
@@ -1072,6 +1089,7 @@ export default function CoursesPage() {
               </div>
               <Link
                 href={generateCourseUrl(course)}
+                onClick={(e) => handleCourseClick(e, course)}
                 className={`px-4 py-2 rounded-xl ${meta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
               >
                 <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
@@ -1650,6 +1668,7 @@ export default function CoursesPage() {
 
                         <Link 
                           href={generateCourseUrl(course)}
+                          onClick={(e) => handleCourseClick(e, course)}
                           className="px-4 sm:px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-xs rounded-xl transition-all duration-300 shadow-md shadow-orange-500/25 active:scale-95 flex items-center gap-1.5 shrink-0"
                         >
                           <span>{isBn ? 'এনরোল করুন' : 'Enroll Now'}</span>
@@ -1969,6 +1988,7 @@ export default function CoursesPage() {
                       </div>
                       <Link
                         href={generateCourseUrl(course)}
+                        onClick={(e) => handleCourseClick(e, course)}
                         className={`px-4 py-2 rounded-xl ${activeCategoryMeta.btnBg} text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1 shrink-0`}
                       >
                         <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
@@ -2001,6 +2021,13 @@ export default function CoursesPage() {
         )}
 
       </div>
+
+      {/* Demo Course Preview Modal */}
+      <DemoCourseModal
+        isOpen={isDemoModalOpen}
+        onClose={() => setIsDemoModalOpen(false)}
+        course={selectedDemoCourse}
+      />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firesto
 import { generateCourseUrl, resolveTeacherBySlugOrId } from '@/lib/slug';
 import { Link } from '@/i18n/routing';
 import { useLocale } from 'next-intl';
+import DemoCourseModal from '@/components/DemoCourseModal';
 import { 
   Building2, 
   User, 
@@ -83,6 +84,10 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
   const [courses, setCourses] = useState<CourseItem[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>('সকল কোর্স');
   const [selectedTeacherModal, setSelectedTeacherModal] = useState<any | null>(null);
+
+  // Demo Course Preview Modal State
+  const [selectedDemoCourse, setSelectedDemoCourse] = useState<any | null>(null);
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
 
   // Hero Slider Carousel State
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -754,10 +759,19 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
                 isFree
               } = getDiscountInfo(course);
 
+              const isDemoCourse = (course as any).isDemo === true;
+
               return (
                 <Link
                   key={course.id}
                   href={generateCourseUrl(course)}
+                  onClick={(e) => {
+                    if (isDemoCourse) {
+                      e.preventDefault();
+                      setSelectedDemoCourse(course);
+                      setIsDemoModalOpen(true);
+                    }
+                  }}
                   className="group relative rounded-2xl sm:rounded-[2rem] bg-card/95 dark:bg-neutral-900/95 border border-foreground/[0.08] dark:border-white/[0.08] hover:border-orange-500/50 dark:hover:border-orange-500/50 flex flex-col justify-between overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/15 hover:-translate-y-1.5 active:scale-[0.99] shadow-xs cursor-pointer"
                 >
                   {/* Ambient glow on hover */}
@@ -2051,6 +2065,13 @@ export default function TeacherStorefrontView({ teacherId, isOwner = false }: Te
           </>
         )}
       </AnimatePresence>
+
+      {/* Demo Course Preview Notice Modal */}
+      <DemoCourseModal
+        isOpen={isDemoModalOpen}
+        onClose={() => setIsDemoModalOpen(false)}
+        course={selectedDemoCourse}
+      />
 
     </div>
   );

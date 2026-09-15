@@ -10,6 +10,7 @@ import { generateCourseUrl } from '@/lib/slug';
 import { useAuth } from '@/context/AuthContext';
 import RoleSelectionModal from '@/components/RoleSelectionModal';
 import TeacherStorefrontView from '@/components/TeacherStorefrontView';
+import DemoCourseModal from '@/components/DemoCourseModal';
 import gsap from 'gsap';
 import { 
   Search, 
@@ -131,6 +132,8 @@ export default function HomePage() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+  const [selectedDemoCourse, setSelectedDemoCourse] = useState<any | null>(null);
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
   const [activeCourseTab, setActiveCourseTab] = useState<'all' | 'coaching' | 'individual' | 'popular'>('all');
   const [courses, setCourses] = useState<CourseItem[]>([]);
   const [coachingCenters, setCoachingCenters] = useState<CoachingProfile[]>([]);
@@ -838,6 +841,13 @@ export default function HomePage() {
 
                         <Link 
                           href={generateCourseUrl(course)}
+                          onClick={(e) => {
+                            if ((course as any).isDemo === true) {
+                              e.preventDefault();
+                              setSelectedDemoCourse(course);
+                              setIsDemoModalOpen(true);
+                            }
+                          }}
                           className="px-4 py-2 rounded-xl bg-foreground/5 hover:bg-primary hover:text-white font-bold text-xs transition-all flex items-center gap-1 group/btn"
                         >
                           <span>{t('featuredCourses.viewDetails')}</span>
@@ -1303,6 +1313,13 @@ export default function HomePage() {
         isOpen={isRoleModalOpen} 
         onClose={() => setIsRoleModalOpen(false)} 
         onSelectRole={handleRoleSelect} 
+      />
+
+      {/* DEMO COURSE PREVIEW MODAL */}
+      <DemoCourseModal
+        isOpen={isDemoModalOpen}
+        onClose={() => setIsDemoModalOpen(false)}
+        course={selectedDemoCourse}
       />
 
     </div>

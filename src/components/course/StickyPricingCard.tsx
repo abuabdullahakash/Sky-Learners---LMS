@@ -1,8 +1,9 @@
 import { PhoneCall } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
+import DemoCourseModal from '@/components/DemoCourseModal';
 
 import { generateCategorySlug } from '@/lib/slug';
 
@@ -10,6 +11,7 @@ export default function StickyPricingCard({ course }: { course: any }) {
   const t = useTranslations('CourseDetails');
   const router = useRouter();
   const shapeRef = useRef<HTMLDivElement>(null);
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
 
   useEffect(() => {
     if (shapeRef.current) {
@@ -120,7 +122,13 @@ export default function StickyPricingCard({ course }: { course: any }) {
         </ul>
 
         <button 
-          onClick={() => router.push(`/courses/${generateCategorySlug(course.category)}/${course.slug || course.id}/checkout`)}
+          onClick={() => {
+            if (course?.isDemo === true) {
+              setIsDemoModalOpen(true);
+            } else {
+              router.push(`/courses/${generateCategorySlug(course.category)}/${course.slug || course.id}/checkout`);
+            }
+          }}
           className="relative overflow-hidden w-full py-4 bg-primary text-primary-foreground text-xl font-bold rounded-lg shadow-lg shadow-primary/20 z-10 transition-all duration-300 before:absolute before:inset-0 before:-translate-x-full hover:before:translate-x-0 before:transition-transform before:duration-500 before:bg-white/20 cursor-pointer"
         >
           <span className="relative z-10">{t('pricingCard.enrollBtn')}</span>
@@ -141,6 +149,13 @@ export default function StickyPricingCard({ course }: { course: any }) {
           </a>
         </div>
       )}
+
+      {/* Demo Course Preview Modal */}
+      <DemoCourseModal
+        isOpen={isDemoModalOpen}
+        onClose={() => setIsDemoModalOpen(false)}
+        course={course}
+      />
     </div>
   );
 }
